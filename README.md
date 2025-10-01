@@ -8,3 +8,5 @@ MLCOE Summer Associate Internship Exercises
 It'd be good if each of our questions are formatted into packages and we ensure our testing & linting is all uniform (I'll sort out automation)
 
 I suggest creating a new branch for each question part & bonus when moving onto them
+
+- Remove empty.txt when starting
