@@ -32,7 +32,8 @@ jobs:
       # 4. Create & activate lint environment
       - name: Create lint environment
         run: |
-          conda env create -f environment-lint.yml -n ci --force
+          conda remove -n ci --all -y || true
+          conda env create -f environment-lint.yml -n ci
           echo "conda activate ci" >> $GITHUB_ENV
           conda list
 
