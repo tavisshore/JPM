@@ -15,15 +15,12 @@ build/
 # -------------------------
 # Virtual environments
 # -------------------------
-# If you sometimes use venv or virtualenv
 venv/
 .env/
 .env.*
 
-# Conda envs (optional if you only use environment.yml)
 .conda/
 .conda_env/
-# Avoid committing conda package caches
 pkgs/
 *.conda
 
@@ -31,14 +28,12 @@ pkgs/
 # VSCode
 # -------------------------
 .vscode/
-# If you want to keep workspace settings in git, exclude this line
-# .vscode/settings.json
 
 # -------------------------
 # pre-commit / cache
 # -------------------------
 .pre-commit-config.yaml   # keep this! DO NOT ignore
-.pre-commit/               # cache of installed hooks
+.pre-commit/              # cache of installed hooks
 
 # -------------------------
 # Pytest / Coverage

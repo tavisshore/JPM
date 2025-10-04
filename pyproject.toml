@@ -11,3 +11,8 @@ line_length = 88
 line-length = 88
 select = ["E", "F", "W", "C", "I", "B"]
 exclude = ["build", "dist", ".venv"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+python_files = "question_*.py"
