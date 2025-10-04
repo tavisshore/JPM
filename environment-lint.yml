@@ -3,7 +3,7 @@ channels:
   - conda-forge
 dependencies:
   - python=3.11
-  - black=25.9.0
+  - black=25.1.0
   - isort=5.12.0
   - ruff=0.0.349
   - pre-commit=3.4.0
