@@ -1,0 +1,10 @@
+name: lint
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - black=24.12b0
+  - isort=5.12.0
+  - ruff=0.0.349
+  - pre-commit=3.4.0
+  - pip

@@ -1,0 +1,58 @@
+name: CI - Pre-commit Auto-Fix & Lint
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Setup Miniconda
+      - name: Setup Miniconda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+
+      # 3. Cache conda packages
+      - name: Cache conda packages
+        uses: actions/cache@v3
+        with:
+          path: ~/miniconda3/pkgs
+          key: conda-pkgs-${{ runner.os }}-${{ hashFiles('environment-lint.yml') }}
+          restore-keys: |
+            conda-pkgs-${{ runner.os }}-
+
+      # 4. Create & activate lint environment
+      - name: Create lint environment
+        run: |
+          conda env create -f environment-lint.yml -n ci --force
+          echo "conda activate ci" >> $GITHUB_ENV
+          conda list
+
+      # 5. Ensure pre-commit is installed
+      - name: Install pre-commit
+        run: |
+          conda activate ci
+          pip install --upgrade pre-commit
+
+      # 6. Run pre-commit hooks with auto-fix
+      - name: Run pre-commit hooks (auto-fix)
+        run: |
+          set -e
+          conda activate ci
+          # Run hooks with auto-fix where supported
+          pre-commit run --all-files --show-diff-on-failure --hook-stage manual
+
+          # Optional: if hooks fail due to missing packages, try installing and rerunning
+          if [ $? -ne 0 ]; then
+            echo "Hooks failed. Attempting to install missing packages..."
+            pip install -r requirements.txt || true
+            pre-commit run --all-files --show-diff-on-failure --hook-stage manual
+          fi
