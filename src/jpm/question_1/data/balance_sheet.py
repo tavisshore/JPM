@@ -40,14 +40,14 @@ def _nan_sum(values) -> float:
 class BSCheckResult:
     ok: bool
     violations: Dict[str, float]  # name -> absolute error
-    computed: Dict[str, float]  # values the engine computed/overrode
+    computed: Dict[str, float]  # values that we computed/overrode
 
 
 class BalanceSheetBaseline:
     """
     Baseline mapper/validator/repairer for yfinance balance sheets.
 
-    - Input: My frame from yf.py
+    - Input: Frame from yf.py
     - Output: canonical schema DataFrame with identities enforced.
     - Strategy: compute totals from components; use residuals only
       for the last identity.
@@ -175,14 +175,13 @@ class BalanceSheetBaseline:
     # NCL components
     NCL_COMPONENTS = ["LongTermDebt", "LTDebtAndLeases", "OtherNonCurrentLiabilities"]
 
-    def fit_transform(self, yf_df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    def fit_transform(self, df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """
         Returns:
           (canon_df, checks_df)
           - canon_df: canonical, repaired balance sheet
           - checks_df: per-date errors for each identity (abs error)
         """
-        df = self._normalize(yf_df)
         rows = []
         checks = []
         for dt, row in df.iterrows():
@@ -196,27 +195,6 @@ class BalanceSheetBaseline:
         canon_df = pd.DataFrame(rows).set_index("Date").sort_index()
         checks_df = pd.DataFrame(checks).set_index("Date").sort_index()
         return canon_df[self.CANON_COLS], checks_df
-
-    # -----------------------------------------------------------------------
-
-    def _normalize(self, df: pd.DataFrame) -> pd.DataFrame:
-        # Expect yfinance “rows=line items, cols=dates”; handle both orientations
-        if not isinstance(df, pd.DataFrame):
-            df = pd.DataFrame(df)
-        # If columns look like dates, transpose so dates are index
-        if not isinstance(df.index, pd.DatetimeIndex):
-            # heuristic: if columns are datetime-like
-            if pd.to_datetime(df.columns, errors="coerce").notna().any():
-                df = df.T
-        if not isinstance(df.index, pd.DatetimeIndex):
-            df.index = pd.to_datetime(df.index, errors="coerce")
-        df = df[~df.index.isna()].sort_index()
-        # Coerce numerics
-        for c in df.columns:
-            df[c] = pd.to_numeric(df[c], errors="coerce")
-        # Drop fully-NaN dates and fully-NaN line items
-        df = df.dropna(how="all").dropna(how="all", axis=1)
-        return df
 
     def _process_row(self, row: pd.Series) -> Tuple[Dict[str, float], Dict[str, float]]:
         d = self._map_to_canonical(row)
@@ -248,7 +226,7 @@ class BalanceSheetBaseline:
 
         return d, errs
 
-    # ---------- mapping ----------
+    # mapping
     def _map_to_canonical(self, row: pd.Series) -> Dict[str, float]:
         d: Dict[str, float] = dict.fromkeys(self.CANON_COLS, np.nan)
         for yf_col, canon_col in self.YF_TO_CANON.items():
@@ -258,7 +236,7 @@ class BalanceSheetBaseline:
                     d[canon_col] = float(val)
         return d
 
-    # ---------- derivations: cash / STI ----------
+    # derivations: cash / STI
     def _derive_cash_sti(self, d: Dict[str, float], computed: Dict[str, float]) -> None:
         if (
             pd.isna(d["Cash"])
@@ -282,7 +260,7 @@ class BalanceSheetBaseline:
             d["CashAndSTI"] = _nan_sum([d["Cash"], d["ShortTermInvestments"]])
             computed["CashAndSTI"] = d["CashAndSTI"]
 
-    # ---------- derivations: PPE ----------
+    # derivations: PPE
     def _compute_ppe(self, d: Dict[str, float], computed: Dict[str, float]) -> None:
         if pd.isna(d["NetPPE"]) and (
             pd.notna(d["GrossPPE"]) or pd.notna(d["AccumDepreciation"])
@@ -298,7 +276,7 @@ class BalanceSheetBaseline:
             d["GrossPPE"] = d["NetPPE"] + d["AccumDepreciation"]
             computed["GrossPPE"] = d["GrossPPE"]
 
-    # ---------- assets ----------
+    # assets
     def _compute_current_assets(
         self, d: Dict[str, float], computed: Dict[str, float]
     ) -> None:
@@ -323,7 +301,7 @@ class BalanceSheetBaseline:
             d["TotalAssets"] = ta_sum
             computed["TotalAssets"] = d["TotalAssets"]
 
-    # ---------- liabilities ----------
+    # liabilities
     def _compute_current_liabilities(
         self, d: Dict[str, float], computed: Dict[str, float]
     ) -> None:
@@ -348,7 +326,7 @@ class BalanceSheetBaseline:
             d["TotalLiabilities"] = tl_sum
             computed["TotalLiabilities"] = d["TotalLiabilities"]
 
-    # ---------- debt ----------
+    # debt
     def _debt_parts(self, d: Dict[str, float]) -> float:
         return _nan_sum(
             [
@@ -384,7 +362,7 @@ class BalanceSheetBaseline:
                 d["NetDebt"] = d["TotalDebt"] - cash_like
                 computed["NetDebt"] = d["NetDebt"]
 
-    # ---------- equity / identities ----------
+    # equity / identities
     def _compute_equity(self, d: Dict[str, float], computed: Dict[str, float]) -> None:
         if pd.isna(d["TotalEquityInclMI"]):
             eq_sum = _nan_sum(
@@ -418,7 +396,7 @@ class BalanceSheetBaseline:
             d["TotalEquityInclMI"] = ta - tl
             computed["TotalEquityInclMI(residual)"] = d["TotalEquityInclMI"]
 
-    # ---------- other heuristics ----------
+    # other heuristics
     def _estimate_minority_interest(
         self, d: Dict[str, float], computed: Dict[str, float]
     ) -> None:
@@ -450,7 +428,7 @@ class BalanceSheetBaseline:
             d["TangibleBookValue"] = d["NetTangibleAssets"]
             computed["TangibleBookValue"] = d["TangibleBookValue"]
 
-    # ---------- error recording ----------
+    # error recording
     def _record_errors(self, d: Dict[str, float], errs: Dict[str, float]) -> None:
         def err(name: str, lhs: float, rhs: float) -> None:
             if pd.notna(lhs) and pd.notna(rhs):
@@ -509,7 +487,6 @@ class BalanceSheetBaseline:
 
 
 if __name__ == "__main__":
-    # yf_bs is your yfinance balance sheet (dates on index, columns from your list)
     from src.jpm.question_1.data.yf import FinanceIngestor
 
     yf_ing = FinanceIngestor(
@@ -520,7 +497,5 @@ if __name__ == "__main__":
     engine = BalanceSheetBaseline()
     canon, checks = engine.fit_transform(yf_bs)
 
-    # Inspect violations (should be near zero after residual repair)
     print(checks.tail(3).round(2))
-    # Your canonical, constraint-consistent balance sheet:
     print(canon.tail(3)[["TotalAssets", "TotalLiabilities", "TotalEquityInclMI"]])
