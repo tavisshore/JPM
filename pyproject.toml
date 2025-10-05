@@ -9,8 +9,10 @@ line_length = 88
 
 [tool.ruff]
 line-length = 88
-select = ["E", "F", "W", "C", "I", "B"]
 exclude = ["build", "dist", ".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "C", "I", "B"]
 
 [tool.pytest.ini_options]
 minversion = "8.0"
