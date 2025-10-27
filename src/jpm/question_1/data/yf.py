@@ -23,7 +23,9 @@ class FinanceIngestor:
       - caches each artifact to Parquet to prevent redundant downloading
     """
 
-    def __init__(self, ticker: str, cache_dir: str | Path = "cache", ttl_days: int = 1):
+    def __init__(
+        self, ticker: str = "MSFT", cache_dir: str | Path = "cache", ttl_days: int = 7
+    ):
         self.ticker = ticker.upper()
         self.t = yf.Ticker(self.ticker)
         self.cache_dir = Path(cache_dir) / self.ticker
@@ -31,20 +33,20 @@ class FinanceIngestor:
         self.ttl = timedelta(days=ttl_days)
 
     def balance_sheet(
-        self, quarterly: bool = False, force: bool = False
+        self, quarterly: bool = True, force: bool = False
     ) -> pd.DataFrame:
         name = f"balance_sheet_{'q' if quarterly else 'a'}"
         return self._get_or_fetch(
             name, self._load_bs_q if quarterly else self._load_bs_a, force
         )
 
-    def income(self, quarterly: bool = False, force: bool = False) -> pd.DataFrame:
+    def income(self, quarterly: bool = True, force: bool = False) -> pd.DataFrame:
         name = f"income_{'q' if quarterly else 'a'}"
         return self._get_or_fetch(
             name, self._load_is_q if quarterly else self._load_is_a, force
         )
 
-    def cashflow(self, quarterly: bool = False, force: bool = False) -> pd.DataFrame:
+    def cashflow(self, quarterly: bool = True, force: bool = False) -> pd.DataFrame:
         name = f"cashflow_{'q' if quarterly else 'a'}"
         return self._get_or_fetch(
             name, self._load_cf_q if quarterly else self._load_cf_a, force
@@ -143,9 +145,11 @@ class FinanceIngestor:
         Transposing this so indices are ascending dates and cols are the items
         """
         df = pd.DataFrame(obj)
+        print(obj)
         if df.empty:
             return df
         df = df.T
+
         if not isinstance(df.index, pd.DatetimeIndex):
             df.index = pd.to_datetime(df.index, errors="coerce")
         df = df[~df.index.isna()].sort_index()
@@ -157,6 +161,7 @@ class FinanceIngestor:
         # drop fully-NaN rows (dates) and fully-NaN columns
         df = df.dropna(how="all")  # rows
         df = df.dropna(how="all", axis=1)  # columns
+
         return df
 
 
