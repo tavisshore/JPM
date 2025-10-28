@@ -32,12 +32,6 @@ class FinanceIngestor:
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self.ttl = timedelta(days=ttl_days)
 
-    def income(self, quarterly: bool = True, force: bool = False) -> pd.DataFrame:
-        name = f"income_{'q' if quarterly else 'a'}"
-        return self._get_or_fetch(
-            name, self._load_is_q if quarterly else self._load_is_a, force
-        )
-
     def balance_sheet(
         self, quarterly: bool = True, force: bool = False
     ) -> pd.DataFrame:
@@ -46,44 +40,79 @@ class FinanceIngestor:
             name, self._load_bs_q if quarterly else self._load_bs_a, force
         )
 
-    def constructor_data(
-        self, quarterly: bool = True, force: bool = False
-    ) -> dict[str, dict]:
-        """
-        Get all data needed to construct velez-pareja models.
-        """
-        is_data = self.income(quarterly=quarterly, force=force)
-        row = is_data.iloc[-1]
-        income_date = is_data.index[0]
-        is_data = row.to_dict()
+    def income(self, quarterly: bool = True, force: bool = False) -> pd.DataFrame:
+        name = f"income_{'q' if quarterly else 'a'}"
+        return self._get_or_fetch(
+            name, self._load_is_q if quarterly else self._load_is_a, force
+        )
 
-        bs_data = self.balance_sheet(quarterly=quarterly, force=force)
-        bs_data = bs_data[bs_data.index < income_date]
-        bs_row = bs_data.iloc[-1]
-        bs_data = bs_row.to_dict()
+    def cashflow(self, quarterly: bool = True, force: bool = False) -> pd.DataFrame:
+        name = f"cashflow_{'q' if quarterly else 'a'}"
+        return self._get_or_fetch(
+            name, self._load_cf_q if quarterly else self._load_cf_a, force
+        )
 
-        # Rattle down to required fields only
+    def prices(
+        self, period: str = "5y", interval: str = "1d", force: bool = False
+    ) -> pd.DataFrame:
+        name = f"prices_{period}_{interval}"
 
-        return {"income_statement": is_data, "balance_sheet": bs_data}
+        def loader() -> pd.DataFrame:
+            return self.t.history(period=period, interval=interval).sort_index()
+
+        return self._get_or_fetch(name, loader, force)
+
+    def dividends(self, force: bool = False) -> pd.DataFrame:
+        return self._get_or_fetch("dividends", self._load_dividends, force)
+
+    def splits(self, force: bool = False) -> pd.DataFrame:
+        return self._get_or_fetch("splits", self._load_splits, force)
 
     def all_minimal(self, force: bool = False) -> Dict[str, pd.DataFrame]:
         return {
+            "bs_q": self.balance_sheet(quarterly=True, force=force),
+            "bs_a": self.balance_sheet(quarterly=False, force=force),
             "is_q": self.income(quarterly=True, force=force),
             "is_a": self.income(quarterly=False, force=force),
+            "cf_q": self.cashflow(quarterly=True, force=force),
+            "cf_a": self.cashflow(quarterly=False, force=force),
+            "prices": self.prices(force=force),
+            "dividends": self.dividends(force=force),
+            "splits": self.splits(force=force),
         }
 
     # loaders - Add more as needed
+    def _load_bs_a(self) -> pd.DataFrame:
+        return self._normalise_statement(self.t.balance_sheet)
+
+    def _load_bs_q(self) -> pd.DataFrame:
+        return self._normalise_statement(self.t.quarterly_balance_sheet)
+
     def _load_is_a(self) -> pd.DataFrame:
         return self._normalise_statement(self.t.financials)
 
     def _load_is_q(self) -> pd.DataFrame:
         return self._normalise_statement(self.t.quarterly_financials)
 
-    def _load_bs_a(self) -> pd.DataFrame:
-        return self._normalise_statement(self.t.balance_sheet)
+    def _load_cf_a(self) -> pd.DataFrame:
+        return self._normalise_statement(self.t.cashflow)
 
-    def _load_bs_q(self) -> pd.DataFrame:
-        return self._normalise_statement(self.t.quarterly_balance_sheet)
+    def _load_cf_q(self) -> pd.DataFrame:
+        return self._normalise_statement(self.t.quarterly_cashflow)
+
+    def _load_dividends(self) -> pd.DataFrame:
+        s = self.t.dividends
+        df = s.to_frame("dividend") if isinstance(s, pd.Series) else pd.DataFrame(s)
+        if not isinstance(df.index, pd.DatetimeIndex):
+            df.index = pd.to_datetime(df.index, errors="coerce")
+        return df.dropna(axis=0, how="all").sort_index()
+
+    def _load_splits(self) -> pd.DataFrame:
+        s = self.t.splits
+        df = s.to_frame("split_ratio") if isinstance(s, pd.Series) else pd.DataFrame(s)
+        if not isinstance(df.index, pd.DatetimeIndex):
+            df.index = pd.to_datetime(df.index, errors="coerce")
+        return df.dropna(axis=0, how="all").sort_index()
 
     def _get_or_fetch(
         self, name: str, loader: Callable[[], pd.DataFrame], force: bool
@@ -116,7 +145,7 @@ class FinanceIngestor:
         Transposing this so indices are ascending dates and cols are the items
         """
         df = pd.DataFrame(obj)
-
+        print(obj)
         if df.empty:
             return df
         df = df.T
@@ -142,4 +171,4 @@ if __name__ == "__main__":
     )
     bs_q = ing.all_minimal()
     print(bs_q["bs_q"].head())
-    # print(bs_q["bs_q"].columns)
+    print(bs_q["bs_q"].columns)
