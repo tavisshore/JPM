@@ -29,12 +29,22 @@ from __future__ import annotations
 
 import pandas as pd
 
-from src.jpm.question_1.components import BudgetState, CashBudget, InputData
+from src.jpm.question_1.components import (
+    BudgetState,
+    CashBudget,
+    InputData,
+    LoanBook,
+    LTLoan,
+)
 from src.jpm.question_1.misc import as_series
 
 if __name__ == "__main__":
+    # Proper functionality not yet implemented / used
+    loanbook = LoanBook()
+
     years = pd.Index([0, 1, 2], name="year")
-    idata = InputData(
+
+    input_data = InputData(
         years=years,
         ebit=as_series({0: 0, 1: 5, 2: 9}, years),
         depreciation=as_series({0: 0, 1: 9, 2: 9}, years),
@@ -46,41 +56,32 @@ if __name__ == "__main__":
         lt_loan_term_years=5,
     )
 
-    cb = CashBudget(idata)
+    # Initial Long-term Loan
+    lt_loan_sched = LTLoan(input=input_data, start_year=0, initial_draw=20.0)
+
+    cb = CashBudget(input_data)
 
     # Year 0
     state0 = BudgetState()
-    cb0 = cb.year0()
+    cb0 = cb.year0(loanbook)
 
     state1 = BudgetState(
         cum_ncb_prev=cb0.at["Cumulated NCB => BS"],
         st_invest_prev=cb0.at["ST investments => BS"],
         st_loan_beg=cb0.at["ST Loan"],
         lt_beg_balance=cb0.at["LT Loan"],
-        lt_annual_principal=cb0.at["LT Loan"] / idata.lt_loan_term_years,
+        lt_annual_principal=cb0.at["LT Loan"] / input_data.lt_loan_term_years,
     )
+    # BudgetState(cum_ncb_prev=10.0, st_invest_prev=0.0, st_loan_beg=10.0,
+    # lt_beg_balance=20.0, lt_annual_principal=4.0)
 
     cb1, cb_state2 = cb.project_cb(
-        year=1, state=state1, equity_contrib=0, dividends=0.0
+        year=1, state=state1, equity_contrib=0, dividends=0.0, loanbook=loanbook
     )
 
-    print(cb0)
+    print(state1)
     print()
     print(cb1)
-
-    # st_loan_sched = STLoanSchedule(
-    #     years=years,
-    #     rate=as_series({1:0.10,2:0.10}, years),
-    #     draws=as_series({0:15,1:0,2:0}, years),
-    # )
-
-    # lt_loan_sched = LTLoanSchedule(
-    #     years=years,
-    #     rate=as_series({0:0.12,1:0.12,2:0.12}, years),
-    #     initial_draw=20.0,
-    #     term_years=5,
-    # )
-    # # print(lt_loan_sched.compute())
 
     # # CashBudget (Year 0) gave ST investments end-of-year = 0
     # st_invest_bs = pd.Series({0:0.0, 1:0.0, 2:0.0}, index=years)

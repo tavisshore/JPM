@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Iterable, List
+from typing import Iterable
 
 import pandas as pd
 
@@ -25,6 +25,15 @@ def _make_year_index(start, periods: int, like: pd.Index) -> pd.Index:
         return pd.period_range(start=start_p, periods=periods, freq="Y")
     start_int = int(start)
     return pd.Index(range(start_int, start_int + periods), dtype=int)
+
+
+@dataclass
+class DebtPay:
+    st_interest: float
+    st_principal: float
+    lt_interest: float
+    lt_principal: float
+    total: float
 
 
 @dataclass
@@ -84,6 +93,7 @@ class STLoan:
         df = self._df
         if year not in df.index:
             raise KeyError(f"{year!r} not in schedule index")
+        # Need to think about loans that complete
         return df.loc[year]
 
 
@@ -100,7 +110,7 @@ class LTLoan:
     initial_draw: float
 
     _years: pd.Index = field(init=False, repr=False)
-    _df: pd.DataFrame = field(init=False, repr=False)
+    _df: pd.DataFrame = field(init=False, repr=False, default=None)
 
     def __post_init__(self):
         self._years = _make_year_index(
@@ -161,27 +171,52 @@ class LTLoan:
 
 @dataclass
 class LoanBook:
-    """
-    Class for storing multiple loans (ST and LT)
-    and retrieving their due payments per year
-    """
-
-    loans: List[STLoan | LTLoan] = field(default_factory=list)
+    st_loans: list[STLoan] = field(default_factory=list)
+    lt_loans: list[LTLoan] = field(default_factory=list)
 
     def add(self, loan: STLoan | LTLoan) -> None:
-        self.loans.append(loan)
+        if isinstance(loan, STLoan):
+            self.st_loans.append(loan)
+        elif isinstance(loan, LTLoan):
+            self.lt_loans.append(loan)
+        else:
+            raise TypeError(f"Unsupported loan type: {type(loan)}")
 
-    def extend(self, items: Iterable[STLoan | LTLoan]) -> None:
-        self.loans.extend(items)
+    def extend(self, loans: Iterable[STLoan | LTLoan]) -> None:
+        for loan in loans:
+            self.add(loan)
+
+    def all(self) -> list[STLoan | LTLoan]:
+        return self.st_loans + self.lt_loans
 
     def __len__(self) -> int:
-        return len(self.loans)
+        return len(self.st_loans) + len(self.lt_loans)
 
     def __iter__(self):
-        return iter(self.loans)
+        return iter(self.all())
 
-    def of_type(self, cls) -> list[STLoan | LTLoan]:
-        return [loan for loan in self.loans if isinstance(loan, cls)]
+    def debt_payments(self, year) -> DebtPay:
+        """
+        Aggregates debt payments for a given year using the loan schedules.
+        """
 
-    def dues(self, year) -> list[pd.Series[Any]]:
-        return [loan.compute(year) for loan in self.loans]
+        st_interest, st_principal = 0.0, 0.0
+        lt_interest, lt_principal = 0.0, 0.0
+
+        for loan in self.st_loans:
+            row = loan.compute(year)
+            st_interest += float(row["Interest payment ST loan"])
+            st_principal += float(row["Principal payments ST loan"])
+
+        for loan in self.lt_loans:
+            row = loan.compute(year)
+            lt_interest += float(row["Interest payment LT loan"])
+            lt_principal += float(row["Principal payments LT loan"])
+
+        return DebtPay(
+            st_interest=st_interest,
+            st_principal=st_principal,
+            lt_interest=lt_interest,
+            lt_principal=lt_principal,
+            total=st_interest + st_principal + lt_interest + lt_principal,
+        )

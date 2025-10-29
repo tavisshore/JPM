@@ -3,7 +3,7 @@ from __future__ import annotations
 import pandas as pd
 
 from src.jpm.question_1.components.input import BudgetState, InputData
-from src.jpm.question_1.components.loans import LTLoan, STLoan
+from src.jpm.question_1.components.loans import LoanBook, LTLoan, STLoan
 
 
 class CashBudget:
@@ -34,13 +34,15 @@ class CashBudget:
         self,
         year: int,
         state: BudgetState,
+        loanbook: LoanBook,
         equity_contrib: float = 0.0,
         dividends: float = 0.0,
-        loans: list[LTLoan | STLoan] | None = None,
     ) -> tuple[pd.Series, BudgetState]:
         y = year
         if y not in self.I.years:
             raise ValueError(f"Year {y} not in InputData.years")
+
+        mincash = float(self.I.min_cash.reindex(self.I.years).at[y])
 
         # Module 1 - Operating Activities
         ebitda = float(self.I.ebitda.reindex(self.I.years).at[y])
@@ -48,57 +50,37 @@ class CashBudget:
         # Module 2 - Investments in assets
         purchase_fixed_assets = self._capex_for(y)  # Purchase of fixed assets
         ncb_of_invest = -purchase_fixed_assets  # NCB of investment in fixed assets
-        ncb_after_invest = (
-            ncb_of_invest + ebitda
-        )  # NCB after investment in fixed assets
+        ncb_after_invest = ncb_of_invest + ebitda
 
         # Module 3 - External Financing
-        kd_t = float(self.I.kd.reindex(self.I.years, fill_value=0.0).at[y])  # interest
-        st_interest = state.st_loan_beg * kd_t
-        st_principal = state.st_loan_beg
-        # LT: equal-principal; if year 0 needs an initial draw, we set it below
-        lt_interest = state.lt_beg_balance * kd_t
-        lt_principal = min(state.lt_annual_principal, state.lt_beg_balance)
-        total_debt_payment = st_interest + st_principal + lt_interest + lt_principal
+        loan_record = loanbook.debt_payments(year=year)
 
         # LT draw only at year 0 - if initial CapEx exceeds equity, cover with LT draw
+        # NOTE Add functionality for new long-term loans later
         lt_draw = 0.0
-        if y == self.I.years.min():
-            lt_draw = max(0.0, purchase_fixed_assets - equity_contrib)
 
         # + Module 5 - Discretionary transactions
         st_return_rate = float(
             self.I.rtn_st_inv.reindex(self.I.years, fill_value=0.0).at[y]
         )
-        mincash = float(self.I.min_cash.reindex(self.I.years).at[y])
         st_return = state.st_invest_prev * st_return_rate
         st_redeem = state.st_invest_prev
         st_inflow = st_return + st_redeem
 
         # ST: last year repaid in full this year
         st_loan = self.new_st_loan(
-            state.cum_ncb_prev, ncb_after_invest, total_debt_payment, st_inflow, mincash
+            state.cum_ncb_prev, ncb_after_invest, loan_record.total, st_inflow, mincash
         )
-        # Store instances of loans for later use
-        if st_loan:
-            loans.append(
-                STLoan(
-                    input=self.I,
-                    amount=st_loan,
-                    start_year=y,
-                )
-            )
+
+        # Add new loans
+        # TODO - add loan functionality, getting dues etc.
+        if st_loan:  # Better way - unit test for negative events
+            loanbook.add(STLoan(input=self.I, amount=st_loan, start_year=y))
         if lt_draw:
-            loans.append(
-                LTLoan(
-                    input=self.I,
-                    start_year=y,
-                    initial_draw=lt_draw,
-                )
-            )
+            loanbook.add(LTLoan(input=self.I, start_year=y, initial_draw=lt_draw))
 
         # + Module 4 - Transactions with Owners
-        ncb_financing = st_loan + lt_draw - total_debt_payment
+        ncb_financing = st_loan + lt_draw - loan_record.total
         ncb_owners = equity_contrib - dividends
         ncb_after_prev = ncb_owners + ncb_financing + ncb_after_invest
         # End-of-year ST investment chosen to hit MinCash
@@ -119,11 +101,11 @@ class CashBudget:
                 # External Financing
                 "ST Loan": st_loan,
                 "LT Loan": lt_draw,
-                "Interest ST loan": st_interest,
-                "Principal ST loan": st_principal,
-                "Interest LT loan": lt_interest,
-                "Principal LT loan": lt_principal,
-                "Total debt payment": total_debt_payment,
+                "Interest ST loan": loan_record.st_interest,  # all of these?
+                "Principal ST loan": loan_record.st_principal,
+                "Interest LT loan": loan_record.lt_interest,
+                "Principal LT loan": loan_record.lt_principal,
+                "Total debt payment": loan_record.total,  # To here
                 "NCB of financing activities": ncb_financing,
                 # Transactions with Owners
                 "Initial invested equity": equity_contrib,
@@ -142,7 +124,7 @@ class CashBudget:
         )
 
         # State for the following year
-        next_lt_beg = state.lt_beg_balance - lt_principal + lt_draw
+        next_lt_beg = state.lt_beg_balance - loan_record.lt_principal + lt_draw
         next_lt_ann_prin = state.lt_annual_principal
         if lt_draw > 0.0 and self.I.lt_loan_term_years > 0:
             next_lt_ann_prin = lt_draw / self.I.lt_loan_term_years
@@ -156,13 +138,12 @@ class CashBudget:
         )
         return out, next_state
 
-    def year0(self) -> pd.Series:
+    def year0(self, loanbook: LoanBook) -> pd.Series:
         """
         InputData and Formulas are taken from Table 5 'Cash budget for year 0'
         - Keeping separate for now - assuming real data won't go from this init
         """
         y = 0
-        loans = []
         # Module 1 - Operating Activities
         # Operating NCB (EBITDA) — initial assumption is 0
         ebitda = float(pd.to_numeric(self.I.ebitda.get(y, 0.0), errors="coerce") or 0.0)
@@ -181,21 +162,9 @@ class CashBudget:
 
         # Store instances of loans for later use
         if st_loan:
-            loans.append(
-                STLoan(
-                    input=self.I,
-                    amount=st_loan,
-                    start_year=y,
-                )
-            )
+            loanbook.add(STLoan(input=self.I, amount=st_loan, start_year=y))
         if lt_loan:
-            loans.append(
-                LTLoan(
-                    input=self.I,
-                    start_year=y,
-                    initial_draw=lt_loan,
-                )
-            )
+            loanbook.add(LTLoan(input=self.I, start_year=y, initial_draw=lt_loan))
 
         total_debt_payment = 0.0  # Year 0 assumption
         ncb_financing = st_loan + lt_loan - total_debt_payment
