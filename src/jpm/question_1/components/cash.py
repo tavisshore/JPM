@@ -20,10 +20,8 @@ class CashBudget:
     cum_ncb: pd.Series = field(init=False, repr=False)
 
     def __post_init__(self):
-        # initialize both as zero Series aligned with years
         z = pd.Series(0.0, index=self.years)
         object.__setattr__(self, "cum_ncb", z.copy())
-        object.__setattr__(self, "st_invest", z.copy())
 
     def _capex_for(self, year: int) -> float:
         nfa = self.input.net_fixed_assets

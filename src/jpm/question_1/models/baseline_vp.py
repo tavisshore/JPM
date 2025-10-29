@@ -31,6 +31,7 @@ import pandas as pd
 
 from src.jpm.question_1.components import (
     CashBudget,
+    IncomeStatement,
     InputData,
     InvestmentBook,
     LoanBook,
@@ -58,22 +59,40 @@ if __name__ == "__main__":
 
     cb = CashBudget(input_data, years)
 
+    i_s = IncomeStatement(
+        years=years,
+        ebit=input_data.ebit,
+        loanbook=loanbook,
+        investmentbook=investmentbook,
+    )
+
     # Year 0
     cb0 = cb.year0(loanbook, investmentbook)
 
+    # Year 1
+    is1 = i_s.generate_statement(year=1, dividends=0.0)
     cb1 = cb.project_cb(
         year=1,
+        equity_contrib=0,
+        dividends=0,
+        loanbook=loanbook,
+        investmentbook=investmentbook,
+    )
+
+    # Year 2
+    is2 = i_s.generate_statement(year=2, dividends=0.0)
+
+    cb2 = cb.project_cb(
+        year=2,
         equity_contrib=0,
         dividends=0.0,
         loanbook=loanbook,
         investmentbook=investmentbook,
     )
 
-    print("Year 0 - Cash Budget")
-    print(cb0)
+    print(is1)
     print()
-    print("Year 1 - Cash Budget")
-    print(cb1)
+    print(is2)
 
     # is1 = IncomeStatement(
     #     years=years,
