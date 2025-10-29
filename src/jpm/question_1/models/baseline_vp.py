@@ -33,15 +33,13 @@ from src.jpm.question_1.components import (
     BudgetState,
     CashBudget,
     InputData,
+    InvestmentBook,
     LoanBook,
     LTLoan,
 )
 from src.jpm.question_1.misc import as_series
 
 if __name__ == "__main__":
-    # Proper functionality not yet implemented / used
-    loanbook = LoanBook()
-
     years = pd.Index([0, 1, 2], name="year")
 
     input_data = InputData(
@@ -56,14 +54,17 @@ if __name__ == "__main__":
         lt_loan_term_years=5,
     )
 
+    loanbook = LoanBook()
+    investmentbook = InvestmentBook(input_data)
+
     # Initial Long-term Loan
     lt_loan_sched = LTLoan(input=input_data, start_year=0, initial_draw=20.0)
 
-    cb = CashBudget(input_data)
+    cb = CashBudget(input_data, years)
 
     # Year 0
     state0 = BudgetState()
-    cb0 = cb.year0(loanbook)
+    cb0 = cb.year0(loanbook, investmentbook)
 
     state1 = BudgetState(
         cum_ncb_prev=cb0.at["Cumulated NCB => BS"],
@@ -75,12 +76,18 @@ if __name__ == "__main__":
     # BudgetState(cum_ncb_prev=10.0, st_invest_prev=0.0, st_loan_beg=10.0,
     # lt_beg_balance=20.0, lt_annual_principal=4.0)
 
-    cb1, cb_state2 = cb.project_cb(
-        year=1, state=state1, equity_contrib=0, dividends=0.0, loanbook=loanbook
+    cb1 = cb.project_cb(
+        year=1,
+        equity_contrib=0,
+        dividends=0.0,
+        loanbook=loanbook,
+        investmentbook=investmentbook,
     )
 
-    print(state1)
+    print("Year 0 - Cash Budget")
+    print(cb0)
     print()
+    print("Year 1 - Cash Budget")
     print(cb1)
 
     # # CashBudget (Year 0) gave ST investments end-of-year = 0
