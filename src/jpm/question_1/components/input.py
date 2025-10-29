@@ -13,7 +13,8 @@ class InputData:
     kd: pd.Series
     rtn_st_inv: pd.Series
     equity_investment: float
-    lt_loan_term_years: int
+    st_loan_term: int
+    lt_loan_term: int
     ebitda: pd.Series = field(init=False, repr=True)
 
     def __post_init__(self):
@@ -24,14 +25,3 @@ class InputData:
         object.__setattr__(self, "kd", self.kd.fillna(0))
         object.__setattr__(self, "rtn_st_inv", self.rtn_st_inv.fillna(0))
         object.__setattr__(self, "ebitda", (self.ebit + self.depreciation).fillna(0.0))
-
-
-@dataclass
-class BudgetState:
-    cum_ncb_prev: float = 0.0  # Cumulated NCB at end of previous year
-    st_invest_prev: float = 0.0  # EOY ST investments (previous year)
-    st_loan_beg: float = (
-        0.0  # Current year beginning ST-loan balance (= last year's draw)
-    )
-    lt_beg_balance: float = 0.0  # Current year beginning LT-loan balance
-    lt_annual_principal: float = 0.0  # Fixed principal per year

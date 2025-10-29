@@ -93,7 +93,6 @@ class Investment:
 
 @dataclass
 class InvestmentBook:
-    input: InputData
     st_investments: List[Investment] = field(default_factory=list)
 
     def add(self, investment: Investment) -> None:

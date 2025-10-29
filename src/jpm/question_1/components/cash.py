@@ -6,7 +6,7 @@ import pandas as pd
 
 from src.jpm.question_1.components.input import InputData
 from src.jpm.question_1.components.investments import Investment, InvestmentBook
-from src.jpm.question_1.components.loans import LoanBook, LTLoan, STLoan
+from src.jpm.question_1.components.loans import Loan, LoanBook
 
 
 @dataclass
@@ -73,7 +73,12 @@ class CashBudget:
         if ncb_after_invest < 0.0:
             lt_loan_draw = -ncb_after_invest
             loanbook.add(
-                LTLoan(input=self.input, start_year=y, initial_draw=lt_loan_draw)
+                Loan(
+                    input=self.input,
+                    start_year=y,
+                    initial_draw=lt_loan_draw,
+                    category="LT",
+                )
             )
         else:
             lt_loan_draw = 0.0
@@ -87,9 +92,17 @@ class CashBudget:
             investment_record.total,
             mincash,
         )
-        # TODO - add ST loan functionality
-        if st_loan_draw:  # Better way - unit test for negative events
-            loanbook.add(STLoan(input=self.input, amount=st_loan_draw, start_year=y))
+
+        # TODO - check functionality on later years 2+
+        if st_loan_draw:
+            loanbook.add(
+                Loan(
+                    input=self.input,
+                    initial_draw=st_loan_draw,
+                    start_year=y,
+                    category="ST",
+                )
+            )
 
         # + Module 4 - Transactions with Owners
         ncb_financing = st_loan_draw + lt_loan_draw - loan_record.total
@@ -127,16 +140,17 @@ class CashBudget:
                 # External Financing
                 "ST Loan": st_loan_draw,
                 "LT Loan": lt_loan_draw,
-                "Interest ST loan": loan_record.st_interest,  # all of these?
-                "Principal ST loan": loan_record.st_principal,
-                "Interest LT loan": loan_record.lt_interest,
+                "Principal ST loan": loan_record.st_principal,  # all of these?
+                "Interest ST loan": loan_record.st_interest,
                 "Principal LT loan": loan_record.lt_principal,
+                "Interest LT loan": loan_record.lt_interest,
                 "Total debt payment": loan_record.total,  # To here
                 "NCB of financing activities": ncb_financing,
                 # Transactions with Owners
                 "Initial invested equity": equity_contrib,
                 "Dividends payment": dividends,
                 "NCB of transactions with owners": ncb_owners,
+                "NCB for the year after previous transactions": ncb_after_prev,
                 # Discretionary Financing
                 "Redemption of ST investment": investment_record.st_principal_in,
                 "Return from ST investments": investment_record.st_interest,
@@ -178,9 +192,17 @@ class CashBudget:
 
         # Store instances of loans for later use
         if st_loan:
-            loanbook.add(STLoan(input=self.input, amount=st_loan, start_year=y))
+            loanbook.add(
+                Loan(
+                    input=self.input, start_year=y, initial_draw=st_loan, category="ST"
+                )
+            )
         if lt_loan:
-            loanbook.add(LTLoan(input=self.input, start_year=y, initial_draw=lt_loan))
+            loanbook.add(
+                Loan(
+                    input=self.input, start_year=y, initial_draw=lt_loan, category="LT"
+                )
+            )
 
         total_debt_payment = 0.0  # Year 0 assumption
         ncb_financing = st_loan + lt_loan - total_debt_payment
@@ -231,6 +253,7 @@ class CashBudget:
             "Initial invested equity": initial_equity,
             "Dividends payment": dividends,
             "NCB of transactions with owners": ncb_owners,
+            "NCB for the year after previous transactions": ncb_after_prev,
             # Discretionary Financing
             "Redemption of ST investment": redemption_st_inv,
             "Return from ST investments": return_st_inv,
@@ -240,4 +263,5 @@ class CashBudget:
             "NCB for the year": ncb_for_year,
             "Cumulated NCB => BS": cum_ncb,
         }
+        self.cum_ncb.loc[y] = cum_ncb
         return pd.Series(rows, name="Year 0")

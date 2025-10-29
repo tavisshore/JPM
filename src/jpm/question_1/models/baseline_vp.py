@@ -30,12 +30,10 @@ from __future__ import annotations
 import pandas as pd
 
 from src.jpm.question_1.components import (
-    BudgetState,
     CashBudget,
     InputData,
     InvestmentBook,
     LoanBook,
-    LTLoan,
 )
 from src.jpm.question_1.misc import as_series
 
@@ -51,30 +49,17 @@ if __name__ == "__main__":
         kd=as_series({0: 0, 1: 0.13, 2: 0.13}, years),
         rtn_st_inv=as_series({0: 0, 1: 0.08, 2: 0.08}, years),
         equity_investment=25.0,
-        lt_loan_term_years=5,
+        st_loan_term=1,
+        lt_loan_term=5,
     )
 
     loanbook = LoanBook()
-    investmentbook = InvestmentBook(input_data)
-
-    # Initial Long-term Loan
-    lt_loan_sched = LTLoan(input=input_data, start_year=0, initial_draw=20.0)
+    investmentbook = InvestmentBook()
 
     cb = CashBudget(input_data, years)
 
     # Year 0
-    state0 = BudgetState()
     cb0 = cb.year0(loanbook, investmentbook)
-
-    state1 = BudgetState(
-        cum_ncb_prev=cb0.at["Cumulated NCB => BS"],
-        st_invest_prev=cb0.at["ST investments => BS"],
-        st_loan_beg=cb0.at["ST Loan"],
-        lt_beg_balance=cb0.at["LT Loan"],
-        lt_annual_principal=cb0.at["LT Loan"] / input_data.lt_loan_term_years,
-    )
-    # BudgetState(cum_ncb_prev=10.0, st_invest_prev=0.0, st_loan_beg=10.0,
-    # lt_beg_balance=20.0, lt_annual_principal=4.0)
 
     cb1 = cb.project_cb(
         year=1,
@@ -89,9 +74,6 @@ if __name__ == "__main__":
     print()
     print("Year 1 - Cash Budget")
     print(cb1)
-
-    # # CashBudget (Year 0) gave ST investments end-of-year = 0
-    # st_invest_bs = pd.Series({0:0.0, 1:0.0, 2:0.0}, index=years)
 
     # is1 = IncomeStatement(
     #     years=years,

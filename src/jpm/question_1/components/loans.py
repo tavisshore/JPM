@@ -37,68 +37,7 @@ class DebtPay:
 
 
 @dataclass
-class STLoan:
-    """
-    Short-term loans class
-    Within vp model, these are assumed to be 1-year loans
-    drawn at the start of year t, repaid in full at the end of year t (TODO?)
-    """
-
-    input: "InputData"
-    amount: float
-    start_year: object
-
-    _years: pd.Index = field(init=False, repr=False)
-    _df: pd.DataFrame = field(init=False, repr=False)
-
-    def __post_init__(self):
-        self._years = self.input.years
-        if self.start_year not in set(self._years):
-            raise ValueError(f"start_year {self.start_year!r} not in schedule index.")
-        self._df = self._build_df()
-
-    @property
-    def years(self) -> pd.Index:
-        return self._years
-
-    def _build_df(self) -> pd.DataFrame:
-        y = self._years
-        kd = self.input.kd.reindex(y, fill_value=0.0)
-
-        # Single draw only in start_year; zero otherwise
-        draws = pd.Series(0.0, index=y, dtype=float)
-        draws.loc[self.start_year] = float(self.amount)
-
-        # Beginning-of-year t balance is last year's draw; repaid in full in year t
-        beg = draws.shift(1).fillna(0.0)
-        interest = beg * kd
-        principal = beg.copy()
-        total = interest + principal
-        end = draws.copy()
-
-        return pd.DataFrame(
-            {
-                "Beginning balance": beg,
-                "Interest rate (kd)": kd,
-                "Interest payment ST loan": interest,
-                "Principal payments ST loan": principal,
-                "Total payment ST loan": total,
-                "Ending balance": end,
-                "Draws ST loan": draws,
-            },
-            index=y,
-        )
-
-    def compute(self, year) -> pd.Series:
-        df = self._df
-        if year not in df.index:
-            raise KeyError(f"{year!r} not in schedule index")
-        # Need to think about loans that complete
-        return df.loc[year]
-
-
-@dataclass
-class LTLoan:
+class Loan:
     """
     Long-term loans class
     Within vp model, these are assumed to be taken at start
@@ -108,14 +47,18 @@ class LTLoan:
     input: "InputData"
     start_year: object
     initial_draw: float
+    category: str
 
     _years: pd.Index = field(init=False, repr=False)
     _df: pd.DataFrame = field(init=False, repr=False, default=None)
 
     def __post_init__(self):
-        self._years = _make_year_index(
-            self.start_year, self.input.lt_loan_term_years, like=self.input.years
+        length = (
+            self.input.lt_loan_term
+            if self.category == "LT"
+            else self.input.st_loan_term + 1
         )
+        self._years = _make_year_index(self.start_year, length, like=self.input.years)
         self._df = self._build_df()
 
     @property
@@ -128,7 +71,10 @@ class LTLoan:
         beg = pd.Series(0.0, index=y)
         beg.iloc[0] = float(self.initial_draw)
 
-        term = int(self.input.lt_loan_term_years)
+        if self.category == "LT":
+            term = int(self.input.lt_loan_term)
+        else:
+            term = int(self.input.st_loan_term)
         annual_principal = (self.initial_draw / term) if term > 0 else 0.0
 
         principal = pd.Series(0.0, index=y)
@@ -153,9 +99,9 @@ class LTLoan:
         return pd.DataFrame(
             {
                 "Beginning balance": beg,
-                "Interest payment LT loan": interest,
-                "Principal payments LT loan": principal,
-                "Total payment LT loan": total,
+                f"Interest payment {self.category} loan": interest,
+                f"Principal payments {self.category} loan": principal,
+                f"Total payment {self.category} loan": total,
                 "Ending balance": end,
                 "Interest rate": kd,
             },
@@ -168,29 +114,30 @@ class LTLoan:
             raise KeyError(f"{year!r} not in schedule index")
         return df.loc[year]
 
+    def loan_ongoing(self, year) -> bool:
+        df = self._df
+        return year in df.index
+
 
 @dataclass
 class LoanBook:
-    st_loans: list[STLoan] = field(default_factory=list)
-    lt_loans: list[LTLoan] = field(default_factory=list)
+    loans: list[Loan] = field(default_factory=list)
 
-    def add(self, loan: STLoan | LTLoan) -> None:
-        if isinstance(loan, STLoan):
-            self.st_loans.append(loan)
-        elif isinstance(loan, LTLoan):
-            self.lt_loans.append(loan)
+    def add(self, loan: Loan) -> None:
+        if isinstance(loan, Loan):
+            self.loans.append(loan)
         else:
             raise TypeError(f"Unsupported loan type: {type(loan)}")
 
-    def extend(self, loans: Iterable[STLoan | LTLoan]) -> None:
+    def extend(self, loans: Iterable[Loan]) -> None:
         for loan in loans:
             self.add(loan)
 
-    def all(self) -> list[STLoan | LTLoan]:
-        return self.st_loans + self.lt_loans
+    def all(self) -> list[Loan]:
+        return self.loans
 
     def __len__(self) -> int:
-        return len(self.st_loans) + len(self.lt_loans)
+        return len(self.loans)
 
     def __iter__(self):
         return iter(self.all())
@@ -199,19 +146,18 @@ class LoanBook:
         """
         Aggregates debt payments for a given year using the loan schedules.
         """
-
         st_interest, st_principal = 0.0, 0.0
         lt_interest, lt_principal = 0.0, 0.0
 
-        for loan in self.st_loans:
-            row = loan.compute(year)
-            st_interest += float(row["Interest payment ST loan"])
-            st_principal += float(row["Principal payments ST loan"])
-
-        for loan in self.lt_loans:
-            row = loan.compute(year)
-            lt_interest += float(row["Interest payment LT loan"])
-            lt_principal += float(row["Principal payments LT loan"])
+        for loan in self.loans:
+            if loan.loan_ongoing(year):  # Remove spent loans?
+                row = loan.compute(year)
+                if loan.category == "LT":
+                    lt_interest += float(row["Interest payment LT loan"])
+                    lt_principal += float(row["Principal payments LT loan"])
+                elif loan.category == "ST":
+                    st_interest += float(row["Interest payment ST loan"])
+                    st_principal += float(row["Principal payments ST loan"])
 
         return DebtPay(
             st_interest=st_interest,
