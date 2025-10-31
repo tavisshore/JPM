@@ -15,6 +15,7 @@ class IncomeStatement:
     loanbook: LoanBook
     investmentbook: InvestmentBook
 
+    vp_model: bool = True
     retained_earnings: pd.Series = field(init=False, repr=False)
     net_income: pd.Series = field(init=False, repr=False)
     dividends: pd.Series = field(init=False, repr=False)
@@ -41,7 +42,8 @@ class IncomeStatement:
         prev_retained = self.retained_earnings.loc[year]
 
         # REmove when not following vp
-        dividends = self.net_income.loc[year - 1]
+        if self.vp_model:
+            dividends = self.net_income.loc[year - 1]
 
         retained = prev_retained + net_income - dividends
 

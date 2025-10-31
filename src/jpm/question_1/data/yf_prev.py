@@ -169,6 +169,6 @@ if __name__ == "__main__":
     ing = FinanceIngestor(
         "AAPL", cache_dir="/Users/tavisshore/Desktop/HK/data", ttl_days=0
     )
-    bs_q = ing.all_minimal()
-    print(bs_q["bs_q"].head())
-    print(bs_q["bs_q"].columns)
+    bs_q = ing.balance_sheet()
+    print(bs_q["bs_q"])
+    # print(bs_q["bs_q"].columns)

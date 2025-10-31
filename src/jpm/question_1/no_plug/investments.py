@@ -5,7 +5,7 @@ from typing import List
 
 import pandas as pd
 
-from src.jpm.question_1.components.input import InputData
+from src.jpm.question_1.no_plug.input import InputData
 
 
 @dataclass

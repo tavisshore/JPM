@@ -4,9 +4,9 @@ from dataclasses import dataclass, field
 
 import pandas as pd
 
-from src.jpm.question_1.components.input import InputData
-from src.jpm.question_1.components.investments import Investment, InvestmentBook
-from src.jpm.question_1.components.loans import Loan, LoanBook
+from src.jpm.question_1.no_plug.input import InputData
+from src.jpm.question_1.no_plug.investments import Investment, InvestmentBook
+from src.jpm.question_1.no_plug.loans import Loan, LoanBook
 
 
 @dataclass
