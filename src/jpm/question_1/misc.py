@@ -1,8 +1,10 @@
 import math
-from typing import Dict
+from typing import Any, Dict, List
 
 import pandas as pd
 import tensorflow as tf
+
+Nested = Dict[str, Any] | List[str]
 
 
 def _snake(s: str) -> str:
@@ -13,6 +15,43 @@ def _snake(s: str) -> str:
         .replace("-", "_")
         .replace("__", "_")
     )
+
+
+def find_subtree(d: Nested, target: str) -> Nested | None:
+    """Locate the subtree whose key == target."""
+    if isinstance(d, list):
+        return None
+
+    for k, v in d.items():
+        if k == target:
+            return v
+        if isinstance(v, dict):
+            out = find_subtree(v, target)
+            if out is not None:
+                return out
+
+    return None
+
+
+def collect_leaves(d: Nested) -> List[str]:
+    """Return all leaf strings under a nested dict/list."""
+    if isinstance(d, list):
+        return d
+
+    out: List[str] = []
+    for v in d.values():
+        out.extend(collect_leaves(v))
+    return out
+
+
+def get_leaf_values(d: Nested, sub_key: str | None = None) -> List[str]:
+    if sub_key:
+        subtree = find_subtree(d, sub_key)
+        if subtree is None:
+            return []
+        return collect_leaves(subtree)
+
+    return collect_leaves(d)
 
 
 def to_tensor(x) -> tf.Tensor:

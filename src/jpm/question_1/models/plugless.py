@@ -28,9 +28,8 @@ term loans (for illustration purposes).
 from __future__ import annotations
 
 import pandas as pd
-
-from src.jpm.question_1.misc import as_series
 from src.jpm.question_1.no_plug import (
+    BalanceSheet,
     CashBudget,
     IncomeStatement,
     InputData,
@@ -38,26 +37,26 @@ from src.jpm.question_1.no_plug import (
     LoanBook,
 )
 
+from src.jpm.question_1.misc import as_series
+
 if __name__ == "__main__":
-    years = pd.Index([0, 1, 2], name="year")
+    years = pd.Index([0, 1, 2, 3], name="year")
 
     input_data = InputData(
         years=years,
-        ebit=as_series({0: 0, 1: 5, 2: 9}, years),
-        depreciation=as_series({0: 0, 1: 9, 2: 9}, years),
-        net_fixed_assets=as_series({0: 45, 1: 36, 2: 27}, years),
-        min_cash=as_series({0: 10, 1: 10, 2: 10}, years),
-        kd=as_series({0: 0, 1: 0.13, 2: 0.13}, years),
-        rtn_st_inv=as_series({0: 0, 1: 0.08, 2: 0.08}, years),
-        equity_investment=25.0,
+        ebit=as_series({0: 0, 1: 5, 2: 9, 3: 12.0}, years),
+        depreciation=as_series({0: 0, 1: 9, 2: 9, 3: 9}, years),
+        net_fixed_assets=as_series({0: 45, 1: 36, 2: 27, 3: 18}, years),
+        min_cash=as_series({0: 10, 1: 10, 2: 10, 3: 10}, years),
+        kd=as_series({0: 0, 1: 0.13, 2: 0.13, 3: 0.13}, years),
+        rtn_st_inv=as_series({0: 0, 1: 0.08, 2: 0.08, 3: 0.08}, years),
+        equity_investment=as_series({0: 25, 1: 0, 2: 0, 3: 0}, years),
         st_loan_term=1,
         lt_loan_term=5,
     )
 
     loanbook = LoanBook()
     investmentbook = InvestmentBook()
-
-    cb = CashBudget(input_data, years)
 
     i_s = IncomeStatement(
         years=years,
@@ -66,45 +65,63 @@ if __name__ == "__main__":
         investmentbook=investmentbook,
     )
 
-    # Year 0
-    cb0 = cb.year0(loanbook, investmentbook)
+    cb = CashBudget(
+        input=input_data, years=years, loanbook=loanbook, investmentbook=investmentbook
+    )
+
+    bs = BalanceSheet(
+        years=years,
+        input_data=input_data,
+        cashbudget=cb,
+        income_statement=i_s,
+        loanbook=loanbook,
+        investmentbook=investmentbook,
+    )
+
+    # Year 0 - has different characteristics with VP
+    cb0 = cb.generate_0()
 
     # Year 1
-    is1 = i_s.generate_statement(year=1, dividends=0.0)
-    cb1 = cb.project_cb(
+    is1 = i_s.generate(year=1, dividends=0.0)
+    cb1 = cb.generate(
         year=1,
         equity_contrib=0,
         dividends=0,
-        loanbook=loanbook,
-        investmentbook=investmentbook,
     )
 
     # Year 2
-    is2 = i_s.generate_statement(year=2, dividends=0.0)
-
-    cb2 = cb.project_cb(
+    is2 = i_s.generate(year=2)
+    cb2 = cb.generate(
         year=2,
         equity_contrib=0,
         dividends=0.0,
-        loanbook=loanbook,
-        investmentbook=investmentbook,
     )
 
-    print(is1)
-    print()
-    print(is2)
-
-    # is1 = IncomeStatement(
-    #     years=years,
-    #     ebit=idata.ebit,                     # {1:5, 2:9}
-    #     rtn_rate_st=idata.rtn_st_inv,        # {1:0.08, 2:0.08}
-    #     st_invest_end_prev=st_invest_bs,     # 0 at year 0 ⇒ return in year 1 = 0
-    #     st_interest=st_loan_sched.compute()["Interest payment ST loan"],
-    #     lt_interest=lt_loan_sched.compute()["Interest payment LT loan"],
+    # # Year 3
+    # is3 = i_s.generate(year=3)
+    # cb3 = cb.generate(
+    #     year=3,
+    #     equity_contrib=0,
     #     dividends=0.0,
-    # ).compute()
+    # )
 
-    # # Subsequent years - loop with some example data
+    # # Calculate the final BS
+    # b0 = bs.generate(year=0)
+    # b1 = bs.generate(year=1)
+    # b2 = bs.generate(year=2)
+    # b3 = bs.generate(year=3)
 
-    # print(is1.loc[1].round(1))
-    print()
+    # print()
+    # print()
+
+    # print(b0)
+    # print()
+
+    # print(b1)
+    # print()
+
+    # print(b2)
+    # print()
+
+    # print(b3)
+    # print()

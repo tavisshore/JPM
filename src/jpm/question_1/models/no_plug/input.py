@@ -12,7 +12,7 @@ class InputData:
     min_cash: pd.Series
     kd: pd.Series
     rtn_st_inv: pd.Series
-    equity_investment: float
+    equity_investment: pd.Series
     st_loan_term: int
     lt_loan_term: int
     ebitda: pd.Series = field(init=False, repr=True)
@@ -25,3 +25,4 @@ class InputData:
         object.__setattr__(self, "kd", self.kd.fillna(0))
         object.__setattr__(self, "rtn_st_inv", self.rtn_st_inv.fillna(0))
         object.__setattr__(self, "ebitda", (self.ebit + self.depreciation).fillna(0.0))
+        object.__setattr__(self, "equity_investment", self.equity_investment.fillna(0))

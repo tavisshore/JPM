@@ -4,7 +4,6 @@ from dataclasses import dataclass, field
 from typing import Iterable
 
 import pandas as pd
-
 from src.jpm.question_1.no_plug.input import InputData
 
 
@@ -33,6 +32,13 @@ class DebtPay:
     st_principal: float
     lt_interest: float
     lt_principal: float
+    total: float
+
+
+@dataclass
+class DebtBalances:
+    st_debt: float
+    lt_debt: float
     total: float
 
 
@@ -158,6 +164,8 @@ class LoanBook:
                 elif loan.category == "ST":
                     st_interest += float(row["Interest payment ST loan"])
                     st_principal += float(row["Principal payments ST loan"])
+            else:
+                self.loans.remove(loan)
 
         return DebtPay(
             st_interest=st_interest,
@@ -165,4 +173,29 @@ class LoanBook:
             lt_interest=lt_interest,
             lt_principal=lt_principal,
             total=st_interest + st_principal + lt_interest + lt_principal,
+        )
+
+    def remaining_debt(self, year):
+        """
+        Return ST and LT debt totals
+        """
+        st_total, lt_total = 0.0, 0.0
+
+        for loan in self.loans:
+            if loan.loan_ongoing(year):  # Remove spent loans?
+                row = loan.compute(year)
+                # print(row)
+                # Beginning balance             10.0
+                # Interest payment ST loan       0.0
+                # Principal payments ST loan     0.0
+                # Total payment ST loan          0.0
+                # Ending balance                10.0
+                # Interest rate                  0.0
+                if loan.category == "LT":
+                    lt_total += float(row["Ending balance"])  # Or end?
+                elif loan.category == "ST":
+                    st_total += float(row["Ending balance"])
+
+        return DebtBalances(
+            st_debt=st_total, lt_debt=lt_total, total=st_total + lt_total
         )

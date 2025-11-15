@@ -1,3 +1,4 @@
+from .balance import BalanceSheet
 from .cash import CashBudget
 from .income import IncomeStatement
 from .input import InputData
@@ -12,4 +13,5 @@ __all__ = [
     "InvestmentBook",
     "LoanBook",
     "Loan",
+    "BalanceSheet",
 ]
