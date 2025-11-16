@@ -1,20 +1,14 @@
+from __future__ import annotations
+
+import argparse
 import math
+from pathlib import Path
 from typing import Any, Dict, List
 
 import pandas as pd
 import tensorflow as tf
 
 Nested = Dict[str, Any] | List[str]
-
-
-def _snake(s: str) -> str:
-    return (
-        s.lower()
-        .replace(" ", "_")
-        .replace("/", "_")
-        .replace("-", "_")
-        .replace("__", "_")
-    )
 
 
 def find_subtree(d: Nested, target: str) -> Nested | None:
@@ -44,7 +38,7 @@ def collect_leaves(d: Nested) -> List[str]:
     return out
 
 
-def get_leaf_values(d: Nested, sub_key: str | None = None) -> List[str]:
+def get_leaf_values(d, sub_key: str | None = None) -> List[str]:
     if sub_key:
         subtree = find_subtree(d, sub_key)
         if subtree is None:
@@ -58,7 +52,7 @@ def to_tensor(x) -> tf.Tensor:
     return tf.convert_to_tensor(x, dtype=tf.float32)
 
 
-def tf_sum(xs):
+def tf_sum(xs) -> tf.Tensor:
     return tf.add_n(xs)
 
 
@@ -71,7 +65,7 @@ def coerce_float(x) -> float:
         return 0.0
 
 
-def as_series(mapping, years):
+def as_series(mapping: Dict[int, float], years) -> pd.Series:
     return pd.Series(
         [mapping.get(y, math.nan) for y in years], index=years, dtype="float64"
     )
@@ -81,3 +75,31 @@ def errs_below_tol(errs: Dict[str, tf.Tensor], tol: float = 1e-4) -> tf.Tensor:
     tol_t = tf.constant(tol, dtype=tf.float32)
     vals = [tf.convert_to_tensor(v, dtype=tf.float32) for v in errs.values()]
     return tf.reduce_all(tf.math.less(tf.stack(vals), tol_t))
+
+
+def train_args():
+    p = argparse.ArgumentParser()
+
+    # Data
+    p.add_argument("--ticker", type=str, default="AAPL")
+    p.add_argument("--cache_dir", type=str, default="/Users/tavisshore/Desktop/HK/data")
+    p.add_argument("--target", type=str, default=None)
+    p.add_argument("--batch_size", type=int, default=None)
+    p.add_argument("--lookback", type=int, default=None)
+    p.add_argument("--horizon", type=int, default=None)
+
+    # Model params
+    p.add_argument("--hidden_units", type=int, default=None)
+    p.add_argument("--dense_units", type=int, default=None)
+    p.add_argument("--epochs", type=int, default=None)
+    p.add_argument("--lr", type=float, default=None)
+
+    # Training
+    p.add_argument("--checkpoint_path", type=Path, default=Path("ckpts"))
+
+    # BS identiy loss
+    p.add_argument("--lambda_balance", type=float, default=None)
+    p.add_argument("--enforce_balance", type=bool, default=None)
+    p.add_argument("--learn_subtotals", type=bool, default=None)
+
+    return p.parse_args()

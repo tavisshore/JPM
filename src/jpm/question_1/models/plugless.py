@@ -28,7 +28,9 @@ term loans (for illustration purposes).
 from __future__ import annotations
 
 import pandas as pd
-from src.jpm.question_1.no_plug import (
+
+from src.jpm.question_1.misc import as_series
+from src.jpm.question_1.models.no_plug import (
     BalanceSheet,
     CashBudget,
     IncomeStatement,
@@ -36,8 +38,6 @@ from src.jpm.question_1.no_plug import (
     InvestmentBook,
     LoanBook,
 )
-
-from src.jpm.question_1.misc import as_series
 
 if __name__ == "__main__":
     years = pd.Index([0, 1, 2, 3], name="year")

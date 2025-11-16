@@ -9,6 +9,7 @@ from edgar import Company
 from edgar.xbrl import XBRLS
 from sklearn.preprocessing import StandardScaler
 
+from src.jpm.question_1.config import Config
 from src.jpm.question_1.data.utils import (
     bs_identity,
     build_windows,
@@ -39,58 +40,58 @@ format_limit = {
 class EdgarDataLoader:
     def __init__(
         self,
-        ticker="AAPL",
-        periods=40,
-        cache_dir="/Users/tavisshore/Desktop/HK/data",
-        target="full",
+        config: Config,
     ) -> None:
-        self.cache_statement = Path(f"{cache_dir}/{ticker}.parquet")
-        self.ticker = ticker
-        self.periods = periods
-        self.lookback, self.horizon = 4, 1
-        self.batch_size = 32
-        self.target_type = target
-        self.bs_structure = get_bs_structure(ticker=ticker)
-
-        self.company = Company(ticker)
-        self.feat_stat = {}
+        self.config = config
+        self.cache_statement = Path(
+            f"{self.config.data.cache_dir}/{self.config.data.ticker}.parquet"
+        )
+        self.bs_structure = get_bs_structure(ticker=self.config.data.ticker)
         self.create_dataset()
 
     def create_dataset(self) -> None:
-        self.bs_keys = get_bs_structure(ticker=self.ticker, flatten=True)
+        self.bs_keys = get_leaf_values(get_bs_structure(ticker=self.config.data.ticker))
 
         if self.cache_statement.exists():
             self.data = pd.read_parquet(self.cache_statement)
         else:
+            # Originally in __init__ for downstream
+            # But prevents offline exec
+            self.company = Company(self.config.data.ticker)
             self.create_statements()
 
         # Actually names of features in self.data to column indices
         self.feat_to_idx = {n: i for i, n in enumerate(self.data.columns.tolist())}
-
         # Maybe - check accounting identities now, before training
-        bs_identity(self.data, ticker=self.ticker)
+        bs_identity(self.data, ticker=self.config.data.ticker)
         # TODO - Add more checks
 
         # Now convert into tensorflow training data
+        tar = get_targets(
+            mode=self.config.data.target_type, ticker=self.config.data.ticker
+        )
+
+        if self.config.data.target_type != "full":
+            self.targets = [t for t in tar if t in self.feat_to_idx]
+            self.tgt_indices = [self.feat_to_idx[t] for t in self.targets]
+        else:
+            self.targets = list(self.data.columns)
+            self.tgt_indices = list(range(len(self.targets)))
+
         scaler = StandardScaler()
         X_scaled = scaler.fit_transform(self.data.values.astype("float32"))
-        self.feat_stat["mean"] = scaler.mean_.astype("float32")
-        self.feat_stat["std"] = scaler.scale_.astype("float32")
+        self.full_mean = np.asarray(scaler.mean_, dtype="float32")
+        self.full_std = np.asarray(scaler.scale_, dtype="float32")
+        self.target_mean = self.full_mean[self.tgt_indices]
+        self.target_std = self.full_std[self.tgt_indices]
 
-        if self.target_type != "full":
-            tar = get_targets(mode=self.target_type, ticker=self.ticker)
-            self.tgt_indices = [
-                self.feat_to_idx[t] for t in tar if t in self.feat_to_idx
-            ]
-        else:
-            self.tgt_indices = list(range(len(self.data.columns)))
         self.map_features()
         # Create separate windows for individual companies + concatenate
         # X_windows_list, y_windows_list = [], []
         X_train, y_train, X_test, y_test = build_windows(
             X=X_scaled,
-            lookback=self.lookback,
-            horizon=self.horizon,
+            lookback=self.config.data.lookback,
+            horizon=self.config.data.horizon,
             tgt_indices=self.tgt_indices,
         )
         # X_windows_list.append(Xw)
@@ -105,50 +106,61 @@ class EdgarDataLoader:
                 (X_train.astype("float32"), y_train.astype("float32"))
             )
             .shuffle(len(X_train))
-            .batch(self.batch_size)
+            .batch(self.config.data.batch_size)
             .prefetch(tf.data.AUTOTUNE)
         )
 
-        self.test_dataset = tf.data.Dataset.from_tensor_slices((X_test, y_test)).batch(
-            self.batch_size
+        self.val_dataset = tf.data.Dataset.from_tensor_slices((X_test, y_test)).batch(
+            self.config.data.batch_size
         )
 
-    def map_features(self):
+    def map_features(self) -> None:
         """
         With the bs, is, and cf structures known, map feature names to indices
         For loss, calculations etc.
         """
-        # Start with A = L + E structure
-        self.feature_mappings = {}
-        self.feature_mappings["assets"] = [
-            self.feat_to_idx[k] for k in get_leaf_values(self.bs_structure, "assets")
-        ]
-        self.feature_mappings["liabilities"] = [
-            self.feat_to_idx[k]
-            for k in get_leaf_values(self.bs_structure, "liabilities")
-        ]
-        self.feature_mappings["equity"] = [
-            self.feat_to_idx[k] for k in get_leaf_values(self.bs_structure, "equity")
-        ]
 
-        # Maybe make sub-categories lower weighted losses later?
-        self.feature_mappings["current_assets"] = [
-            self.feat_to_idx[k]
-            for k in get_leaf_values(self.bs_structure, "current_assets")
-        ]
-        self.feature_mappings["non_current_assets"] = [
-            self.feat_to_idx[k]
-            for k in get_leaf_values(self.bs_structure, "non_current_assets")
-        ]
-        self.feature_mappings["current_liabilities"] = [
-            self.feat_to_idx[k]
-            for k in get_leaf_values(self.bs_structure, "current_liabilities")
-        ]
-        self.feature_mappings["non_current_liabilities"] = [
-            self.feat_to_idx[k]
-            for k in get_leaf_values(self.bs_structure, "non_current_liabilities")
-        ]
-        # Adding mappings here
+        name_to_target_idx = {name: i for i, name in enumerate(self.targets)}
+
+        self.feature_mappings = {
+            "assets": [
+                name_to_target_idx[n]
+                for group in ("current_assets", "non_current_assets")
+                for n in self.bs_structure["assets"][group]
+                if n in name_to_target_idx
+            ],
+            "liabilities": [
+                name_to_target_idx[n]
+                for group in ("current_liabilities", "non_current_liabilities")
+                for n in self.bs_structure["liabilities"][group]
+                if n in name_to_target_idx
+            ],
+            "equity": [
+                name_to_target_idx[n]
+                for n in self.bs_structure["equity"]
+                if n in name_to_target_idx
+            ],
+            "current_assets": [
+                name_to_target_idx[n]
+                for n in self.bs_structure["assets"]["current_assets"]
+                if n in name_to_target_idx
+            ],
+            "non_current_assets": [
+                name_to_target_idx[n]
+                for n in self.bs_structure["assets"]["non_current_assets"]
+                if n in name_to_target_idx
+            ],
+            "current_liabilities": [
+                name_to_target_idx[n]
+                for n in self.bs_structure["liabilities"]["current_liabilities"]
+                if n in name_to_target_idx
+            ],
+            "non_current_liabilities": [
+                name_to_target_idx[n]
+                for n in self.bs_structure["liabilities"]["non_current_liabilities"]
+                if n in name_to_target_idx
+            ],
+        }
 
     def create_statements(self) -> None:
         self.filings = self.company.get_filings(form="10-Q")
@@ -156,19 +168,29 @@ class EdgarDataLoader:
 
         # Process each statement
         self.bs_df = self._process_statement(
-            stmt=self.xbrls.statements.balance_sheet(max_periods=self.periods),
+            stmt=self.xbrls.statements.balance_sheet(
+                max_periods=self.config.data.periods
+            ),
             kind="balance sheet",
             needed_cols=self.bs_keys,
         )
         self.is_df = self._process_statement(
-            stmt=self.xbrls.statements.income_statement(max_periods=self.periods),
+            stmt=self.xbrls.statements.income_statement(
+                max_periods=self.config.data.periods
+            ),
             kind="income statement",
-            needed_cols=get_is_structure(ticker=self.ticker, flatten=True),
+            needed_cols=get_leaf_values(
+                get_is_structure(ticker=self.config.data.ticker)
+            ),
         )
         self.cf_df = self._process_statement(
-            stmt=self.xbrls.statements.cashflow_statement(max_periods=self.periods),
+            stmt=self.xbrls.statements.cashflow_statement(
+                max_periods=self.config.data.periods
+            ),
             kind="cash flow statement",
-            needed_cols=get_cf_structure(ticker=self.ticker, flatten=True),
+            needed_cols=get_leaf_values(
+                get_cf_structure(ticker=self.config.data.ticker)
+            ),
         )
 
         # Align all statements on common dates (monthly periods)
@@ -191,7 +213,7 @@ class EdgarDataLoader:
         Common XBRL → tidy DataFrame pipeline.
         """
         if stmt is None:
-            raise ValueError(f"No {kind} found for {self.ticker}")
+            raise ValueError(f"No {kind} found for {self.config.data.ticker}")
 
         df = stmt.to_dataframe()
 
@@ -208,8 +230,8 @@ class EdgarDataLoader:
         wide.index.name = "period_end"
 
         # Drop records before format change
-        if self.ticker in format_limit:
-            wide = wide[wide.index >= format_limit[self.ticker]]
+        if self.config.data.ticker in format_limit:
+            wide = wide[wide.index >= format_limit[self.config.data.ticker]]
 
         # Normalise column names, collapse duplicates, clean NaNs
         wide.columns = [xbrl_to_snake(col) for col in wide.columns]
@@ -224,6 +246,5 @@ class EdgarDataLoader:
 
 
 if __name__ == "__main__":
-    loader = EdgarDataLoader(
-        ticker="AAPL", cache_dir="/Users/tavisshore/Desktop/HK/data"
-    )
+    config = Config()
+    loader = EdgarDataLoader(config=config)

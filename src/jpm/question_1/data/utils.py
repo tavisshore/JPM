@@ -1,10 +1,35 @@
-import math
 import re
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, TypedDict, Union
 
 import numpy as np
 
 from src.jpm.question_1.misc import get_leaf_values
+
+
+class AssetSection(TypedDict):
+    current_assets: List[str]
+    non_current_assets: List[str]
+
+
+class LiabilitySection(TypedDict):
+    current_liabilities: List[str]
+    non_current_liabilities: List[str]
+
+
+class BalanceSheetStructure(TypedDict):
+    assets: AssetSection
+    liabilities: LiabilitySection
+    equity: List[str]
+
+
+def _snake(s: str) -> str:
+    return (
+        s.lower()
+        .replace(" ", "_")
+        .replace("/", "_")
+        .replace("-", "_")
+        .replace("__", "_")
+    )
 
 
 # yf names to snake case
@@ -22,50 +47,20 @@ def xbrl_to_snake(name: str) -> str:
     return s.lower()
 
 
-# handle None values
-def nz(x: Optional[float]) -> float:
-    return 0.0 if x is None else float(x)
-
-
-# return the first non-None value
-def first_non_none(*args: Optional[float]) -> Optional[float]:
-    for a in args:
-        if a is not None:
-            return a
-    return None
-
-
-def _rel_diff(a: float, b: float) -> float:
-    """Relative difference |a-b| / max(1, |a|, |b|)."""
-    return abs(a - b) / max(1.0, abs(a), abs(b))
-
-
-def _pct(x: float, denom: float) -> float:
-    return 0.0 if denom == 0 else x / denom
-
-
-def _isfinite(x: float) -> bool:
-    return x is not None and math.isfinite(float(x))
-
-
-def _sign(x: float) -> int:
-    return 0 if x == 0 else (1 if x > 0 else -1)
-
-
-def get_targets(mode="net_income", ticker="AAPL") -> List[str]:
-    if ticker in ["AAPL"]:
+def get_targets(mode: str = "net_income", ticker: str = "AAPL") -> List[str]:
+    if ticker == "AAPL":
         if mode == "net_income":
             return ["net_income_loss"]
-        if mode == "bs":
-            return get_bs_structure(ticker=ticker, flatten=True)
+        elif mode == "bs":
+            return get_leaf_values(get_bs_structure(ticker=ticker))
+
+    return []
 
 
 # Getting the correct columns from dataframes for BS -> later IS + CF
-def get_bs_structure(
-    ticker="AAPL", flatten=False
-) -> Union[Dict[str, list[str]], list[str]]:
-    if ticker in ["AAPL", "NVDA"]:
-        structure = {
+def get_bs_structure(ticker: str = "AAPL") -> BalanceSheetStructure:
+    if ticker in ["AAPL"]:
+        structure: BalanceSheetStructure = {
             "assets": {
                 "current_assets": [
                     "cash_and_cash_equivalents_at_carrying_value",
@@ -101,17 +96,25 @@ def get_bs_structure(
                 "accumulated_other_comprehensive_income_loss_net_of_tax",
             ],
         }
-
-    if flatten:
-        return get_leaf_values(structure)
+    else:
+        # TODO: extend for other tickers
+        structure: BalanceSheetStructure = {
+            "assets": {
+                "current_assets": [],
+                "non_current_assets": [],
+            },
+            "liabilities": {
+                "current_liabilities": [],
+                "non_current_liabilities": [],
+            },
+            "equity": [],
+        }
 
     return structure
 
 
-def get_is_structure(
-    ticker="AAPL", flatten=False
-) -> Union[Dict[str, list[str]], list[str]]:
-    if ticker in ["AAPL", "NVDA"]:
+def get_is_structure(ticker="AAPL") -> Dict[str, list[str]]:
+    if ticker in ["AAPL"]:
         structure = {
             "Revenues": [
                 "revenue_from_contract_with_customer_excluding_assessed_tax",
@@ -126,16 +129,13 @@ def get_is_structure(
             ],
         }
 
-    if flatten:
-        return get_leaf_values(structure)
-
     return structure
 
 
 def get_cf_structure(
     ticker="AAPL", flatten=False
 ) -> Union[Dict[str, list[str]], list[str]]:
-    if ticker in ["AAPL", "NVDA"]:
+    if ticker in ["AAPL"]:
         structure = {
             "operating_cash_flow": [
                 "net_income_loss",
