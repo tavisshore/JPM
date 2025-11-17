@@ -1,0 +1,173 @@
+import tensorflow as tf
+from tensorflow.keras.layers import Layer
+
+from jpm.question_1.config import LossConfig
+
+
+def bs_loss(
+    feature_means,
+    feature_stds,
+    feature_mappings,
+    config: LossConfig,
+):
+    means64 = tf.constant(feature_means, dtype=tf.float64)
+    stds64 = tf.constant(feature_stds, dtype=tf.float64)
+
+    asset_idx_tf = tf.constant(feature_mappings["assets"], dtype=tf.int32)
+    liability_idx_tf = tf.constant(feature_mappings["liabilities"], dtype=tf.int32)
+    equity_idx_tf = tf.constant(feature_mappings["equity"], dtype=tf.int32)
+
+    if config.learn_subtotals:
+        asset_cur_idx_tf = tf.constant(
+            feature_mappings["current_assets"], dtype=tf.int32
+        )
+        asset_noncur_idx_tf = tf.constant(
+            feature_mappings["non_current_assets"], dtype=tf.int32
+        )
+        liab_cur_idx_tf = tf.constant(
+            feature_mappings["current_liabilities"], dtype=tf.int32
+        )
+        liab_noncur_idx_tf = tf.constant(
+            feature_mappings["non_current_liabilities"], dtype=tf.int32
+        )
+
+    def loss(y_true, y_pred):
+        y_true64 = tf.cast(y_true, tf.float64)
+        y_pred64 = tf.cast(y_pred, tf.float64)
+
+        base = tf.reduce_mean(tf.square(y_true64 - y_pred64))
+
+        y_pred_unscaled = y_pred64 * stds64 + means64
+
+        assets = tf.reduce_sum(
+            tf.gather(y_pred_unscaled, asset_idx_tf, axis=-1), axis=-1
+        )
+        liabilities = tf.reduce_sum(
+            tf.gather(y_pred_unscaled, liability_idx_tf, axis=-1), axis=-1
+        )
+        equity = tf.reduce_sum(
+            tf.gather(y_pred_unscaled, equity_idx_tf, axis=-1), axis=-1
+        )
+
+        eps = tf.constant(1e-6, dtype=tf.float64)
+
+        total_loss = base
+
+        if config.learn_identity:
+            violation = assets - (liabilities + equity)
+            denom_ALE = tf.abs(assets) + tf.abs(liabilities) + tf.abs(equity) + eps
+            rel_violation = violation / denom_ALE
+            identity_penalty = tf.reduce_mean(tf.square(rel_violation))
+            total_loss = total_loss + config.identity_weight * identity_penalty
+
+        if config.learn_subtotals:
+            assets_current = tf.reduce_sum(
+                tf.gather(y_pred_unscaled, asset_cur_idx_tf, axis=-1), axis=-1
+            )
+            assets_noncurrent = tf.reduce_sum(
+                tf.gather(y_pred_unscaled, asset_noncur_idx_tf, axis=-1), axis=-1
+            )
+            assets_sub_sum = assets_current + assets_noncurrent
+            assets_sub_violation = assets_sub_sum - assets
+            denom_A = tf.abs(assets) + eps
+            rel_assets_sub_violation = assets_sub_violation / denom_A
+            assets_sub_penalty = tf.reduce_mean(tf.square(rel_assets_sub_violation))
+
+            liab_current = tf.reduce_sum(
+                tf.gather(y_pred_unscaled, liab_cur_idx_tf, axis=-1), axis=-1
+            )
+            liab_noncurrent = tf.reduce_sum(
+                tf.gather(y_pred_unscaled, liab_noncur_idx_tf, axis=-1), axis=-1
+            )
+            liab_sub_sum = liab_current + liab_noncurrent
+            liab_sub_violation = liab_sub_sum - liabilities
+            denom_L = tf.abs(liabilities) + eps
+            rel_liab_sub_violation = liab_sub_violation / denom_L
+            liab_sub_penalty = tf.reduce_mean(tf.square(rel_liab_sub_violation))
+
+            subcategory_penalty = assets_sub_penalty + liab_sub_penalty
+            total_loss = total_loss + config.subcategory_weight * subcategory_penalty
+
+        return total_loss
+
+    return loss
+
+
+class EnforceBalance(Layer):
+    """Enforce A = L + E via a slack equity term, using float64 internally."""
+
+    def __init__(
+        self,
+        feature_mappings,
+        feature_means,
+        feature_stds,
+        slack_name="accumulated_other_comprehensive_income_loss_net_of_tax",
+        feature_names=None,
+        **kwargs,
+    ):
+        super().__init__(**kwargs)
+        self.asset_idx = tf.constant(feature_mappings["assets"], dtype=tf.int32)
+        self.liability_idx = tf.constant(
+            feature_mappings["liabilities"], dtype=tf.int32
+        )
+        self.equity_idx = tf.constant(feature_mappings["equity"], dtype=tf.int32)
+
+        if feature_names is None:
+            raise ValueError("feature_names required to find slack index")
+
+        if slack_name not in feature_names:
+            raise ValueError(
+                f"Slack variable '{slack_name}' not found in feature names"
+            )
+
+        self.slack_idx = feature_names.index(slack_name)
+
+        equity_idx_py = list(feature_mappings["equity"])
+        if self.slack_idx not in equity_idx_py:
+            raise ValueError(
+                f"Slack index {self.slack_idx} ('{slack_name}') "
+                f"is not in equity indices {equity_idx_py}. "
+                f"Include the slack feature in the equity mapping."
+            )
+
+        # Store stats as float64
+        self.means = tf.constant(feature_means, dtype=tf.float64)
+        self.stds = tf.constant(feature_stds, dtype=tf.float64)
+
+    @tf.function
+    def call(self, y):
+        # Float64 for precision
+        y64 = tf.cast(y, tf.float64)
+
+        # Unscale into real-world space
+        y_unscaled = y64 * self.stds + self.means
+
+        # Compute unscaled A, L, E
+        assets = tf.reduce_sum(
+            tf.gather(y_unscaled, self.asset_idx, axis=-1), axis=-1, keepdims=True
+        )
+        liabilities = tf.reduce_sum(
+            tf.gather(y_unscaled, self.liability_idx, axis=-1), axis=-1, keepdims=True
+        )
+        equity = tf.reduce_sum(
+            tf.gather(y_unscaled, self.equity_idx, axis=-1), axis=-1, keepdims=True
+        )
+
+        diff = assets - (liabilities + equity)
+
+        batch_size = tf.shape(y_unscaled)[0]
+        idx = tf.stack(
+            [
+                tf.range(batch_size, dtype=tf.int32),
+                tf.fill([batch_size], tf.constant(self.slack_idx, tf.int32)),
+            ],
+            axis=1,
+        )
+
+        y_unscaled_corrected = tf.tensor_scatter_nd_add(
+            y_unscaled, idx, tf.squeeze(diff, axis=-1)
+        )
+
+        # Rescale back to network space, then cast to y dtype
+        y_scaled64 = (y_unscaled_corrected - self.means) / self.stds
+        return tf.cast(y_scaled64, y.dtype)
