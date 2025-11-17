@@ -3,7 +3,7 @@ from typing import Dict, List, Optional, Tuple, TypedDict, Union
 
 import numpy as np
 
-from src.jpm.question_1.misc import get_leaf_values
+from jpm.question_1.misc import get_leaf_values
 
 
 class AssetSection(TypedDict):
@@ -20,23 +20,6 @@ class BalanceSheetStructure(TypedDict):
     assets: AssetSection
     liabilities: LiabilitySection
     equity: List[str]
-
-
-def _snake(s: str) -> str:
-    return (
-        s.lower()
-        .replace(" ", "_")
-        .replace("/", "_")
-        .replace("-", "_")
-        .replace("__", "_")
-    )
-
-
-# yf names to snake case
-def title_to_snake(s: str) -> str:
-    s = re.sub(r"[^0-9A-Za-z]+", " ", s)
-    parts = s.lower().strip().split()
-    return "_".join(parts)
 
 
 def xbrl_to_snake(name: str) -> str:

@@ -3,9 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 import pandas as pd
-from src.jpm.question_1.no_plug.input import InputData
-from src.jpm.question_1.no_plug.investments import Investment, InvestmentBook
-from src.jpm.question_1.no_plug.loans import Loan, LoanBook
+
+from jpm.question_1.models.no_plug.input import InputData
+from jpm.question_1.models.no_plug.investments import Investment, InvestmentBook
+from jpm.question_1.models.no_plug.loans import Loan, LoanBook
 
 
 @dataclass

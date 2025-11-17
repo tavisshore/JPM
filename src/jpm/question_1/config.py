@@ -8,7 +8,7 @@ from pathlib import Path
 @dataclass
 class DataConfig:
     ticker: str = "AAPL"
-    cache_dir: str = "/Users/tavisshore/Desktop/HK/data"
+    cache_dir: str = "/scratch/datasets/jpm"
     periods: int = 40
     lookback: int = 4
     horizon: int = 1
@@ -60,8 +60,8 @@ class TrainingConfig:
 
 @dataclass
 class LossConfig:
-    enforce_balance: bool = True
-    learn_identity: bool = True
+    enforce_balance: bool = False
+    learn_identity: bool = False
     identity_weight: float = 1e-4
     learn_subtotals: bool = False
     subcategory_weight: float = 1e-5

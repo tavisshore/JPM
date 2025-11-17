@@ -4,7 +4,8 @@ from dataclasses import dataclass, field
 from typing import List
 
 import pandas as pd
-from src.jpm.question_1.no_plug.input import InputData
+
+from jpm.question_1.models.no_plug.input import InputData
 
 
 @dataclass

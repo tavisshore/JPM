@@ -4,7 +4,8 @@ from dataclasses import dataclass, field
 from typing import Iterable
 
 import pandas as pd
-from src.jpm.question_1.no_plug.input import InputData
+
+from jpm.question_1.models.no_plug.input import InputData
 
 
 def _make_year_index(start, periods: int, like: pd.Index) -> pd.Index:

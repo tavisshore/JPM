@@ -5,11 +5,11 @@ from typing import Dict
 import numpy as np
 import tensorflow as tf
 
-from src.jpm.question_1.config import Config, ModelConfig
-from src.jpm.question_1.data.ed import EdgarDataLoader
-from src.jpm.question_1.models.losses import EnforceBalance, bs_loss
-from src.jpm.question_1.models.metrics import Metric, TickerResults  # adjust path
-from src.jpm.question_1.vis import (
+from jpm.question_1.config import Config, ModelConfig
+from jpm.question_1.data.ed import EdgarDataLoader
+from jpm.question_1.models.losses import EnforceBalance, bs_loss
+from jpm.question_1.models.metrics import Metric, TickerResults
+from jpm.question_1.vis import (
     build_equity_rows,
     build_section_rows,
     make_row,
@@ -30,7 +30,7 @@ class LSTMForecaster:
     def _build_model(self) -> tf.keras.Model:
         inputs = tf.keras.layers.Input(
             shape=(self.config.data.lookback, self.data.num_features),
-            dtype=tf.float32,
+            dtype=tf.float64,
             name="inputs",
         )
 
@@ -84,14 +84,7 @@ class LSTMForecaster:
         lr: float | tf.keras.optimizers.schedules.LearningRateSchedule = (
             self.config.training.lr
         )
-        if self.config.training.scheduler == "exponential":
-            lr = tf.keras.optimizers.schedules.ExponentialDecay(
-                initial_learning_rate=self.config.training.lr,
-                decay_steps=self.config.training.decay_steps,
-                decay_rate=self.config.training.decay_rate,
-                staircase=True,
-            )
-        elif self.config.training.scheduler == "cosine":
+        if self.config.training.scheduler == "cosine":
             lr = tf.keras.optimizers.schedules.CosineDecayRestarts(
                 initial_learning_rate=self.config.training.lr,
                 first_decay_steps=self.config.training.decay_steps,
@@ -224,7 +217,6 @@ class LSTMForecaster:
             self.val_results if stage == "val" else self.train_results
         )
         ticker = self.config.data.ticker
-        # t_res: TickerResults = results[ticker]
 
         print(f"\033[1mResults for {stage} dataset ({ticker}):\033[0m")
 
@@ -256,6 +248,7 @@ class LSTMForecaster:
 
 
 if __name__ == "__main__":
+    from jpm.question_1.models.balance_sheet import BalanceSheet
     from src.jpm.question_1.config import (
         Config,
         DataConfig,
@@ -264,7 +257,6 @@ if __name__ == "__main__":
         TrainingConfig,
     )
     from src.jpm.question_1.misc import train_args
-    from src.jpm.question_1.models.bs import BalanceSheet
 
     args = train_args()
 

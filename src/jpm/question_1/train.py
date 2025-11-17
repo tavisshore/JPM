@@ -1,14 +1,14 @@
-from src.jpm.question_1.config import (
+from jpm.question_1.config import (
     Config,
     DataConfig,
     LossConfig,
     ModelConfig,
     TrainingConfig,
 )
-from src.jpm.question_1.data.ed import EdgarDataLoader
-from src.jpm.question_1.misc import train_args
-from src.jpm.question_1.models.bs import BalanceSheet
-from src.jpm.question_1.models.lstm import LSTMForecaster
+from jpm.question_1.data.ed import EdgarDataLoader
+from jpm.question_1.misc import train_args
+from jpm.question_1.models.balance_sheet import BalanceSheet
+from jpm.question_1.models.lstm import LSTMForecaster
 
 args = train_args()
 
@@ -31,5 +31,5 @@ model.view_results(stage="train")
 model.view_results(stage="val")
 
 # Pass outputs to BS Model
-bs_model = BalanceSheet(config=config, model_dict=validation_results)
-print(bs_model)
+bs_model = BalanceSheet(config=config, results=validation_results)
+bs_model.check_identity()

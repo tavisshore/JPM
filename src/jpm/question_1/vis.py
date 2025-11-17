@@ -3,7 +3,8 @@ from typing import Sequence
 
 import numpy as np
 
-from src.jpm.question_1.models.metrics import Metric
+from jpm.question_1.misc import format_money
+from jpm.question_1.models.metrics import Metric
 
 ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
 DEFAULT_HEADERS = ("Category", "Real Value", "MAE", "Proportion")
@@ -17,10 +18,6 @@ def fmt(name: str) -> str:
     return name.replace("_", " ").title()
 
 
-def format_billions(x: float) -> str:
-    return f"${x / 1e9:.1f}bn"
-
-
 def format_pct(p: float | float) -> str:
     if np.isnan(p):
         return "N/A"
@@ -28,14 +25,7 @@ def format_pct(p: float | float) -> str:
 
 
 def colour(text: str, fg: str = "") -> str:
-    COLORS = {
-        "red": "\033[31m",
-        "green": "\033[32m",
-        "yellow": "\033[33m",
-        "blue": "\033[34m",
-        "magenta": "\033[35m",
-        "cyan": "\033[36m",
-    }
+    COLORS = {"red": "\033[31m", "orange": "\033[38;5;208m", "green": "\033[32m"}
     reset = "\033[0m"
     return f"{COLORS.get(fg, '')}{text}{reset}" if fg else text
 
@@ -47,7 +37,7 @@ def colour_pct(pct: float) -> str:
     elif pct < 0.20:
         return colour(pct_str, "yellow")
     else:
-        return colour(pct_str, "red")
+        return colour(pct_str, "orange")
 
 
 def colour_mae(val: float) -> str:
@@ -57,14 +47,13 @@ def colour_mae(val: float) -> str:
         return colour(s, "green")
     elif bn < 5:
         return colour(s, "yellow")
-    return colour(s, "red")
+    return colour(s, "orange")
 
 
 def make_row(category: str, metric: Metric) -> list[str]:
-    """metric must have keys: value, mae, pct (pct as proportion, e.g. 0.12)."""
     return [
         category,
-        format_billions(metric.value),
+        format_money(metric.value),
         colour_mae(metric.mae),
         colour_pct(metric.pct),
     ]
@@ -74,18 +63,19 @@ def build_section_rows(
     sections: dict[str, list[str]],
     feature_stats: dict[str, dict],
 ) -> list[list[str]]:
-    """
-    sections: e.g. self.data.bs_structure["assets"] (dict[subsection -> list[feature]])
-    feature_stats: ticker_results["features"][feat] -> metric dict
-    """
     rows: list[list[str]] = []
     for section_key, feats in sections.items():
-        section_name = fmt(section_key)  # e.g. "Current Assets"
+        section_name = fmt(section_key)
+        if "non_current" in section_key.lower():
+            section_name = "Non-Current"
+        elif "current" in section_key.lower():
+            section_name = "Current"
+
         for feat in feats:
             m = feature_stats.get(feat)
             if m is None:
                 continue
-            category = f"{section_name} / {fmt(feat)}"
+            category = f"{section_name} - {fmt(feat)}"
             rows.append(make_row(category, m))
     return rows
 
@@ -99,7 +89,7 @@ def build_equity_rows(
         m = feature_stats.get(feat)
         if m is None:
             continue
-        category = f"Equity / {fmt(feat)}"
+        category = f"{fmt(feat)}"
         rows.append(make_row(category, m))
     return rows
 
@@ -109,13 +99,11 @@ def print_table(
     rows: list[list[str]],
     headers: Sequence[str] | None = None,
 ) -> None:
-    """Print a simple ASCII table, handling ANSI colour codes correctly."""
     if not rows:
         return
 
     header_values = list(headers) if headers is not None else list(DEFAULT_HEADERS)
 
-    # Compute column widths based on *visible* text (ANSI stripped)
     col_widths: list[int] = []
     for col_idx in range(len(header_values)):
         max_len = len(header_values[col_idx])

@@ -77,12 +77,30 @@ def errs_below_tol(errs: Dict[str, tf.Tensor], tol: float = 1e-4) -> tf.Tensor:
     return tf.reduce_all(tf.math.less(tf.stack(vals), tol_t))
 
 
+def format_money(n: float) -> str:
+    abs_n = abs(n)
+
+    if abs_n < 1_000:
+        return f"${n}"
+
+    if abs_n < 1_000_000:
+        return f"${n/1_000:.3g}k"
+
+    if abs_n < 1_000_000_000:
+        return f"${n/1_000_000:.3g}mn"
+
+    if abs_n < 1_000_000_000_000:
+        return f"${n/1_000_000_000:.3g}bn"
+
+    return f"${n/1_000_000_000_000:.3g}tn"
+
+
 def train_args():
     p = argparse.ArgumentParser()
 
     # Data
     p.add_argument("--ticker", type=str, default="AAPL")
-    p.add_argument("--cache_dir", type=str, default="/Users/tavisshore/Desktop/HK/data")
+    p.add_argument("--cache_dir", type=str, default=None)
     p.add_argument("--target", type=str, default=None)
     p.add_argument("--batch_size", type=int, default=None)
     p.add_argument("--lookback", type=int, default=None)

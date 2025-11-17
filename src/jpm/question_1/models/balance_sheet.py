@@ -3,10 +3,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict
 
-from src.jpm.question_1.config import Config
-from src.jpm.question_1.data.utils import get_bs_structure
-from src.jpm.question_1.models.metrics import TickerResults
-from src.jpm.question_1.vis import colour, print_table
+from jpm.question_1.config import Config
+from jpm.question_1.data.utils import get_bs_structure
+from jpm.question_1.misc import format_money
+from jpm.question_1.models.metrics import TickerResults
+from jpm.question_1.vis import colour, print_table
 
 
 @dataclass
@@ -74,7 +75,7 @@ class BalanceSheet:
     def total_liabilities_and_equity(self) -> float:
         return self.total_liabilities + self.total_equity
 
-    def check_identity(self, atol: float = 1e-3) -> None:
+    def check_identity(self, atol: float = 1e3) -> None:
         """
         Check Assets ≈ Liabilities + Equity.
         """
@@ -83,21 +84,26 @@ class BalanceSheet:
         diff = A - L_plus_E
         passed = abs(diff) <= atol
 
-        # Colour rules
+        diff_pct = (diff / A) * 100 if A != 0 else 0.0
+
         if passed:
-            status = colour("PASS", "green")
-            diff_col = colour(f"{diff / 1e9:.2f}bn", "green")
+            diff_col = colour(f"{format_money(diff)} | {round(diff_pct, 2)}%", "green")
         else:
-            status = colour("FAIL", "red")
-            diff_col = colour(f"{diff / 1e9:.2f}bn", "red")
+            if diff_pct < 1:
+                diff_col = colour(
+                    f"{format_money(diff)} | {round(diff_pct, 2)}%", "orange"
+                )
+            else:
+                diff_col = colour(
+                    f"{format_money(diff)} | {round(diff_pct, 2)}%", "red"
+                )
 
         rows = [
             [
                 "Accounting Identity (A = L + E)",
-                f"${A / 1e9:.2f}bn",
-                f"${L_plus_E / 1e9:.2f}bn",
+                f"{format_money(A)}",
+                f"{format_money(L_plus_E)}",
                 diff_col,
-                status,
             ]
         ]
 

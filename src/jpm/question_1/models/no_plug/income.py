@@ -4,8 +4,8 @@ from dataclasses import dataclass, field
 
 import pandas as pd
 
-from .investments import InvestmentBook
-from .loans import LoanBook
+from jpm.question_1.models.no_plug.investments import InvestmentBook
+from jpm.question_1.models.no_plug.loans import LoanBook
 
 
 @dataclass

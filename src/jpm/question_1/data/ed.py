@@ -9,8 +9,8 @@ from edgar import Company
 from edgar.xbrl import XBRLS
 from sklearn.preprocessing import StandardScaler
 
-from src.jpm.question_1.config import Config
-from src.jpm.question_1.data.utils import (
+from jpm.question_1.config import Config
+from jpm.question_1.data.utils import (
     bs_identity,
     build_windows,
     get_bs_structure,
@@ -79,9 +79,9 @@ class EdgarDataLoader:
             self.tgt_indices = list(range(len(self.targets)))
 
         scaler = StandardScaler()
-        X_scaled = scaler.fit_transform(self.data.values.astype("float32"))
-        self.full_mean = np.asarray(scaler.mean_, dtype="float32")
-        self.full_std = np.asarray(scaler.scale_, dtype="float32")
+        X_scaled = scaler.fit_transform(self.data.values.astype("float64"))
+        self.full_mean = np.asarray(scaler.mean_, dtype="float64")
+        self.full_std = np.asarray(scaler.scale_, dtype="float64")
         self.target_mean = self.full_mean[self.tgt_indices]
         self.target_std = self.full_std[self.tgt_indices]
 
@@ -103,7 +103,7 @@ class EdgarDataLoader:
         self.num_targets = len(self.tgt_indices)  # Output dim
         self.train_dataset = (
             tf.data.Dataset.from_tensor_slices(
-                (X_train.astype("float32"), y_train.astype("float32"))
+                (X_train.astype("float64"), y_train.astype("float64"))
             )
             .shuffle(len(X_train))
             .batch(self.config.data.batch_size)
