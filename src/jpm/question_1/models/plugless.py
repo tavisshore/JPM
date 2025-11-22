@@ -49,7 +49,7 @@ if __name__ == "__main__":
         net_fixed_assets=as_series({0: 45, 1: 36, 2: 27, 3: 18}, years),
         min_cash=as_series({0: 10, 1: 10, 2: 10, 3: 10}, years),
         kd=as_series({0: 0, 1: 0.13, 2: 0.13, 3: 0.13}, years),
-        rtn_st_inv=as_series({0: 0, 1: 0.08, 2: 0.08, 3: 0.08}, years),
+        rtn_st_inv=as_series({0: 0.08, 1: 0.08, 2: 0.08, 3: 0.08}, years),
         equity_investment=as_series({0: 25, 1: 0, 2: 0, 3: 0}, years),
         st_loan_term=1,
         lt_loan_term=5,
@@ -80,48 +80,44 @@ if __name__ == "__main__":
 
     # Year 0 - has different characteristics with VP
     cb0 = cb.generate_0()
+    cb0.name = 0
 
-    # Year 1
-    is1 = i_s.generate(year=1, dividends=0.0)
-    cb1 = cb.generate(
-        year=1,
-        equity_contrib=0,
-        dividends=0,
-    )
+    cash_budget_history = []
+    income_statement_history = []
+    balance_sheet_history = []
 
-    # Year 2
-    is2 = i_s.generate(year=2)
-    cb2 = cb.generate(
-        year=2,
-        equity_contrib=0,
-        dividends=0.0,
-    )
+    cash_budget_history.append(cb0)
 
-    # # Year 3
-    # is3 = i_s.generate(year=3)
-    # cb3 = cb.generate(
-    #     year=3,
-    #     equity_contrib=0,
-    #     dividends=0.0,
-    # )
+    for year in years[1:]:
+        income_row = i_s.generate(year=year)
+        income_row.name = year
+        income_statement_history.append(income_row)
 
-    # # Calculate the final BS
-    # b0 = bs.generate(year=0)
-    # b1 = bs.generate(year=1)
-    # b2 = bs.generate(year=2)
-    # b3 = bs.generate(year=3)
+        dividends = float(i_s.dividends.reindex(years).at[year])
+        equity_contrib = float(input_data.equity_investment.reindex(years).at[year])
 
-    # print()
-    # print()
+        cash_row = cb.generate(
+            year=year,
+            equity_contrib=equity_contrib,
+            dividends=dividends,
+        )
+        cash_row.name = year
+        cash_budget_history.append(cash_row)
 
-    # print(b0)
-    # print()
+    for year in years:
+        bs_row = bs.generate(year)
+        bs_row.name = year
+        balance_sheet_history.append(bs_row)
 
-    # print(b1)
-    # print()
+    pd.set_option("display.float_format", "{:.2f}".format)
 
-    # print(b2)
-    # print()
+    print("Income Statement")
+    print(pd.DataFrame(income_statement_history).T)
+    print()
 
-    # print(b3)
-    # print()
+    print("Cash Budget")
+    print(pd.DataFrame(cash_budget_history).T)
+    print()
+
+    print("Balance Sheet")
+    print(pd.DataFrame(balance_sheet_history).T)

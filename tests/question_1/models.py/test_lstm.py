@@ -261,12 +261,21 @@ def test_view_results_prints_tables(monkeypatch, tmp_path):
     data = DummyDataLoader()
     forecaster = LSTMForecaster(config=config, data=data)
 
-    metric = Metric(value=1.0, mae=0.1, pct=0.01)
+    metric = Metric(value=1.0, mae=0.1, gt=0.9)
     forecaster.val_results = SimpleNamespace(
         assets=metric,
         liabilities=metric,
         equity=metric,
         features={"feature0": metric, "feature1": metric},
+        baseline_mae={},
+        skill={},
+        model_mae=0.0,
+        net_income_baseline_mae={},
+        net_income_skill={},
+        net_income_model_mae=0.0,
+        net_income_pred=0.0,
+        net_income_gt=0.0,
+        net_income_baseline_pred={},
     )
 
     make_row_mock = MagicMock(side_effect=lambda label, m: [label, m.value])

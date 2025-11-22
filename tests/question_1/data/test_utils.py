@@ -51,7 +51,7 @@ def test_get_cf_structure_flatten(monkeypatch):
 @unit
 def test_build_windows_splits_train_and_test():
     """build_windows should split sliding windows into train/test
-    respecting withhold."""
+    respecting the withhold."""
     X = np.arange(12, dtype=float).reshape(6, 2)
     X_train, y_train, X_test, y_test = utils.build_windows(
         X, lookback=2, horizon=1, tgt_indices=[0], withhold=1

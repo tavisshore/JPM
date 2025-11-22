@@ -34,10 +34,11 @@ def get_targets(mode: str = "net_income", ticker: str = "AAPL") -> List[str]:
     if ticker == "AAPL":
         if mode == "net_income":
             return ["net_income_loss"]
-        elif mode == "bs":
+        if mode == "bs":
             return get_leaf_values(get_bs_structure(ticker=ticker))
-
-    return []
+        if mode == "full":
+            return get_leaf_values(get_bs_structure(ticker=ticker))
+    raise ValueError(f"Unsupported target mode '{mode}' for ticker '{ticker}'")
 
 
 # Getting the correct columns from dataframes for BS -> later IS + CF
