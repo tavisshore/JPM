@@ -31,13 +31,14 @@ if not email:
 
 edgar.set_identity(email)
 
-# Dates where companies seem to change reporting structure significantly
 format_limit = {
     "AAPL": "2018-12",
 }
 
 
 class EdgarDataLoader:
+    """Load, scale, and window Edgar filings into train/val datasets."""
+
     def __init__(
         self,
         config: Config,
@@ -50,23 +51,22 @@ class EdgarDataLoader:
         self.create_dataset()
 
     def create_dataset(self) -> None:
+        if self.config.data.target_type not in {"full", "bs", "net_income"}:
+            raise ValueError(
+                f"Unsupported target_type '{self.config.data.target_type}'. "
+                "Use 'full', 'bs', or 'net_income'."
+            )
         self.bs_keys = get_leaf_values(get_bs_structure(ticker=self.config.data.ticker))
 
         if self.cache_statement.exists():
             self.data = pd.read_parquet(self.cache_statement)
         else:
-            # Originally in __init__ for downstream
-            # But prevents offline exec
             self.company = Company(self.config.data.ticker)
             self.create_statements()
 
-        # Actually names of features in self.data to column indices
         self.feat_to_idx = {n: i for i, n in enumerate(self.data.columns.tolist())}
-        # Maybe - check accounting identities now, before training
         bs_identity(self.data, ticker=self.config.data.ticker)
-        # TODO - Add more checks
 
-        # Now convert into tensorflow training data
         tar = get_targets(
             mode=self.config.data.target_type, ticker=self.config.data.ticker
         )
@@ -86,19 +86,12 @@ class EdgarDataLoader:
         self.target_std = self.full_std[self.tgt_indices]
 
         self.map_features()
-        # Create separate windows for individual companies + concatenate
-        # X_windows_list, y_windows_list = [], []
         X_train, y_train, X_test, y_test = build_windows(
             X=X_scaled,
             lookback=self.config.data.lookback,
             horizon=self.config.data.horizon,
             tgt_indices=self.tgt_indices,
         )
-        # X_windows_list.append(Xw)
-        # y_windows_list.append(yw)
-
-        # X_all = np.concatenate(X_windows_list, axis=0)  # (N, lookback, F)
-        # y_all = np.concatenate(y_windows_list, axis=0)  # (N, F)
         self.num_features = X_train.shape[-1]  # Input dim
         self.num_targets = len(self.tgt_indices)  # Output dim
         self.train_dataset = (

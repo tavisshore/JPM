@@ -12,6 +12,8 @@ from jpm.question_1.vis import colour, print_table
 
 @dataclass
 class Assets:
+    """Balance sheet assets split by current and non-current."""
+
     current_assets: Dict[str, float]
     non_current_assets: Dict[str, float]
 
@@ -22,6 +24,8 @@ class Assets:
 
 @dataclass
 class Liabilities:
+    """Balance sheet liabilities split by current and non-current."""
+
     current_liabilities: Dict[str, float]
     non_current_liabilities: Dict[str, float]
 
@@ -34,6 +38,8 @@ class Liabilities:
 
 @dataclass
 class Equity:
+    """Equity items."""
+
     items: Dict[str, float]
 
     @property
@@ -42,6 +48,8 @@ class Equity:
 
 
 class BalanceSheet:
+    """Construct and validate a balance sheet from model results."""
+
     def __init__(
         self,
         config: Config,
@@ -76,27 +84,23 @@ class BalanceSheet:
         return self.total_liabilities + self.total_equity
 
     def check_identity(self, atol: float = 1e3) -> None:
-        """
-        Check Assets ≈ Liabilities + Equity.
-        """
+        """Check Assets ≈ Liabilities + Equity."""
         A = self.total_assets
         L_plus_E = self.total_liabilities_and_equity
         diff = A - L_plus_E
         passed = abs(diff) <= atol
 
         diff_pct = (diff / A) * 100 if A != 0 else 0.0
+        diff_amt = f"${diff:,.2f}"
+        diff_pct_str = f"{diff_pct:.2f}%"
 
         if passed:
-            diff_col = colour(f"{format_money(diff)} | {round(diff_pct, 2)}%", "green")
+            diff_col = colour(f"{diff_amt} | {diff_pct_str}", "green")
         else:
             if diff_pct < 1:
-                diff_col = colour(
-                    f"{format_money(diff)} | {round(diff_pct, 2)}%", "orange"
-                )
+                diff_col = colour(f"{diff_amt} | {diff_pct_str}", "orange")
             else:
-                diff_col = colour(
-                    f"{format_money(diff)} | {round(diff_pct, 2)}%", "red"
-                )
+                diff_col = colour(f"{diff_amt} | {diff_pct_str}", "red")
 
         rows = [
             [

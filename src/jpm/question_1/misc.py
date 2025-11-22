@@ -39,6 +39,7 @@ def collect_leaves(d: Nested) -> List[str]:
 
 
 def get_leaf_values(d, sub_key: str | None = None) -> List[str]:
+    """Return leaf strings, optionally from a subtree keyed by sub_key."""
     if sub_key:
         subtree = find_subtree(d, sub_key)
         if subtree is None:
@@ -49,14 +50,17 @@ def get_leaf_values(d, sub_key: str | None = None) -> List[str]:
 
 
 def to_tensor(x) -> tf.Tensor:
+    """Convert input to a float32 tensor."""
     return tf.convert_to_tensor(x, dtype=tf.float32)
 
 
 def tf_sum(xs) -> tf.Tensor:
+    """Sum a list of tensors."""
     return tf.add_n(xs)
 
 
 def coerce_float(x) -> float:
+    """Safely convert to float, returning 0.0 on failure or NaN."""
     if pd.isna(x):
         return 0.0
     try:
@@ -66,18 +70,21 @@ def coerce_float(x) -> float:
 
 
 def as_series(mapping: Dict[int, float], years) -> pd.Series:
+    """Create a float64 series from a mapping over the provided index."""
     return pd.Series(
         [mapping.get(y, math.nan) for y in years], index=years, dtype="float64"
     )
 
 
 def errs_below_tol(errs: Dict[str, tf.Tensor], tol: float = 1e-4) -> tf.Tensor:
+    """Check all tensors are below a tolerance."""
     tol_t = tf.constant(tol, dtype=tf.float32)
     vals = [tf.convert_to_tensor(v, dtype=tf.float32) for v in errs.values()]
     return tf.reduce_all(tf.math.less(tf.stack(vals), tol_t))
 
 
 def format_money(n: float) -> str:
+    """Format a numeric value into a compact money string."""
     abs_n = abs(n)
 
     if abs_n < 1_000:
@@ -96,6 +103,7 @@ def format_money(n: float) -> str:
 
 
 def train_args():
+    """Build CLI args for training entrypoints."""
     p = argparse.ArgumentParser()
 
     # Data

@@ -8,8 +8,14 @@ import tensorflow as tf
 from jpm.question_1.config import Config, ModelConfig
 from jpm.question_1.data.ed import EdgarDataLoader
 from jpm.question_1.models.losses import EnforceBalance, bs_loss
-from jpm.question_1.models.metrics import Metric, TickerResults
+from jpm.question_1.models.metrics import (
+    Metric,
+    TickerResults,
+    baseline_skill_scores,
+    compute_baseline_predictions,
+)
 from jpm.question_1.vis import (
+    build_baseline_rows,
     build_equity_rows,
     build_section_rows,
     make_row,
@@ -18,6 +24,8 @@ from jpm.question_1.vis import (
 
 
 class LSTMForecaster:
+    """Wrapper around a Keras LSTM for balance sheet forecasting."""
+
     def __init__(self, config: Config, data: EdgarDataLoader) -> None:
         self.config = config
         self.data = data
@@ -123,15 +131,27 @@ class LSTMForecaster:
         return obj
 
     def evaluate(self, stage: str = "val") -> TickerResults:
-        y_pred = self.predict(
-            self.data.val_dataset if stage == "val" else self.data.train_dataset
-        )
+        if stage not in {"val", "train"}:
+            raise ValueError("stage must be 'val' or 'train'")
+
         ds = self.data.val_dataset if stage == "val" else self.data.train_dataset
-        y_gt = np.concatenate([y.numpy() for _, y in ds], axis=0)
+
+        # GET GT to align predictions and baselines
+        x_batches: list[np.ndarray] = []
+        y_batches: list[np.ndarray] = []
+        for x_batch, y_batch in ds:
+            x_batches.append(x_batch.numpy())
+            y_batches.append(y_batch.numpy())
+
+        history = np.concatenate(x_batches, axis=0)
+        y_gt = np.concatenate(y_batches, axis=0)
+
+        y_pred = self.model.predict(history)
 
         # Unscale and construct full balance sheets
         y_pred_unscaled = y_pred * self.data.target_std + self.data.target_mean
         y_gt_unscaled = y_gt * self.data.target_std + self.data.target_mean
+        history_unscaled = history * self.data.target_std + self.data.target_mean
 
         # Compute MAE on assets, liabilities, equity
         asset_idx = self.data.feature_mappings["assets"]
@@ -150,56 +170,78 @@ class LSTMForecaster:
         mae_liabilities = np.mean(np.abs(liabilities_pred - liabilities_gt))
         mae_equity = np.mean(np.abs(equity_pred - equity_gt))
 
-        # Mean absolute ground truth magnitude (denominator for % error)
-        mean_assets_gt = np.mean(np.abs(assets_gt))
-        mean_liabilities_gt = np.mean(np.abs(liabilities_gt))
-        mean_equity_gt = np.mean(np.abs(equity_gt))
-
-        # Percentage errors
-        pct_assets = mae_assets / (np.abs(mean_assets_gt) + 1e-9)
-        pct_liabilities = mae_liabilities / (mean_liabilities_gt + 1e-9)
-        pct_equity = mae_equity / (mean_equity_gt + 1e-9)
-
-        # One value oscillates around zero, causing spikes in pct error
-        eps = 1e-6
-        abs_err = np.abs(y_pred_unscaled - y_gt_unscaled)
+        err = y_pred_unscaled - y_gt_unscaled
+        abs_err = np.abs(err)
         per_feature_mae = np.mean(abs_err, axis=0)
-        per_feature_mean_gt = np.mean(np.abs(y_gt_unscaled), axis=0)
-
-        with np.errstate(divide="ignore", invalid="ignore"):
-            per_feature_pct_error = per_feature_mae / per_feature_mean_gt
-            per_feature_pct_error = np.where(
-                per_feature_mean_gt > eps,
-                per_feature_pct_error,
-                0.0,  # would NaN or 0 be better?
-            )
 
         feature_metrics: Dict[str, Metric] = {
             name: Metric(
                 value=float(y_pred_unscaled[:, idx].mean()),
                 mae=float(per_feature_mae[idx]),
-                pct=float(per_feature_pct_error[idx]),
+                gt=float(y_gt_unscaled[:, idx].mean()),
             )
             for name, idx in self.data.feat_to_idx.items()
         }
+
+        baseline_results = baseline_skill_scores(
+            y_true=y_gt_unscaled,
+            model_pred=y_pred_unscaled,
+            history=history_unscaled,
+            seasonal_lag=min(4, history_unscaled.shape[1]),
+        )
+
+        # Net income specific baseline comparison, if available
+        net_income_baseline_mae: Dict[str, float] = {}
+        net_income_skill: Dict[str, float] = {}
+        net_income_model_mae = 0.0
+        net_income_pred = 0.0
+        net_income_gt = 0.0
+        net_income_baseline_pred: Dict[str, float] = {}
+        net_income_key = "net_income_loss"
+        if net_income_key in self.data.feat_to_idx:
+            ni_idx = self.data.feat_to_idx[net_income_key]
+            net_income_pred = float(y_pred_unscaled[:, ni_idx].mean())
+            net_income_gt = float(y_gt_unscaled[:, ni_idx].mean())
+            net_income_model_mae = float(
+                np.mean(np.abs(y_pred_unscaled[:, ni_idx] - y_gt_unscaled[:, ni_idx]))
+            )
+            baselines_pred = compute_baseline_predictions(
+                history_unscaled, seasonal_lag=min(4, history_unscaled.shape[1])
+            )
+            eps = 1e-12
+            for name, pred in baselines_pred.items():
+                mae = float(np.mean(np.abs(pred[:, ni_idx] - y_gt_unscaled[:, ni_idx])))
+                net_income_baseline_mae[name] = mae
+                denom = mae if mae > eps else eps
+                net_income_skill[name] = 1.0 - net_income_model_mae / denom
+                net_income_baseline_pred[name] = float(pred[:, ni_idx].mean())
 
         ticker_results = TickerResults(
             assets=Metric(
                 value=float(assets_pred.mean()),
                 mae=float(mae_assets),
-                pct=float(pct_assets),
+                gt=float(assets_gt.mean()),
             ),
             liabilities=Metric(
                 value=float(liabilities_pred.mean()),
                 mae=float(mae_liabilities),
-                pct=float(pct_liabilities),
+                gt=float(liabilities_gt.mean()),
             ),
             equity=Metric(
                 value=float(equity_pred.mean()),
                 mae=float(mae_equity),
-                pct=float(pct_equity),
+                gt=float(equity_gt.mean()),
             ),
             features=feature_metrics,
+            model_mae=baseline_results["model_mae"],
+            baseline_mae=baseline_results["baseline_mae"],
+            skill=baseline_results["skill"],
+            net_income_model_mae=net_income_model_mae,
+            net_income_baseline_mae=net_income_baseline_mae,
+            net_income_skill=net_income_skill,
+            net_income_pred=net_income_pred,
+            net_income_gt=net_income_gt,
+            net_income_baseline_pred=net_income_baseline_pred,
         )
 
         # results_dict: Dict[str, TickerResults] = {
@@ -244,11 +286,22 @@ class LSTMForecaster:
         )
         print_table("Equity", equity_rows)
 
+        if results.baseline_mae:
+            baseline_rows = build_baseline_rows(
+                results.baseline_mae, results.skill, results.model_mae
+            )
+            print_table(
+                "Baseline Comparison (Balance Sheet)",
+                baseline_rows,
+                headers=("Method", "MAE", "Error diff"),
+            )
+
         print()
 
 
 if __name__ == "__main__":
     from jpm.question_1.models.balance_sheet import BalanceSheet
+    from jpm.question_1.models.income_statement import IncomeStatement
     from src.jpm.question_1.config import (
         Config,
         DataConfig,
@@ -280,4 +333,8 @@ if __name__ == "__main__":
 
     # Pass outputs to BS Model
     bs = BalanceSheet(config=config, results=validation_results)
-    print(f"\nIdentity: {bs.check_identity()}")
+    bs.check_identity()
+
+    # Income Statement to predict Net Income (Loss)
+    i_s = IncomeStatement(config=config, results=validation_results)
+    i_s.view()

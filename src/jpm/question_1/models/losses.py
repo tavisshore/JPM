@@ -10,6 +10,7 @@ def bs_loss(
     feature_mappings,
     config: LossConfig,
 ):
+    """Build a balance-sheet-aware loss combining MSE with identity penalties."""
     means64 = tf.constant(feature_means, dtype=tf.float64)
     stds64 = tf.constant(feature_stds, dtype=tf.float64)
 
@@ -32,6 +33,7 @@ def bs_loss(
         )
 
     def loss(y_true, y_pred):
+        """Compute loss for a batch."""
         y_true64 = tf.cast(y_true, tf.float64)
         y_pred64 = tf.cast(y_pred, tf.float64)
 
@@ -112,6 +114,15 @@ class EnforceBalance(Layer):
         )
         self.equity_idx = tf.constant(feature_mappings["equity"], dtype=tf.int32)
 
+        if (
+            not feature_mappings["assets"]
+            or not feature_mappings["liabilities"]
+            or not feature_mappings["equity"]
+        ):
+            raise ValueError(
+                "feature_mappings for assets, liabilities, and equity must be non-empty"
+            )
+
         if feature_names is None:
             raise ValueError("feature_names required to find slack index")
 
@@ -136,13 +147,10 @@ class EnforceBalance(Layer):
 
     @tf.function
     def call(self, y):
-        # Float64 for precision
         y64 = tf.cast(y, tf.float64)
 
-        # Unscale into real-world space
         y_unscaled = y64 * self.stds + self.means
 
-        # Compute unscaled A, L, E
         assets = tf.reduce_sum(
             tf.gather(y_unscaled, self.asset_idx, axis=-1), axis=-1, keepdims=True
         )
