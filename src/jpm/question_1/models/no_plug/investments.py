@@ -6,6 +6,7 @@ from typing import List
 import pandas as pd
 
 from jpm.question_1.models.no_plug.input import InputData
+from jpm.question_1.models.no_plug.loans import _make_year_index
 
 
 @dataclass
@@ -22,17 +23,15 @@ class Investment:
     start_year: int
     term_years: int = 1
 
-    _balance: pd.Index = field(init=False, repr=False)
+    _years: pd.Index = field(init=False, repr=False)
     _df: pd.DataFrame = field(init=False, repr=False)
 
     def __post_init__(self):
-        z = pd.Series(
-            0.0, index=range(self.start_year, self.start_year + self.term_years + 1)
-        )
-        object.__setattr__(self, "_balance", z.copy())
-
         if self.term_years < 1:
             raise ValueError("term_years must be >= 1")
+        self._years = _make_year_index(
+            self.start_year, self.term_years + 1, like=self.input.years
+        )
         self._df = self._build_df()
 
     @property
@@ -40,31 +39,43 @@ class Investment:
         return self._df
 
     def _build_df(self) -> pd.DataFrame:
-        self._balance[self.start_year] = float(self.amount)
+        years = self._years
+        beg = pd.Series(0.0, index=years, dtype=float)
+        beg.iloc[0] = float(self.amount)
 
-        for yearly in range(self.start_year + 1, self.start_year + self.term_years + 1):
-            r = self.input.rtn_st_inv[yearly - 1]
-            self._balance[yearly] = self._balance[yearly - 1] * (1 + r)
+        rates = self.input.rtn_st_inv.reindex(years, fill_value=0.0)
 
-        # TEMPORARY - Fix investment classes
-        y = 0
-        # principal = pd.Series(0.0, index=y, dtype=float)
-        # if self.start_year in y:
-        #     m_year = y[min(start_pos + self.term_years, len(y) - 1)]
-        #     if start_pos + self.term_years < len(y):
-        #         principal.loc[m_year] = beg.loc[m_year]
-        # total_cash_in = interest + principal
+        interest = pd.Series(0.0, index=years, dtype=float)
+        principal = pd.Series(0.0, index=years, dtype=float)
+        end = pd.Series(0.0, index=years, dtype=float)
+
+        for i, _year in enumerate(years):
+            if i == 0:
+                end.iloc[i] = beg.iloc[i]
+                continue
+
+            beg.iloc[i] = end.iloc[i - 1]
+            rate = float(rates.iloc[i])
+            interest.iloc[i] = beg.iloc[i] * rate
+
+            if i == len(years) - 1:
+                principal.iloc[i] = beg.iloc[i]
+                end.iloc[i] = 0.0
+            else:
+                end.iloc[i] = beg.iloc[i]
+
+        total_cash_in = interest + principal
 
         return pd.DataFrame(
             {
-                # "Beginning balance": beg,
-                "Return rate": r,
-                # "Interest income": interest,
-                # "Principal redeemed": principal,
-                # "Total cash-in": total_cash_in,
-                # "Ending balance": end,
+                "Beginning balance": beg,
+                "Return rate": rates,
+                "Interest income": interest,
+                "Principal redeemed": principal,
+                "Total cash-in": total_cash_in,
+                "Ending balance": end,
             },
-            index=y,
+            index=years,
         )
 
     def compute(self, year) -> pd.Series:
@@ -84,8 +95,8 @@ class InvestmentBook:
     def total_st_investment_at_end(self, year: object) -> float:
         total = 0.0
         for inv in self.investments:
-            if year in inv._df.index:
-                total += inv._df.at[year, "Ending balance"]
+            if year in inv.df.index:
+                total += inv.df.at[year, "Ending balance"]
         return total
 
     def investment_income(self, year) -> InvestmentIncome:
@@ -93,11 +104,12 @@ class InvestmentBook:
         principal_in = 0.0
 
         for inv in self.investments:
-            row = inv.compute(year)
-            interest += float(row["Interest income"])
-            principal_in += float(
-                row["Principal redeemed"]
-            )  # may be zero except maturity
+            if year in inv.df.index:
+                row = inv.compute(year)
+                interest += float(row["Interest income"])
+                principal_in += float(
+                    row["Principal redeemed"]
+                )  # may be zero except maturity
 
         return InvestmentIncome(
             interest=interest,

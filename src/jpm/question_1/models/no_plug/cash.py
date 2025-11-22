@@ -23,9 +23,11 @@ class CashBudget:
     history: pd.DataFrame = field(init=False, repr=False)
 
     def __post_init__(self):
-        z = pd.Series(0.0, index=self.years)
-        object.__setattr__(self, "cum_ncb", z.copy())
-        object.__setattr__(self, "history", z.copy())
+        years_idx = pd.Index(self.years)
+        object.__setattr__(
+            self, "cum_ncb", pd.Series(0.0, index=years_idx, dtype=float)
+        )
+        object.__setattr__(self, "history", pd.DataFrame(index=years_idx, dtype=float))
 
     def _capex_for(self, year: int) -> float:
         nfa = self.input.net_fixed_assets
@@ -115,7 +117,6 @@ class CashBudget:
             - mincash
         )
         if st_invest_end:
-            print(f"Invest: {st_invest_end}")
             self.investmentbook.add(
                 Investment(
                     input=self.input,
@@ -160,7 +161,8 @@ class CashBudget:
             "Cumulated NCB": cum_ncb,
         }
 
-        self.history.loc[year] = out
+        row = pd.Series(out, dtype=float)
+        self.history.loc[year, row.index] = row.values
         self.cum_ncb.loc[year] = cum_ncb
         return pd.Series(out, name=year)
 
@@ -266,6 +268,8 @@ class CashBudget:
             "NCB for the year": ncb_for_year,
             "Cumulated NCB": cum_ncb,
         }
-        self.history[year] = rows
+        # self.history[year] = rows
+        row = pd.Series(rows, dtype=float)
+        self.history.loc[year, row.index] = row.values
         self.cum_ncb.loc[year] = cum_ncb
         return pd.Series(rows, name="Year 0")

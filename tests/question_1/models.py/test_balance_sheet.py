@@ -322,8 +322,8 @@ def test_total_properties_match_component_totals(balance_sheet):
 def test_total_liabilities_and_equity_uses_component_totals(
     empty_structure, monkeypatch
 ):
-    """Regression test to ensure liabilities+equity total equals
-    the sum of both parts."""
+    """Regression test to ensure liabilities plus equity equals
+    the sum of both components."""
     bs = _make_bs_with_totals(
         assets_total=0.0,
         liabilities_total=111.0,

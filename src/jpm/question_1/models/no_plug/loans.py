@@ -165,8 +165,6 @@ class LoanBook:
                 elif loan.category == "ST":
                     st_interest += float(row["Interest payment ST loan"])
                     st_principal += float(row["Principal payments ST loan"])
-            else:
-                self.loans.remove(loan)
 
         return DebtPay(
             st_interest=st_interest,

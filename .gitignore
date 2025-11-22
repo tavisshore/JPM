@@ -72,3 +72,5 @@ cache/
 
 temp.*
 *.xlsx
+ckpts/*
+ckpts/best_model_ckpt.weights.h5
