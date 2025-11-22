@@ -60,8 +60,8 @@ class TrainingConfig:
 
 @dataclass
 class LossConfig:
-    enforce_balance: bool = False
-    learn_identity: bool = False
+    enforce_balance: bool = True
+    learn_identity: bool = True
     identity_weight: float = 1e-4
     learn_subtotals: bool = False
     subcategory_weight: float = 1e-5

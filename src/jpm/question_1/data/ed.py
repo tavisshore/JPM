@@ -26,7 +26,7 @@ email = os.getenv("EDGAR_EMAIL")
 if not email:
     raise ValueError(
         "EDGAR_EMAIL environment variable not set"
-        "set with 'export EDGAR_EMAIL='example@jpm.com'"
+        "set with 'export EDGAR_EMAIL='your_email@jpm.com'"
     )
 
 edgar.set_identity(email)
