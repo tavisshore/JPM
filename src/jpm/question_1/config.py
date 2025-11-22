@@ -53,7 +53,7 @@ class TrainingConfig:
     decay_steps: int = 100
     decay_rate: float = 0.9
     scheduler: str = "exponential"  # Options: "exponential", "cosine", or "constant"
-    epochs: int = 100
+    epochs: int = 1000
     checkpoint_path: Path = Path("ckpts")
 
     @classmethod

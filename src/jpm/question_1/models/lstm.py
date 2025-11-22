@@ -99,7 +99,6 @@ class LSTMForecaster:
             )
         return tf.keras.optimizers.Adam(learning_rate=lr)
 
-    # Convenience wrappers so calling code doesn't touch raw Keras much
     def fit(self, **kwargs):
         checkpoint_cb = tf.keras.callbacks.ModelCheckpoint(
             filepath=self.config.training.checkpoint_path
@@ -109,13 +108,17 @@ class LSTMForecaster:
             save_weights_only=True,
         )
 
-        return self.model.fit(
+        history = self.model.fit(
             self.data.train_dataset,
             validation_data=self.data.val_dataset,
             epochs=self.config.training.epochs,
             callbacks=[checkpoint_cb],
             **kwargs,
         )
+        self.model.load_weights(
+            self.config.training.checkpoint_path / "best_model_ckpt.weights.h5"
+        )
+        return history
 
     def predict(self, x):
         return self.model.predict(x)
@@ -243,10 +246,6 @@ class LSTMForecaster:
             net_income_gt=net_income_gt,
             net_income_baseline_pred=net_income_baseline_pred,
         )
-
-        # results_dict: Dict[str, TickerResults] = {
-        # self.config.data.ticker: ticker_results
-        # }
 
         if stage == "val":
             self.val_results = ticker_results
