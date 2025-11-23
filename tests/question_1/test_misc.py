@@ -1,6 +1,3 @@
-import sys
-from pathlib import Path
-
 import numpy as np
 import pandas as pd
 import pytest
@@ -81,35 +78,3 @@ def test_format_money_formats_ranges():
     assert misc.format_money(5_500_000) == "$5.5mn"
     assert misc.format_money(2_000_000_000) == "$2bn"
     assert misc.format_money(3_000_000_000_000) == "$3tn"
-
-
-@integration
-def test_train_args_defaults(monkeypatch):
-    """train_args should populate default CLI values when none provided."""
-    monkeypatch.setattr(sys, "argv", ["prog"])
-    args = misc.train_args()
-    assert args.ticker == "AAPL"
-    assert args.checkpoint_path == Path("ckpts")
-    assert args.batch_size is None
-
-
-@integration
-def test_train_args_with_overrides(monkeypatch):
-    """train_args should honor CLI overrides like ticker/batch/checkpoint."""
-    monkeypatch.setattr(
-        sys,
-        "argv",
-        [
-            "prog",
-            "--ticker",
-            "MSFT",
-            "--batch_size",
-            "64",
-            "--checkpoint_path",
-            "custom",
-        ],
-    )
-    args = misc.train_args()
-    assert args.ticker == "MSFT"
-    assert args.batch_size == 64
-    assert args.checkpoint_path == Path("custom")

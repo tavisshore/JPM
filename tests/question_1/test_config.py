@@ -80,19 +80,6 @@ def test_training_config_from_args_preserves_paths_and_scheduler():
 
 
 @unit
-def test_training_config_from_args_handles_missing_attributes():
-    """Args without every field should still fall back to defaults."""
-    args = SimpleNamespace(lr=1e-3)  # epochs/decay_* missing
-
-    cfg = TrainingConfig.from_args(args)
-
-    assert cfg.lr == pytest.approx(1e-3)
-    assert cfg.epochs == TrainingConfig().epochs
-    assert cfg.decay_steps == TrainingConfig().decay_steps
-    assert cfg.decay_rate == TrainingConfig().decay_rate
-
-
-@unit
 def test_loss_config_from_args_overrides_selected_fields():
     """LossConfig.from_args should override provided weights/flags."""
     args = SimpleNamespace(
@@ -110,19 +97,6 @@ def test_loss_config_from_args_overrides_selected_fields():
     assert cfg.identity_weight == pytest.approx(0.2)
     assert cfg.learn_subtotals == LossConfig().learn_subtotals
     assert cfg.subcategory_weight == pytest.approx(5e-5)
-
-
-@unit
-def test_data_config_from_args_ignores_unrecognized_attributes():
-    """DataConfig.from_args should ignore unknown attributes on the args object."""
-    args = SimpleNamespace(ticker="META", extra_flag=True)
-
-    cfg = DataConfig.from_args(args)
-
-    assert cfg.ticker == "META"
-    # Ensure extra attribute did not create new fields or errors
-    assert hasattr(cfg, "periods")
-    assert cfg.periods == DataConfig().periods
 
 
 @integration

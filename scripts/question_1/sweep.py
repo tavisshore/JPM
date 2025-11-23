@@ -8,17 +8,17 @@ from jpm.question_1.config import Config
 from jpm.question_1.data.ed import EdgarDataLoader
 from jpm.question_1.models.lstm import LSTMForecaster
 
-# Bit too extensive?
 GRID = {
     "data.batch_size": [32],
-    "data.lookback": [2, 3, 4, 5],
-    "data.horizon": [1, 2],
-    "model.lstm_units": [64, 128, 256],
-    "model.lstm_layers": [1, 2, 3],
-    "model.dense_units": [64, 128, 256],
-    "model.dropout": [0.0, 0.1],
-    "training.lr": [1e-3, 1e-4],
-    "training.epochs": [100],
+    "data.lookback": [4, 5],
+    "data.horizon": [1],
+    "model.lstm_units": [256, 368],
+    "model.lstm_layers": [1, 2],
+    "model.dense_units": [128, 256],
+    "model.dropout": [0.1, 0.2],
+    "model.variational": [False],
+    "training.lr": [1e-4],
+    "training.epochs": [500],
     "loss.enforce_balance": [True, False],
     "loss.learn_identity": [True, False],
     "loss.identity_weight": [1e-4],

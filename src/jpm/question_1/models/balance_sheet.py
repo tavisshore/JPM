@@ -58,7 +58,7 @@ class BalanceSheet:
         self.config = config
         self.results = results
 
-        self._feature_values: Dict[str, float] = results.feature_values()
+        self._feature_values = results.feature_values()
 
         # Ticker-specific structure -> eventually make universal (pt2?)
         self.bs_structure = get_bs_structure(ticker=self.config.data.ticker)
@@ -116,6 +116,7 @@ class BalanceSheet:
             rows=rows,
             headers=["", "Assets", "Liabilities + Equity", "Difference"],
         )
+        # Single-row table keeps the check consistent with other views
 
     def _get_value(self, name: str) -> float:
         return float(self._feature_values.get(name, 0.0))
@@ -128,6 +129,7 @@ class BalanceSheet:
 
         current = {name: self._get_value(name) for name in current_names}
         non_current = {name: self._get_value(name) for name in non_current_names}
+        # Preserve category split for later reporting
 
         return Assets(
             current_assets=current,

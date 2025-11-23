@@ -48,6 +48,7 @@ class EdgarDataLoader:
             f"{self.config.data.cache_dir}/{self.config.data.ticker}.parquet"
         )
         self.bs_structure = get_bs_structure(ticker=self.config.data.ticker)
+        # Prefer cached parquet to avoid repeated SEC fetches
         self.create_dataset()
 
     def create_dataset(self) -> None:
@@ -64,6 +65,7 @@ class EdgarDataLoader:
             self.company = Company(self.config.data.ticker)
             self.create_statements()
 
+        # Build a simple feature index for later tensor slicing
         self.feat_to_idx = {n: i for i, n in enumerate(self.data.columns.tolist())}
         bs_identity(self.data, ticker=self.config.data.ticker)
 
@@ -78,6 +80,7 @@ class EdgarDataLoader:
             self.targets = list(self.data.columns)
             self.tgt_indices = list(range(len(self.targets)))
 
+        # Standardize features; retain means/stds for unscaling later
         scaler = StandardScaler()
         X_scaled = scaler.fit_transform(self.data.values.astype("float64"))
         self.full_mean = np.asarray(scaler.mean_, dtype="float64")
@@ -91,9 +94,11 @@ class EdgarDataLoader:
             lookback=self.config.data.lookback,
             horizon=self.config.data.horizon,
             tgt_indices=self.tgt_indices,
+            withhold=self.config.data.withhold_periods,
         )
         self.num_features = X_train.shape[-1]  # Input dim
         self.num_targets = len(self.tgt_indices)  # Output dim
+        # Minimal tf.data pipeline with shuffle/prefetch to smooth training
         self.train_dataset = (
             tf.data.Dataset.from_tensor_slices(
                 (X_train.astype("float64"), y_train.astype("float64"))
@@ -113,6 +118,7 @@ class EdgarDataLoader:
         For loss, calculations etc.
         """
 
+        # Map feature names to target indices for fast gathers
         name_to_target_idx = {name: i for i, name in enumerate(self.targets)}
 
         self.feature_mappings = {
@@ -233,8 +239,7 @@ class EdgarDataLoader:
         collapsed = collapsed.dropna(axis=1, how="all")
         collapsed = collapsed.fillna(0)
 
-        # Only keep necessary columns (will raise if missing -> good fail-fast)
-        # print(collapsed.columns)
+        # Keep only required concepts; missing ones raise for visibility
         return collapsed[needed_cols]
 
 
