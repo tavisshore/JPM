@@ -5,7 +5,7 @@ from jpm.question_1.misc import format_money
 from jpm.question_1.models.metrics import Metric
 
 ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
-DEFAULT_HEADERS = ("Category", "Ground Truth", "Predicted", "Error")
+DEFAULT_HEADERS = ("Category", "Ground Truth", "Predicted", "Error", "Unc.")
 
 
 def _strip_ansi(s: str) -> str:
@@ -58,6 +58,7 @@ def make_row(category: str, metric: Metric) -> list[str]:
         format_money(metric.gt),
         format_money(metric.value),
         colour_mae(metric.mae),
+        colour_mae(metric.std) if hasattr(metric, "std") and metric.std else "",
     ]
 
 
@@ -66,7 +67,7 @@ def build_section_rows(
     feature_stats: dict[str, dict],
 ) -> list[list[str]]:
     """Create rows for assets/liabilities sections from feature metrics."""
-    rows: list[list[str]] = []
+    rows = []
     for section_key, feats in sections.items():
         section_name = fmt(section_key)
         if "non_current" in section_key.lower():
@@ -88,7 +89,7 @@ def build_equity_rows(
     feature_stats: dict[str, dict],
 ) -> list[list[str]]:
     """Create rows for equity metrics."""
-    rows: list[list[str]] = []
+    rows = []
     for feat in equity_feats:
         m = feature_stats.get(feat)
         if m is None:
@@ -108,7 +109,7 @@ def build_baseline_rows(
     model_pred: float | None = None,
 ) -> list[list[str]]:
     """Render baseline comparison rows, optionally including GT and predictions."""
-    rows: list[list[str]] = []
+    rows = []
     if ground_truth is None:
         rows.append(["Model (reference)", colour_mae(model_mae), colour_skill(0.0)])
         for name in sorted(baseline_mae):
@@ -155,7 +156,7 @@ def print_table(
 
     header_values = list(headers) if headers is not None else list(DEFAULT_HEADERS)
 
-    col_widths: list[int] = []
+    col_widths = []
     for col_idx in range(len(header_values)):
         max_len = len(header_values[col_idx])
         for row in rows:
@@ -164,6 +165,7 @@ def print_table(
             if vis_len > max_len:
                 max_len = vis_len
         col_widths.append(max_len)
+    # Account for ANSI escape sequences so alignment stays correct
 
     def _fmt_cell(value: str, width: int) -> str:
         s = str(value)

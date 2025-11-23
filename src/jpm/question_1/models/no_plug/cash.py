@@ -28,6 +28,7 @@ class CashBudget:
             self, "cum_ncb", pd.Series(0.0, index=years_idx, dtype=float)
         )
         object.__setattr__(self, "history", pd.DataFrame(index=years_idx, dtype=float))
+        # Track cumulative cash balance and a history table up front
 
     def _capex_for(self, year: int) -> float:
         nfa = self.input.net_fixed_assets
@@ -36,16 +37,19 @@ class CashBudget:
             return float(nfa.at[year])
         prev = self.input.years[self.input.years.get_loc(year) - 1]
         return float(nfa.at[year] - nfa.at[prev] + dep.at[year])
+        # Basic capex calculation using net fixed assets delta
 
     def new_st_loan(
         self, prev_cum_ncb, ncb_after_invest, total_debt_payment, st_inflow, min_cash
     ):
         x = prev_cum_ncb + ncb_after_invest - total_debt_payment + st_inflow - min_cash
         return 0 if x > 0 else -x
+        # Borrow short-term only to cover shortfall after investment
 
     def new_st_investment(self, prev_cum_ncb, min_cash):
         x = prev_cum_ncb - min_cash
         return x if x > 0 else 0
+        # Invest excess cash above the minimum target
 
     def generate(
         self,
@@ -67,6 +71,7 @@ class CashBudget:
         purchase_fixed_assets = self._capex_for(year)  # Purchase of fixed assets
         ncb_of_invest = -purchase_fixed_assets  # NCB of investment in fixed assets
         ncb_after_invest = ncb_of_invest + ebitda
+        # After capex, combine with EBITDA to see funding gap
 
         # Module 3 - External Financing
         # Deficit in Module 2 -> Take out LT Loan
@@ -104,6 +109,7 @@ class CashBudget:
                     category="ST",
                 )
             )
+        # Financing flows capture both new debt and repayments
 
         # + Module 4 - Transactions with Owners
         ncb_financing = st_loan_draw + lt_loan_draw - loan_record.total

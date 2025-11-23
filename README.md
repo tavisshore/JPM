@@ -1,11 +1,12 @@
 # JPM
 MLCOE Summer Associate Internship Exercises
 
-## N.B.
-- Mandatory tools: Python3, Tensorflow, Tensorflow Probability.
-- Unit tests and integration tests
+## Install
+- In a virtualenv/conda env: `pip install -e .`
 
-## Code Practice
-- Update your code in the correct branch, then we can merge into main just before we submit each part
-- I've automated linting & CI as pre-commits, would be good to double check these once we're into it
-- I think if we always add new tests before pushing new functions, this'll help us keep on top of that
+## Question 1 Setup
+- Export an email for SEC access before pulling filings: `export EDGAR_EMAIL="your_email@jpm.com"`
+
+## Question 1: Running Models
+- Plugless model: `python -m jpm.question_1.models.plugless`
+- Train LSTM forecaster: `python -m jpm.question_1.models.lstm` (accepts CLI args via `train_args`)

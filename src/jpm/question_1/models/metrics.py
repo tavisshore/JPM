@@ -13,6 +13,7 @@ class Metric:
     value: float
     mae: float
     gt: float = 0.0
+    std: float = 0.0
 
 
 @dataclass
@@ -32,6 +33,7 @@ class TickerResults:
     net_income_pred: float = 0.0
     net_income_gt: float = 0.0
     net_income_baseline_pred: Dict[str, float] = field(default_factory=dict)
+    pred_std: Dict[str, float] = field(default_factory=dict)
 
     def feature_values(self) -> Dict[str, float]:
         return {name: m.value for name, m in self.features.items()}
@@ -59,6 +61,7 @@ def compute_baseline_predictions(
         seasonal_naive = history[:, -seasonal_lag, :]
     else:
         seasonal_naive = last_value
+    # Baselines stay deterministic and trivial for fair skill comparison
 
     return {
         "global_mean": global_mean_pred,

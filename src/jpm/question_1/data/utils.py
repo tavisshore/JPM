@@ -23,9 +23,8 @@ class BalanceSheetStructure(TypedDict):
 
 
 def xbrl_to_snake(name: str) -> str:
-    # remove any prefix matching "*-*_" -> always us-gaap_?
+    # Drop common XBRL prefixes (e.g., us-gaap_) and normalize to snake_case
     name = re.sub(r"^[^-]+-[^_]+_", "", name)
-    # insert underscores before caps
     s = re.sub(r"(?<!^)(?=[A-Z])", "_", name)
     return s.lower()
 
@@ -160,7 +159,7 @@ def build_windows(
     lookback: int = 3,
     horizon: int = 1,
     tgt_indices: Optional[List[int]] = None,
-    withhold: int = 1,
+    withhold: int = 2,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Build sliding windows over X and split the *last `withhold`
@@ -199,6 +198,7 @@ def build_windows(
         if tgt_indices is not None:
             y_target = y_target[tgt_indices]
 
+        # Partition into train vs withheld windows
         if t < split_idx:
             X_train.append(x_win)
             y_train.append(y_target)

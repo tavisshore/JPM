@@ -16,6 +16,7 @@ def find_subtree(d: Nested, target: str) -> Nested | None:
     if isinstance(d, list):
         return None
 
+    # Depth-first scan until we bump into the target key
     for k, v in d.items():
         if k == target:
             return v
@@ -32,7 +33,8 @@ def collect_leaves(d: Nested) -> List[str]:
     if isinstance(d, list):
         return d
 
-    out: List[str] = []
+    out = []
+    # Flatten any nested mix of dicts and lists
     for v in d.values():
         out.extend(collect_leaves(v))
     return out
@@ -46,16 +48,19 @@ def get_leaf_values(d, sub_key: str | None = None) -> List[str]:
             return []
         return collect_leaves(subtree)
 
+    # Default: collect every terminal value in the nested structure
     return collect_leaves(d)
 
 
 def to_tensor(x) -> tf.Tensor:
     """Convert input to a float32 tensor."""
+    # Centralised conversion keeps dtype consistent
     return tf.convert_to_tensor(x, dtype=tf.float32)
 
 
 def tf_sum(xs) -> tf.Tensor:
     """Sum a list of tensors."""
+    # Prefer tf.add_n for performance on stacked tensors
     return tf.add_n(xs)
 
 
@@ -71,6 +76,7 @@ def coerce_float(x) -> float:
 
 def as_series(mapping: Dict[int, float], years) -> pd.Series:
     """Create a float64 series from a mapping over the provided index."""
+    # Keeps ordering stable even when mapping misses some periods
     return pd.Series(
         [mapping.get(y, math.nan) for y in years], index=years, dtype="float64"
     )
@@ -80,6 +86,7 @@ def errs_below_tol(errs: Dict[str, tf.Tensor], tol: float = 1e-4) -> tf.Tensor:
     """Check all tensors are below a tolerance."""
     tol_t = tf.constant(tol, dtype=tf.float32)
     vals = [tf.convert_to_tensor(v, dtype=tf.float32) for v in errs.values()]
+    # Stack before comparison so we only emit one boolean
     return tf.reduce_all(tf.math.less(tf.stack(vals), tol_t))
 
 
@@ -91,15 +98,15 @@ def format_money(n: float) -> str:
         return f"${n}"
 
     if abs_n < 1_000_000:
-        return f"${n/1_000:.3g}k"
+        return f"${n / 1_000:.3g}k"
 
     if abs_n < 1_000_000_000:
-        return f"${n/1_000_000:.3g}mn"
+        return f"${n / 1_000_000:.3g}mn"
 
     if abs_n < 1_000_000_000_000:
-        return f"${n/1_000_000_000:.3g}bn"
+        return f"${n / 1_000_000_000:.3g}bn"
 
-    return f"${n/1_000_000_000_000:.3g}tn"
+    return f"${n / 1_000_000_000_000:.3g}tn"
 
 
 def train_args():

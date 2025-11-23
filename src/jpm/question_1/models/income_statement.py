@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import Dict
 
 from jpm.question_1.config import Config
 from jpm.question_1.data.utils import get_is_structure
@@ -37,15 +37,16 @@ class IncomeStatement:
         self.config = config
         self.results = results
 
-        self._feature_metrics: Dict[str, Metric] = results.features
+        self._feature_metrics = results.features
         self.is_structure = get_is_structure(ticker=self.config.data.ticker)
 
         self.revenues = self._build_section("Revenues")
         self.expenses = self._build_section("Expenses")
+        # Sections mirror the presentation structure for readability
 
     def _build_section(self, name: str) -> IncomeStatementSection:
         """Assemble a section from available metrics, defaulting missing ones."""
-        concepts: List[str] = self.is_structure.get(name, [])
+        concepts = self.is_structure.get(name, [])
         items = {
             concept: self._feature_metrics.get(concept, _default_metric())
             for concept in concepts
@@ -61,13 +62,16 @@ class IncomeStatement:
         return self.revenues.total_gt - self.expenses.total_gt
 
     def view(self) -> None:
-        rows: list[list[str]] = []
+        """Print the income statement and optional baseline comparison tables."""
+
+        rows = []
         rows.append(
             [
                 "Total Revenue",
                 format_money(self.revenues.total_gt),
                 format_money(self.revenues.total_pred),
                 colour_mae(abs(self.revenues.total_pred - self.revenues.total_gt)),
+                "",
             ]
         )
         rows.append(
@@ -76,6 +80,7 @@ class IncomeStatement:
                 format_money(self.expenses.total_gt),
                 format_money(self.expenses.total_pred),
                 colour_mae(abs(self.expenses.total_pred - self.expenses.total_gt)),
+                "",
             ]
         )
 
@@ -88,6 +93,7 @@ class IncomeStatement:
                 format_money(ni_gt),
                 colour(format_money(ni_pred), net_colour),
                 colour_mae(abs(ni_pred - ni_gt)),
+                "",
             ]
         )
 
@@ -97,7 +103,7 @@ class IncomeStatement:
         ):
             if not section.items:
                 continue
-            rows.append([f"-- {title} --", "", "", ""])
+            rows.append([f"-- {title} --", "", "", "", ""])
             for concept, value in section.items.items():
                 rows.append(
                     [
@@ -105,13 +111,14 @@ class IncomeStatement:
                         format_money(value.gt),
                         format_money(value.value),
                         colour_mae(abs(value.value - value.gt)),
+                        colour_mae(value.std),
                     ]
                 )
 
         print_table(
             title="Income Statement",
             rows=rows,
-            headers=["Category", "Ground Truth", "Predicted", "Error"],
+            headers=["Category", "Ground Truth", "Predicted", "Error", "Unc."],
         )
 
         if self.results.net_income_baseline_mae:

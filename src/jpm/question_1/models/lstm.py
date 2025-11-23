@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from typing import Dict
-
 import numpy as np
 import tensorflow as tf
+import tensorflow_probability as tfp
+import tf_keras as keras
 
 from jpm.question_1.config import Config, ModelConfig
 from jpm.question_1.data.ed import EdgarDataLoader
@@ -22,6 +22,9 @@ from jpm.question_1.vis import (
     print_table,
 )
 
+tfpl = tfp.layers
+tfd = tfp.distributions
+
 
 class LSTMForecaster:
     """Wrapper around a Keras LSTM for balance sheet forecasting."""
@@ -35,78 +38,138 @@ class LSTMForecaster:
         if not self.config.training.checkpoint_path.exists():
             self.config.training.checkpoint_path.mkdir(parents=True)
 
-    def _build_model(self) -> tf.keras.Model:
-        inputs = tf.keras.layers.Input(
+    def _build_model(self) -> keras.Model:
+        inputs = keras.layers.Input(
             shape=(self.config.data.lookback, self.data.num_features),
-            dtype=tf.float64,
+            dtype="float32",
             name="inputs",
         )
 
         x = inputs
         for i in range(self.config.model.lstm_layers):
             return_sequences = i < self.config.model.lstm_layers - 1
-            x = tf.keras.layers.LSTM(
+            x = keras.layers.LSTM(
                 self.config.model.lstm_units,
                 return_sequences=return_sequences,
                 name=f"lstm_{i + 1}",
             )(x)
 
         if self.config.model.dropout > 0:
-            x = tf.keras.layers.Dropout(self.config.model.dropout)(x)
+            x = keras.layers.Dropout(self.config.model.dropout, name="dropout")(x)
 
-        if self.config.model.dense_units is not None:
-            x = tf.keras.layers.Dense(self.config.model.dense_units, activation="relu")(
-                x
-            )
+        if self.config.model.dense_units > 0:
+            x = keras.layers.Dense(
+                self.config.model.dense_units,
+                activation="relu",
+                name="dense",
+            )(x)
 
-        outputs = tf.keras.layers.Dense(len(self.data.targets), name="next_quarter")(x)
+        if self.config.model.probabilistic:
+            n = len(self.data.targets)
+            params_size = tfpl.MultivariateNormalTriL.params_size(n)
 
+            params = keras.layers.Dense(
+                params_size,
+                name="params",
+            )(x)
+
+            outputs = tfpl.MultivariateNormalTriL(
+                event_size=n,
+                name="next_quarter",
+            )(params)
+        else:
+            outputs = self._build_output_layer()(x)
+
+        # EnforceBalance is a post-processing constraint layer
+        # Not for probabilistic outputs
         if self.config.loss.enforce_balance:
+            if self.config.model.probabilistic:
+                raise ValueError(
+                    "enforce_balance + probabilistic=True is not currently supported. "
+                )
+
             outputs = EnforceBalance(
                 feature_mappings=self.data.feature_mappings,
-                feature_means=self.data.target_mean,  # np.ndarray shape (F,)
-                feature_stds=self.data.target_std,  # np.ndarray shape (F,)
+                feature_means=self.data.target_mean,
+                feature_stds=self.data.target_std,
                 slack_name="accumulated_other_comprehensive_income_loss_net_of_tax",
                 feature_names=self.data.bs_keys,
             )(outputs)
 
-        model = tf.keras.Model(inputs=inputs, outputs=outputs)
+        model = keras.Model(inputs=inputs, outputs=outputs, name="lstm_model")
         return model
 
     def _compile_model(self):
-        loss_fn = bs_loss(
-            feature_means=self.data.target_mean,
-            feature_stds=self.data.target_std,
-            feature_mappings=self.data.feature_mappings,
-            config=self.config.loss,
-        )
+        if self.config.model.probabilistic:
 
-        self.model.compile(
-            optimizer=self._build_optimizer(),
-            loss=loss_fn,
-            metrics=["mae"],
-        )
+            def nll(y_true, y_pred_dist):
+                return -tf.reduce_mean(y_pred_dist.log_prob(y_true))
+
+            self.model.compile(
+                optimizer="adam",
+                loss=nll,
+                metrics=["mae"],
+            )
+        else:
+            loss_fn = bs_loss(
+                feature_means=self.data.target_mean,
+                feature_stds=self.data.target_std,
+                feature_mappings=self.data.feature_mappings,
+                config=self.config.loss,
+            )
+
+            self.model.compile(
+                optimizer=self._build_optimizer(),
+                loss=loss_fn,
+                metrics=["mae"],
+            )
         self.model.summary()
 
     def _build_optimizer(self):
-        lr: float | tf.keras.optimizers.schedules.LearningRateSchedule = (
-            self.config.training.lr
-        )
+        lr = self.config.training.lr
         if self.config.training.scheduler == "cosine":
-            lr = tf.keras.optimizers.schedules.CosineDecayRestarts(
+            lr = keras.optimizers.schedules.CosineDecayRestarts(
                 initial_learning_rate=self.config.training.lr,
                 first_decay_steps=self.config.training.decay_steps,
             )
-        return tf.keras.optimizers.Adam(learning_rate=lr)
+        return keras.optimizers.Adam(learning_rate=lr)
+
+    def _kl_weight(self) -> float:
+        """Approximate KL weight based on dataset cardinality."""
+        try:
+            cardinality = int(self.data.train_dataset.cardinality().numpy())
+        except Exception:
+            cardinality = -1
+        if cardinality <= 0:
+            return 1.0
+        return 1.0 / cardinality
+
+    def _build_output_layer(self):
+        if not self.config.model.variational:
+            return keras.layers.Dense(len(self.data.targets), name="next_quarter")
+
+        kl_weight = self._kl_weight()
+        make_prior_fn = tfp.layers.default_multivariate_normal_fn
+        make_posterior_fn = tfp.layers.default_mean_field_normal_fn()
+
+        return tfp.layers.DenseVariational(
+            len(self.data.targets),
+            make_prior_fn=make_prior_fn,
+            make_posterior_fn=make_posterior_fn,
+            kl_weight=kl_weight,
+            name="next_quarter",
+        )
 
     def fit(self, **kwargs):
-        checkpoint_cb = tf.keras.callbacks.ModelCheckpoint(
+        checkpoint_cb = keras.callbacks.ModelCheckpoint(
             filepath=self.config.training.checkpoint_path
             / "best_model_ckpt.weights.h5",
             monitor="val_loss" if self.data.val_dataset is not None else "loss",
             save_best_only=True,
             save_weights_only=True,
         )
+        if not hasattr(checkpoint_cb, "_implements_train_batch_hooks"):
+            checkpoint_cb._implements_train_batch_hooks = lambda: False
 
         history = self.model.fit(
             self.data.train_dataset,
@@ -130,7 +193,7 @@ class LSTMForecaster:
     def load(cls, path: str, config: Config) -> "LSTMForecaster":
         obj = cls.__new__(cls)
         obj.config = config
-        obj.model = tf.keras.models.load_model(path)
+        obj.model = keras.models.load_model(path)
         return obj
 
     def evaluate(self, stage: str = "val") -> TickerResults:
@@ -139,17 +202,41 @@ class LSTMForecaster:
 
         ds = self.data.val_dataset if stage == "val" else self.data.train_dataset
 
-        # GET GT to align predictions and baselines
-        x_batches: list[np.ndarray] = []
-        y_batches: list[np.ndarray] = []
+        x_batches = []
+        y_batches = []
         for x_batch, y_batch in ds:
             x_batches.append(x_batch.numpy())
             y_batches.append(y_batch.numpy())
+        # Use NumPy for baseline and summary metrics to avoid TF graph overhead
 
         history = np.concatenate(x_batches, axis=0)
         y_gt = np.concatenate(y_batches, axis=0)
 
-        y_pred = self.model.predict(history)
+        pred_std = None
+        if self.config.model.probabilistic:
+            if self.config.model.mc_samples > 1:
+                dists = [
+                    self.model(history, training=False)
+                    for _ in range(self.config.model.mc_samples)
+                ]
+                means = np.stack([d.mean().numpy() for d in dists], axis=0)
+                stds = np.stack([d.stddev().numpy() for d in dists], axis=0)
+                y_pred = np.mean(means, axis=0)
+                pred_std = np.mean(stds, axis=0)
+            else:
+                dist = self.model(history, training=False)
+                y_pred = dist.mean().numpy()
+                pred_std = dist.stddev().numpy()
+        elif self.config.model.variational and self.config.model.mc_samples > 1:
+            samples = [
+                self.model.predict(history, verbose=0)
+                for _ in range(self.config.model.mc_samples)
+            ]
+            y_pred = np.mean(samples, axis=0)
+            pred_std = np.std(samples, axis=0)
+        else:
+            y_pred = self.model.predict(history)
+        # Monte Carlo sampling yields predictive std when enabled
 
         # Unscale and construct full balance sheets
         y_pred_unscaled = y_pred * self.data.target_std + self.data.target_mean
@@ -176,12 +263,17 @@ class LSTMForecaster:
         err = y_pred_unscaled - y_gt_unscaled
         abs_err = np.abs(err)
         per_feature_mae = np.mean(abs_err, axis=0)
+        per_feature_std = np.zeros_like(per_feature_mae)
+        if pred_std is not None:
+            per_feature_std = np.mean(pred_std, axis=0)
+        # Track per-feature spread if variance estimates are available
 
-        feature_metrics: Dict[str, Metric] = {
+        feature_metrics = {
             name: Metric(
                 value=float(y_pred_unscaled[:, idx].mean()),
                 mae=float(per_feature_mae[idx]),
                 gt=float(y_gt_unscaled[:, idx].mean()),
+                std=float(per_feature_std[idx]),
             )
             for name, idx in self.data.feat_to_idx.items()
         }
@@ -194,12 +286,12 @@ class LSTMForecaster:
         )
 
         # Net income specific baseline comparison, if available
-        net_income_baseline_mae: Dict[str, float] = {}
-        net_income_skill: Dict[str, float] = {}
+        net_income_baseline_mae = {}
+        net_income_skill = {}
         net_income_model_mae = 0.0
         net_income_pred = 0.0
         net_income_gt = 0.0
-        net_income_baseline_pred: Dict[str, float] = {}
+        net_income_baseline_pred = {}
         net_income_key = "net_income_loss"
         if net_income_key in self.data.feat_to_idx:
             ni_idx = self.data.feat_to_idx[net_income_key]
@@ -245,6 +337,10 @@ class LSTMForecaster:
             net_income_pred=net_income_pred,
             net_income_gt=net_income_gt,
             net_income_baseline_pred=net_income_baseline_pred,
+            pred_std={
+                name: float(pred_std[:, idx].mean()) if pred_std is not None else 0.0
+                for name, idx in self.data.feat_to_idx.items()
+            },
         )
 
         if stage == "val":
@@ -254,15 +350,13 @@ class LSTMForecaster:
         return ticker_results
 
     def view_results(self, stage: str = "val") -> None:
-        results: TickerResults = (
-            self.val_results if stage == "val" else self.train_results
-        )
+        results = self.val_results if stage == "val" else self.train_results
         ticker = self.config.data.ticker
 
         print(f"\033[1mResults for {stage} dataset ({ticker}):\033[0m")
 
         # Summary Table
-        overall_rows: list[list[str]] = [
+        overall_rows = [
             make_row("Assets", results.assets),
             make_row("Liabilities", results.liabilities),
             make_row("Equity", results.equity),
@@ -327,7 +421,6 @@ if __name__ == "__main__":
     model.evaluate(stage="train")
     validation_results = model.evaluate(stage="val")
 
-    model.view_results(stage="train")
     model.view_results(stage="val")
 
     # Pass outputs to BS Model

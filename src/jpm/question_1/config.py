@@ -11,10 +11,11 @@ class DataConfig:
     ticker: str = "AAPL"
     cache_dir: str = "/scratch/datasets/jpm"
     periods: int = 40  # quarters -> 10 years
-    lookback: int = 4
+    lookback: int = 5
     horizon: int = 1
     batch_size: int = 32
     target_type: str = "full"
+    withhold_periods: int = 1  # test set size in quarters
 
     @classmethod
     def from_args(cls, args):
@@ -23,6 +24,7 @@ class DataConfig:
         for f in fields(cls):
             arg_val = getattr(args, f.name, None)
             kwargs[f.name] = f.default if arg_val is None else arg_val
+        # Populate fields from CLI, otherwise use defaults
         return cls(**kwargs)
 
 
@@ -30,10 +32,13 @@ class DataConfig:
 class ModelConfig:
     """Model hyperparameters."""
 
-    lstm_units: int = 128
-    lstm_layers: int = 1
-    dense_units: int = 128
+    lstm_units: int = 128  # 368
+    lstm_layers: int = 2
+    dense_units: int = 128  # 256
     dropout: float = 0.1
+    variational: bool = False
+    probabilistic: bool = False
+    mc_samples: int = 1
 
     @classmethod
     def from_args(cls, args):
@@ -42,6 +47,7 @@ class ModelConfig:
         for f in fields(cls):
             arg_val = getattr(args, f.name, None)
             kwargs[f.name] = f.default if arg_val is None else arg_val
+        # Avoid leaving unspecified fields unset when mixing CLI and defaults
         return cls(**kwargs)
 
 
@@ -49,11 +55,11 @@ class ModelConfig:
 class TrainingConfig:
     """Training hyperparameters."""
 
-    lr: float = 1e-3
+    lr: float = 1e-4
     decay_steps: int = 100
     decay_rate: float = 0.9
-    scheduler: str = "exponential"  # Options: "exponential", "cosine", or "constant"
-    epochs: int = 1000
+    scheduler: str = "exponential"
+    epochs: int = 500
     checkpoint_path: Path = Path("ckpts")
 
     @classmethod
@@ -63,6 +69,7 @@ class TrainingConfig:
         for f in fields(cls):
             arg_val = getattr(args, f.name, None)
             kwargs[f.name] = f.default if arg_val is None else arg_val
+        # Keeps learning-rate scheduling optional for quick experiments
         return cls(**kwargs)
 
 
@@ -83,6 +90,7 @@ class LossConfig:
         for f in fields(cls):
             arg_val = getattr(args, f.name, None)
             kwargs[f.name] = f.default if arg_val is None else arg_val
+        # Enables toggling loss penalties via CLI switches
         return cls(**kwargs)
 
 

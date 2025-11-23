@@ -56,6 +56,7 @@ def bs_loss(
         total_loss = base
 
         if config.learn_identity:
+            # Enforce Assets ≈ Liabilities + Equity on unscaled values
             violation = assets - (liabilities + equity)
             denom_ALE = tf.abs(assets) + tf.abs(liabilities) + tf.abs(equity) + eps
             rel_violation = violation / denom_ALE
@@ -88,6 +89,7 @@ def bs_loss(
             liab_sub_penalty = tf.reduce_mean(tf.square(rel_liab_sub_violation))
 
             subcategory_penalty = assets_sub_penalty + liab_sub_penalty
+            # Subtotal consistency penalties are down-weighted
             total_loss = total_loss + config.subcategory_weight * subcategory_penalty
 
         return total_loss
@@ -96,7 +98,7 @@ def bs_loss(
 
 
 class EnforceBalance(Layer):
-    """Enforce A = L + E via a slack equity term, using float64 internally."""
+    """Enforce A = L + E via a slack equity term"""
 
     def __init__(
         self,
@@ -141,11 +143,10 @@ class EnforceBalance(Layer):
                 f"Include the slack feature in the equity mapping."
             )
 
-        # Store stats as float64
+        # Use float64 to minimise drift when rescaling and adjusting slack
         self.means = tf.constant(feature_means, dtype=tf.float64)
         self.stds = tf.constant(feature_stds, dtype=tf.float64)
 
-    @tf.function
     def call(self, y):
         y64 = tf.cast(y, tf.float64)
 
