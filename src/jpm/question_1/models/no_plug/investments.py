@@ -29,6 +29,8 @@ class Investment:
     def __post_init__(self):
         if self.term_years < 1:
             raise ValueError("term_years must be >= 1")
+        if self.amount < 0:
+            raise ValueError("investment amount cannot be negative")
         self._years = _make_year_index(
             self.start_year, self.term_years + 1, like=self.input.years
         )
@@ -90,6 +92,8 @@ class InvestmentBook:
     investments: List[Investment] = field(default_factory=list)
 
     def add(self, investment: Investment) -> None:
+        if not isinstance(investment, Investment):
+            raise TypeError(f"Expected Investment instance, got {type(investment)}")
         self.investments.append(investment)
 
     def total_st_investment_at_end(self, year: object) -> float:

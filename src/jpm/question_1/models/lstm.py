@@ -207,49 +207,132 @@ class LSTMForecaster:
             raise ValueError("stage must be 'val' or 'train'")
 
         ds = self.data.val_dataset if stage == "val" else self.data.train_dataset
+        if ds is None:
+            raise ValueError(f"{stage} dataset is not available for evaluation")
 
+        history, y_gt = self._collect_batches(ds, stage)
+        y_pred, pred_std = self._predict_with_uncertainty(history)
+
+        y_pred_unscaled, y_gt_unscaled, history_unscaled = self._unscale(
+            y_pred, y_gt, history
+        )
+
+        feature_metrics, per_feature_std = self._compute_feature_metrics(
+            y_pred_unscaled, y_gt_unscaled, pred_std
+        )
+        ticker_results = self._build_results(
+            y_pred_unscaled,
+            y_gt_unscaled,
+            feature_metrics,
+            per_feature_std,
+            history_unscaled,
+        )
+
+        if stage == "val":
+            self.val_results = ticker_results
+        else:
+            self.train_results = ticker_results
+        return ticker_results
+
+    def _collect_batches(self, ds, stage: str) -> tuple[np.ndarray, np.ndarray]:
         x_batches = []
         y_batches = []
         for x_batch, y_batch in ds:
             x_batches.append(x_batch.numpy())
             y_batches.append(y_batch.numpy())
-        # Use NumPy for baseline and summary metrics to avoid TF graph overhead
-
+        if not x_batches:
+            raise ValueError(f"No batches found when evaluating {stage} dataset")
         history = np.concatenate(x_batches, axis=0)
         y_gt = np.concatenate(y_batches, axis=0)
+        return history, y_gt
 
+    def _predict_with_uncertainty(
+        self, history: np.ndarray
+    ) -> tuple[np.ndarray, np.ndarray | None]:
         pred_std = None
         if self.config.model.probabilistic:
-            if self.config.model.mc_samples > 1:
-                dists = [
-                    self.model(history, training=False)
-                    for _ in range(self.config.model.mc_samples)
-                ]
-                means = np.stack([d.mean().numpy() for d in dists], axis=0)
-                stds = np.stack([d.stddev().numpy() for d in dists], axis=0)
-                y_pred = np.mean(means, axis=0)
-                pred_std = np.mean(stds, axis=0)
-            else:
-                dist = self.model(history, training=False)
-                y_pred = dist.mean().numpy()
-                pred_std = dist.stddev().numpy()
+            y_pred, pred_std = self._predict_probabilistic(history)
         elif self.config.model.variational and self.config.model.mc_samples > 1:
-            samples = [
-                self.model.predict(history, verbose=0)
-                for _ in range(self.config.model.mc_samples)
-            ]
-            y_pred = np.mean(samples, axis=0)
-            pred_std = np.std(samples, axis=0)
+            y_pred, pred_std = self._predict_variational(history)
         else:
             y_pred = self.model.predict(history)
-        # Monte Carlo sampling yields predictive std when enabled
+        return y_pred, pred_std
 
-        # Unscale and construct full balance sheets
+    def _predict_probabilistic(
+        self, history: np.ndarray
+    ) -> tuple[np.ndarray, np.ndarray]:
+        if self.config.model.mc_samples > 1:
+            dists = [
+                self.model(history, training=False)
+                for _ in range(self.config.model.mc_samples)
+            ]
+            means = np.stack([d.mean().numpy() for d in dists], axis=0)
+            stds = np.stack([d.stddev().numpy() for d in dists], axis=0)
+            return np.mean(means, axis=0), np.mean(stds, axis=0)
+
+        dist = self.model(history, training=False)
+        return dist.mean().numpy(), dist.stddev().numpy()
+
+    def _predict_variational(
+        self, history: np.ndarray
+    ) -> tuple[np.ndarray, np.ndarray]:
+        samples = [
+            self.model.predict(history, verbose=0)
+            for _ in range(self.config.model.mc_samples)
+        ]
+        return np.mean(samples, axis=0), np.std(samples, axis=0)
+
+    def _unscale(
+        self, y_pred: np.ndarray, y_gt: np.ndarray, history: np.ndarray
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         y_pred_unscaled = y_pred * self.data.target_std + self.data.target_mean
         y_gt_unscaled = y_gt * self.data.target_std + self.data.target_mean
         history_unscaled = history * self.data.target_std + self.data.target_mean
+        return y_pred_unscaled, y_gt_unscaled, history_unscaled
 
-        # Compute MAE on assets, liabilities, equity
+    def _compute_feature_metrics(
+        self,
+        y_pred_unscaled: np.ndarray,
+        y_gt_unscaled: np.ndarray,
+        pred_std: np.ndarray | None,
+    ) -> tuple[dict[str, Metric], np.ndarray]:
+        per_feature_mae, per_feature_std = self._per_feature_errors(
+            y_pred_unscaled, y_gt_unscaled, pred_std
+        )
+
+        feature_metrics = {
+            name: Metric(
+                value=float(y_pred_unscaled[:, idx].mean()),
+                mae=float(per_feature_mae[idx]),
+                gt=float(y_gt_unscaled[:, idx].mean()),
+                std=float(per_feature_std[idx]),
+            )
+            for name, idx in self.data.feat_to_idx.items()
+        }
+        return feature_metrics, per_feature_std
+
+    def _per_feature_errors(
+        self,
+        y_pred_unscaled: np.ndarray,
+        y_gt_unscaled: np.ndarray,
+        pred_std: np.ndarray | None,
+    ) -> tuple[np.ndarray, np.ndarray]:
+        err = y_pred_unscaled - y_gt_unscaled
+        abs_err = np.abs(err)
+        per_feature_mae = np.mean(abs_err, axis=0)
+        per_feature_std = np.zeros_like(per_feature_mae)
+        if pred_std is not None:
+            per_feature_std = np.mean(pred_std, axis=0)
+        return per_feature_mae, per_feature_std
+
+    def _build_results(
+        self,
+        y_pred_unscaled: np.ndarray,
+        y_gt_unscaled: np.ndarray,
+        feature_metrics: dict[str, Metric],
+        per_feature_std: np.ndarray,
+        history_unscaled: np.ndarray,
+    ) -> TickerResults:
         asset_idx = self.data.feature_mappings["assets"]
         liability_idx = self.data.feature_mappings["liabilities"]
         equity_idx = self.data.feature_mappings["equity"]
@@ -266,24 +349,6 @@ class LSTMForecaster:
         mae_liabilities = np.mean(np.abs(liabilities_pred - liabilities_gt))
         mae_equity = np.mean(np.abs(equity_pred - equity_gt))
 
-        err = y_pred_unscaled - y_gt_unscaled
-        abs_err = np.abs(err)
-        per_feature_mae = np.mean(abs_err, axis=0)
-        per_feature_std = np.zeros_like(per_feature_mae)
-        if pred_std is not None:
-            per_feature_std = np.mean(pred_std, axis=0)
-        # Track per-feature spread if variance estimates are available
-
-        feature_metrics = {
-            name: Metric(
-                value=float(y_pred_unscaled[:, idx].mean()),
-                mae=float(per_feature_mae[idx]),
-                gt=float(y_gt_unscaled[:, idx].mean()),
-                std=float(per_feature_std[idx]),
-            )
-            for name, idx in self.data.feat_to_idx.items()
-        }
-
         baseline_results = baseline_skill_scores(
             y_true=y_gt_unscaled,
             model_pred=y_pred_unscaled,
@@ -291,33 +356,9 @@ class LSTMForecaster:
             seasonal_lag=min(4, history_unscaled.shape[1]),
         )
 
-        # Net income specific baseline comparison, if available
-        net_income_baseline_mae = {}
-        net_income_skill = {}
-        net_income_model_mae = 0.0
-        net_income_pred = 0.0
-        net_income_gt = 0.0
-        net_income_baseline_pred = {}
-        net_income_key = "net_income_loss"
-        if net_income_key in self.data.feat_to_idx:
-            ni_idx = self.data.feat_to_idx[net_income_key]
-            net_income_pred = float(y_pred_unscaled[:, ni_idx].mean())
-            net_income_gt = float(y_gt_unscaled[:, ni_idx].mean())
-            net_income_model_mae = float(
-                np.mean(np.abs(y_pred_unscaled[:, ni_idx] - y_gt_unscaled[:, ni_idx]))
-            )
-            baselines_pred = compute_baseline_predictions(
-                history_unscaled, seasonal_lag=min(4, history_unscaled.shape[1])
-            )
-            eps = 1e-12
-            for name, pred in baselines_pred.items():
-                mae = float(np.mean(np.abs(pred[:, ni_idx] - y_gt_unscaled[:, ni_idx])))
-                net_income_baseline_mae[name] = mae
-                denom = mae if mae > eps else eps
-                net_income_skill[name] = 1.0 - net_income_model_mae / denom
-                net_income_baseline_pred[name] = float(pred[:, ni_idx].mean())
+        net_income_results = self._net_income_baselines(y_pred_unscaled, y_gt_unscaled)
 
-        ticker_results = TickerResults(
+        return TickerResults(
             assets=Metric(
                 value=float(assets_pred.mean()),
                 mae=float(mae_assets),
@@ -337,23 +378,65 @@ class LSTMForecaster:
             model_mae=baseline_results["model_mae"],
             baseline_mae=baseline_results["baseline_mae"],
             skill=baseline_results["skill"],
-            net_income_model_mae=net_income_model_mae,
-            net_income_baseline_mae=net_income_baseline_mae,
-            net_income_skill=net_income_skill,
-            net_income_pred=net_income_pred,
-            net_income_gt=net_income_gt,
-            net_income_baseline_pred=net_income_baseline_pred,
+            net_income_model_mae=net_income_results["model_mae"],
+            net_income_baseline_mae=net_income_results["baseline_mae"],
+            net_income_skill=net_income_results["skill"],
+            net_income_pred=net_income_results["pred"],
+            net_income_gt=net_income_results["gt"],
+            net_income_baseline_pred=net_income_results["baseline_pred"],
             pred_std={
-                name: float(pred_std[:, idx].mean()) if pred_std is not None else 0.0
+                name: float(per_feature_std[idx])
                 for name, idx in self.data.feat_to_idx.items()
             },
         )
 
-        if stage == "val":
-            self.val_results = ticker_results
-        else:
-            self.train_results = ticker_results
-        return ticker_results
+    def _net_income_baselines(
+        self, y_pred_unscaled: np.ndarray, y_gt_unscaled: np.ndarray
+    ) -> dict[str, dict[str, float] | float]:
+        net_income_baseline_mae: dict[str, float] = {}
+        net_income_skill: dict[str, float] = {}
+        net_income_model_mae = 0.0
+        net_income_pred = 0.0
+        net_income_gt = 0.0
+        net_income_baseline_pred: dict[str, float] = {}
+        net_income_key = "net_income_loss"
+        if net_income_key not in self.data.feat_to_idx:
+            return {
+                "baseline_mae": net_income_baseline_mae,
+                "skill": net_income_skill,
+                "model_mae": net_income_model_mae,
+                "pred": net_income_pred,
+                "gt": net_income_gt,
+                "baseline_pred": net_income_baseline_pred,
+            }
+
+        ni_idx = self.data.feat_to_idx[net_income_key]
+        net_income_pred = float(y_pred_unscaled[:, ni_idx].mean())
+        net_income_gt = float(y_gt_unscaled[:, ni_idx].mean())
+        net_income_model_mae = float(
+            np.mean(np.abs(y_pred_unscaled[:, ni_idx] - y_gt_unscaled[:, ni_idx]))
+        )
+
+        baselines_pred = compute_baseline_predictions(
+            history=y_gt_unscaled * 0 + y_gt_unscaled,  # reuse history shape
+            seasonal_lag=min(4, y_gt_unscaled.shape[1]),
+        )
+        eps = 1e-12
+        for name, pred in baselines_pred.items():
+            mae = float(np.mean(np.abs(pred[:, ni_idx] - y_gt_unscaled[:, ni_idx])))
+            net_income_baseline_mae[name] = mae
+            denom = mae if mae > eps else eps
+            net_income_skill[name] = 1.0 - net_income_model_mae / denom
+            net_income_baseline_pred[name] = float(pred[:, ni_idx].mean())
+
+        return {
+            "baseline_mae": net_income_baseline_mae,
+            "skill": net_income_skill,
+            "model_mae": net_income_model_mae,
+            "pred": net_income_pred,
+            "gt": net_income_gt,
+            "baseline_pred": net_income_baseline_pred,
+        }
 
     def view_results(self, stage: str = "val") -> None:
         results = self.val_results if stage == "val" else self.train_results

@@ -20,6 +20,39 @@ class DataConfig:
     seasonal_weight: float = 1.11
     seasonal_lag: int = 4  # don't change
 
+    def __post_init__(self) -> None:
+        self._validate_strings()
+        self._validate_positive_ints()
+        self._validate_positive_floats()
+        self._validate_choices()
+
+    def _validate_strings(self) -> None:
+        if not isinstance(self.ticker, str) or not self.ticker.strip():
+            raise ValueError("ticker must be a non-empty string")
+        if self.cache_dir is None or not str(self.cache_dir).strip():
+            raise ValueError("cache_dir must be provided")
+
+    def _validate_positive_ints(self) -> None:
+        for name, val in (
+            ("periods", self.periods),
+            ("lookback", self.lookback),
+            ("horizon", self.horizon),
+            ("batch_size", self.batch_size),
+            ("seasonal_lag", self.seasonal_lag),
+        ):
+            if val <= 0:
+                raise ValueError(f"{name} must be a positive integer")
+        if self.withhold_periods < 0:
+            raise ValueError("withhold_periods must be non-negative")
+
+    def _validate_positive_floats(self) -> None:
+        if self.seasonal_weight <= 0:
+            raise ValueError("seasonal_weight must be positive")
+
+    def _validate_choices(self) -> None:
+        if self.target_type not in {"full", "bs", "net_income"}:
+            raise ValueError("target_type must be one of {'full', 'bs', 'net_income'}")
+
     @classmethod
     def from_args(cls, args):
         """Create a DataConfig from argparse.Namespace."""
@@ -46,6 +79,18 @@ class ModelConfig:
     probabilistic: bool = False
     mc_samples: int = 1
 
+    def __post_init__(self) -> None:
+        if self.lstm_units <= 0:
+            raise ValueError("lstm_units must be positive")
+        if self.lstm_layers <= 0:
+            raise ValueError("lstm_layers must be positive")
+        if self.dense_units < 0:
+            raise ValueError("dense_units must be >= 0")
+        if not 0 <= self.dropout < 1:
+            raise ValueError("dropout must be in [0, 1)")
+        if self.mc_samples <= 0:
+            raise ValueError("mc_samples must be positive")
+
     @classmethod
     def from_args(cls, args):
         """Create a ModelConfig from argparse.Namespace."""
@@ -68,6 +113,18 @@ class TrainingConfig:
     epochs: int = 500
     checkpoint_path: Path = Path("ckpts")
 
+    def __post_init__(self) -> None:
+        if self.lr <= 0:
+            raise ValueError("lr must be positive")
+        if self.decay_steps <= 0:
+            raise ValueError("decay_steps must be positive")
+        if self.decay_rate <= 0:
+            raise ValueError("decay_rate must be positive")
+        if self.epochs <= 0:
+            raise ValueError("epochs must be positive")
+        if self.scheduler not in {"exponential", "cosine", "constant"}:
+            raise ValueError("scheduler must be 'exponential', 'cosine', or 'constant'")
+
     @classmethod
     def from_args(cls, args):
         """Create a TrainingConfig from argparse.Namespace."""
@@ -88,6 +145,12 @@ class LossConfig:
     identity_weight: float = 1e-4
     learn_subtotals: bool = False
     subcategory_weight: float = 1e-5
+
+    def __post_init__(self) -> None:
+        if self.identity_weight < 0:
+            raise ValueError("identity_weight must be non-negative")
+        if self.subcategory_weight < 0:
+            raise ValueError("subcategory_weight must be non-negative")
 
     @classmethod
     def from_args(cls, args):

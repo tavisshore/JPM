@@ -59,6 +59,12 @@ class CashBudget:
     ) -> pd.Series:
         if year not in self.input.years:
             raise ValueError(f"Year {year} not in InputData.years")
+        if year == self.input.years.min():
+            raise ValueError("Use generate_0 for the initial year")
+        if year - 1 not in self.cum_ncb.index:
+            raise ValueError(
+                f"Cannot compute year {year} because prior year cash balance is missing"
+            )
 
         mincash = float(self.input.min_cash.reindex(self.input.years).at[year])
         loan_record = self.loanbook.debt_payments(year=year)
@@ -177,6 +183,8 @@ class CashBudget:
         InputData and Formulas are taken from Table 5 'Cash budget for year 0'
         - Keeping separate for now - assuming real data won't go from this init
         """
+        if year not in self.input.years:
+            raise ValueError(f"Year {year} not in InputData.years")
         # Module 1 - Operating Activities
         # Operating NCB (EBITDA) — initial assumption is 0
         ebitda = float(

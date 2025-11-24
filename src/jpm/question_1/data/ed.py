@@ -47,46 +47,26 @@ class EdgarDataLoader:
         self.cache_statement = Path(
             f"{self.config.data.cache_dir}/{self.config.data.ticker}.parquet"
         )
+        self.cache_statement.parent.mkdir(parents=True, exist_ok=True)
         self.bs_structure = get_bs_structure(ticker=self.config.data.ticker)
         # Prefer cached parquet to avoid repeated SEC fetches
         self.create_dataset()
 
     def create_dataset(self) -> None:
-        if self.config.data.target_type not in {"full", "bs", "net_income"}:
-            raise ValueError(
-                f"Unsupported target_type '{self.config.data.target_type}'. "
-                "Use 'full', 'bs', or 'net_income'."
-            )
+        self._validate_target_type()
         self.bs_keys = get_leaf_values(get_bs_structure(ticker=self.config.data.ticker))
 
-        if self.cache_statement.exists():
-            self.data = pd.read_parquet(self.cache_statement)
-        else:
-            self.company = Company(self.config.data.ticker)
-            self.create_statements()
+        self.data = self._load_or_fetch_data()
+        self._validate_data()
 
-        # Build a simple feature index for later tensor slicing
-        self.feat_to_idx = {n: i for i, n in enumerate(self.data.columns.tolist())}
-        bs_identity(self.data, ticker=self.config.data.ticker)
-
+        self._set_feature_index()
         tar = get_targets(
             mode=self.config.data.target_type, ticker=self.config.data.ticker
         )
+        self._prepare_targets(tar)
 
-        if self.config.data.target_type != "full":
-            self.targets = [t for t in tar if t in self.feat_to_idx]
-            self.tgt_indices = [self.feat_to_idx[t] for t in self.targets]
-        else:
-            self.targets = list(self.data.columns)
-            self.tgt_indices = list(range(len(self.targets)))
-
-        # Standardize features; retain means/stds for unscaling later
-        scaler = StandardScaler()
-        X_scaled = scaler.fit_transform(self.data.values.astype("float64"))
-        self.full_mean = np.asarray(scaler.mean_, dtype="float64")
-        self.full_std = np.asarray(scaler.scale_, dtype="float64")
-        self.target_mean = self.full_mean[self.tgt_indices]
-        self.target_std = self.full_std[self.tgt_indices]
+        X_scaled, scaler = self._scale_features()
+        self._set_scaler_stats(scaler)
 
         self.map_features()
         X_train, y_train, X_test, y_test = build_windows(
@@ -97,20 +77,7 @@ class EdgarDataLoader:
             withhold=self.config.data.withhold_periods,
         )
 
-        # Optionally emphasise the same quarter(s) in prior years in the input window
-        seasonal_step = self.config.data.seasonal_lag
-        if self.config.data.seasonal_weight != 1.0 and seasonal_step > 0:
-            seasonal_indices = []
-            idx = self.config.data.lookback - seasonal_step
-            while idx >= 0:
-                seasonal_indices.append(idx)
-                idx -= seasonal_step
-
-            if seasonal_indices:
-                X_train = X_train.copy()
-                X_test = X_test.copy()
-                X_train[:, seasonal_indices, :] *= self.config.data.seasonal_weight
-                X_test[:, seasonal_indices, :] *= self.config.data.seasonal_weight
+        X_train, X_test = self._apply_seasonal_weight(X_train, X_test)
 
         self.num_features = X_train.shape[-1]  # Input dim
         self.num_targets = len(self.tgt_indices)  # Output dim
@@ -127,6 +94,93 @@ class EdgarDataLoader:
         self.val_dataset = tf.data.Dataset.from_tensor_slices((X_test, y_test)).batch(
             self.config.data.batch_size
         )
+
+    def _validate_target_type(self) -> None:
+        if self.config.data.target_type not in {"full", "bs", "net_income"}:
+            raise ValueError(
+                f"Unsupported target_type '{self.config.data.target_type}'. "
+                "Use 'full', 'bs', or 'net_income'."
+            )
+
+    def _load_or_fetch_data(self) -> pd.DataFrame:
+        if self.cache_statement.exists():
+            try:
+                return pd.read_parquet(self.cache_statement)
+            except (OSError, ValueError) as exc:
+                raise RuntimeError(
+                    f"Failed to load cached statement at {self.cache_statement}"
+                ) from exc
+        self.company = Company(self.config.data.ticker)
+        self.create_statements()
+        return self.data
+
+    def _validate_data(self) -> None:
+        if self.data.empty:
+            raise ValueError("Loaded financial data is empty; cannot build dataset")
+
+        non_numeric_cols = [
+            col
+            for col, dtype in self.data.dtypes.items()
+            if not np.issubdtype(dtype, np.number)
+        ]
+        if non_numeric_cols:
+            raise TypeError(
+                f"All features must be numeric before scaling; "
+                f"found non-numeric columns: {non_numeric_cols}"
+            )
+        bs_identity(self.data, ticker=self.config.data.ticker)
+
+    def _set_feature_index(self) -> None:
+        self.feat_to_idx = {n: i for i, n in enumerate(self.data.columns.tolist())}
+
+    def _prepare_targets(self, tar: list[str]) -> None:
+        if not tar:
+            raise ValueError("No targets resolved for the provided configuration")
+
+        if self.config.data.target_type != "full":
+            self.targets = [t for t in tar if t in self.feat_to_idx]
+            self.tgt_indices = [self.feat_to_idx[t] for t in self.targets]
+        else:
+            self.targets = list(self.data.columns)
+            self.tgt_indices = list(range(len(self.targets)))
+
+        if not self.targets:
+            raise ValueError(
+                "Resolved target set is empty; check ticker and target_type settings"
+            )
+
+    def _scale_features(self) -> tuple[np.ndarray, StandardScaler]:
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(self.data.values.astype("float64"))
+        return X_scaled, scaler
+
+    def _set_scaler_stats(self, scaler: StandardScaler) -> None:
+        self.full_mean = np.asarray(scaler.mean_, dtype="float64")
+        self.full_std = np.asarray(scaler.scale_, dtype="float64")
+        self.target_mean = self.full_mean[self.tgt_indices]
+        self.target_std = self.full_std[self.tgt_indices]
+
+    def _apply_seasonal_weight(
+        self, X_train: np.ndarray, X_test: np.ndarray
+    ) -> tuple[np.ndarray, np.ndarray]:
+        seasonal_step = self.config.data.seasonal_lag
+        if self.config.data.seasonal_weight == 1.0 or seasonal_step <= 0:
+            return X_train, X_test
+
+        seasonal_indices = []
+        idx = self.config.data.lookback - seasonal_step
+        while idx >= 0:
+            seasonal_indices.append(idx)
+            idx -= seasonal_step
+
+        if not seasonal_indices:
+            return X_train, X_test
+
+        X_train = X_train.copy()
+        X_test = X_test.copy()
+        X_train[:, seasonal_indices, :] *= self.config.data.seasonal_weight
+        X_test[:, seasonal_indices, :] *= self.config.data.seasonal_weight
+        return X_train, X_test
 
     def map_features(self) -> None:
         """
@@ -256,6 +310,9 @@ class EdgarDataLoader:
         collapsed = collapsed.fillna(0)
 
         # Keep only required concepts; missing ones raise for visibility
+        missing_cols = [col for col in needed_cols if col not in collapsed.columns]
+        if missing_cols:
+            raise ValueError(f"{kind.title()} missing required columns: {missing_cols}")
         return collapsed[needed_cols]
 
 
