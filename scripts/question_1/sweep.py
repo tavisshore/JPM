@@ -10,19 +10,20 @@ from jpm.question_1.models.lstm import LSTMForecaster
 
 GRID = {
     "data.batch_size": [32],
-    "data.lookback": [4, 5],
+    "data.lookback": [5, 9],
     "data.horizon": [1],
-    "model.lstm_units": [256, 368],
-    "model.lstm_layers": [1, 2],
-    "model.dense_units": [128, 256],
-    "model.dropout": [0.1, 0.2],
+    "data.seasonal_weight": [x / 100.0 for x in range(100, 120, 1)],
+    "model.lstm_units": [256],
+    "model.lstm_layers": [2],
+    "model.dense_units": [256],
+    "model.dropout": [0.1],
     "model.variational": [False],
     "training.lr": [1e-4],
     "training.epochs": [500],
-    "loss.enforce_balance": [True, False],
-    "loss.learn_identity": [True, False],
+    "loss.enforce_balance": [False],
+    "loss.learn_identity": [True],
     "loss.identity_weight": [1e-4],
-    "loss.learn_subtotals": [True, False],
+    "loss.learn_subtotals": [False],
     "loss.subcategory_weight": [1e-5],
 }
 
