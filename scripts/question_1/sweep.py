@@ -6,13 +6,14 @@ from copy import deepcopy
 
 from jpm.question_1.config import Config
 from jpm.question_1.data.ed import EdgarDataLoader
+from jpm.question_1.misc import set_seed
 from jpm.question_1.models.lstm import LSTMForecaster
 
 GRID = {
     "data.batch_size": [32],
-    "data.lookback": [5, 9],
+    "data.lookback": [5],
     "data.horizon": [1],
-    "data.seasonal_weight": [x / 100.0 for x in range(100, 120, 1)],
+    "data.seasonal_weight": [1.08],  # [x / 100.0 for x in range(100, 120, 1)],
     "model.lstm_units": [256],
     "model.lstm_layers": [2],
     "model.dense_units": [256],
@@ -38,6 +39,8 @@ def apply_config_value(cfg: Config, key: str, value) -> Config:
 
 
 def main():
+    set_seed(42)
+
     base = Config()
     keys, values = zip(*GRID.items(), strict=True)
 
