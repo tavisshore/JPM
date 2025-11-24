@@ -24,12 +24,16 @@ class BalanceSheetStructure(TypedDict):
 
 def xbrl_to_snake(name: str) -> str:
     # Drop common XBRL prefixes (e.g., us-gaap_) and normalize to snake_case
+    if not isinstance(name, str) or not name:
+        raise ValueError("xbrl_to_snake expects a non-empty string")
     name = re.sub(r"^[^-]+-[^_]+_", "", name)
     s = re.sub(r"(?<!^)(?=[A-Z])", "_", name)
     return s.lower()
 
 
 def get_targets(mode: str = "net_income", ticker: str = "AAPL") -> List[str]:
+    if mode not in {"net_income", "bs", "full"}:
+        raise ValueError(f"Unsupported target mode '{mode}'")
     if ticker == "AAPL":
         if mode == "net_income":
             return ["net_income_loss"]
@@ -79,21 +83,8 @@ def get_bs_structure(ticker: str = "AAPL") -> BalanceSheetStructure:
                 "accumulated_other_comprehensive_income_loss_net_of_tax",
             ],
         }
-    else:
-        # TODO: extend for other tickers
-        structure: BalanceSheetStructure = {
-            "assets": {
-                "current_assets": [],
-                "non_current_assets": [],
-            },
-            "liabilities": {
-                "current_liabilities": [],
-                "non_current_liabilities": [],
-            },
-            "equity": [],
-        }
-
-    return structure
+        return structure
+    raise ValueError(f"Unsupported ticker '{ticker}' for balance sheet structure")
 
 
 def get_is_structure(ticker="AAPL") -> Dict[str, list[str]]:
@@ -111,8 +102,8 @@ def get_is_structure(ticker="AAPL") -> Dict[str, list[str]]:
                 "income_tax_expense_benefit",
             ],
         }
-
-    return structure
+        return structure
+    raise ValueError(f"Unsupported ticker '{ticker}' for income statement structure")
 
 
 def get_cf_structure(
@@ -148,10 +139,10 @@ def get_cf_structure(
             ],
         }
 
-    if flatten:
-        return get_leaf_values(structure)
-
-    return structure
+        if flatten:
+            return get_leaf_values(structure)
+        return structure
+    raise ValueError(f"Unsupported ticker '{ticker}' for cash flow structure")
 
 
 def build_windows(
@@ -171,34 +162,72 @@ def build_windows(
         X_test:  (N_test, lookback, F)   where N_test == withhold
         y_test:  (N_test, target_dim)
     """
+    _validate_window_args(X, lookback, horizon, tgt_indices, withhold)
     T, F = X.shape
+    max_start = _max_start(T, lookback, horizon)
+    split_idx = _split_index(max_start, withhold)
 
+    X_train, y_train, X_test, y_test = _build_window_arrays(
+        X, lookback, horizon, tgt_indices, max_start, split_idx, F
+    )
+    return X_train, y_train, X_test, y_test
+
+
+def _validate_window_args(
+    X: np.ndarray,
+    lookback: int,
+    horizon: int,
+    tgt_indices: Optional[List[int]],
+    withhold: int,
+) -> None:
+    if not isinstance(X, np.ndarray):
+        raise TypeError("X must be a numpy ndarray")
+    if X.ndim != 2:
+        raise ValueError(f"X must be 2D array of shape (time, features); got {X.shape}")
+    if lookback <= 0:
+        raise ValueError("lookback must be positive")
+    if horizon <= 0:
+        raise ValueError("horizon must be positive")
+    if tgt_indices is not None and any(i < 0 or i >= X.shape[1] for i in tgt_indices):
+        raise IndexError("tgt_indices contain out-of-bounds indices for X features")
+    if not isinstance(withhold, int):
+        raise TypeError("withhold must be an integer")
     if withhold < 0:
         raise ValueError("withhold must be >= 0")
 
-    # total number of possible window starts
+    if lookback + horizon > X.shape[0]:
+        raise ValueError("Sequence too short for given lookback and horizon")
+
+
+def _max_start(T: int, lookback: int, horizon: int) -> int:
     max_start = T - lookback - horizon + 1
     if max_start <= 0:
         raise ValueError("Sequence too short for given lookback and horizon")
+    return max_start
 
+
+def _split_index(max_start: int, withhold: int) -> int:
     if withhold > max_start:
         raise ValueError(
             f"withhold={withhold} is too large; max possible windows is {max_start}"
         )
+    return max_start - withhold
 
-    split_idx = max_start - withhold  # number of train windows
 
+def _build_window_arrays(
+    X: np.ndarray,
+    lookback: int,
+    horizon: int,
+    tgt_indices: Optional[List[int]],
+    max_start: int,
+    split_idx: int,
+    num_features: int,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     X_train, y_train = [], []
     X_test, y_test = [], []
 
     for t in range(max_start):
-        x_win = X[t : t + lookback]
-        y_target = X[t + lookback + horizon - 1]
-
-        if tgt_indices is not None:
-            y_target = y_target[tgt_indices]
-
-        # Partition into train vs withheld windows
+        x_win, y_target = _extract_window(X, t, lookback, horizon, tgt_indices)
         if t < split_idx:
             X_train.append(x_win)
             y_train.append(y_target)
@@ -206,12 +235,28 @@ def build_windows(
             X_test.append(x_win)
             y_test.append(y_target)
 
-    X_train = np.stack(X_train) if X_train else np.empty((0, lookback, F))
-    y_train = np.stack(y_train) if y_train else np.empty((0, y_target.shape[-1]))
-    X_test = np.stack(X_test) if X_test else np.empty((0, lookback, F))
-    y_test = np.stack(y_test) if y_test else np.empty((0, y_target.shape[-1]))
+    X_train_arr = (
+        np.stack(X_train) if X_train else np.empty((0, lookback, num_features))
+    )
+    y_train_arr = np.stack(y_train) if y_train else np.empty((0, y_target.shape[-1]))
+    X_test_arr = np.stack(X_test) if X_test else np.empty((0, lookback, num_features))
+    y_test_arr = np.stack(y_test) if y_test else np.empty((0, y_target.shape[-1]))
 
-    return X_train, y_train, X_test, y_test
+    return X_train_arr, y_train_arr, X_test_arr, y_test_arr
+
+
+def _extract_window(
+    X: np.ndarray,
+    start: int,
+    lookback: int,
+    horizon: int,
+    tgt_indices: Optional[List[int]],
+) -> tuple[np.ndarray, np.ndarray]:
+    x_win = X[start : start + lookback]
+    y_target = X[start + lookback + horizon - 1]
+    if tgt_indices is not None:
+        y_target = y_target[tgt_indices]
+    return x_win, y_target
 
 
 def bs_identity(df, ticker, tol=1e1) -> None:
@@ -219,6 +264,10 @@ def bs_identity(df, ticker, tol=1e1) -> None:
     Checks Assets = Liabilities + Equity for each row.
     Returns a DataFrame with the computed values and the error.
     """
+    if tol <= 0:
+        raise ValueError("tol must be positive")
+    if df is None or df.empty:
+        raise ValueError("Input dataframe for bs_identity cannot be empty")
     categories = get_bs_structure(ticker)
     A_cols = (
         categories["assets"]["current_assets"]
@@ -229,6 +278,12 @@ def bs_identity(df, ticker, tol=1e1) -> None:
         + categories["liabilities"]["non_current_liabilities"]
     )
     E_cols = categories["equity"]
+
+    missing_cols = [c for c in A_cols + L_cols + E_cols if c not in df.columns]
+    if missing_cols:
+        raise ValueError(
+            f"Dataframe missing required balance sheet columns: {missing_cols}"
+        )
 
     # Ensure missing values don't break the sums
     df_filled = df.fillna(0)

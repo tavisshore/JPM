@@ -32,10 +32,9 @@ def test_get_targets_returns_structure_leaves(monkeypatch):
 
 @unit
 def test_get_bs_structure_returns_defaults_for_unknown_ticker():
-    """get_bs_structure should return empty sections for unknown tickers."""
-    structure = utils.get_bs_structure(ticker="UNKNOWN")
-    assert structure["assets"]["current_assets"] == []
-    assert structure["equity"] == []
+    """Unsupported tickers should raise to surface missing mappings."""
+    with pytest.raises(ValueError):
+        utils.get_bs_structure(ticker="UNKNOWN")
 
 
 @unit

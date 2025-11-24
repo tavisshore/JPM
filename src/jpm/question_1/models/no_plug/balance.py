@@ -30,6 +30,8 @@ class BalanceSheet:
         """
         vp example gives 100% of net income as dividends next year
         """
+        if year not in self.years:
+            raise ValueError(f"Year {year} not present in balance sheet index")
         # Assets
         cash = self.cashbudget.history.loc[year]["Cumulated NCB"]
         st_investments = self.cashbudget.history.loc[year]["ST investments"]

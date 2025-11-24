@@ -30,6 +30,12 @@ class IncomeStatement:
         """
         vp example gives 100% of net income as dividends next year
         """
+        if year not in self.years:
+            raise ValueError(f"Year {year} not found in income statement index")
+        if self.vp_model and year == self.years.min():
+            raise ValueError(
+                "vp_model=True requires at least one prior year to compute dividends"
+            )
         ebit = float(self.ebit.reindex(self.years).get(year, 0.0))
         investment_returns = self.investmentbook.investment_income(year)
         st_returns_interest = investment_returns.interest

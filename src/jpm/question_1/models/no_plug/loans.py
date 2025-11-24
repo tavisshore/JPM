@@ -13,6 +13,10 @@ def _make_year_index(start, periods: int, like: pd.Index) -> pd.Index:
     Create a year sequence starting at `start` with `periods` length,
     matching (Int/Datetime/Period)
     """
+    if periods <= 0:
+        raise ValueError("periods must be positive")
+    if start is None:
+        raise ValueError("start year is required to build a schedule")
     if isinstance(like, pd.DatetimeIndex) or isinstance(start, pd.Timestamp):
         start_ts = pd.Timestamp(start)
         return pd.date_range(start=start_ts, periods=periods, freq="YS")
@@ -60,6 +64,10 @@ class Loan:
     _df: pd.DataFrame = field(init=False, repr=False, default=None)
 
     def __post_init__(self):
+        if self.category not in {"LT", "ST"}:
+            raise ValueError("category must be either 'LT' or 'ST'")
+        if self.initial_draw < 0:
+            raise ValueError("initial_draw cannot be negative")
         length = (
             self.input.lt_loan_term
             if self.category == "LT"
