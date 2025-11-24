@@ -6,6 +6,7 @@ import tensorflow_probability as tfp
 
 from jpm.question_1.config import Config, ModelConfig
 from jpm.question_1.data.ed import EdgarDataLoader
+from jpm.question_1.misc import set_seed
 from jpm.question_1.models.losses import EnforceBalance, bs_loss
 from jpm.question_1.models.metrics import (
     Metric,
@@ -356,7 +357,9 @@ class LSTMForecaster:
             seasonal_lag=min(4, history_unscaled.shape[1]),
         )
 
-        net_income_results = self._net_income_baselines(y_pred_unscaled, y_gt_unscaled)
+        net_income_results = self._net_income_baselines(
+            y_pred_unscaled, y_gt_unscaled, history_unscaled
+        )
 
         return TickerResults(
             assets=Metric(
@@ -391,7 +394,10 @@ class LSTMForecaster:
         )
 
     def _net_income_baselines(
-        self, y_pred_unscaled: np.ndarray, y_gt_unscaled: np.ndarray
+        self,
+        y_pred_unscaled: np.ndarray,
+        y_gt_unscaled: np.ndarray,
+        history_unscaled: np.ndarray,
     ) -> dict[str, dict[str, float] | float]:
         net_income_baseline_mae: dict[str, float] = {}
         net_income_skill: dict[str, float] = {}
@@ -418,8 +424,8 @@ class LSTMForecaster:
         )
 
         baselines_pred = compute_baseline_predictions(
-            history=y_gt_unscaled * 0 + y_gt_unscaled,  # reuse history shape
-            seasonal_lag=min(4, y_gt_unscaled.shape[1]),
+            history=history_unscaled,
+            seasonal_lag=min(4, history_unscaled.shape[1]),
         )
         eps = 1e-12
         for name, pred in baselines_pred.items():
@@ -491,8 +497,9 @@ if __name__ == "__main__":
         ModelConfig,
         TrainingConfig,
     )
-    from src.jpm.question_1.misc import train_args
+    from src.jpm.question_1.misc import set_seed, train_args
 
+    set_seed(42)
     args = train_args()
 
     data_cfg = DataConfig.from_args(args)

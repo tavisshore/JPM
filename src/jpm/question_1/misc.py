@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import argparse
 import math
+import random
 from pathlib import Path
 from typing import Any, Dict, List
 
+import numpy as np
 import pandas as pd
 import tensorflow as tf
 
@@ -62,6 +64,18 @@ def tf_sum(xs) -> tf.Tensor:
     """Sum a list of tensors."""
     # Prefer tf.add_n for performance on stacked tensors
     return tf.add_n(xs)
+
+
+def set_seed(seed: int) -> None:
+    """Set seeds across Python, NumPy, and TensorFlow for reproducibility."""
+    if not isinstance(seed, int):
+        raise TypeError("seed must be an integer")
+    if seed < 0:
+        raise ValueError("seed must be non-negative")
+
+    random.seed(seed)
+    np.random.seed(seed)
+    tf.random.set_seed(seed)
 
 
 def coerce_float(x) -> float:

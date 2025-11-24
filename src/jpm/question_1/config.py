@@ -17,7 +17,7 @@ class DataConfig:
     target_type: str = "full"
     withhold_periods: int = 1  # test set size in quarters
     # >1.0 weighs for the seasonal lag timestep
-    seasonal_weight: float = 1.11
+    seasonal_weight: float = 1.15  # 11
     seasonal_lag: int = 4  # don't change
 
     def __post_init__(self) -> None:
@@ -140,9 +140,9 @@ class TrainingConfig:
 class LossConfig:
     """Loss term configuration."""
 
-    enforce_balance: bool = False
+    enforce_balance: bool = True
     learn_identity: bool = True
-    identity_weight: float = 1e-4
+    identity_weight: float = 1e-2
     learn_subtotals: bool = False
     subcategory_weight: float = 1e-5
 
