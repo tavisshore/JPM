@@ -14,4 +14,3 @@ MLCOE Summer Associate Internship Exercises
 - Train LSTM forecaster:
 - `python -m jpm.question_1.models.lstm --cache_dir /PATH/TO/DESIRED/CACHE`
 - Financial statements from the SEC will be stored in your cache directory.
-  
