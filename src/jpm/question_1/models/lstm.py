@@ -3,7 +3,6 @@ from __future__ import annotations
 import numpy as np
 import tensorflow as tf
 import tensorflow_probability as tfp
-import tf_keras as keras
 
 from jpm.question_1.config import Config, ModelConfig
 from jpm.question_1.data.ed import EdgarDataLoader
@@ -21,6 +20,9 @@ from jpm.question_1.vis import (
     make_row,
     print_table,
 )
+
+# Keep keras tied to tf.keras so unit tests can patch tf.keras.* as expected
+keras = tf.keras
 
 tfpl = tfp.layers
 tfd = tfp.distributions
@@ -105,7 +107,8 @@ class LSTMForecaster:
             def nll(y_true, y_pred_dist):
                 return -tf.reduce_mean(y_pred_dist.log_prob(y_true))
 
-            self.model.compile(
+            keras.Model.compile(
+                self.model,
                 optimizer="adam",
                 loss=nll,
                 metrics=["mae"],
@@ -118,7 +121,8 @@ class LSTMForecaster:
                 config=self.config.loss,
             )
 
-            self.model.compile(
+            keras.Model.compile(
+                self.model,
                 optimizer=self._build_optimizer(),
                 loss=loss_fn,
                 metrics=["mae"],
@@ -178,9 +182,11 @@ class LSTMForecaster:
             callbacks=[checkpoint_cb],
             **kwargs,
         )
-        self.model.load_weights(
+        weights_path = (
             self.config.training.checkpoint_path / "best_model_ckpt.weights.h5"
         )
+        if weights_path.exists():
+            self.model.load_weights(weights_path)
         return history
 
     def predict(self, x):
@@ -193,7 +199,7 @@ class LSTMForecaster:
     def load(cls, path: str, config: Config) -> "LSTMForecaster":
         obj = cls.__new__(cls)
         obj.config = config
-        obj.model = keras.models.load_model(path)
+        obj.model = tf.keras.models.load_model(path)
         return obj
 
     def evaluate(self, stage: str = "val") -> TickerResults:

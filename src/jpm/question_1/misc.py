@@ -120,6 +120,7 @@ def train_args():
     p.add_argument("--batch_size", type=int, default=None)
     p.add_argument("--lookback", type=int, default=None)
     p.add_argument("--horizon", type=int, default=None)
+    p.add_argument("--seasonal_weight", type=float, default=None)
 
     # Model params
     p.add_argument("--hidden_units", type=int, default=None)

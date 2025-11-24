@@ -96,6 +96,22 @@ class EdgarDataLoader:
             tgt_indices=self.tgt_indices,
             withhold=self.config.data.withhold_periods,
         )
+
+        # Optionally emphasise the same quarter(s) in prior years in the input window
+        seasonal_step = self.config.data.seasonal_lag
+        if self.config.data.seasonal_weight != 1.0 and seasonal_step > 0:
+            seasonal_indices = []
+            idx = self.config.data.lookback - seasonal_step
+            while idx >= 0:
+                seasonal_indices.append(idx)
+                idx -= seasonal_step
+
+            if seasonal_indices:
+                X_train = X_train.copy()
+                X_test = X_test.copy()
+                X_train[:, seasonal_indices, :] *= self.config.data.seasonal_weight
+                X_test[:, seasonal_indices, :] *= self.config.data.seasonal_weight
+
         self.num_features = X_train.shape[-1]  # Input dim
         self.num_targets = len(self.tgt_indices)  # Output dim
         # Minimal tf.data pipeline with shuffle/prefetch to smooth training

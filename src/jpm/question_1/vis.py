@@ -155,12 +155,15 @@ def print_table(
         return
 
     header_values = list(headers) if headers is not None else list(DEFAULT_HEADERS)
+    num_cols = max(len(header_values), max(len(r) for r in rows))
+    if len(header_values) < num_cols:
+        header_values += [""] * (num_cols - len(header_values))
 
     col_widths = []
-    for col_idx in range(len(header_values)):
+    for col_idx in range(num_cols):
         max_len = len(header_values[col_idx])
         for row in rows:
-            cell = str(row[col_idx])
+            cell = str(row[col_idx]) if col_idx < len(row) else ""
             vis_len = len(_strip_ansi(cell))
             if vis_len > max_len:
                 max_len = vis_len
@@ -174,8 +177,9 @@ def print_table(
         return s + " " * pad
 
     def _fmt_row(values: list[str]) -> str:
+        padded = values + [""] * (num_cols - len(values))
         return " | ".join(
-            _fmt_cell(v, w) for v, w in zip(values, col_widths, strict=True)
+            _fmt_cell(v, w) for v, w in zip(padded, col_widths, strict=True)
         )
 
     sep = "-+-".join("-" * w for w in col_widths)

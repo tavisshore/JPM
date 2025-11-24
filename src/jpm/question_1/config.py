@@ -16,6 +16,9 @@ class DataConfig:
     batch_size: int = 32
     target_type: str = "full"
     withhold_periods: int = 1  # test set size in quarters
+    # >1.0 weighs for the seasonal lag timestep
+    seasonal_weight: float = 1.11
+    seasonal_lag: int = 4  # don't change
 
     @classmethod
     def from_args(cls, args):
@@ -23,6 +26,9 @@ class DataConfig:
         kwargs = {}
         for f in fields(cls):
             arg_val = getattr(args, f.name, None)
+            if f.name == "seasonal_lag":
+                kwargs[f.name] = f.default  # keep seasonal lag fixed
+                continue
             kwargs[f.name] = f.default if arg_val is None else arg_val
         # Populate fields from CLI, otherwise use defaults
         return cls(**kwargs)
@@ -32,10 +38,10 @@ class DataConfig:
 class ModelConfig:
     """Model hyperparameters."""
 
-    lstm_units: int = 128  # 368
+    lstm_units: int = 256  # 368
     lstm_layers: int = 2
-    dense_units: int = 128  # 256
-    dropout: float = 0.1
+    dense_units: int = 256  # 256
+    dropout: float = 0.2
     variational: bool = False
     probabilistic: bool = False
     mc_samples: int = 1
@@ -77,7 +83,7 @@ class TrainingConfig:
 class LossConfig:
     """Loss term configuration."""
 
-    enforce_balance: bool = True
+    enforce_balance: bool = False
     learn_identity: bool = True
     identity_weight: float = 1e-4
     learn_subtotals: bool = False
