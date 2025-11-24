@@ -115,7 +115,7 @@ def train_args():
 
     # Data
     p.add_argument("--ticker", type=str, default="AAPL")
-    p.add_argument("--cache_dir", type=str, default=None)
+    p.add_argument("--cache_dir", type=str, required=True)
     p.add_argument("--target", type=str, default=None)
     p.add_argument("--batch_size", type=int, default=None)
     p.add_argument("--lookback", type=int, default=None)
