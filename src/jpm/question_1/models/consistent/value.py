@@ -9,10 +9,10 @@ class DepreciationSchedule:
 
     beginning_nfa: pd.Series
 
-    dep_invest_year0: pd.Series
-    dep_invest_year1: pd.Series
-    dep_invest_year2: pd.Series
-    dep_invest_year3: pd.Series
+    dep_invest_year0: pd.DataFrame
+    dep_invest_year1: pd.DataFrame
+    dep_invest_year2: pd.DataFrame
+    dep_invest_year3: pd.DataFrame
 
     annual_depreciation: pd.Series
     cumulated_depreciation: pd.Series
@@ -23,16 +23,35 @@ class DepreciationSchedule:
     new_fixed_assets: pd.Series
     net_fixed_assets: pd.Series
 
+    # @classmethod
+    # def initial(cls, input_data) -> "DepreciationSchedule":
+    #     beggining_nfa = pd.Series([0.0], index=[0])
+    #     invest_to_keep = input_data.net_fixed_assets
+    #     annual_dep = 0
+    #     cum_dep = 0
+    #     invest_to_grow = 0
+    #     new_fa = invest_to_keep + invest_to_grow
+    #     net_fa = beggining_nfa
+
+    #     return cls(
+    #         years=input_data.years,
+    #         beginning_nfa=beggining_nfa,
+    #         dep_invest=pd.DataFrame(),
+    #         annual_depreciation=pd.Series([annual_dep], index=[0]),
+    #         cumulated_depreciation=pd.Series([cum_dep], index=[0]),
+    #         investment_keep_constant=pd.Series([invest_to_keep], index=[0]),
+    #         investment_for_growth=pd.Series([invest_to_grow], index=[0]),
+    #         new_fixed_assets=pd.Series([new_fa], index=[0]),
+    #         net_fixed_assets=pd.Series([net_fa], index=[0]),
+    #     )
+
     @classmethod
     def from_inputs(cls, input_data) -> "DepreciationSchedule":
         years = input_data.years
         T = len(years)
 
-        # Useful life (D7 = 4 years in the paper)
         life = int(round(input_data.lineal_depreciation.iloc[0]))
-
-        # Initial NFA from Table 1a (row “Fixed assets”)
-        initial_nfa = float(input_data.net_fixed_assets.iloc[0])
+        initial_nfa = float(input_data.net_fixed_assets)
 
         beginning_nfa = [0.0] * T
         new_fa = [0.0] * T
@@ -64,8 +83,14 @@ class DepreciationSchedule:
             # Row 75: Investment for growth (=C77*E23)
             if t == 0:
                 inv_growth[t] = 0.0
+            elif t < T - 1:
+                inv_growth[t] = (
+                    net_fa[t - 1] * input_data.increase_sales_volume.iloc[t + 1]
+                )
             else:
-                inv_growth[t] = net_fa[t - 1] * input_data.increase_sales_volume.iloc[t]
+                inv_growth[t] = (
+                    0.0  # last year has no growth investment - out of horizon
+                )
 
             # Row 76: New fixed assets (=D75+D74)
             new_fa[t] = inv_const[t] + inv_growth[t]
@@ -80,6 +105,12 @@ class DepreciationSchedule:
         annual_dep = pd.Series(annual_dep, index=years)
         net_fa = pd.Series(net_fa, index=years)
         cum_dep = annual_dep.cumsum()
+
+        # Shift inv_growth back 1 year to match spreadsheet logic
+        # print(beginning_nfa)
+
+        # print(inv_growth)
+        # breakpoint()
 
         # Rows 67–70: depreciation by investment year (cohorts)
         def cohort_dep(invest_year: int) -> pd.Series:
@@ -145,7 +176,7 @@ class InventorySchedule:
 
         # Row 81 – Units sold (from Table 3)
         units_sold = forecast.sales_units.copy()
-
+        # print(units_sold)
         # Row 82 – Final inventory (units)
         # Year 1: =D10 (initial inventory in units)
         # Years t>1: =E81 * E29  (units_sold_t * inventory_pct_t)
@@ -298,25 +329,30 @@ class SalesPurchasesSchedule:
         # Row 104 – Inflow from current year: sales * (1 - AR% - adv_cust%)
         inflow_current = total_sales * (1.0 - ar_rate - adv_cust_rate)
         # Year 0 is 0.0 in the sheet
-        inflow_current.iloc[0] = 0.0
 
         # Row 105 – Credit sales: sales * AR%
         credit_sales = total_sales * ar_rate
 
         # Row 106 – Payment in advance from customers: sales * adv_cust%
-        adv_from_customers = total_sales * adv_cust_rate
+        payments_in_advance = total_sales * adv_cust_rate
 
         # Row 107 – Total purchases (value): from Table 6b
         total_purchases = inv.purchases_value.copy()
 
         # Row 108 – Purchases paid same year: purchases * (1 - AP% - adv_sup%)
+        # If year 0, = total_purchases (no credit or advance payments yet)
         purchases_paid_same_year = total_purchases * (1.0 - ap_rate - adv_sup_rate)
+        purchases_paid_same_year.iloc[0] = total_purchases.iloc[0]
 
         # Row 109 – Purchases on credit: purchases * AP%
         purchases_on_credit = total_purchases * ap_rate
+        year0_credit = total_purchases.iloc[0] - purchases_paid_same_year.iloc[0]
+        purchases_on_credit.iloc[0] = year0_credit
 
         # Row 110 – Payment in advance to suppliers: purchases * adv_sup%
         adv_to_suppliers = total_purchases * adv_sup_rate
+        # shift a year
+        adv_to_suppliers = adv_to_suppliers.shift(-1).fillna(0.0)
 
         # --------------------------------------------------------
         # Table 8b – Flows (Rows 113–120)
@@ -334,8 +370,11 @@ class SalesPurchasesSchedule:
         accounts_receivable_flow = pd.Series(ar_vals, index=years)
 
         # Row 115 – Advance payments from customers (flows)
-        # = advance_from_customers this period
-        advance_payments_from_customers = adv_from_customers.copy()
+        advance_payments_from_customers = payments_in_advance.copy()
+        # Shifted a year ahead
+        advance_payments_from_customers = advance_payments_from_customers.shift(
+            -1
+        ).fillna(0.0)
 
         # Row 116 – Total inflows
         total_inflows = (
@@ -359,8 +398,8 @@ class SalesPurchasesSchedule:
 
         # Row 120 – Total outflows
         total_outflows = (
-            payment_accounts_payable
-            + purchases_paid_current_year
+            purchases_paid_current_year
+            + payment_accounts_payable
             + advance_payment_to_suppliers
         )
 
@@ -369,7 +408,7 @@ class SalesPurchasesSchedule:
             total_sales_revenues=total_sales,
             inflow_from_current_year=inflow_current,
             credit_sales=credit_sales,
-            advance_from_customers=adv_from_customers,
+            advance_from_customers=payments_in_advance,
             total_purchases=total_purchases,
             purchases_paid_same_year=purchases_paid_same_year,
             purchases_on_credit=purchases_on_credit,

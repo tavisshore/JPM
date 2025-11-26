@@ -78,6 +78,7 @@ class AdminSellingExpenses:
             + payroll_expenses
             + advertising_expenses
         )
+        total_as_expenses.iloc[0] = 0.0  # blank in year 0 WHY??
 
         return cls(
             years=years,

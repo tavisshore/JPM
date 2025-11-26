@@ -62,6 +62,7 @@ class Forecasting:
 
         # 2.1 Increase factor volume
         increase_factor_volume = 1.0 + input_data.increase_sales_volume
+        increase_factor_volume.iloc[0] = 0.0
 
         # 2.2 Base units from elasticity: Q0 = b0 * P0^b
         P0 = market_research.selling_price
@@ -70,9 +71,10 @@ class Forecasting:
         base_units = b0 * (P0**b)
 
         # 2.3 Units each year
-        units = [base_units]
-        for t in range(1, len(years)):
-            units.append(units[t - 1] * increase_factor_volume.iloc[t])
+        units = [0.0, base_units]
+        for t in range(2, len(years)):
+            if t != 1:
+                units.append(units[t - 1] * increase_factor_volume.iloc[t])
         sales_units = pd.Series(units, index=years)
 
         # 2.4 Selling price
@@ -83,10 +85,12 @@ class Forecasting:
 
         # 2.5 Total sales
         total_sales = selling_price * sales_units
+        total_sales.iloc[0] = 0.0  # Or shift?
 
         # minimum cash requirement
-        minimum_cash_required = policy.minimum_initial_cash * total_sales
+        minimum_cash_required = policy.cash_pct_of_sales * total_sales
         minimum_cash_required.index = years
+        minimum_cash_required.iloc[0] = policy.minimum_initial_cash
 
         # ============================================================
         # 2) RatesForecast (Table 4 logic)
@@ -106,9 +110,12 @@ class Forecasting:
 
         # Return on short-term investment: Rf + risk premium of ST return
         return_st_investment = risk_free_rate + input_data.risk_premium_return_st_inv
+        return_st_investment.iloc[0] = 0.0  # year 0 left as 0 in the spreadsheet
+        # Improve this later
 
         # Cost of debt: Rf + risk premium in cost of debt
         cost_of_debt = risk_free_rate + input_data.risk_premium_debt_cost
+        cost_of_debt.iloc[0] = 0.0  # year 0 left as 0 in the spreadsheet
 
         return cls(
             years=years,

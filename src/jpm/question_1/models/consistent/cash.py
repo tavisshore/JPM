@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import pandas as pd
 
 
-@dataclass(frozen=True)
+@dataclass()
 class CashBudget:
     years: pd.Index
 
@@ -72,15 +72,17 @@ class CashBudget:
     # --------------------------------------------------------------------- #
     # Constructors
     # --------------------------------------------------------------------- #
+
     @classmethod
     def initial(
         cls,
+        input_data,
         policy,
         sales_purch_schedule,
         admin_selling_expenses,
         dep_and_investment,
         forecast,
-        transactions,
+        loans,
     ):
         years_full = sales_purch_schedule.years
         y0 = years_full[0]  # single year
@@ -93,15 +95,25 @@ class CashBudget:
 
         inflows_from_sales = pd.Series([inflow0], index=years)
         total_operating_inflows = inflows_from_sales.copy()
+
         payments_for_purchases = pd.Series([outflow0], index=years)
         admin_selling_expenses = pd.Series([admin0], index=years)
         total_operating_outflows = pd.Series([outflow0 + admin0], index=years)
-        operating_ncb = pd.Series([inflow0 - (outflow0 + admin0)], index=years)
+        oper_ncb = inflow0 - (outflow0 + admin0)
+        operating_ncb = pd.Series([oper_ncb], index=years)
 
         # --- Module 9b (investing) ---
-        investment_in_fixed_assets = dep_and_investment.new_fixed_assets.loc[years]
-        ncb_investment_assets = -investment_in_fixed_assets
-        ncb_after_capex = operating_ncb + ncb_investment_assets
+        investment_in_fixed_assets_val = float(
+            dep_and_investment.new_fixed_assets.iloc[years].values[0]
+        )
+        investment_in_fixed_assets = pd.Series(
+            [investment_in_fixed_assets_val], index=years
+        )
+
+        ncb_investment_assets = pd.Series(
+            [-investment_in_fixed_assets_val], index=years
+        )
+        ncb_after_capex = oper_ncb + ncb_investment_assets.iloc[0]
         income_taxes = pd.Series([0.0], index=years)
 
         # Loans - setting payments for year 0 to zero
@@ -113,38 +125,40 @@ class CashBudget:
         total_loan_payment = pd.Series([0.0], index=years)
 
         # Now st and lt
+        # NOTE - this in > 0 in paper?!
         st_loan = 0.0
-        if 0 + operating_ncb - 0 - forecast.minimum_cash_required.loc[0] > 0:
-            st_loan = -(0 + operating_ncb - 0 - forecast.minimum_cash_required.loc[0])
+        if oper_ncb - forecast.minimum_cash_required.loc[0] < 0:
+            st_loan = -(oper_ncb - forecast.minimum_cash_required.loc[0])
 
-        payments_to_owners = transactions.owner_transactions.payments_to_owners.loc[y0]
-        lt_loan = 0.0
-        in_from_st_investment = 0.0
-
-        if (
-            0
-            + ncb_after_capex
-            + st_loan
-            - 0
-            - payments_to_owners
-            + in_from_st_investment
-            - forecast.minimum_cash_required.loc[0]
-            > 0
-        ):
-            lt_loan = (
-                -(
-                    0
-                    + ncb_after_capex
-                    + st_loan
-                    - 0
-                    - payments_to_owners
-                    + in_from_st_investment
-                    - forecast.minimum_cash_required.loc[0]
-                )
-                * policy.debt_financing_pct
+        if st_loan > 0:
+            # Add new ST loan to loans manager
+            loans.new_loan(
+                category="ST",
+                start_year=y0,
+                amount=st_loan,
+                input_data=input_data,
+                forecast=forecast,
             )
 
-        ncb_financing_activities = st_loan + lt_loan - total_loan_payment
+        lt_loan = 0.0
+        if (ncb_after_capex + st_loan - forecast.minimum_cash_required.loc[0]) < 0:
+            lt_loan = (
+                -(ncb_after_capex + st_loan - forecast.minimum_cash_required.loc[0])
+                * policy.debt_financing_pct
+            )
+        if lt_loan > 0:
+            # Add LT loan to loans manager
+            loans.new_loan(
+                category="LT",
+                start_year=y0,
+                amount=lt_loan,
+                input_data=input_data,
+                forecast=forecast,
+            )
+
+        ncb_financing_activities = pd.Series(
+            [st_loan + lt_loan - float(total_loan_payment.iloc[0])], index=years
+        )
 
         return cls(
             years=years,
@@ -157,7 +171,7 @@ class CashBudget:
             operating_ncb=operating_ncb,
             investment_in_fixed_assets=investment_in_fixed_assets,
             ncb_investment_assets=ncb_investment_assets,
-            ncb_after_capex=ncb_after_capex,
+            ncb_after_capex=pd.Series([ncb_after_capex], index=years),
             st_loan_inflow=pd.Series([st_loan], index=years),
             lt_loan_inflow=pd.Series([lt_loan], index=years),
             principal_st_loan=st_loan_pp,
@@ -172,27 +186,117 @@ class CashBudget:
     def add_year(
         self,
         year: int,
-        income_tax,
+        income_statement,
         sales_purchases,
         expenses,
         dep_and_investment,
+        forecast,
+        transactions,
+        loans,
+        input_data,
+        policy,
     ):
-        # WITH NEW CLASSES CHANGE
-        # INCOME TAX !
+        self.years = self.years.append(pd.Index([year]))
+        print(f"Year: {year} Cash Budget Calculation")
 
-        # compute single-year values
+        # Module 1 - Operating Activities
         admin_expense = expenses.total_as_expenses.loc[year]
         total_inflow = sales_purchases.total_inflows.loc[year]
         payment_for_purchases = sales_purchases.total_outflows.loc[year]
-        invest = dep_and_investment.new_fixed_assets.loc[year]
+        income_tax = income_statement.income_taxes.loc[year]
 
         total_outflow = payment_for_purchases + admin_expense + income_tax
         oper_ncb = total_inflow - total_outflow
-        ncb_inv = -invest
-        ncb_after_capex = oper_ncb + ncb_inv
 
-        # new index = old years + the new year
-        self.years = self.years.append(pd.Index([year]))
+        # Module 2 - Investing Activities
+        invest = dep_and_investment.new_fixed_assets.loc[year]
+
+        ncb_inv = -invest
+        ncb_after_capex = ncb_inv + oper_ncb
+
+        # Module 3 - Financing Activities
+        loans_summary = loans.schedule_summary(year)
+        st_loan_pp = loans_summary.short_term.principal_payments
+        st_loan_ip = loans_summary.short_term.interest_payments
+        st_loan_total = st_loan_pp + st_loan_ip
+
+        lt_loan_pp = loans_summary.long_term.principal_payments
+        lt_loan_ip = loans_summary.long_term.interest_payments
+
+        total_loan_payment = st_loan_total + lt_loan_pp + lt_loan_ip
+
+        # Now take out loan?
+        previous_ncb = (
+            transactions.discretionary_transactions.year_ncb.loc[year - 1]
+            if year > 0
+            else 0.0
+        )
+        previous_cum_ncb = (
+            transactions.discretionary_transactions.cumulated_ncb.loc[year - 1]
+            if year > 0
+            else 0.0
+        )
+
+        st_loan_check = (
+            previous_ncb
+            + oper_ncb
+            - st_loan_total
+            - forecast.minimum_cash_required.loc[year]
+        )
+        st_loan = 0.0
+        if st_loan_check < 0:
+            st_loan = -st_loan_check
+
+        if st_loan > 0:
+            # Add new ST loan to loans manager
+            loans.new_loan(
+                category="ST",
+                start_year=year,
+                amount=st_loan,
+                input_data=input_data,
+                forecast=forecast,
+            )
+
+        self.st_loan_inflow = pd.concat(
+            [self.st_loan_inflow, pd.Series([st_loan], index=[year])]
+        )
+
+        # Update transactions from here?
+        return_from_st_investment = (
+            transactions.discretionary_transactions.get_st_returns(
+                year=year,
+                income_statement=income_statement,
+            )
+        )
+        payments_to_owners = transactions.owner_transactions.owner_payments(
+            year, income_statement, dep_and_investment, policy
+        )
+
+        lt_loan = 0.0
+        lt_check = (
+            previous_cum_ncb
+            + ncb_after_capex
+            + st_loan
+            - total_loan_payment
+            - payments_to_owners
+            + return_from_st_investment
+            - forecast.minimum_cash_required.loc[year]
+        )
+        if lt_check < 0:
+            lt_loan = (-lt_check) * policy.debt_financing_pct
+
+        print(f"LT: {lt_loan}")
+        if lt_loan > 0:
+            # Add LT loan to loans manager
+            loans.new_loan(
+                category="LT",
+                start_year=year,
+                amount=lt_loan,
+                input_data=input_data,
+                forecast=forecast,
+            )
+
+        ncb_financing_activities = st_loan + lt_loan - total_loan_payment
 
         # use concat instead of deprecated Series.append
         self.inflows_from_sales = pd.concat(
@@ -232,88 +336,6 @@ class CashBudget:
             [self.ncb_after_capex, pd.Series([ncb_after_capex], index=[year])]
         )
 
-    # TODO maybe separate into ST and LT methods
-    def add_financing(
-        self,
-        year,
-        policy,
-        forecast,
-        transactions,
-        loans,
-    ):
-        """
-        Fill Table 9c once the borrowing schedule is known.
-        """
-        # Loans to take and pay or not
-
-        # Loan payments first
-        st_loan_pp = self.st_loan_inflow.loc[year - 1]
-        st_loan_ip = loans.st_ip.loc[year]
-        st_loan_total = st_loan_pp + st_loan_ip
-        lt_loan_pp = loans.lt_total_pp.loc[year]
-        lt_loan_ip = loans.lt_total_interest.loc[year]
-        total_loan_payment = st_loan_total + lt_loan_pp + lt_loan_ip
-
-        # Now take out loan?
-        previous_ncb = (
-            transactions.discretionary_transactions.year_ncb.loc[year - 1]
-            if year > 0
-            else 0.0
-        )
-        previous_cum_ncb = (
-            transactions.discretionary_transactions.cum_ncb.loc[year - 1]
-            if year > 0
-            else 0.0
-        )
-
-        oper_ncb = self.operating_ncb.loc[year]
-
-        st_loan_check = (
-            previous_ncb
-            + oper_ncb
-            - st_loan_total
-            - forecast.minimum_cash_required.loc[year]
-        )
-        st_loan = 0.0
-        if st_loan_check > 0:
-            st_loan = -st_loan_check
-
-        payments_to_owners = transactions.owner_transactions.payments_to_owners.loc[
-            year
-        ]
-        return_from_st_investment = (
-            transactions.discretionary_transactions.return_from_st_investment.loc[year]
-        )
-
-        if (
-            previous_cum_ncb
-            + oper_ncb
-            + st_loan
-            - total_loan_payment
-            - payments_to_owners
-            + return_from_st_investment
-            - forecast.minimum_cash_required.loc[year]
-            > 0
-        ):
-            lt_loan = (
-                -(
-                    previous_cum_ncb
-                    + oper_ncb
-                    + st_loan
-                    - total_loan_payment
-                    - payments_to_owners
-                    + return_from_st_investment
-                    - forecast.minimum_cash_required.loc[year]
-                )
-                * policy.debt_financing_pct
-            )
-
-        ncb_financing_activities = st_loan + lt_loan - total_loan_payment
-
-        # use concat instead of deprecated Series.append
-        self.st_loan_inflow = pd.concat(
-            [self.st_loan_inflow, pd.Series([st_loan], index=[year])]
-        )
         self.lt_loan_inflow = pd.concat(
             [self.lt_loan_inflow, pd.Series([lt_loan], index=[year])]
         )

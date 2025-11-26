@@ -12,7 +12,7 @@ def series(defaults):
 class InputData:
     years: pd.Index
 
-    net_fixed_assets: pd.Series
+    net_fixed_assets: float
     lineal_depreciation: pd.Series
 
     corporate_tax_rate: float
@@ -78,9 +78,6 @@ class PolicyTable:
         )
         self.payout_ratio = to_series(self.payout_ratio, "payout_ratio")
         self.cash_pct_of_sales = to_series(self.cash_pct_of_sales, "cash_pct_of_sales")
-        self.debt_financing_pct = to_series(
-            self.debt_financing_pct, "debt_financing_pct"
-        )
         self.selling_commission_pct = to_series(
             self.selling_commission_pct, "selling_commission_pct"
         )
