@@ -191,13 +191,6 @@ class LoanBook:
         for loan in self.loans:
             if loan.loan_ongoing(year):  # Remove spent loans?
                 row = loan.compute(year)
-                # print(row)
-                # Beginning balance             10.0
-                # Interest payment ST loan       0.0
-                # Principal payments ST loan     0.0
-                # Total payment ST loan          0.0
-                # Ending balance                10.0
-                # Interest rate                  0.0
                 if loan.category == "LT":
                     lt_total += float(row["Ending balance"])  # Or end?
                 elif loan.category == "ST":

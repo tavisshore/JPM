@@ -13,8 +13,10 @@ If using conda, create a clean 3.10 env
 - `export EDGAR_EMAIL="your_email@jpm.com"`
 
 ### Running Models
-- Plugless Vélez-Pareja model:
-- `python -m jpm.question_1.models.plugless`
-- Train LSTM forecaster:
+- **Plugless** Vélez-Pareja model:
+- `python scripts/question_1/noplug_vp.py`
+- **Consistent** Vélez-Pareja model:
+- `python scripts/question_1/construct_vp.py`
+- Train **LSTM** forecaster:
 - `python scripts/question_1/eval_lstm.py --cache_dir /PATH/TO/DESIRED/CACHE`
 - Financial statements from the SEC will be stored in your cache directory.
