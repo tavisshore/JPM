@@ -1,15 +1,20 @@
+from __future__ import annotations
+
 from dataclasses import dataclass, field
+from typing import Iterable
 
 import pandas as pd
 
 
-def series(defaults):
-    # keep raw defaults; __post_init__ will align them with the provided years index
+def series(defaults: Iterable[float]) -> field:
+
     return field(default_factory=lambda: list(defaults))
 
 
 @dataclass()
 class InputData:
+    """Core input parameters used across financial schedules."""
+
     years: pd.Index
 
     net_fixed_assets: float
@@ -37,6 +42,8 @@ class InputData:
 
 @dataclass()
 class MarketResearchInput:
+    """Market research assumptions for pricing and elasticity."""
+
     selling_price: float
     elasticity_b: float
     elasticity_coef: float
@@ -44,6 +51,8 @@ class MarketResearchInput:
 
 @dataclass
 class PolicyTable:
+    """Operational policies and percentages applied to model calculations."""
+
     years: pd.Index
 
     promo_ad: pd.Series = series([0.0, 0.03, 0.0, 0.0, 0.0])

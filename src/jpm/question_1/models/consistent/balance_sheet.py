@@ -1,126 +1,107 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 import pandas as pd
+
+if TYPE_CHECKING:
+    from income_statement import IncomeStatement
+    from loans import LoanSchedules
+    from trans import Transactions
+    from value import DepreciationSchedule, InventorySchedule, SalesPurchasesSchedule
 
 
 @dataclass(frozen=True)
 class BalanceSheet:
+    """Balance sheet assembled from transaction, loan, and inventory schedules."""
+
     years: pd.Index
 
-    # Assets
-    cash_cb: pd.Series  # row 213  (Cash CB)          = D163
-    ar_it: pd.Series  # row 214  (AR IT)            = D105 (intermediate)
-    inventory_it: pd.Series  # row 215  (Inventory IT)     = D93
-    app_it: pd.Series  # row 216  (APP IT)           = D119
-    st_investments_cb: pd.Series  # row 217  (ST invest. CB)    = D160
-    current_assets: pd.Series  # row 218  = SUM(D213:D217)
-    net_fixed_assets_it: pd.Series  # row 219  (Net fixed assets) = D77
-    total_assets: pd.Series  # row 220  = D219 + D218
+    cash_cb: pd.Series
+    ar_it: pd.Series
+    inventory_it: pd.Series
+    app_it: pd.Series
+    st_investments_cb: pd.Series
+    current_assets: pd.Series
+    net_fixed_assets_it: pd.Series
+    total_assets: pd.Series
 
-    # Liabilities
-    ap_it: pd.Series  # row 222  (AP IT)            = D109
-    apr: pd.Series  # row 223  (APR)              = D115
-    short_term_debt_cb: pd.Series  # row 224  (ST debt CB)       = D171
-    current_liabilities: pd.Series  # row 225  = SUM(D222:D224)
-    long_term_debt_cb: pd.Series  # row 226  (LT debt CB)       = D192
-    total_liabilities: pd.Series  # row 227  = D226 + D225
+    ap_it: pd.Series
+    apr: pd.Series
+    short_term_debt_cb: pd.Series
+    current_liabilities: pd.Series
+    long_term_debt_cb: pd.Series
+    total_liabilities: pd.Series
 
-    # Equity
-    equity_investment_cb: pd.Series  # row 228  = C228 + D150
-    retained_earnings_is: pd.Series  # row 229  (CRE)              = D208
-    current_year_ni: pd.Series  # row 230  (NI)               = D206
-    repurchase_of_equity: pd.Series  # row 231  = C231 - D152
+    equity_investment_cb: pd.Series
+    retained_earnings_is: pd.Series
+    current_year_ni: pd.Series
+    repurchase_of_equity: pd.Series
 
-    # Totals & check
-    total_liabilities_and_equity: pd.Series  # row 232 = SUM(D228:D231)+D227
-    check: pd.Series  # row 233 = D232 - D220
+    total_liabilities_and_equity: pd.Series
+    check: pd.Series
 
-    # -----------------------------------------------------------------
-    # Constructor from other modules
-    # -----------------------------------------------------------------
     @classmethod
     def from_inputs(
         cls,
         years: pd.Index,
-        transactions,
-        # Assets-side inputs
-        cash_cb: pd.Series,  # usually DiscretionaryTransactions.cumulated_ncb
-        ar_it: pd.Series,  # Accounts receivable IT (Table 8)
-        inventory_it: pd.Series,  # F
-        app_it: pd.Series,  # Advance payments paid IT (to suppliers)
-        st_investments_cb: pd.Series,  # DiscretionaryTransactions.st_investments
-        net_fixed_assets_it: pd.Series,  # DepreciationSchedule.net_fixed_assets
-        # Liabilities inputs
-        ap_it: pd.Series,  # Accounts payable IT
-        apr: pd.Series,  # Advance payments received (from customers)
-        short_term_debt_cb: pd.Series,  # LoanSchedules.st_eb
-        long_term_debt_cb: pd.Series,  # LoanSchedules.lt_eb
-        # Equity inputs
-        invested_equity: pd.Series,  # OwnerTransactions.invested_equity (row 150)
-        retained_earnings_is: pd.Series,  # CRE (row 229) from IS / CRE module
-        current_year_ni: pd.Series,  # IncomeStatement.net_income (row 206)
-        repurchased_stock: pd.Series,  # OwnerTransactions.repurchased_stock (row 152)
+        transactions: "Transactions",
+        sales_purchases: "SalesPurchasesSchedule",
+        inventory: "InventorySchedule",
+        depreciation: "DepreciationSchedule",
+        loanbook: "LoanSchedules",
+        income_statement: "IncomeStatement",
     ) -> "BalanceSheet":
         years = pd.Index(years)
 
-        # make sure all series are aligned & indexed by years
-        def align(s: pd.Series) -> pd.Series:
-            return s.reindex(years).fillna(0.0)
+        cash_cb = transactions.discretionary.cumulated_ncb
 
-        cash_cb = align(cash_cb)
-        ar_it = align(ar_it)
-        inventory_it = align(inventory_it)
-        app_it = align(app_it)
-        st_investments_cb = align(st_investments_cb)
-        net_fixed_assets_it = align(net_fixed_assets_it)
-        ap_it = align(ap_it)
-        apr = align(apr)
-        short_term_debt_cb = align(short_term_debt_cb)
-        long_term_debt_cb = align(long_term_debt_cb)
-        invested_equity = align(invested_equity)
-        retained_earnings_is = align(retained_earnings_is)
-        current_year_ni = align(current_year_ni)
-        repurchased_stock = align(repurchased_stock)
+        ar_it = sales_purchases.credit_sales
+        inventory_it = inventory.final_inventory_value
+        app_it = sales_purchases.advance_payment_to_suppliers
+        st_investments_cb = transactions.discretionary.st_investments
+        net_fixed_assets_it = depreciation.net_fixed_assets
+        current_assets = cash_cb + ar_it + inventory_it + app_it + st_investments_cb
+        total_assets = current_assets + net_fixed_assets_it
 
-        # ---------------- ASSETS ----------------
-        current_assets = (
-            cash_cb + ar_it + inventory_it + app_it + st_investments_cb
-        )  # row 218
-        total_assets = current_assets + net_fixed_assets_it  # row 220
+        ap_it = sales_purchases.purchases_on_credit
+        apr = sales_purchases.advance_payments_from_customers
+        loan_summary = loanbook.book.schedule_summary_series(years)
+        short_term_debt_cb = loan_summary.short_term.ending_balance
+        long_term_debt_cb = loan_summary.long_term.ending_balance
 
-        # ---------------- LIABILITIES ----------------
-        current_liabilities = ap_it + apr + short_term_debt_cb  # row 225
-        total_liabilities = current_liabilities + long_term_debt_cb  # row 227
+        current_liabilities = ap_it + apr + short_term_debt_cb
+        total_liabilities = current_liabilities + long_term_debt_cb
 
-        # ---------------- EQUITY FLOWS (cumulative) ----------------
-        # row 228: Equity investment CB = previous CB + current invested equity
         equity_cb_vals = []
         eq_cb_prev = 0.0
         for y in years:
-            eq_cb_curr = eq_cb_prev + invested_equity.loc[y]
+            eq_cb_curr = eq_cb_prev + transactions.owner.invested_equity.loc[y]
             equity_cb_vals.append(eq_cb_curr)
             eq_cb_prev = eq_cb_curr
         equity_investment_cb = pd.Series(equity_cb_vals, index=years)
 
-        # row 231: Repurchase of equity = previous CB - current repurchased stock
+        retained_earnings_is = income_statement.cre
+        current_year_ni = income_statement.net_income
+
         repurchase_vals = []
         rep_prev = 0.0
         for y in years:
-            rep_curr = rep_prev - repurchased_stock.loc[y]
+            rep_curr = rep_prev - transactions.owner.repurchased_stock.loc[y]
             repurchase_vals.append(rep_curr)
             rep_prev = rep_curr
         repurchase_of_equity = pd.Series(repurchase_vals, index=years)
 
-        # ---------------- TOTAL L&E AND CHECK ----------------
         total_liabilities_and_equity = (
             total_liabilities
             + equity_investment_cb
             + retained_earnings_is
             + current_year_ni
             + repurchase_of_equity
-        )  # row 232
+        )
 
-        check = total_liabilities_and_equity - total_assets  # row 233
+        check = total_liabilities_and_equity - total_assets
 
         return cls(
             years=years,

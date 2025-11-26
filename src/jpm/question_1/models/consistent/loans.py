@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Iterable
+from typing import Iterable, Union
 
 import pandas as pd
-from forecasting import Forecasting
-from input import InputData
+
+from .forecasting import Forecasting
+from .input import InputData
 
 
 def _make_year_index(start, periods: int, like: pd.Index) -> pd.Index:
@@ -33,6 +34,8 @@ def _make_year_index(start, periods: int, like: pd.Index) -> pd.Index:
 
 @dataclass
 class DebtPay:
+    """Aggregated debt payments for a given year."""
+
     st_interest: float
     st_principal: float
     lt_interest: float
@@ -42,6 +45,8 @@ class DebtPay:
 
 @dataclass
 class DebtBalances:
+    """Outstanding short- and long-term debt balances."""
+
     st_debt: float
     lt_debt: float
     total: float
@@ -49,30 +54,38 @@ class DebtBalances:
 
 @dataclass
 class ShortTermLoan:
-    beginning_balance: float
-    interest_payments: float
-    principal_payments: float
-    ending_balance: float
-    cost_of_debt: float
+    """Short-term loan schedule summary."""
+
+    beginning_balance: Union[float, pd.Series]
+    interest_payments: Union[float, pd.Series]
+    principal_payments: Union[float, pd.Series]
+    ending_balance: Union[float, pd.Series]
+    cost_of_debt: Union[float, pd.Series]
 
 
 @dataclass
 class LongTermLoan:
-    beginning_balance: float
-    interest_payments: float
-    new_debt: float
-    principal_payments: float
-    ending_balance: float
+    """Long-term loan schedule summary."""
+
+    beginning_balance: Union[float, pd.Series]
+    interest_payments: Union[float, pd.Series]
+    new_debt: Union[float, pd.Series]
+    principal_payments: Union[float, pd.Series]
+    ending_balance: Union[float, pd.Series]
 
 
 @dataclass
 class LoanTable:
+    """Container bundling short- and long-term loan schedules."""
+
     short_term: ShortTermLoan
     long_term: LongTermLoan
 
 
 @dataclass
 class Loan:
+    """Individual loan schedule with derived interest calculations."""
+
     input_data: InputData
     forecast: Forecasting
     start_year: object
@@ -119,7 +132,7 @@ class Loan:
 
         for i, _ in enumerate(y):
             if i == 0:
-                end.iloc[i] = beg.iloc[i]  # no payment in year 0
+                end.iloc[i] = beg.iloc[i]
                 continue
 
             beg.iloc[i] = end.iloc[i - 1]
@@ -151,7 +164,7 @@ class Loan:
         row = self.compute(year)
         kd = self.forecast.cost_of_debt.reindex(self.years, fill_value=0.0)
         rate = float(kd.loc[year])
-        # mimic prior behaviour: no interest accrued in the draw year
+
         if year == self.years[0]:
             return 0.0
         return float(row["Beginning balance"]) * rate
@@ -163,6 +176,8 @@ class Loan:
 
 @dataclass
 class LoanBook:
+    """Collection of loans with helper aggregation utilities."""
+
     loans: list[Loan] = field(default_factory=list)
 
     def add(self, loan: Loan) -> None:
@@ -184,7 +199,7 @@ class LoanBook:
     def __iter__(self):
         return iter(self.all())
 
-    def debt_payments(self, year) -> DebtPay:
+    def debt_payments(self, year: int) -> DebtPay:
         """
         Aggregates debt payments for a given year using the loan schedules.
         """
@@ -213,7 +228,7 @@ class LoanBook:
             total=st_interest + st_principal + lt_interest + lt_principal,
         )
 
-    def remaining_debt(self, year):
+    def remaining_debt(self, year: int) -> DebtBalances:
         """
         Return ST and LT debt totals
         """
@@ -231,7 +246,7 @@ class LoanBook:
             st_debt=st_total, lt_debt=lt_total, total=st_total + lt_total
         )
 
-    def new_lt_debt(self, year) -> float:
+    def new_lt_debt(self, year: int) -> float:
         """
         Sum the initial draw of LT loans that start in the provided year.
         """
@@ -241,11 +256,10 @@ class LoanBook:
                 total += float(loan.initial_draw)
         return total
 
-    def schedule_summary(self, year) -> LoanTable:
+    def schedule_summary(self, year: int) -> LoanTable:
         st_beg = st_int = st_pri = st_end = 0.0
         lt_beg = lt_int = lt_pri = lt_end = 0.0
 
-        # Try to pick a cost of debt rate for the year (assumes shared forecast)
         kd_rate = 0.0
         for loan in self.loans:
             if year in loan.years:
@@ -262,7 +276,7 @@ class LoanBook:
 
             row = loan.compute(year)
             principal_key = f"Principal payments {loan.category} loan"
-            # Exclude loans originated in the same year from beginning balance
+
             beg = 0.0 if loan.years[0] == year else float(row["Beginning balance"])
             pri = float(row[principal_key])
             end = float(row["Ending balance"])
@@ -294,26 +308,60 @@ class LoanBook:
             ending_balance=lt_end,
         )
         loans_out = LoanTable(short_term=short_term, long_term=long_term)
-
-        # print(f"Year {year} Loan Summary:")
-        # print(
-        #     f"  ST Loan - Int: {st_int:.2f}, Pri: {st_pri:.2f}, "
-        #     f"End: {st_end:.2f}, Kd: {kd_rate:.4f}"
-        # )
-        # print(
-        #     f"  LT Loan - Int: {lt_int:.2f}, New: {self.new_lt_debt(year):.2f}, "
-        #     f"Pri: {lt_pri:.2f}, End: {lt_end:.2f}"
-        # )
-        # print()
-
         return loans_out
+
+    def schedule_summary_series(self, years: Iterable[int]) -> LoanTable:
+        years_idx = pd.Index(years)
+
+        st_beg = pd.Series(0.0, index=years_idx)
+        st_int = pd.Series(0.0, index=years_idx)
+        st_pri = pd.Series(0.0, index=years_idx)
+        st_end = pd.Series(0.0, index=years_idx)
+
+        lt_beg = pd.Series(0.0, index=years_idx)
+        lt_int = pd.Series(0.0, index=years_idx)
+        lt_pri = pd.Series(0.0, index=years_idx)
+        lt_end = pd.Series(0.0, index=years_idx)
+        kd_rate = pd.Series(0.0, index=years_idx)
+        new_lt_debt = pd.Series(0.0, index=years_idx)
+
+        for yr in years_idx:
+            summary = self.schedule_summary(yr)
+            short = summary.short_term
+            long = summary.long_term
+
+            st_beg.loc[yr] = short.beginning_balance
+            st_int.loc[yr] = short.interest_payments
+            st_pri.loc[yr] = short.principal_payments
+            st_end.loc[yr] = short.ending_balance
+
+            lt_beg.loc[yr] = long.beginning_balance
+            lt_int.loc[yr] = long.interest_payments
+            lt_pri.loc[yr] = long.principal_payments
+            lt_end.loc[yr] = long.ending_balance
+
+            kd_rate.loc[yr] = short.cost_of_debt
+            new_lt_debt.loc[yr] = long.new_debt
+
+        short_term = ShortTermLoan(
+            beginning_balance=st_beg,
+            interest_payments=st_int,
+            principal_payments=st_pri,
+            ending_balance=st_end,
+            cost_of_debt=kd_rate,
+        )
+        long_term = LongTermLoan(
+            beginning_balance=lt_beg,
+            interest_payments=lt_int,
+            new_debt=new_lt_debt,
+            principal_payments=lt_pri,
+            ending_balance=lt_end,
+        )
+        return LoanTable(short_term=short_term, long_term=long_term)
 
 
 class LoanSchedules:
-    """
-    Wrapper that keeps the LoanBook interface while making it easy to
-    spin up new loan instances when external financing is needed.
-    """
+    """Facade that builds and aggregates loan schedules when financing is needed."""
 
     def __init__(self):
         self.book = LoanBook()
@@ -322,7 +370,7 @@ class LoanSchedules:
         self,
         *,
         category: str,
-        start_year,
+        start_year: int,
         amount: float,
         input_data: InputData,
         forecast: Forecasting,
@@ -340,17 +388,20 @@ class LoanSchedules:
     def extend(self, loans: Iterable[Loan]) -> None:
         self.book.extend(loans)
 
-    def debt_payments(self, year) -> DebtPay:
+    def debt_payments(self, year: int) -> DebtPay:
         return self.book.debt_payments(year)
 
-    def remaining_debt(self, year):
+    def remaining_debt(self, year: int) -> DebtBalances:
         return self.book.remaining_debt(year)
 
-    def new_lt_debt(self, year) -> float:
+    def new_lt_debt(self, year: int) -> float:
         return self.book.new_lt_debt(year)
 
-    def schedule_summary(self, year) -> dict:
+    def schedule_summary(self, year: int) -> LoanTable:
         return self.book.schedule_summary(year)
+
+    def schedule_summary_series(self, years: Iterable[int]) -> LoanTable:
+        return self.book.schedule_summary_series(years)
 
     def all(self) -> list[Loan]:
         return self.book.all()

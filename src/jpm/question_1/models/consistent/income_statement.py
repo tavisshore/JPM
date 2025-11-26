@@ -1,36 +1,48 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 import pandas as pd
+
+if TYPE_CHECKING:
+    from expenses import AdminSellingExpenses
+    from forecasting import Forecasting
+    from input import InputData, PolicyTable
+    from loans import LoanSchedules
+    from value import DepreciationSchedule, InventorySchedule
 
 
 @dataclass
 class IncomeStatement:
+    """Income statement calculations over the forecast horizon."""
+
     years: pd.Index
 
-    sales_revenues: pd.Series  # Row 196
-    cogs: pd.Series  # Row 197
-    gross_income: pd.Series  # Row 198
-    admin_selling_expenses: pd.Series  # Row 199
-    depreciation: pd.Series  # Row 200
-    ebit: pd.Series  # Row 201
-    interest_payments: pd.Series  # Row 202
-    return_from_st_investment: pd.Series  # Row 203
-    ebt: pd.Series  # Row 204
-    income_taxes: pd.Series  # Row 205
-    net_income: pd.Series  # Row 206
-    next_year_dividends: pd.Series  # Row 207
-    cre: pd.Series  # Row 208 – Cumulated Retained Earnings
+    sales_revenues: pd.Series
+    cogs: pd.Series
+    gross_income: pd.Series
+    admin_selling_expenses: pd.Series
+    depreciation: pd.Series
+    ebit: pd.Series
+    interest_payments: pd.Series
+    return_from_st_investment: pd.Series
+    ebt: pd.Series
+    income_taxes: pd.Series
+    net_income: pd.Series
+    next_year_dividends: pd.Series
+    cre: pd.Series
 
     @classmethod
     def init_year(
         cls,
-        input_data,
-        policy,
-        forecast_sales,  # Table 3
-        inv_fifo,  # Table 6b
-        admin_selling,  # Table 7
-        depr_sched,  # Table 5
-        loan_schedules,  # Tables 11a/11b
+        input_data: "InputData",
+        policy: "PolicyTable",
+        forecast_sales: "Forecasting",
+        inv_fifo: "InventorySchedule",
+        admin_selling: "AdminSellingExpenses",
+        depr_sched: "DepreciationSchedule",
+        loan_schedules: "LoanSchedules",
     ) -> "IncomeStatement":
         full_years = input_data.years
         y0 = full_years[0]
@@ -75,15 +87,15 @@ class IncomeStatement:
     def add_year(
         self,
         year,
-        input_data,
-        policy,
-        forecast_sales,  # Table 3
-        inv_fifo,  # Table 6b
-        admin_selling,  # Table 7
-        depr_sched,  # Table 5
-        loan_schedules,  # Tables 11a/11b
-    ):
-        # New index with added year
+        input_data: "InputData",
+        policy: "PolicyTable",
+        forecast_sales: "Forecasting",
+        inv_fifo: "InventorySchedule",
+        admin_selling: "AdminSellingExpenses",
+        depr_sched: "DepreciationSchedule",
+        loan_schedules: "LoanSchedules",
+    ) -> None:
+
         self.years = self.years.append(pd.Index([year]))
 
         sales_revenues_t = forecast_sales.total_sales.loc[year]
@@ -94,7 +106,7 @@ class IncomeStatement:
         ebit_t = gross_income_t - admin_selling_expenses_t - depreciation_t
         dp = loan_schedules.debt_payments(year)
         interest_payments_t = dp.st_interest + dp.lt_interest
-        return_from_st_investment_t = 0.0  # assumed zero for year 0
+        return_from_st_investment_t = 0.0
         ebt_t = ebit_t + return_from_st_investment_t - interest_payments_t
         tax_rate = input_data.corporate_tax_rate
         income_taxes_t = max(0.0, ebt_t) * tax_rate
@@ -102,9 +114,11 @@ class IncomeStatement:
         payout_ratio = float(policy.payout_ratio.iloc[1])
         next_year_dividends_t = net_income_t * payout_ratio
 
-        cre_prev = float(self.cre.iloc[-1])
-        cre_t = cre_prev + net_income_t - next_year_dividends_t
-        # Append new values to existing series
+        cre_prev = float(self.cre.iloc[year - 1])
+        net_income_prev = float(self.net_income.iloc[year - 1])
+        dividends_prev = float(self.next_year_dividends.iloc[year - 1])
+        cre_t = cre_prev + net_income_prev - dividends_prev
+
         self.sales_revenues = pd.concat(
             [self.sales_revenues, pd.Series([sales_revenues_t], index=[year])]
         )
