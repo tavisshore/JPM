@@ -197,7 +197,6 @@ class CashBudget:
         policy,
     ):
         self.years = self.years.append(pd.Index([year]))
-        print(f"Year: {year} Cash Budget Calculation")
 
         # Module 1 - Operating Activities
         admin_expense = expenses.total_as_expenses.loc[year]
@@ -237,6 +236,7 @@ class CashBudget:
             else 0.0
         )
 
+        previous_cash = forecast.minimum_cash_required.loc[year - 1]
         st_loan_check = (
             previous_ncb
             + oper_ncb
@@ -274,7 +274,7 @@ class CashBudget:
 
         lt_loan = 0.0
         lt_check = (
-            previous_cum_ncb
+            previous_cash
             + ncb_after_capex
             + st_loan
             - total_loan_payment
@@ -282,10 +282,22 @@ class CashBudget:
             + return_from_st_investment
             - forecast.minimum_cash_required.loc[year]
         )
+
         if lt_check < 0:
             lt_loan = (-lt_check) * policy.debt_financing_pct
 
-        print(f"LT: {lt_loan}")
+        print(f"LT year {year} - loan: {lt_loan:.2f}")
+        min_cash_required = forecast.minimum_cash_required.loc[year]
+        print(
+            f"  Previous cum NCB: {previous_cum_ncb:.2f}\n"
+            f"  NCB after Capex: {ncb_after_capex:.2f}\n"
+            f"  ST Loan: {st_loan:.2f}\n"
+            f"  Total Loan Payment: {total_loan_payment:.2f}\n"
+            f"  Payments to Owners: {payments_to_owners:.2f}\n"
+            f"  Return from ST Investment: {return_from_st_investment:.2f}\n"
+            f"  Minimum Cash Required: {min_cash_required:.2f}\n\n"
+        )
+
         if lt_loan > 0:
             # Add LT loan to loans manager
             loans.new_loan(
@@ -332,7 +344,7 @@ class CashBudget:
         self.ncb_investment_assets = pd.concat(
             [self.ncb_investment_assets, pd.Series([ncb_inv], index=[year])]
         )
-        self.ncb_after_capex_series = pd.concat(
+        self.ncb_after_capex = pd.concat(
             [self.ncb_after_capex, pd.Series([ncb_after_capex], index=[year])]
         )
 

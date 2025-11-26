@@ -14,10 +14,32 @@ class Transactions:
         self.discretionary_transactions = discretionary
         self.add_year(0, forecasting)
 
-    def add_year(self, year, forecasting):
+    def add_year(
+        self,
+        year,
+        forecasting=None,
+        policy_table=None,
+        cash_budget=None,
+        depreciation=None,
+        income_s=None,
+    ):
         if year == 0:
             calculated_cum_ncb = self.discretionary_transactions.year_ncb.loc[year]
         else:
+            self.owner_transactions.add_year(
+                year=year,
+                policy=policy_table,
+                cash_budget=cash_budget,
+            )
+
+            self.discretionary_transactions.add_year(
+                year=year,
+                policy=policy_table,
+                cash_budget=cash_budget,
+                income_statement=income_s,
+                owners=self.owner_transactions,
+            )
+
             previous_cum_ncb = self.calculated_cumulated_ncb.loc[year - 1]
             calculated_cum_ncb = (
                 previous_cum_ncb + self.discretionary_transactions.year_ncb.loc[year]
@@ -272,45 +294,32 @@ class DiscretionaryTransactions:
             cumulated_ncb=pd.Series([cum_ncb], index=pd.Index([year])),
         )
 
-    def add_year(self, year, policy, cash_budget, depreciation, income_statement):
+    def add_year(self, year, policy, cash_budget, income_statement, owners):
         min_cash = float(policy.minimum_initial_cash)  # D50
 
-        previous_st_investment = self.st_investments.loc[year - 1]
-        redemption_from_previous = previous_st_investment
-        return_from_st = self.return_from_st_investment.loc[
-            year
-        ]  # Add already with below
-
+        redemption_from_previous = self.st_investments.loc[year - 1]
+        return_from_st = self.return_from_st_investment.loc[year]
         total_inflow = redemption_from_previous + return_from_st
 
-        # row 160: ST investments
-        # IF(D139 + D140 + D150 > 0, 0,
-        #    C163 + D155 + D159 - D50)
         external_financing = (
             cash_budget.st_loan_inflow.loc[year]
             + cash_budget.lt_loan_inflow.loc[year]
-            + income_statement.invested_equity.loc[year]
+            + owners.invested_equity.loc[year]
         )
         previous_cum_ncb = self.cumulated_ncb.loc[year - 1]
         st_inv = 0.0
         if external_financing > 0:
             available = (
                 previous_cum_ncb
-                + income_statement.ncb_previous_modules.loc[year]
+                + owners.ncb_previous_modules.loc[year]
                 + total_inflow
                 - min_cash
             )
             st_inv = max(0.0, available)  # final check??
 
-        # row 161: NCB of discretionary transactions
         ncb_disc = total_inflow - st_inv
-
-        # row 162: Year NCB = NCB_prev_modules + NCB_discretionary
-        year_ncb = income_statement.ncb_previous_modules.loc[year] + ncb_disc
-
-        # row 163: Cumulated NCB
+        year_ncb = owners.ncb_previous_modules.loc[year] + ncb_disc
         cum_ncb = previous_cum_ncb + year_ncb
-        # new index
         new_index = self.years.append(pd.Index([year]))
 
         self.years = new_index
@@ -344,8 +353,7 @@ class DiscretionaryTransactions:
 
     def get_st_returns(self, year, income_statement) -> float:
         # --- 157: Redemption of ST investment ---
-        previous_st_investment = self.st_investments.loc[year - 1]
-        redemption_from_previous = previous_st_investment
+        redemption_from_previous = self.st_investments.loc[year - 1]
         return_from_st = redemption_from_previous * float(
             income_statement.return_from_st_investment.loc[year]
         )

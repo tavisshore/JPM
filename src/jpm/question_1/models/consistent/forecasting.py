@@ -112,7 +112,6 @@ class Forecasting:
         return_st_investment = risk_free_rate + input_data.risk_premium_return_st_inv
         return_st_investment.iloc[0] = 0.0  # year 0 left as 0 in the spreadsheet
         # Improve this later
-
         # Cost of debt: Rf + risk premium in cost of debt
         cost_of_debt = risk_free_rate + input_data.risk_premium_debt_cost
         cost_of_debt.iloc[0] = 0.0  # year 0 left as 0 in the spreadsheet

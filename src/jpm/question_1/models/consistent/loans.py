@@ -295,6 +295,17 @@ class LoanBook:
         )
         loans_out = LoanTable(short_term=short_term, long_term=long_term)
 
+        # print(f"Year {year} Loan Summary:")
+        # print(
+        #     f"  ST Loan - Int: {st_int:.2f}, Pri: {st_pri:.2f}, "
+        #     f"End: {st_end:.2f}, Kd: {kd_rate:.4f}"
+        # )
+        # print(
+        #     f"  LT Loan - Int: {lt_int:.2f}, New: {self.new_lt_debt(year):.2f}, "
+        #     f"Pri: {lt_pri:.2f}, End: {lt_end:.2f}"
+        # )
+        # print()
+
         return loans_out
 
 
