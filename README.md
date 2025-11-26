@@ -16,11 +16,13 @@ export EDGAR_EMAIL="your_email@jpm.com"
 ```
 
 ## Run the models (Question 1)
-- Plugless Vélez-Pareja:
+- **Plugless** Vélez-Pareja:
   `python scripts/question_1/noplug_vp.py`
-- Consistent Vélez-Pareja:
+
+- **Consistent** Vélez-Pareja:
   `python scripts/question_1/construct_vp.py`
-- Train LSTM forecaster:
+
+- Train **LSTM** forecaster:
   `python scripts/question_1/eval_lstm.py --cache_dir /PATH/TO/DESIRED/CACHE`
 
 Downloaded SEC statements are cached under the chosen `--cache_dir`.
