@@ -3,16 +3,76 @@ from dataclasses import dataclass
 import pandas as pd
 
 
+def _investment_to_keep_constant(t: int, initial_nfa: float, annual_dep):
+    return initial_nfa if t == 0 else annual_dep[t]
+
+
+def _investment_for_growth(t: int, T: int, net_fa, increase_sales_volume) -> float:
+    if t == 0:
+        return 0.0
+    if t < T - 1:
+        return net_fa[t - 1] * increase_sales_volume.iloc[t + 1]
+    return 0.0  # last year has no growth investment - out of horizon
+
+
+def _annual_depreciation_for_year(t: int, life: int, new_fa) -> float:
+    dep_t = 0.0
+    for tau, value in enumerate(new_fa):
+        if (t >= tau + 1) and (t <= tau + life):
+            dep_t += value / life
+    return dep_t
+
+
+def _compute_depreciation_schedule(
+    years, life: int, initial_nfa: float, increase_sales_volume
+):
+    T = len(years)
+    beginning_nfa = [0.0] * T
+    new_fa = [0.0] * T
+    inv_const = [0.0] * T
+    inv_growth = [0.0] * T
+    annual_dep = [0.0] * T
+    net_fa = [0.0] * T
+
+    for t in range(T):
+        beginning_nfa[t] = 0.0 if t == 0 else net_fa[t - 1]
+        annual_dep[t] = _annual_depreciation_for_year(t, life, new_fa)
+        inv_const[t] = _investment_to_keep_constant(t, initial_nfa, annual_dep)
+        inv_growth[t] = _investment_for_growth(t, T, net_fa, increase_sales_volume)
+        new_fa[t] = inv_const[t] + inv_growth[t]
+        net_fa[t] = beginning_nfa[t] + new_fa[t] - annual_dep[t]
+
+    return {
+        "beginning_nfa": pd.Series(beginning_nfa, index=years),
+        "new_fixed_assets": pd.Series(new_fa, index=years),
+        "investment_keep_constant": pd.Series(inv_const, index=years),
+        "investment_for_growth": pd.Series(inv_growth, index=years),
+        "annual_depreciation": pd.Series(annual_dep, index=years),
+        "net_fixed_assets": pd.Series(net_fa, index=years),
+    }
+
+
+def _cohort_depreciation(invest_year: int, life: int, years, new_fa) -> pd.Series:
+    vals = []
+    T = len(years)
+    for t in range(T):
+        if (t >= invest_year + 1) and (t <= invest_year + life):
+            vals.append(new_fa.iloc[invest_year] / life)
+        else:
+            vals.append(0.0)
+    return pd.Series(vals, index=years)
+
+
 @dataclass(frozen=True)
 class DepreciationSchedule:
     years: pd.Index
 
     beginning_nfa: pd.Series
 
-    dep_invest_year0: pd.DataFrame
-    dep_invest_year1: pd.DataFrame
-    dep_invest_year2: pd.DataFrame
-    dep_invest_year3: pd.DataFrame
+    dep_invest_year0: pd.Series
+    dep_invest_year1: pd.Series
+    dep_invest_year2: pd.Series
+    dep_invest_year3: pd.Series
 
     annual_depreciation: pd.Series
     cumulated_depreciation: pd.Series
@@ -23,123 +83,44 @@ class DepreciationSchedule:
     new_fixed_assets: pd.Series
     net_fixed_assets: pd.Series
 
-    # @classmethod
-    # def initial(cls, input_data) -> "DepreciationSchedule":
-    #     beggining_nfa = pd.Series([0.0], index=[0])
-    #     invest_to_keep = input_data.net_fixed_assets
-    #     annual_dep = 0
-    #     cum_dep = 0
-    #     invest_to_grow = 0
-    #     new_fa = invest_to_keep + invest_to_grow
-    #     net_fa = beggining_nfa
-
-    #     return cls(
-    #         years=input_data.years,
-    #         beginning_nfa=beggining_nfa,
-    #         dep_invest=pd.DataFrame(),
-    #         annual_depreciation=pd.Series([annual_dep], index=[0]),
-    #         cumulated_depreciation=pd.Series([cum_dep], index=[0]),
-    #         investment_keep_constant=pd.Series([invest_to_keep], index=[0]),
-    #         investment_for_growth=pd.Series([invest_to_grow], index=[0]),
-    #         new_fixed_assets=pd.Series([new_fa], index=[0]),
-    #         net_fixed_assets=pd.Series([net_fa], index=[0]),
-    #     )
-
     @classmethod
     def from_inputs(cls, input_data) -> "DepreciationSchedule":
         years = input_data.years
-        T = len(years)
-
         life = int(round(input_data.lineal_depreciation.iloc[0]))
         initial_nfa = float(input_data.net_fixed_assets)
 
-        beginning_nfa = [0.0] * T
-        new_fa = [0.0] * T
-        inv_const = [0.0] * T
-        inv_growth = [0.0] * T
-        annual_dep = [0.0] * T
-        net_fa = [0.0] * T
-
-        for t in range(T):
-            # Row 66: Beginning NFA
-            if t == 0:
-                beginning_nfa[t] = 0.0
-            else:
-                beginning_nfa[t] = net_fa[t - 1]
-
-            # Row 72: Annual depreciation in year t
-            dep_t = 0.0
-            for tau in range(t):  # sum contributions from all previous cohorts
-                if (t >= tau + 1) and (t <= tau + life):
-                    dep_t += new_fa[tau] / life
-            annual_dep[t] = dep_t
-
-            # Row 74: Investment to keep NFA constant
-            if t == 0:
-                inv_const[t] = initial_nfa  # =D6 in spreadsheet
-            else:
-                inv_const[t] = annual_dep[t]  # =E72, F72, ...
-
-            # Row 75: Investment for growth (=C77*E23)
-            if t == 0:
-                inv_growth[t] = 0.0
-            elif t < T - 1:
-                inv_growth[t] = (
-                    net_fa[t - 1] * input_data.increase_sales_volume.iloc[t + 1]
-                )
-            else:
-                inv_growth[t] = (
-                    0.0  # last year has no growth investment - out of horizon
-                )
-
-            # Row 76: New fixed assets (=D75+D74)
-            new_fa[t] = inv_const[t] + inv_growth[t]
-
-            # Row 77: Net fixed assets (=D66+D76-D72)
-            net_fa[t] = beginning_nfa[t] + new_fa[t] - annual_dep[t]
-
-        beginning_nfa = pd.Series(beginning_nfa, index=years)
-        new_fa = pd.Series(new_fa, index=years)
-        inv_const = pd.Series(inv_const, index=years)
-        inv_growth = pd.Series(inv_growth, index=years)
-        annual_dep = pd.Series(annual_dep, index=years)
-        net_fa = pd.Series(net_fa, index=years)
+        depreciation = _compute_depreciation_schedule(
+            years, life, initial_nfa, input_data.increase_sales_volume
+        )
+        annual_dep = depreciation["annual_depreciation"]
         cum_dep = annual_dep.cumsum()
 
-        # Shift inv_growth back 1 year to match spreadsheet logic
-        # print(beginning_nfa)
-
-        # print(inv_growth)
-        # breakpoint()
-
-        # Rows 67–70: depreciation by investment year (cohorts)
-        def cohort_dep(invest_year: int) -> pd.Series:
-            vals = []
-            for t in range(T):
-                if (t >= invest_year + 1) and (t <= invest_year + life):
-                    vals.append(new_fa.iloc[invest_year] / life)
-                else:
-                    vals.append(0.0)
-            return pd.Series(vals, index=years)
-
-        dep_y0 = cohort_dep(0)  # “Annual depreciation for investment in year 0”
-        dep_y1 = cohort_dep(1)  # “… in year 1”
-        dep_y2 = cohort_dep(2)  # “… in year 2”
-        dep_y3 = cohort_dep(3)  # “… in year 3”
+        dep_y0 = _cohort_depreciation(
+            0, life, years, depreciation["new_fixed_assets"]
+        )  # “Annual depreciation for investment in year 0”
+        dep_y1 = _cohort_depreciation(
+            1, life, years, depreciation["new_fixed_assets"]
+        )  # “… in year 1”
+        dep_y2 = _cohort_depreciation(
+            2, life, years, depreciation["new_fixed_assets"]
+        )  # “… in year 2”
+        dep_y3 = _cohort_depreciation(
+            3, life, years, depreciation["new_fixed_assets"]
+        )  # “… in year 3”
 
         return cls(
             years=years,
-            beginning_nfa=beginning_nfa,
+            beginning_nfa=depreciation["beginning_nfa"],
             dep_invest_year0=dep_y0,
             dep_invest_year1=dep_y1,
             dep_invest_year2=dep_y2,
             dep_invest_year3=dep_y3,
             annual_depreciation=annual_dep,
             cumulated_depreciation=cum_dep,
-            investment_keep_constant=inv_const,
-            investment_for_growth=inv_growth,
-            new_fixed_assets=new_fa,
-            net_fixed_assets=net_fa,
+            investment_keep_constant=depreciation["investment_keep_constant"],
+            investment_for_growth=depreciation["investment_for_growth"],
+            new_fixed_assets=depreciation["new_fixed_assets"],
+            net_fixed_assets=depreciation["net_fixed_assets"],
         )
 
 
