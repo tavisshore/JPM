@@ -40,7 +40,6 @@ class Forecasting:
         years = input_data.years
 
         def nominal_rate(infl: pd.Series, real: pd.Series) -> pd.Series:
-
             rate = (1.0 + infl) * (1.0 + real) - 1.0
             rate.iloc[0] = 0.0
             return rate
@@ -90,7 +89,7 @@ class Forecasting:
                 rf_vals.append(0.0)
             else:
                 π = input_data.inflation_rate.loc[y]
-                r_real = input_data.real_interest_rate.loc[y]
+                r_real = input_data.real_interest_rate
                 rf_vals.append((1.0 + π) * (1.0 + r_real) - 1.0)
 
         risk_free_rate = pd.Series(rf_vals, index=years)
