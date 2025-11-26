@@ -17,6 +17,7 @@ from jpm.question_1.models.consistent import (
     PolicyTable,
     SalesPurchasesSchedule,
     Transactions,
+    ValuationInputs,
 )
 
 years = pd.Index([0, 1, 2, 3, 4])
@@ -40,9 +41,13 @@ input_data = InputData(
     real_increase_overheads=pd.Series([0.0, 0.005, 0.005, 0.005, 0.005], index=years),
     real_increase_payroll=pd.Series([0.0, 0.015, 0.015, 0.015, 0.015], index=years),
     increase_sales_volume=pd.Series([0.0, 0.0, 0.01, 0.02, 0.02], index=years),
-    real_interest_rate=pd.Series([0, 0.02, 0.02, 0.02, 0.02], index=years),
+    real_interest_rate=0.02,
     risk_premium_debt_cost=0.05,
     risk_premium_return_st_inv=-0.02,
+    observed_kk=0.15,
+    perpetual_leverage=0.3,
+    expected_inflation_rate=0.0,
+    real_growth_rate=0.0,
 )
 
 market_research = MarketResearchInput(
@@ -205,3 +210,13 @@ cf_df = pd.concat(
 cf_df.index.name = "year"
 print("\nCash Flow Statement:")
 print(cf_df.T.round(1))
+
+
+# Valuation - under construction, completion 27/11/2025
+val_inputs = ValuationInputs.from_inputs(input_data=input_data)
+value = val_inputs.tv_and_liquidate(
+    balance_sheet=bs,
+    income_statement=income_s,
+    cash_flow=cf,
+    year=-1,
+)

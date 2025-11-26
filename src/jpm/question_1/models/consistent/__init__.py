@@ -7,6 +7,7 @@ from .income_statement import IncomeStatement
 from .input import InputData, MarketResearchInput, PolicyTable
 from .loans import LoanSchedules
 from .trans import DiscretionaryTransactions, OwnerTransactions, Transactions
+from .valuation import ValuationInputs
 from .value import DepreciationSchedule, InventorySchedule, SalesPurchasesSchedule
 
 __all__ = [
@@ -26,4 +27,5 @@ __all__ = [
     "DiscretionaryTransactions",
     "DepreciationSchedule",
     "CashFlow",
+    "ValuationInputs",
 ]

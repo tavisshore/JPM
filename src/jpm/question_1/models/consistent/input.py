@@ -7,7 +7,6 @@ import pandas as pd
 
 
 def series(defaults: Iterable[float]) -> field:
-
     return field(default_factory=lambda: list(defaults))
 
 
@@ -35,9 +34,15 @@ class InputData:
     real_increase_overheads: pd.Series
     real_increase_payroll: pd.Series
     increase_sales_volume: pd.Series
-    real_interest_rate: pd.Series
+    real_interest_rate: float
     risk_premium_debt_cost: float
     risk_premium_return_st_inv: float
+
+    # Valuation purposes
+    observed_kk: float
+    perpetual_leverage: float
+    expected_inflation_rate: float
+    real_growth_rate: float
 
 
 @dataclass()
