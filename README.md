@@ -7,6 +7,8 @@ Create a clean Python 3.10 environment and install the package:
 conda create -n jpm python=3.10
 conda activate jpm
 python -m pip install .
+
+pytest -v
 ```
 
 ## Environment
@@ -34,3 +36,31 @@ export EDGAR_EMAIL="your_email@jpm.com"
     ```
 
 Downloaded SEC statements are cached under the chosen `--cache_dir`.
+
+
+## Question 3 - DeepHalo Reproduction
+The experiments are implemented as Python modules and can be invoked directly.
+- Table 1
+  ```
+  python -m experiments.reproduce_table1
+  ```
+- Decoy effect
+  ```
+  python -m experiments.decoy_effect
+  ```
+- Attraction effect
+  ```
+  python -m experiments.attraction_effect_tf
+  ```
+- Compromise effect
+  ```
+  python -m experiments.compromise_effect_tf
+  ```
+- Attraction effect (PyTorch)
+  ```
+  python -m experiments.attraction_effect_torch
+  ```
+
+  
+  
+
