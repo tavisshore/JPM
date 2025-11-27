@@ -15,7 +15,7 @@ EDGAR requires an email for downloads:
 export EDGAR_EMAIL="your_email@jpm.com"
 ```
 
-## Run the models (Question 1)
+## Question 1 - Evaluating Models
 
 - **Vélez-Pareja:**
   - **Plugless:**
