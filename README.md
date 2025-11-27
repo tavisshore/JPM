@@ -18,11 +18,11 @@ export EDGAR_EMAIL="your_email@jpm.com"
 ## Question 1 - Evaluating Models
 
 - **Vélez-Pareja:**
-  - **Plugless:**
+  - **Plugless:** from the paper *Forecasting Financial Statements with No plugs and No Circularity*
     ```bash
     python scripts/question_1/noplug_vp.py
     ```
-  - **Consistent:**
+  - **Consistent:** from the paper *Constructing Consistent Financial Planning Models for Valuation* 
     ```bash
     python scripts/question_1/construct_vp.py
     ```
