@@ -17,7 +17,7 @@ EDGAR requires an email for downloads:
 export EDGAR_EMAIL="your_email@jpm.com"
 ```
 
-## Question 1 - Evaluating Models
+## Question 1 - Balance Sheet Forecasting
 
 - **Vélez-Pareja:**
   - **Plugless:** from the paper *Forecasting Financial Statements with No plugs and No Circularity* [1]
