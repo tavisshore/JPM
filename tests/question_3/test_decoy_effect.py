@@ -1,6 +1,5 @@
-import tensorflow as tf
 import numpy as np
-
+import tensorflow as tf
 from choice_learn_ext.models.deep_context.deep_halo_core import DeepContextChoiceModel
 from choice_learn_ext.models.deep_context.trainer import Trainer
 
@@ -63,9 +62,7 @@ def test_decoy_effect_learned():
     )
 
     # Evaluate probabilities on A and B
-    avail_eval = tf.convert_to_tensor(
-        np.stack([mask_A, mask_B]), dtype=tf.float32
-    )
+    avail_eval = tf.convert_to_tensor(np.stack([mask_A, mask_B]), dtype=tf.float32)
     item_ids_eval = tf.tile(tf.range(num_items)[tf.newaxis, :], [2, 1])
 
     out = model({"available": avail_eval, "item_ids": item_ids_eval}, training=False)

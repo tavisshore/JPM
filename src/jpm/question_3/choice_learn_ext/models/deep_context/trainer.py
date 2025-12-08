@@ -1,7 +1,9 @@
 # src/jpm/question_3/choice_learn_ext/models/deep_context/trainer.py
 
 from __future__ import annotations
+
 from typing import Dict, Optional
+
 import tensorflow as tf
 from choice_learn_ext.models.deep_context.deep_halo_core import DeepHalo
 
@@ -26,15 +28,17 @@ class Trainer:
             )
             loss = loss + reg
         grads = tape.gradient(loss, self.model.trainable_variables)
-        self.optimizer.apply_gradients(zip(grads, self.model.trainable_variables))
+        self.optimizer.apply_gradients(
+            zip(grads, self.model.trainable_variables, strict=True)
+        )
         return loss
 
     def fit_arrays(
         self,
-        available: tf.Tensor,      # (N, J)
-        choices: tf.Tensor,        # (N,)
+        available: tf.Tensor,  # (N, J)
+        choices: tf.Tensor,  # (N,)
         item_ids: Optional[tf.Tensor] = None,  # (N, J) if featureless
-        X: Optional[tf.Tensor] = None,         # (N, J, d_x) if feature-based
+        X: Optional[tf.Tensor] = None,  # (N, J, d_x) if feature-based
         batch_size: int = 256,
         epochs: int = 20,
         verbose: int = 1,
@@ -67,7 +71,7 @@ class Trainer:
             steps = 0
             for batch in ds:
                 loss = self.train_step(batch)
-                running += float(loss.numpy()) #THis makes it slower
+                running += float(loss.numpy())  # THis makes it slower
                 steps += 1
             if verbose:
                 print(f"Epoch {ep:03d}  NLL: {running / max(steps, 1):.4f}")

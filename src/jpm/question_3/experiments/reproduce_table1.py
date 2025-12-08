@@ -24,25 +24,25 @@ Run with:
 
 Outputs appear in the same folder as this script.
 """
+
+import csv
 import os
 import sys
+
+import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
-import matplotlib.pyplot as plt
-import csv
+from choice_learn_ext.models.deep_context.deep_halo_core import DeepContextChoiceModel
+from choice_learn_ext.models.deep_context.trainer import Trainer
 
 # ---------------------------------------------------------------------
 # Make sure choice_learn_ext is importable when running this as a script
 # ---------------------------------------------------------------------
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))         
-QUESTION3_DIR = os.path.abspath(os.path.join(CURRENT_DIR, "..")) 
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+QUESTION3_DIR = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
 
 if QUESTION3_DIR not in sys.path:
     sys.path.insert(0, QUESTION3_DIR)
-
-from choice_learn_ext.models.deep_context.deep_halo_core import DeepContextChoiceModel
-from choice_learn_ext.models.deep_context.trainer import Trainer
-
 
 
 # ---------------------------------------------------------------------
@@ -51,17 +51,17 @@ from choice_learn_ext.models.deep_context.trainer import Trainer
 J = 4  # items indexed 1..4 in paper but 0..3 internally
 
 rows = [
-    ((1, 2),         [0.98, 0.02, 0.00, 0.00]),
-    ((1, 3),         [0.50, 0.00, 0.50, 0.00]),
-    ((1, 4),         [0.50, 0.00, 0.00, 0.50]),
-    ((2, 3),         [0.00, 0.50, 0.50, 0.00]),
-    ((2, 4),         [0.00, 0.50, 0.00, 0.50]),
-    ((3, 4),         [0.00, 0.00, 0.90, 0.10]),
-    ((1, 2, 3),      [0.49, 0.01, 0.50, 0.00]),
-    ((1, 2, 4),      [0.49, 0.01, 0.00, 0.50]),
-    ((1, 3, 4),      [0.50, 0.00, 0.45, 0.05]),
-    ((2, 3, 4),      [0.00, 0.50, 0.45, 0.05]),
-    ((1, 2, 3, 4),   [0.49, 0.01, 0.45, 0.05]),
+    ((1, 2), [0.98, 0.02, 0.00, 0.00]),
+    ((1, 3), [0.50, 0.00, 0.50, 0.00]),
+    ((1, 4), [0.50, 0.00, 0.00, 0.50]),
+    ((2, 3), [0.00, 0.50, 0.50, 0.00]),
+    ((2, 4), [0.00, 0.50, 0.00, 0.50]),
+    ((3, 4), [0.00, 0.00, 0.90, 0.10]),
+    ((1, 2, 3), [0.49, 0.01, 0.50, 0.00]),
+    ((1, 2, 4), [0.49, 0.01, 0.00, 0.50]),
+    ((1, 3, 4), [0.50, 0.00, 0.45, 0.05]),
+    ((2, 3, 4), [0.00, 0.50, 0.45, 0.05]),
+    ((1, 2, 3, 4), [0.49, 0.01, 0.45, 0.05]),
 ]
 
 
@@ -164,8 +164,9 @@ def main():
         np.tile(np.arange(J, dtype=np.int32), (len(rows), 1))
     )
 
-    out = model({"available": eval_available, "item_ids": eval_item_ids},
-                training=False)
+    out = model(
+        {"available": eval_available, "item_ids": eval_item_ids}, training=False
+    )
     probs = tf.exp(out["log_probs"]).numpy()
 
     # ----------------------------------------------------
@@ -175,7 +176,7 @@ def main():
     with open(csv_path, "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow(["Set", "Target", "Predicted"])
-        for (S, target), p in zip(rows, probs):
+        for (S, target), p in zip(rows, probs, strict=True):
             writer.writerow([str(S), list(target), list(np.round(p, 5))])
 
     # ----------------------------------------------------
@@ -194,15 +195,9 @@ def main():
     # 8. Print results
     # ----------------------------------------------------
     print("\n=== Target vs Predicted ===")
-    for (S, target), p in zip(rows, probs):
+    for (S, target), p in zip(rows, probs, strict=True):
         S_str = str(S)
-        print(
-            f"S={S_str:12}  "
-            f"target={np.round(target, 3)}  "
-            f"pred={np.round(p, 3)}"
-    )
-
-
+        print(f"S={S_str:12}  target={np.round(target, 3)}  pred={np.round(p, 3)}")
 
     print("\nSaved:")
     print(" -", csv_path)

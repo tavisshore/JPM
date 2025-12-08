@@ -1,8 +1,11 @@
 import os
 import sys
+
+import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
-import matplotlib.pyplot as plt
+from choice_learn_ext.models.deep_context.deep_halo_core import DeepContextChoiceModel
+from choice_learn_ext.models.deep_context.trainer import Trainer
 
 # ---------------------------------------------------------------------
 # Make sure choice_learn_ext is importable when running this as a script
@@ -12,9 +15,6 @@ QUESTION3_DIR = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
 if QUESTION3_DIR not in sys.path:
     sys.path.insert(0, QUESTION3_DIR)
 
-from choice_learn_ext.models.deep_context.trainer import Trainer
-from choice_learn_ext.models.deep_context.deep_halo_core import DeepContextChoiceModel
-
 
 # ------------------------------------------------------------
 # 1. Use the same Table-1 synthetic setup as before
@@ -23,17 +23,17 @@ J = 4  # four items, indexed 0..3
 
 # rows: (choice set S using 1-based labels, target probability vec over 4 items)
 rows = [
-    ((1, 2),         [0.98, 0.02, 0.00, 0.00]),
-    ((1, 3),         [0.50, 0.00, 0.50, 0.00]),
-    ((1, 4),         [0.50, 0.00, 0.00, 0.50]),
-    ((2, 3),         [0.00, 0.50, 0.50, 0.00]),
-    ((2, 4),         [0.00, 0.50, 0.00, 0.50]),
-    ((3, 4),         [0.00, 0.00, 0.90, 0.10]),
-    ((1, 2, 3),      [0.49, 0.01, 0.50, 0.00]),
-    ((1, 2, 4),      [0.49, 0.01, 0.00, 0.50]),
-    ((1, 3, 4),      [0.50, 0.00, 0.45, 0.05]),
-    ((2, 3, 4),      [0.00, 0.50, 0.45, 0.05]),
-    ((1, 2, 3, 4),   [0.49, 0.01, 0.45, 0.05]),
+    ((1, 2), [0.98, 0.02, 0.00, 0.00]),
+    ((1, 3), [0.50, 0.00, 0.50, 0.00]),
+    ((1, 4), [0.50, 0.00, 0.00, 0.50]),
+    ((2, 3), [0.00, 0.50, 0.50, 0.00]),
+    ((2, 4), [0.00, 0.50, 0.00, 0.50]),
+    ((3, 4), [0.00, 0.00, 0.90, 0.10]),
+    ((1, 2, 3), [0.49, 0.01, 0.50, 0.00]),
+    ((1, 2, 4), [0.49, 0.01, 0.00, 0.50]),
+    ((1, 3, 4), [0.50, 0.00, 0.45, 0.05]),
+    ((2, 3, 4), [0.00, 0.50, 0.45, 0.05]),
+    ((1, 2, 3, 4), [0.49, 0.01, 0.45, 0.05]),
 ]
 
 
@@ -69,7 +69,9 @@ def train_deephalo():
     tf.random.set_seed(0)
     np.random.seed(0)
 
-    available, choices, item_ids = build_sampled_dataset(rows, draws_per_row=1000, seed=0)
+    available, choices, item_ids = build_sampled_dataset(
+        rows, draws_per_row=1000, seed=0
+    )
     print("Training data shape:")
     print("  available:", available.shape)
     print("  choices:  ", choices.shape)
@@ -121,7 +123,7 @@ def compute_probabilities_for_sets(model):
     probs = tf.exp(outputs["log_probs"]).numpy()
 
     set_to_probs = {}
-    for S, p in zip(eval_sets_unique, probs):
+    for S, p in zip(eval_sets_unique, probs, strict=True):
         set_to_probs[S] = p
 
     return set_to_probs
@@ -173,8 +175,8 @@ def plot_influence_heatmap(influence, out_path):
     plt.colorbar(im)
     plt.xlabel("Influence source i (items 1–4)")
     plt.ylabel("Affected item j (items 1–4)")
-    plt.xticks(range(J), [str(k+1) for k in range(J)])
-    plt.yticks(range(J), [str(k+1) for k in range(J)])
+    plt.xticks(range(J), [str(k + 1) for k in range(J)])
+    plt.yticks(range(J), [str(k + 1) for k in range(J)])
     plt.title("Average influence I(i → j)")
     plt.tight_layout()
     plt.savefig(out_path, dpi=200)
@@ -182,10 +184,10 @@ def plot_influence_heatmap(influence, out_path):
 
 
 def save_influence_csv(influence, out_path):
-    header = ["item_j \\ item_i"] + [f"i={i+1}" for i in range(J)]
+    header = ["item_j \\ item_i"] + [f"i={i + 1}" for i in range(J)]
     rows_csv = []
     for j in range(J):
-        row = [f"j={j+1}"] + [f"{influence[i,j]:.5f}" for i in range(J)]
+        row = [f"j={j + 1}"] + [f"{influence[i, j]:.5f}" for i in range(J)]
         rows_csv.append(",".join(row))
     with open(out_path, "w") as f:
         f.write(",".join(header) + "\n")

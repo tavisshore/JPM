@@ -1,6 +1,4 @@
 import tensorflow as tf
-import numpy as np
-
 from choice_learn_ext.models.deep_context.deep_halo_core import DeepContextChoiceModel
 from choice_learn_ext.models.deep_context.trainer import Trainer
 

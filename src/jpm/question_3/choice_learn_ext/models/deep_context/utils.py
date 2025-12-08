@@ -5,7 +5,6 @@ from __future__ import annotations
 import tensorflow as tf
 
 
-
 def masked_mean(x: tf.Tensor, mask: tf.Tensor, axis: int = 1) -> tf.Tensor:
     """
     Compute mean along `axis`, only where mask == 1.
@@ -25,13 +24,12 @@ def masked_mean(x: tf.Tensor, mask: tf.Tensor, axis: int = 1) -> tf.Tensor:
         mask = tf.expand_dims(mask, axis=-1)  # (..., J, 1)
 
     # Sum over items
-    num = tf.reduce_sum(x * mask, axis=axis)      # (..., d)
-    den = tf.reduce_sum(mask, axis=axis)          # (..., 1)
+    num = tf.reduce_sum(x * mask, axis=axis)  # (..., d)
+    den = tf.reduce_sum(mask, axis=axis)  # (..., 1)
 
     den = tf.maximum(den, tf.constant(1.0, dtype=x.dtype))
     # Broadcasting: (..., d) / (..., 1) -> (..., d)
     return num / den
-
 
 
 def masked_log_softmax(logits: tf.Tensor, mask: tf.Tensor, axis: int = -1) -> tf.Tensor:
@@ -46,7 +44,6 @@ def masked_log_softmax(logits: tf.Tensor, mask: tf.Tensor, axis: int = -1) -> tf
     """
     logits = tf.convert_to_tensor(logits)
     mask = tf.cast(mask, tf.bool)
-
 
     very_neg = tf.constant(-1e9, dtype=logits.dtype)
     masked_logits = tf.where(mask, logits, very_neg)

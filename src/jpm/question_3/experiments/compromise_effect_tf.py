@@ -1,7 +1,10 @@
 import os
 import sys
+
 import numpy as np
 import tensorflow as tf
+from choice_learn_ext.models.deep_context.deep_halo_core import DeepContextChoiceModel
+from choice_learn_ext.models.deep_context.trainer import Trainer
 
 # ---------------------------------------------------------------------
 # Make sure choice_learn_ext is importable when running this as a script
@@ -11,10 +14,8 @@ QUESTION3_DIR = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
 if QUESTION3_DIR not in sys.path:
     sys.path.insert(0, QUESTION3_DIR)
 
-from choice_learn_ext.models.deep_context.deep_halo_core import DeepContextChoiceModel
-from choice_learn_ext.models.deep_context.trainer import Trainer
 
-#Start of the compromised effect tf reporducation of Zhang
+# Start of the compromised effect tf reporducation of Zhang
 # ------------------------------------------------------------
 def build_sampled_dataset(rows, J, draws_per_row=2000, seed=0):
     rng = np.random.default_rng(seed)
@@ -50,8 +51,8 @@ def main():
     J = 3
 
     rows = [
-        ((1, 2),    [0.30, 0.70, 0.00]),  # {A,B}
-        ((2, 3),    [0.00, 0.30, 0.70]),  # {B,C}
+        ((1, 2), [0.30, 0.70, 0.00]),  # {A,B}
+        ((2, 3), [0.00, 0.30, 0.70]),  # {B,C}
         ((1, 2, 3), [0.10, 0.80, 0.10]),  # {A,B,C}
     ]
 
@@ -78,8 +79,8 @@ def main():
 
     # Evaluate compromise effect
     eval_sets = {
-        "AB":  (1, 2),
-        "BC":  (2, 3),
+        "AB": (1, 2),
+        "BC": (2, 3),
         "ABC": (1, 2, 3),
     }
 
@@ -102,8 +103,8 @@ def main():
     print(f"  P(. | {{B,C}})   = {np.round(p_BC, 3)}")
     print(f"  P(. | {{A,B,C}}) = {np.round(p_ABC, 3)}")
 
-    pB_AB  = p_AB[1]
-    pB_BC  = p_BC[1]
+    pB_AB = p_AB[1]
+    pB_BC = p_BC[1]
     pB_ABC = p_ABC[1]
 
     delta = pB_ABC - max(pB_AB, pB_BC)

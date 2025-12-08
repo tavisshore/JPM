@@ -38,11 +38,13 @@ Run:
 
 import os
 import sys
-import numpy as np
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
+import numpy as np
 import torch
-import torch.nn as nn
+
+# Authors' official DeepHalo (PyTorch version)
+from FeatureBased import DeepHalo
 
 # ---------------------------------------------------------------------
 # Ensure authors' model is importable when running this as a script
@@ -52,9 +54,6 @@ AUTHORS_DIR = os.path.abspath(os.path.join(CURRENT_DIR, "..", "authors"))
 if AUTHORS_DIR not in sys.path:
     sys.path.insert(0, AUTHORS_DIR)
 
-# Authors' official DeepHalo (PyTorch version)
-from FeatureBased import DeepHalo
-
 
 # ---------------------------------------------------------------------
 # Synthetic attraction-effect setup
@@ -62,7 +61,7 @@ from FeatureBased import DeepHalo
 J = 3  # A,B,C
 
 rows = [
-    ((0, 1),    [0.50, 0.50, 0.00]),  # {A,B}
+    ((0, 1), [0.50, 0.50, 0.00]),  # {A,B}
     ((0, 1, 2), [0.30, 0.70, 0.00]),  # {A,B,C} with decoy C
 ]
 
@@ -114,10 +113,7 @@ def make_item_features(J):
 
 
 def plot_attraction_effect(probs_no_decoy, probs_decoy, out_path):
-    labels = [
-        "A (no decoy)", "A (with decoy)",
-        "B (no decoy)", "B (with decoy)"
-    ]
+    labels = ["A (no decoy)", "A (with decoy)", "B (no decoy)", "B (with decoy)"]
     values = [
         probs_no_decoy[0],  # A
         probs_decoy[0],
