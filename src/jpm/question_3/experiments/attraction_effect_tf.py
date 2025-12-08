@@ -1,19 +1,18 @@
 import os
 import sys
+
+import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
-import matplotlib.pyplot as plt
-
+from choice_learn_ext.models.deep_context.deep_halo_core import DeepContextChoiceModel
+from choice_learn_ext.models.deep_context.trainer import Trainer
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 QUESTION3_DIR = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
 if QUESTION3_DIR not in sys.path:
     sys.path.insert(0, QUESTION3_DIR)
 
-#from choice_learn_ext.models.deep_context.model import DeepContextChoiceModel
-from choice_learn_ext.models.deep_context.deep_halo_core import DeepContextChoiceModel
-
-from choice_learn_ext.models.deep_context.trainer import Trainer
+# from choice_learn_ext.models.deep_context.model import DeepContextChoiceModel
 
 # ------------------------------------------------------------
 # 1. Attraction-effect setup
@@ -28,7 +27,7 @@ J = 3
 # S1 = {A,B}      : A and B roughly equal
 # S2 = {A,B,C}    : decoy C pushes share toward B
 rows = [
-    ((0, 1),    [0.50, 0.50, 0.00]),  # no decoy
+    ((0, 1), [0.50, 0.50, 0.00]),  # no decoy
     ((0, 1, 2), [0.30, 0.70, 0.00]),  # with decoy favouring B
 ]
 
@@ -60,13 +59,12 @@ def build_sampled_dataset(rows, draws_per_row=5000, seed=0):
 
 
 def plot_attraction_effect(probs_no_decoy, probs_decoy, out_path):
-    labels = ["A (no decoy)", "A (with decoy)",
-              "B (no decoy)", "B (with decoy)"]
+    labels = ["A (no decoy)", "A (with decoy)", "B (no decoy)", "B (with decoy)"]
     values = [
         probs_no_decoy[0],  # P(A | {A,B})
-        probs_decoy[0],     # P(A | {A,B,C})
+        probs_decoy[0],  # P(A | {A,B,C})
         probs_no_decoy[1],  # P(B | {A,B})
-        probs_decoy[1],     # P(B | {A,B,C})
+        probs_decoy[1],  # P(B | {A,B,C})
     ]
 
     x = np.arange(len(labels))
@@ -105,14 +103,12 @@ def main():
 
     # Evaluate on S1={A,B} and S2={A,B,C}
     avail_no_decoy = np.array([[1.0, 1.0, 0.0]], dtype=np.float32)
-    avail_decoy    = np.array([[1.0, 1.0, 1.0]], dtype=np.float32)
+    avail_decoy = np.array([[1.0, 1.0, 1.0]], dtype=np.float32)
 
     eval_available = tf.convert_to_tensor(
         np.vstack([avail_no_decoy, avail_decoy]), dtype=tf.float32
     )
-    eval_item_ids = tf.convert_to_tensor(
-        np.tile(np.arange(J, dtype=np.int32), (2, 1))
-    )
+    eval_item_ids = tf.convert_to_tensor(np.tile(np.arange(J, dtype=np.int32), (2, 1)))
 
     outputs = model(
         {"available": eval_available, "item_ids": eval_item_ids},

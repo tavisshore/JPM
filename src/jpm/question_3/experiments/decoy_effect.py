@@ -35,9 +35,12 @@ Run with:
 
 import os
 import sys
+
+import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
-import matplotlib.pyplot as plt
+from choice_learn_ext.models.deep_context.deep_halo_core import DeepContextChoiceModel
+from choice_learn_ext.models.deep_context.trainer import Trainer
 
 # ---------------------------------------------------------------------
 # Make sure choice_learn_ext is importable when running this as a script
@@ -47,10 +50,7 @@ QUESTION3_DIR = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
 if QUESTION3_DIR not in sys.path:
     sys.path.insert(0, QUESTION3_DIR)
 
-#from choice_learn_ext.models.deep_context.deep_halo_core import DeepContextChoiceModel
-from choice_learn_ext.models.deep_context.deep_halo_core import DeepContextChoiceModel
-
-from choice_learn_ext.models.deep_context.trainer import Trainer
+# from choice_learn_ext.models.deep_context.deep_halo_core import DeepContextChoiceModel
 
 # ---------------------------------------------------------------------
 # 1. Synthetic decoy setup
@@ -66,7 +66,7 @@ J = 3
 #   S2 = {A, B, C}
 # with "true" probabilities designed to create a decoy effect on A.
 rows = [
-    ((0, 1),    [0.45, 0.55, 0.00]),  # no decoy
+    ((0, 1), [0.45, 0.55, 0.00]),  # no decoy
     ((0, 1, 2), [0.60, 0.40, 0.00]),  # with decoy C
 ]
 
@@ -127,9 +127,9 @@ def plot_decoy_effect(probs_no_decoy, probs_decoy, out_path):
     ]
     values = [
         probs_no_decoy[0],  # P(A | {A,B})
-        probs_decoy[0],     # P(A | {A,B,C})
+        probs_decoy[0],  # P(A | {A,B,C})
         probs_no_decoy[1],  # P(B | {A,B})
-        probs_decoy[1],     # P(B | {A,B,C})
+        probs_decoy[1],  # P(B | {A,B,C})
     ]
 
     x = np.arange(len(labels))
@@ -187,9 +187,7 @@ def main():
     eval_available = tf.convert_to_tensor(
         np.vstack([avail_no_decoy, avail_decoy]), dtype=tf.float32
     )
-    eval_item_ids = tf.convert_to_tensor(
-        np.tile(np.arange(J, dtype=np.int32), (2, 1))
-    )
+    eval_item_ids = tf.convert_to_tensor(np.tile(np.arange(J, dtype=np.int32), (2, 1)))
 
     outputs = model(
         {"available": eval_available, "item_ids": eval_item_ids},

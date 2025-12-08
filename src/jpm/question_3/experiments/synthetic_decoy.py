@@ -1,5 +1,5 @@
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
 
 # ---------------------------------------------------------------------
 # Make sure choice_learn_ext is importable when running this as a script
@@ -63,9 +63,7 @@ def main():
     )
 
     # Evaluate on the two specific choice sets A and B
-    avail_eval = tf.convert_to_tensor(
-        np.stack([mask_A, mask_B]), dtype=tf.float32
-    )
+    avail_eval = tf.convert_to_tensor(np.stack([mask_A, mask_B]), dtype=tf.float32)
     item_ids_eval = tf.tile(tf.range(num_items)[tf.newaxis, :], [2, 1])
 
     out = model({"available": avail_eval, "item_ids": item_ids_eval}, training=False)
