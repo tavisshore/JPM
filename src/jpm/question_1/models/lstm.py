@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import numpy as np
+import pandas as pd
 import tensorflow as tf
 import tensorflow_probability as tfp
 
-from jpm.question_1.config import Config, ModelConfig
+from jpm.question_1.clients.llm_client import LLMClient
+from jpm.question_1.config import Config, LLMConfig, ModelConfig
 from jpm.question_1.data.ed import EdgarDataLoader
 from jpm.question_1.misc import set_seed
 from jpm.question_1.models.losses import EnforceBalance, bs_loss
@@ -203,7 +205,9 @@ class LSTMForecaster:
         obj.model = tf.keras.models.load_model(path)
         return obj
 
-    def evaluate(self, stage: str = "val") -> TickerResults:
+    def evaluate(
+        self, stage: str = "val", llm_config: LLMConfig | None = None
+    ) -> TickerResults:
         if stage not in {"val", "train"}:
             raise ValueError("stage must be 'val' or 'train'")
 
@@ -217,6 +221,49 @@ class LSTMForecaster:
         y_pred_unscaled, y_gt_unscaled, history_unscaled = self._unscale(
             y_pred, y_gt, history
         )
+
+        if llm_config:
+            # Add in LLM client forecast here, and then average the two - comparing
+            # There's no training involved so only for val
+            history_df = pd.DataFrame(
+                history_unscaled[0],
+                columns=self.data.targets,
+                index=self._prediction_index(
+                    stage, history_unscaled[0].shape[0], for_history=True
+                ),
+                copy=False,
+            )
+
+            y_pred_unscaled_df = pd.DataFrame(
+                y_pred_unscaled,
+                columns=self.data.targets,
+                index=self._prediction_index(stage, y_pred_unscaled.shape[0]),
+                copy=False,
+            )
+
+            llm_client = LLMClient()
+
+            if llm_config.adjust:
+                llm_estimation = llm_client.forecast_next_quarter(
+                    history=history_df, prediction=y_pred_unscaled_df, cfg=llm_config
+                )
+            else:
+                llm_estimation = llm_client.forecast_next_quarter(
+                    history=history_df, cfg=llm_config
+                )
+
+            y_pred_unscaled = y_pred_unscaled_df.apply(pd.to_numeric, errors="coerce")
+            llm_estimation = llm_estimation.apply(pd.to_numeric, errors="coerce")
+
+            # Ensure both indices are in pandas datetime format
+            y_pred_unscaled.index = pd.to_datetime(y_pred_unscaled.index)
+            llm_estimation.index = pd.to_datetime(llm_estimation.index)
+
+            # # If not adjusting - avg the predictions
+            if llm_config.adjust:
+                y_pred_unscaled = llm_estimation.values
+            else:
+                y_pred_unscaled = (y_pred_unscaled.add(llm_estimation)).div(2).values
 
         feature_metrics, per_feature_std = self._compute_feature_metrics(
             y_pred_unscaled, y_gt_unscaled, pred_std
@@ -290,6 +337,38 @@ class LSTMForecaster:
         y_gt_unscaled = y_gt * self.data.target_std + self.data.target_mean
         history_unscaled = history * self.data.target_std + self.data.target_mean
         return y_pred_unscaled, y_gt_unscaled, history_unscaled
+
+    def _prediction_index(self, stage: str, count: int, for_history: bool = False):
+        if count <= 0 or not hasattr(self.data, "_get_timestamp_index"):
+            return None
+
+        try:
+            ts_index = self.data._get_timestamp_index()
+        except Exception:
+            return None
+
+        lookback = self.config.data.lookback
+        horizon = self.config.data.horizon
+        max_start = len(ts_index) - lookback - horizon + 1
+        if max_start <= 0:
+            return None
+
+        first_window_start = (
+            max_start - self.config.data.withhold_periods if stage == "val" else 0
+        )
+        if first_window_start < 0 or first_window_start > max_start:
+            return None
+
+        if for_history:
+            start_pos = first_window_start
+            end_pos = start_pos + count
+        else:
+            start_pos = first_window_start + lookback + horizon - 1
+            end_pos = start_pos + count
+
+        if start_pos < 0 or end_pos > len(ts_index):
+            return None
+        return ts_index[start_pos:end_pos]
 
     def _compute_feature_metrics(
         self,

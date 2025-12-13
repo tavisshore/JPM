@@ -57,6 +57,7 @@ class EdgarDataLoader:
         self.bs_keys = get_leaf_values(get_bs_structure(ticker=self.config.data.ticker))
 
         self.data = self._load_or_fetch_data()
+
         self._validate_data()
 
         self._set_feature_index()
@@ -78,6 +79,8 @@ class EdgarDataLoader:
         )
 
         X_train, X_test = self._apply_seasonal_weight(X_train, X_test)
+        self.X_train, self.y_train = X_train, y_train
+        self.X_test, self.y_test = X_test, y_test
 
         self.num_features = X_train.shape[-1]  # Input dim
         self.num_targets = len(self.tgt_indices)  # Output dim
@@ -94,6 +97,32 @@ class EdgarDataLoader:
         self.val_dataset = tf.data.Dataset.from_tensor_slices((X_test, y_test)).batch(
             self.config.data.batch_size
         )
+
+    def get_final_window(self) -> tuple[pd.DataFrame, pd.Series]:
+        """Return the most recent lookback window and its target."""
+        if hasattr(self, "X_test") and self.X_test.size:
+            X_scaled = self.X_test[-1]
+            y_scaled = self.y_test[-1]
+        # elif hasattr(self, "X_train") and self.X_train.size:
+        # X_scaled = self.X_train[-1]
+        # y_scaled = self.y_train[-1]
+        else:
+            raise ValueError("No windowed data available; ensure create_dataset ran")
+
+        X_unscaled = X_scaled * self.full_std + self.full_mean
+        y_unscaled = y_scaled * self.target_std + self.target_mean
+
+        X_named = pd.DataFrame(X_unscaled, columns=self.data.columns)
+        y_named = pd.Series(y_unscaled, index=self.targets)
+        timestamp_index = self._get_timestamp_index()
+        start_idx = len(self.data) - (
+            self.config.data.lookback + self.config.data.horizon
+        )
+        X_named.index = timestamp_index[
+            start_idx : start_idx + self.config.data.lookback
+        ]
+        y_named.name = timestamp_index[-1]
+        return X_named, y_named
 
     def _validate_target_type(self) -> None:
         if self.config.data.target_type not in {"full", "bs", "net_income"}:
@@ -132,6 +161,12 @@ class EdgarDataLoader:
 
     def _set_feature_index(self) -> None:
         self.feat_to_idx = {n: i for i, n in enumerate(self.data.columns.tolist())}
+
+    def _get_timestamp_index(self) -> pd.DatetimeIndex:
+        """Return a datetime index aligned to the original data index order."""
+        if isinstance(self.data.index, pd.PeriodIndex):
+            return self.data.index.to_timestamp()
+        return pd.DatetimeIndex(self.data.index)
 
     def _prepare_targets(self, tar: list[str]) -> None:
         if not tar:

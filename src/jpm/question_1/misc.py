@@ -123,13 +123,15 @@ def format_money(n: float) -> str:
     return f"${n / 1_000_000_000_000:.3g}tn"
 
 
-def train_args():
+def get_args():
     """Build CLI args for training entrypoints."""
     p = argparse.ArgumentParser()
 
     # Data
     p.add_argument("--ticker", type=str, default="AAPL")
-    p.add_argument("--cache_dir", type=str, required=True)
+    p.add_argument(
+        "--cache_dir", type=str, default="/scratch/datasets/jpm"
+    )  # required=True)
     p.add_argument("--target", type=str, default=None)
     p.add_argument("--batch_size", type=int, default=None)
     p.add_argument("--lookback", type=int, default=None)
@@ -149,5 +151,13 @@ def train_args():
     p.add_argument("--lambda_balance", type=float, default=None)
     p.add_argument("--enforce_balance", type=bool, default=None)
     p.add_argument("--learn_subtotals", type=bool, default=None)
+
+    # LLM Ensemble
+    p.add_argument("--use_llm", action="store_true")
+    p.add_argument("--llm_provider", type=str, default=None)
+    p.add_argument("--llm_model", type=str, default=None)
+    p.add_argument("--llm_temperature", type=float, default=None)
+    p.add_argument("--llm_max_tokens", type=int, default=None)
+    p.add_argument("--adjust", type=bool, default=None)
 
     return p.parse_args()
