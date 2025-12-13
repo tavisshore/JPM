@@ -1,6 +1,7 @@
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -120,6 +121,49 @@ def test_map_features_ignores_missing_targets(tmp_path):
     loader.map_features()
 
     assert loader.feature_mappings["current_assets"] == [0]
+
+
+@unit
+def test_get_final_window_uses_original_timestamp_index(tmp_path):
+    """get_final_window should restore the original data timestamps on outputs."""
+    from jpm.question_1.data.ed import EdgarDataLoader
+
+    lookback = 2
+    horizon = 1
+    config = Config(
+        data=DataConfig(cache_dir=str(tmp_path), lookback=lookback, horizon=horizon)
+    )
+    loader = object.__new__(EdgarDataLoader)
+    loader.config = config
+
+    periods = pd.period_range("2020-03-31", periods=4, freq="Q")
+    loader.data = pd.DataFrame(
+        {
+            "cash": [10.0, 20.0, 30.0, 40.0],
+            "inventory": [1.0, 2.0, 3.0, 4.0],
+        },
+        index=periods,
+    )
+    loader.targets = list(loader.data.columns)
+    loader.feat_to_idx = {name: idx for idx, name in enumerate(loader.targets)}
+    loader.tgt_indices = list(range(len(loader.targets)))
+    loader.full_mean = np.zeros(len(loader.targets))
+    loader.full_std = np.ones(len(loader.targets))
+    loader.target_mean = loader.full_mean
+    loader.target_std = loader.full_std
+
+    # Final window corresponds to rows 1:3 with the last row as the target
+    loader.X_test = np.expand_dims(loader.data.values[1:3], axis=0)
+    loader.y_test = np.expand_dims(loader.data.values[-1], axis=0)
+
+    X_named, y_named = loader.get_final_window()
+
+    expected_idx = loader.data.index.to_timestamp()
+    start_idx = len(loader.data) - (lookback + horizon)
+
+    assert list(X_named.index) == list(expected_idx[start_idx : start_idx + lookback])
+    assert y_named.name == expected_idx[-1]
+    assert isinstance(X_named.index[0], pd.Timestamp)
 
 
 @integration

@@ -110,7 +110,7 @@ class TrainingConfig:
     decay_steps: int = 100
     decay_rate: float = 0.9
     scheduler: str = "exponential"
-    epochs: int = 500
+    epochs: int = 50  # Raise again after dev
     checkpoint_path: Path = Path("ckpts")
 
     def __post_init__(self) -> None:
@@ -164,6 +164,24 @@ class LossConfig:
 
 
 @dataclass
+class LLMConfig:
+    provider: str = "openai"
+    model: str = "gpt-5-nano"  # dev nano, eval mini
+    temperature: float = 0.05
+    max_tokens: int = 8192
+    adjust: bool = False
+
+    @classmethod
+    def from_args(cls, args):
+        """Create a LLMConfig from argparse.Namespace."""
+        kwargs = {}
+        for f in fields(cls):
+            arg_val = getattr(args, f.name, None)
+            kwargs[f.name] = f.default if arg_val is None else arg_val
+        return cls(**kwargs)
+
+
+@dataclass
 class Config:
     """Root configuration grouping data, model, training, and loss settings."""
 
@@ -171,3 +189,4 @@ class Config:
     model: ModelConfig = ModelConfig()
     training: TrainingConfig = TrainingConfig()
     loss: LossConfig = LossConfig()
+    llm: None | LLMConfig = None
