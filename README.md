@@ -16,7 +16,10 @@ EDGAR requires an email for downloads:
 ```bash
 export EDGAR_EMAIL="your_email@jpm.com"
 ```
-
+The LLM client of choice requires API keys:
+```bash
+export OPENAI_API_KEY="your_key"
+```
 ## Question 1 - Balance Sheet Forecasting
 
 - **Vélez-Pareja:**
