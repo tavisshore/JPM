@@ -1,9 +1,7 @@
 import re
-from typing import Dict, List, Optional, Tuple, TypedDict, Union
+from typing import List, Optional, Tuple, TypedDict
 
 import numpy as np
-
-from jpm.question_1.misc import get_leaf_values
 
 
 class AssetSection(TypedDict):
@@ -31,118 +29,13 @@ def xbrl_to_snake(name: str) -> str:
     return s.lower()
 
 
-def get_targets(mode: str = "net_income", ticker: str = "AAPL") -> List[str]:
-    if mode not in {"net_income", "bs", "full"}:
-        raise ValueError(f"Unsupported target mode '{mode}'")
-    if ticker == "AAPL":
-        if mode == "net_income":
-            return ["net_income_loss"]
-        if mode == "bs":
-            return get_leaf_values(get_bs_structure(ticker=ticker))
-        if mode == "full":
-            return get_leaf_values(get_bs_structure(ticker=ticker))
-    raise ValueError(f"Unsupported target mode '{mode}' for ticker '{ticker}'")
-
-
-# Getting the correct columns from dataframes for BS -> later IS + CF
-def get_bs_structure(ticker: str = "AAPL") -> BalanceSheetStructure:
-    if ticker in ["AAPL"]:
-        structure: BalanceSheetStructure = {
-            "assets": {
-                "current_assets": [
-                    "cash_and_cash_equivalents_at_carrying_value",
-                    "marketable_securities_current",
-                    "accounts_receivable_net_current",
-                    "nontrade_receivables_current",
-                    "inventory_net",
-                    "other_assets_current",
-                ],
-                "non_current_assets": [
-                    "marketable_securities_noncurrent",
-                    "other_assets_noncurrent",
-                    "property_plant_and_equipment_net",
-                ],
-            },
-            "liabilities": {
-                "current_liabilities": [
-                    "accounts_payable_current",
-                    "contract_with_customer_liability_current",
-                    "other_liabilities_current",
-                    "commercial_paper",
-                    "other_short_term_borrowings",
-                    "long_term_debt_current",
-                ],
-                "non_current_liabilities": [
-                    "other_liabilities_noncurrent",
-                    "long_term_debt_noncurrent",
-                ],
-            },
-            "equity": [
-                "retained_earnings_accumulated_deficit",
-                "common_stocks_including_additional_paid_in_capital",
-                "accumulated_other_comprehensive_income_loss_net_of_tax",
-            ],
-        }
-        return structure
-    raise ValueError(f"Unsupported ticker '{ticker}' for balance sheet structure")
-
-
-def get_is_structure(ticker="AAPL") -> Dict[str, list[str]]:
-    if ticker in ["AAPL"]:
-        structure = {
-            "Revenues": [
-                "revenue_from_contract_with_customer_excluding_assessed_tax",
-            ],
-            "Expenses": [
-                "cost_of_goods_and_services_sold",
-                "operating_expenses",
-                "selling_general_and_administrative_expense",
-                "research_and_development_expense",
-                # "interest_expense",
-                "income_tax_expense_benefit",
-            ],
-        }
-        return structure
-    raise ValueError(f"Unsupported ticker '{ticker}' for income statement structure")
-
-
-def get_cf_structure(
-    ticker="AAPL", flatten=False
-) -> Union[Dict[str, list[str]], list[str]]:
-    if ticker in ["AAPL"]:
-        structure = {
-            "operating_cash_flow": [
-                "net_income_loss",
-                "depreciation_depletion_and_amortization",
-                "share_based_compensation",
-                "other_noncash_income_expense",
-                # Working capital (only the core components)
-                "increase_decrease_in_accounts_receivable",
-                "increase_decrease_in_accounts_payable",
-                "increase_decrease_in_inventories",
-            ],
-            "investing_cash_flow": [
-                # Core investing activity = capex + investment changes
-                "payments_to_acquire_property_plant_and_equipment",
-                "payments_to_acquire_other_investments",
-                "proceeds_from_sale_and_maturity_of_other_investments",
-            ],
-            "financing_cash_flow": [
-                # Equity
-                "proceeds_from_issuance_of_common_stock",
-                "payments_for_repurchase_of_common_stock",
-                # Debt
-                "proceeds_from_issuance_of_long_term_debt",
-                "repayments_of_long_term_debt",
-                # Dividends
-                "payments_of_dividends",
-            ],
-        }
-
-        if flatten:
-            return get_leaf_values(structure)
-        return structure
-    raise ValueError(f"Unsupported ticker '{ticker}' for cash flow structure")
+def xbrl_to_raw(name: str) -> str:
+    # Drop common XBRL prefixes (e.g., us-gaap_) and normalize to snake_case
+    if not isinstance(name, str) or not name:
+        raise ValueError("xbrl_to_snake expects a non-empty string")
+    name = re.sub(r"^[^-]+-[^_]+_", "", name)
+    s = re.sub(r"(?<!^)(?=[A-Z])", " ", name)
+    return s.lower()
 
 
 def build_windows(
@@ -259,44 +152,489 @@ def _extract_window(
     return x_win, y_target
 
 
-def bs_identity(df, ticker, tol=1e1) -> None:
+def detect_duplicate_columns(df, tolerance=1e-6, similarity_threshold=0.999):
     """
-    Checks Assets = Liabilities + Equity for each row.
-    Returns a DataFrame with the computed values and the error.
+    Detect columns that are duplicates or derived from other columns.
+
+    Parameters:
+    -----------
+    df : pd.DataFrame
+        Input dataframe to analyze
+    tolerance : float
+        Numerical tolerance for considering values equal (default 1e-6)
+    similarity_threshold : float
+        Threshold for considering columns identical (0-1, default 0.9)
+
+    Returns:
+    --------
+    dict
+        Dictionary with duplicate groups and analysis
     """
-    if tol <= 0:
-        raise ValueError("tol must be positive")
-    if df is None or df.empty:
-        raise ValueError("Input dataframe for bs_identity cannot be empty")
-    categories = get_bs_structure(ticker)
-    A_cols = (
-        categories["assets"]["current_assets"]
-        + categories["assets"]["non_current_assets"]
+
+    results = {"duplicate_groups": [], "columns_to_drop": [], "summary": {}}
+
+    columns = df.columns.tolist()
+    checked = set()
+
+    for i, col1 in enumerate(columns):
+        if col1 in checked:
+            continue
+
+        duplicates = [col1]
+
+        for _, col2 in enumerate(columns[i + 1 :], start=i + 1):
+            if col2 in checked:
+                continue
+
+            # Check if columns are identical
+            if are_columns_duplicate(
+                df[col1], df[col2], tolerance, similarity_threshold
+            ):
+                duplicates.append(col2)
+                checked.add(col2)
+
+        if len(duplicates) > 1:
+            # Found duplicate group
+            results["duplicate_groups"].append(duplicates)
+
+            # Decide which to keep
+            column_to_keep = select_column_to_keep(duplicates)
+            columns_to_drop = [col for col in duplicates if col != column_to_keep]
+
+            results["columns_to_drop"].extend(columns_to_drop)
+
+    # Hard-coded exceptions for key totals
+    if "liabilities and stockholders equity" in results["columns_to_drop"]:
+        results["columns_to_drop"].remove("liabilities and stockholders equity")
+    if "assets" in results["columns_to_drop"]:
+        results["columns_to_drop"].remove("assets")
+
+    results["summary"] = {
+        "total_columns": len(columns),
+        "duplicate_groups_found": len(results["duplicate_groups"]),
+        "columns_to_drop": len(results["columns_to_drop"]),
+        "columns_remaining": len(columns) - len(results["columns_to_drop"]),
+    }
+
+    return results
+
+
+def are_columns_duplicate(col1, col2, tolerance=1e-6, similarity_threshold=0.999):
+    """
+    Check if two columns are duplicates within tolerance.
+
+    Parameters:
+    -----------
+    col1, col2 : pd.Series
+        Columns to compare
+    tolerance : float
+        Numerical tolerance
+    similarity_threshold : float
+        Minimum fraction of matching rows (0-1)
+
+    Returns:
+    --------
+    bool
+        True if columns are considered duplicates
+    """
+
+    # Handle NaN values - both NaN is considered a match
+    mask_both_nan = col1.isna() & col2.isna()
+    mask_both_not_nan = (~col1.isna()) & (~col2.isna())
+
+    # Check numerical similarity for non-NaN values
+    if mask_both_not_nan.any():
+        diff = np.abs(col1[mask_both_not_nan] - col2[mask_both_not_nan])
+        matches_numeric = (diff <= tolerance).sum()
+    else:
+        matches_numeric = 0
+
+    # Total matches (both NaN + numerical matches)
+    total_matches = mask_both_nan.sum() + matches_numeric
+    total_rows = len(col1)
+
+    # Calculate similarity ratio
+    similarity_ratio = total_matches / total_rows if total_rows > 0 else 0
+
+    return similarity_ratio >= similarity_threshold
+
+
+def select_column_to_keep(duplicate_columns):
+    """
+    Select which column to keep from a group of duplicates.
+    Prefer to drop columns with 'total' in the name.
+
+    Parameters:
+    -----------
+    duplicate_columns : list
+        List of duplicate column names
+
+    Returns:
+    --------
+    str
+        Column name to keep
+    """
+
+    # Keywords that suggest derived/aggregate columns (prefer to drop these)
+    drop_keywords = ["total", "sum", "aggregate", "combined", "consolidated"]
+
+    # Score each column (lower score = more likely to drop)
+    scores = []
+    for col in duplicate_columns:
+        col_lower = col.lower()
+
+        # Start with base score
+        score = 100
+
+        # Penalize if contains drop keywords
+        for keyword in drop_keywords:
+            if keyword in col_lower:
+                score -= 50
+
+        # Penalize longer names (often more descriptive/derived)
+        score -= len(col) * 0.1
+
+        scores.append(score)
+
+    # Keep the column with highest score
+    max_score_idx = scores.index(max(scores))
+    return duplicate_columns[max_score_idx]
+
+
+def remove_duplicate_columns(
+    df, kind="balance sheet", tolerance=1e-6, similarity_threshold=0.999, verbose=True
+):
+    """
+    Remove duplicate columns from dataframe.
+
+    Parameters:
+    -----------
+    df : pd.DataFrame
+        Input dataframe
+    tolerance : float
+        Numerical tolerance for considering values equal
+    similarity_threshold : float
+        Threshold for considering columns identical (0-1)
+    verbose : bool
+        Whether to print detailed information
+
+    Returns:
+    --------
+    tuple
+        (cleaned_df, results_dict)
+    """
+
+    results = detect_duplicate_columns(df, tolerance, similarity_threshold)
+
+    if verbose:
+        print_duplicate_analysis(results, kind)
+
+    # Drop duplicate columns
+    cleaned_df = df.drop(columns=results["columns_to_drop"])
+
+    return cleaned_df, results
+
+
+def print_duplicate_analysis(results, kind="balance sheet"):
+    """
+    Pretty print the duplicate column analysis with colors.
+    """
+
+    try:
+        from colorama import Fore, Style, init
+
+        init(autoreset=True)
+    except ImportError:
+        # Fallback to no colors
+        class Fore:
+            CYAN = GREEN = RED = YELLOW = MAGENTA = WHITE = ""
+
+        class Style:
+            RESET_ALL = BRIGHT = ""
+
+    print(f"\n{Fore.CYAN}{'=' * 80}{Style.RESET_ALL}")
+    print(
+        f"{Fore.CYAN}{Style.BRIGHT} {kind.capitalize()} \
+            DUPLICATE COLUMN ANALYSIS {Style.RESET_ALL}"
     )
-    L_cols = (
-        categories["liabilities"]["current_liabilities"]
-        + categories["liabilities"]["non_current_liabilities"]
+    print(f"{Fore.CYAN}{'=' * 80}{Style.RESET_ALL}\n")
+
+    summary = results["summary"]
+    print(
+        f"{Fore.WHITE}Total Columns: \
+            {Fore.CYAN}{summary['total_columns']}{Style.RESET_ALL}"
     )
-    E_cols = categories["equity"]
-
-    missing_cols = [c for c in A_cols + L_cols + E_cols if c not in df.columns]
-    if missing_cols:
-        raise ValueError(
-            f"Dataframe missing required balance sheet columns: {missing_cols}"
-        )
-
-    # Ensure missing values don't break the sums
-    df_filled = df.fillna(0)
-
-    out = df_filled.assign(
-        assets_sum=df_filled[A_cols].sum(axis=1),
-        liabilities_sum=df_filled[L_cols].sum(axis=1),
-        equity_sum=df_filled[E_cols].sum(axis=1),
+    print(
+        f"{Fore.YELLOW}Duplicate Groups Found: \
+            {Fore.CYAN}{summary['duplicate_groups_found']}{Style.RESET_ALL}"
+    )
+    print(
+        f"{Fore.RED}Columns to Drop: \
+        {Fore.CYAN}{summary['columns_to_drop']}{Style.RESET_ALL}"
+    )
+    print(
+        f"{Fore.GREEN}Columns Remaining: \
+            {Fore.CYAN}{summary['columns_remaining']}{Style.RESET_ALL}"
     )
 
-    out["identity_error"] = out["assets_sum"] - (
-        out["liabilities_sum"] + out["equity_sum"]
-    )
-    out["valid"] = out["identity_error"].abs() < tol
+    if results["duplicate_groups"]:
+        print(f"\n{Fore.MAGENTA}{'─' * 80}{Style.RESET_ALL}")
+        print(f"{Fore.MAGENTA}DUPLICATE GROUPS:{Style.RESET_ALL}\n")
 
-    print(f"Accounting Identity: {out['valid'].sum()}/{len(out)} valid")
+        for i, group in enumerate(results["duplicate_groups"], 1):
+            print(f"{Fore.YELLOW}Group {i}:{Style.RESET_ALL}")
+
+            # Determine which to keep
+            to_keep = select_column_to_keep(group)
+
+            for col in group:
+                if col == to_keep:
+                    print(f"  {Fore.GREEN}✓ KEEP: {col}{Style.RESET_ALL}")
+                else:
+                    print(f"  {Fore.RED}✗ DROP: {col}{Style.RESET_ALL}")
+            print()
+    else:
+        print(f"\n{Fore.GREEN}✓ No duplicate columns found!{Style.RESET_ALL}")
+
+    print(f"{Fore.CYAN}{'=' * 80}{Style.RESET_ALL}\n")
+
+
+# New LLM parsed verifications
+
+
+# def verify_bs_totals(df, balance_sheet_structure, tolerance=0.01):
+
+#     structure = balance_sheet_structure["structure"]
+#     results = {"passed": True, "mismatches": [], "summary": {}}
+
+#     def verify_section(section_data, section_name, parent_name=""):
+#         """Recursively verify totals within a section."""
+
+#         for key, value in section_data.items():
+#             if key == "__unmapped__":
+#                 continue
+
+#             full_path = f"{parent_name}.{key}" if parent_name else key
+
+#             if isinstance(value, dict):
+#                 # Check if this dict has a "Total" key
+#                 total_keys = [k for k in value.keys() if k.startswith("Total")]
+
+#                 for total_key in total_keys:
+#                     # Get all component keys (excluding the total and nested dicts)
+#                     component_keys = [
+#                         k
+#                         for k in value.keys()
+#                         if k != total_key
+#                         and k != "__unmapped__"
+#                         and not isinstance(value[k], dict)
+#                     ]
+
+#                     if component_keys and total_key in df.columns:
+#                         # Calculate sum of components
+#                         existing_components = [
+#                             k for k in component_keys if k in df.columns
+#                         ]
+
+#                         if existing_components:
+#                             calculated_total = df[existing_components].sum(axis=1)
+#                             reported_total = df[total_key]
+
+#                             # Check for mismatches
+#                             difference = (calculated_total - reported_total).abs()
+#                             max_diff = difference.max()
+
+#                             if max_diff > tolerance:
+#                                 mismatch_rows = difference[
+#                                     difference > tolerance
+#                                 ].index.tolist()
+#                                 results["passed"] = False
+#                                 results["mismatches"].append(
+#                                     {
+#                                         "section": full_path,
+#                                         "total_field": total_key,
+#                                         "components": existing_components,
+#                                         "max_difference": max_diff,
+#                                         "rows_with_mismatch": mismatch_rows[
+#                                             :10
+#                                         ],  # Limit to first 10
+#                                         "num_mismatched_rows": len(mismatch_rows),
+#                                     }
+#                                 )
+#                             else:
+#                                 results["summary"][total_key] = "PASS"
+
+#                 # Recurse into nested structure
+#                 verify_section(value, key, full_path)
+
+#     # Verify Assets
+#     if "Assets" in structure:
+#         verify_section(structure["Assets"], "Assets")
+
+#         # Special check: Total Current + Total Non-Current = Total Assets
+#         if all(
+#             col in df.columns
+#             for col in [
+#                 "Total Current Assets",
+#                 "Total Non-Current Assets",
+#                 "Total Assets",
+#             ]
+#         ):
+#             calc_total = df["Total Current Assets"] + df["Total Non-Current Assets"]
+#             reported_total = df["Total Assets"]
+#             difference = (calc_total - reported_total).abs()
+#             max_diff = difference.max()
+
+#             if max_diff > tolerance:
+#                 mismatch_rows = difference[difference > tolerance].index.tolist()
+#                 results["passed"] = False
+#                 results["mismatches"].append(
+#                     {
+#                         "section": "Assets",
+#                         "total_field": "Total Assets",
+#                         "components": [
+#                             "Total Current Assets",
+#                             "Total Non-Current Assets",
+#                         ],
+#                         "max_difference": max_diff,
+#                         "rows_with_mismatch": mismatch_rows[:10],
+#                         "num_mismatched_rows": len(mismatch_rows),
+#                     }
+#                 )
+#             else:
+#                 results["summary"]["Total Assets"] = "PASS"
+
+#     # Verify Liabilities
+#     if "Liabilities" in structure:
+#         verify_section(structure["Liabilities"], "Liabilities")
+
+#         # Special check: Total Current + Total Non-Current = Total Liabilities
+#         if all(
+#             col in df.columns
+#             for col in [
+#                 "Total Current Liabilities",
+#                 "Total Non-Current Liabilities",
+#                 "Total Liabilities",
+#             ]
+#         ):
+#             calc_total = (
+#                 df["Total Current Liabilities"] + df["Total Non-Current Liabilities"]
+#             )
+#             reported_total = df["Total Liabilities"]
+#             difference = (calc_total - reported_total).abs()
+#             max_diff = difference.max()
+
+#             if max_diff > tolerance:
+#                 mismatch_rows = difference[difference > tolerance].index.tolist()
+#                 results["passed"] = False
+#                 results["mismatches"].append(
+#                     {
+#                         "section": "Liabilities",
+#                         "total_field": "Total Liabilities",
+#                         "components": [
+#                             "Total Current Liabilities",
+#                             "Total Non-Current Liabilities",
+#                         ],
+#                         "max_difference": max_diff,
+#                         "rows_with_mismatch": mismatch_rows[:10],
+#                         "num_mismatched_rows": len(mismatch_rows),
+#                     }
+#                 )
+#             else:
+#                 results["summary"]["Total Liabilities"] = "PASS"
+
+#     # Verify Equity (no subcategories to sum, but included for completeness)
+#     if "Equity" in structure:
+#         verify_section(structure["Equity"], "Equity")
+
+#     # Verify fundamental accounting equation:
+#     # Total Assets = Total Liabilities + Total Equity
+#     if all(
+#         col in df.columns
+#         for col in ["Total Assets", "Total Liabilities", "Total Equity"]
+#     ):
+#         calc_total = df["Total Liabilities"] + df["Total Equity"]
+#         reported_total = df["Total Assets"]
+#         difference = (calc_total - reported_total).abs()
+#         max_diff = difference.max()
+
+#         if max_diff > tolerance:
+#             mismatch_rows = difference[difference > tolerance].index.tolist()
+#             results["passed"] = False
+#             results["mismatches"].append(
+#                 {
+#                     "section": "Accounting Equation",
+#                     "total_field": "Total Assets",
+#                     "components": ["Total Liabilities", "Total Equity"],
+#                     "max_difference": max_diff,
+#                     "rows_with_mismatch": mismatch_rows[:10],
+#                     "num_mismatched_rows": len(mismatch_rows),
+#                 }
+#             )
+#         else:
+#             results["summary"]["Accounting Equation
+#               (Assets = Liab + Equity)"] = "PASS"
+
+#     # Check Totals section
+#     if "Totals" in structure and "Total Liabilities and Equity" in df.columns:
+#         if all(
+#             col in df.columns
+#             for col in [
+#                 "Total Liabilities",
+#                 "Total Equity",
+#                 "Total Liabilities and Equity",
+#             ]
+#         ):
+#             calc_total = df["Total Liabilities"] + df["Total Equity"]
+#             reported_total = df["Total Liabilities and Equity"]
+#             difference = (calc_total - reported_total).abs()
+#             max_diff = difference.max()
+
+#             if max_diff > tolerance:
+#                 mismatch_rows = difference[difference > tolerance].index.tolist()
+#                 results["passed"] = False
+#                 results["mismatches"].append(
+#                     {
+#                         "section": "Totals",
+#                         "total_field": "Total Liabilities and Equity",
+#                         "components": ["Total Liabilities", "Total Equity"],
+#                         "max_difference": max_diff,
+#                         "rows_with_mismatch": mismatch_rows[:10],
+#                         "num_mismatched_rows": len(mismatch_rows),
+#                     }
+#                 )
+#             else:
+#                 results["summary"]["Total Liabilities and Equity"] = "PASS"
+
+#     return results
+
+
+# def print_verification_results(results):
+#     """Pretty print the verification results."""
+
+#     print("=" * 80)
+#     print("BALANCE SHEET VERIFICATION RESULTS")
+#     print("=" * 80)
+
+#     if results["passed"]:
+#         print("\n✓ ALL CHECKS PASSED")
+#         print("\nVerified totals:")
+#         for total, status in results["summary"].items():
+#             print(f"  • {total}: {status}")
+#     else:
+#         print("\n✗ VERIFICATION FAILED")
+#         print(f"\nFound {len(results['mismatches'])} mismatch(es):\n")
+
+#         for i, mismatch in enumerate(results["mismatches"], 1):
+#             print(f"{i}. {mismatch['section']} - {mismatch['total_field']}")
+#             print(f"   Components: {', '.join(mismatch['components'])}")
+#             print(f"   Max difference: ${mismatch['max_difference']:,.2f}")
+#             print(f"   Rows affected: {mismatch['num_mismatched_rows']}")
+#             print()
+
+#         if results["summary"]:
+#             print("Passed checks:")
+#             for total, status in results["summary"].items():
+#                 print(f"  • {total}: {status}")
+
+#     print("=" * 80)

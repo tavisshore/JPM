@@ -10,7 +10,7 @@ class DataConfig:
 
     ticker: str = "AAPL"
     cache_dir: str = "/scratch/datasets/jpm"
-    periods: int = 40  # quarters -> 10 years
+    periods: int = 60  # quarters -> 15 years, post-2008
     lookback: int = 5
     horizon: int = 1
     batch_size: int = 32
@@ -110,7 +110,7 @@ class TrainingConfig:
     decay_steps: int = 100
     decay_rate: float = 0.9
     scheduler: str = "exponential"
-    epochs: int = 50  # Raise again after dev
+    epochs: int = 500  # Raise again after dev
     checkpoint_path: Path = Path("ckpts")
 
     def __post_init__(self) -> None:
@@ -166,7 +166,7 @@ class LossConfig:
 @dataclass
 class LLMConfig:
     provider: str = "openai"
-    model: str = "gpt-5-nano"  # dev nano, eval mini
+    model: str = "gpt-5-mini"  # dev nano, eval mini
     temperature: float = 0.05
     max_tokens: int = 8192
     adjust: bool = False
@@ -189,4 +189,4 @@ class Config:
     model: ModelConfig = ModelConfig()
     training: TrainingConfig = TrainingConfig()
     loss: LossConfig = LossConfig()
-    llm: None | LLMConfig = None
+    llm: LLMConfig = LLMConfig()

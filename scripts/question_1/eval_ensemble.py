@@ -20,7 +20,9 @@ model_cfg = ModelConfig.from_args(args)
 train_cfg = TrainingConfig.from_args(args)
 loss_cfg = LossConfig.from_args(args)
 llm_cfg = LLMConfig.from_args(args)
-config = Config(data=data_cfg, model=model_cfg, training=train_cfg, loss=loss_cfg)
+config = Config(
+    data=data_cfg, model=model_cfg, training=train_cfg, loss=loss_cfg, llm=llm_cfg
+)
 
 data = EdgarDataLoader(config=config)
 

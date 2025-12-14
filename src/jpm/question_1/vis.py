@@ -67,20 +67,15 @@ def build_section_rows(
     feature_stats: dict[str, dict],
 ) -> list[list[str]]:
     """Create rows for assets/liabilities sections from feature metrics."""
-    rows = []
-    for section_key, feats in sections.items():
-        section_name = fmt(section_key)
-        if "non_current" in section_key.lower():
-            section_name = "Non-Current"
-        elif "current" in section_key.lower():
-            section_name = "Current"
 
-        for feat in feats:
-            m = feature_stats.get(feat)
-            if m is None:
-                continue
-            category = f"{section_name} - {fmt(feat)}"
-            rows.append(make_row(category, m))
+    rows = []
+    for feat in sections:
+        m = feature_stats.get(feat)
+
+        if m is None:
+            continue
+        category = f"{fmt(feat)}"
+        rows.append(make_row(category, m))
     return rows
 
 

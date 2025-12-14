@@ -97,8 +97,8 @@ class LSTMForecaster:
                 feature_mappings=self.data.feature_mappings,
                 feature_means=self.data.target_mean,
                 feature_stds=self.data.target_std,
-                slack_name="accumulated_other_comprehensive_income_loss_net_of_tax",
-                feature_names=self.data.bs_keys,
+                slack_name="Accumulated Other Comprehensive Income (AOCI)",
+                feature_names=self.data.name_to_target_idx,
             )(outputs)
 
         model = keras.Model(inputs=inputs, outputs=outputs, name="lstm_model")
@@ -525,9 +525,8 @@ class LSTMForecaster:
 
     def view_results(self, stage: str = "val") -> None:
         results = self.val_results if stage == "val" else self.train_results
-        ticker = self.config.data.ticker
 
-        print(f"\033[1mResults for {stage} dataset ({ticker}):\033[0m")
+        print(f"\033[1mResults for {stage} dataset ({self.config.data.ticker}):\033[0m")
 
         # Summary Table
         overall_rows = [
@@ -539,17 +538,17 @@ class LSTMForecaster:
 
         # Detailed per-feature tables
         assets_rows = build_section_rows(
-            self.data.bs_structure["assets"], results.features
+            self.data.bs_structure["Assets"], results.features
         )
         print_table("Assets", assets_rows)
 
         liabilities_rows = build_section_rows(
-            self.data.bs_structure["liabilities"], results.features
+            self.data.bs_structure["Liabilities"], results.features
         )
         print_table("Liabilities", liabilities_rows)
 
         equity_rows = build_equity_rows(
-            self.data.bs_structure["equity"], results.features
+            self.data.bs_structure["Equity"], results.features
         )
         print_table("Equity", equity_rows)
 

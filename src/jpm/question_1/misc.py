@@ -54,6 +54,20 @@ def get_leaf_values(d, sub_key: str | None = None) -> List[str]:
     return collect_leaves(d)
 
 
+def get_leaf_keys(d: Nested) -> List[str]:
+    """Return all leaf keys under a nested dict."""
+    if isinstance(d, list):
+        return []
+
+    out = []
+    for k, v in d.items():
+        if isinstance(v, dict):
+            out.extend(get_leaf_keys(v))
+        elif isinstance(v, list):
+            out.append(k)
+    return out
+
+
 def to_tensor(x) -> tf.Tensor:
     """Convert input to a float32 tensor."""
     # Centralised conversion keeps dtype consistent
