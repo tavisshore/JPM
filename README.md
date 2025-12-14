@@ -21,7 +21,7 @@ The LLM clients requires API keys (currently just ChatGPT):
 export OPENAI_API_KEY="your_key"
 ```
 ## Question 1 - Balance Sheet Forecasting
-
+### Part 1
 - **Vélez-Pareja:**
   - **Plugless:** from the paper *Forecasting Financial Statements with No plugs and No Circularity* [1]
     ```bash
@@ -38,6 +38,13 @@ export OPENAI_API_KEY="your_key"
     python scripts/question_1/eval_lstm.py --cache_dir /PATH/TO/DESIRED/CACHE
     ```
 
+### Part 2
+- **Ensemble model:**
+    The LLM can be used to either adjust the LSTM estimation, or independently predict the future financial statement features before combining the output with the LSTM.
+    ```bash
+    python scripts/question_1/eval_ensemble.py --cache_dir /PATH/TO/DESIRED/CACHE
+    ```
+    
 Downloaded SEC statements are cached under the chosen `--cache_dir`.
 
 
