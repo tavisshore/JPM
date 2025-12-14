@@ -16,7 +16,7 @@ EDGAR requires an email for downloads:
 ```bash
 export EDGAR_EMAIL="your_email@jpm.com"
 ```
-The LLM clients requires API keys (currently just ChatGPT):
+The LLM clients requires API keys (currently just ChatGPT), this is soon to be required for both question parts as company financial statements are now being parsed by LLM to standardise:
 ```bash
 export OPENAI_API_KEY="your_key"
 ```
