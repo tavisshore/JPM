@@ -193,6 +193,13 @@ def detect_duplicate_columns(df, tolerance=1e-6, similarity_threshold=0.999):
                 duplicates.append(col2)
                 checked.add(col2)
 
+        # Hard-coded exceptions for key totals
+        if "liabilities and stockholders equity" in duplicates:
+            duplicates.remove("liabilities and stockholders equity")
+            # results['']
+        if "assets" in duplicates:
+            duplicates.remove("assets")
+
         if len(duplicates) > 1:
             # Found duplicate group
             results["duplicate_groups"].append(duplicates)
@@ -202,12 +209,6 @@ def detect_duplicate_columns(df, tolerance=1e-6, similarity_threshold=0.999):
             columns_to_drop = [col for col in duplicates if col != column_to_keep]
 
             results["columns_to_drop"].extend(columns_to_drop)
-
-    # Hard-coded exceptions for key totals
-    if "liabilities and stockholders equity" in results["columns_to_drop"]:
-        results["columns_to_drop"].remove("liabilities and stockholders equity")
-    if "assets" in results["columns_to_drop"]:
-        results["columns_to_drop"].remove("assets")
 
     results["summary"] = {
         "total_columns": len(columns),

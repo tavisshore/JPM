@@ -268,6 +268,7 @@ class LSTMForecaster:
         feature_metrics, per_feature_std = self._compute_feature_metrics(
             y_pred_unscaled, y_gt_unscaled, pred_std
         )
+
         ticker_results = self._build_results(
             y_pred_unscaled,
             y_gt_unscaled,

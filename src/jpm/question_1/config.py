@@ -10,14 +10,14 @@ class DataConfig:
 
     ticker: str = "AAPL"
     cache_dir: str = "/scratch/datasets/jpm"
-    periods: int = 60  # quarters -> 15 years, post-2008
-    lookback: int = 5
+    periods: int = 20  # quarters -> 15 years, post-2008
+    lookback: int = 4
     horizon: int = 1
     batch_size: int = 32
     target_type: str = "full"
-    withhold_periods: int = 2  # test set size in quarters
+    withhold_periods: int = 1  # test set size in quarters
     # >1.0 weighs for the seasonal lag timestep
-    seasonal_weight: float = 1.15  # 11
+    seasonal_weight: float = 1.1  # 11
     seasonal_lag: int = 4  # don't change
 
     def __post_init__(self) -> None:
@@ -71,10 +71,10 @@ class DataConfig:
 class ModelConfig:
     """Model hyperparameters."""
 
-    lstm_units: int = 256  # 368
-    lstm_layers: int = 2
-    dense_units: int = 256  # 256
-    dropout: float = 0.2
+    lstm_units: int = 368  # 368
+    lstm_layers: int = 3
+    dense_units: int = 368  # 256
+    dropout: float = 0.1
     variational: bool = False
     probabilistic: bool = False
     mc_samples: int = 1
@@ -140,8 +140,8 @@ class TrainingConfig:
 class LossConfig:
     """Loss term configuration."""
 
-    enforce_balance: bool = True
-    learn_identity: bool = True
+    enforce_balance: bool = False
+    learn_identity: bool = False
     identity_weight: float = 1e-2
     learn_subtotals: bool = False
     subcategory_weight: float = 1e-5

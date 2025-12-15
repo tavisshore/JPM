@@ -99,24 +99,6 @@ class IncomeStatement:
             ]
         )
 
-        for title, section in (
-            ("Revenue Breakdown", self.revenues),
-            ("Expense Breakdown", self.expenses),
-        ):
-            if not section.items:
-                continue
-            rows.append([f"-- {title} --", "", "", "", ""])
-            for concept, value in section.items.items():
-                rows.append(
-                    [
-                        concept.replace("_", " ").title(),
-                        format_money(value.gt),
-                        format_money(value.value),
-                        colour_mae(abs(value.value - value.gt)),
-                        colour_mae(value.std),
-                    ]
-                )
-
         print_table(
             title="Income Statement",
             rows=rows,
@@ -137,3 +119,6 @@ class IncomeStatement:
                 rows=baseline_rows,
                 headers=("Method", "Ground Truth", "Estimate", "Error"),
             )
+
+    def get_results(self) -> TickerResults:
+        return self.results
