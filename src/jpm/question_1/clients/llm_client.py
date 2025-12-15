@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import sys
 import threading
@@ -13,6 +14,26 @@ from openai import OpenAI
 from pandas import DataFrame
 
 from jpm.question_1.config import LLMConfig
+
+
+def count_leaf_list_values(d):
+    count = 0
+    for value in d.values():
+        if isinstance(value, dict):
+            count += count_leaf_list_values(value)
+        elif isinstance(value, list):
+            count += len(value)
+    return count
+
+
+def leaf_list_values(d):
+    values = []
+    for value in d.values():
+        if isinstance(value, dict):
+            values.extend(leaf_list_values(value))
+        elif isinstance(value, list):
+            values.extend(value)
+    return values
 
 
 class LLMClient:
@@ -102,7 +123,7 @@ class LLMClient:
         self,
         history: DataFrame,
         cfg: LLMConfig,
-        prediction=None,
+        prediction: DataFrame | None = None,
         feature_columns: Optional[List[str]] = None,
         max_rows: int = 4,
         adjust: bool = False,
@@ -119,6 +140,9 @@ class LLMClient:
         data_csv = recent.to_csv(index=True)
 
         if adjust:
+            assert (
+                prediction is not None
+            ), "Prediction DataFrame required for adjust=True"
             predict_csv = prediction.to_csv(index=True)
             system_content = (
                 "You are a financial analyst. "
@@ -170,6 +194,108 @@ class LLMClient:
             raise ValueError(f"LLM response missing columns: {missing_cols}")
 
         return parsed[target_cols].head(1)
+
+    def parse_financial_features(
+        self,
+        features: List[str],
+        structure_json: Dict[str, Any],
+        cfg: LLMConfig,
+    ) -> Dict[str, Any]:
+        structure_str = json.dumps(
+            structure_json,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+
+        features_str = json.dumps(features, ensure_ascii=False)
+
+        system_content = """
+                You are a deterministic mapper from feature strings to a fixed balance-sheet JSON taxonomy.
+
+                Definitions:
+                - A "leaf" is any key whose value is a JSON array (list). Only leaves may be modified.
+                - Non-leaves are JSON objects (dicts) and must not be modified.
+
+                Hard requirements:
+                - Output must be a single valid JSON object.
+                - The output object MUST keep identical keys and nesting as the input structure (no new keys; no renamed keys).
+                - Only append items to existing leaf arrays.
+                - Feature strings must be copied verbatim (exact characters; no normalization).
+
+                Mapping strategy:
+                1. PRIORITIZE USEFUL FEATURES: Only map features that represent meaningful balance sheet line items.
+                2. IGNORE IRRELEVANT FEATURES: Skip features that are:
+                - Meta-information (filing dates, document IDs, entity information, CIK numbers)
+                - Ratios or percentages
+                - Duplicative or redundant information
+                - Administrative fields
+                - Non-balance-sheet items
+                3. Place ignored features into "__unmapped__" array.
+
+                Totals / rollups routing (apply FIRST for relevant features):
+                - If a feature is a rollup/total/subtotal, map it to the most specific matching "Total ..." leaf:
+                * "assets current" or "total current assets" -> Assets / Current / Total Current Assets
+                * "assets noncurrent" or "total non-current assets" -> Assets / Non-Current / Total Non-Current Assets
+                * "assets" or "total assets" -> Assets / Total Assets
+                * "liabilities current" or "total current liabilities" -> Liabilities / Current / Total Current Liabilities
+                * "liabilities noncurrent" or "total non-current liabilities" -> Liabilities / Non-Current / Total Non-Current Liabilities
+                * "liabilities" or "total liabilities" -> Liabilities / Total Liabilities
+                * "stockholders equity" or "shareholders equity" or "total equity" -> Equity / Total Equity
+                * "liabilities and stockholders equity" (or similar) -> Totals / Total Liabilities and Equity
+
+                Share-count routing (for relevant features):
+                - Features containing "shares issued" -> Equity / Common Stock / Shares Issued (or Preferred if explicitly preferred)
+                - Features containing "shares outstanding" -> Equity / Common Stock / Shares Outstanding (or Preferred if explicitly preferred)
+                - Features containing "common stock" without shares -> Equity / Common Stock / Amount
+                - Features containing "preferred stock" without shares -> Equity / Preferred Stock / Amount
+
+                Normal mapping rule (for relevant features only):
+                - Choose the single best leaf by accounting meaning.
+                - If ambiguous, choose the best accounting meaning; if still tied, choose the leaf whose full path is alphabetically first.
+                - Preserve the input order of features within each leaf list (stable assignment).
+                - If a feature does NOT clearly represent a balance sheet line item, place it in "__unmapped__".
+
+                Quality over completeness:
+                - It is BETTER to leave a feature unmapped than to force it into an incorrect category.
+                - An empty array for a balance sheet line item is acceptable if no relevant feature exists.
+                - "__unmapped__" may contain many items - this is expected and correct.
+
+                Self-check (silent before output):
+                - Total mapped items across ALL leaf lists (including __unmapped__) equals number of input features.
+                - No duplicates across leaves.
+                - Only balance-sheet-relevant features are in non-__unmapped__ leaves.
+                Fix until all checks pass, then output JSON only.
+                """
+
+        user_content = f"""
+        STRUCTURE_JSON:
+        {structure_str}
+
+        FEATURES_JSON_ARRAY:
+        {features_str}
+
+        Return ONLY the updated JSON. Be conservative - when in doubt, use __unmapped__.
+        """
+
+        messages = [
+            {"role": "system", "content": system_content},
+            {"role": "user", "content": user_content},
+        ]
+
+        raw = self.chat(messages, cfg)
+
+        try:
+            parsed = json.loads(raw)
+        except Exception as exc:
+            raise ValueError(f"Failed to parse LLM response as JSON: {exc}") from exc
+
+        # Print the features not sorted:
+        # sorted_values = leaf_list_values(parsed)
+        # not_sorted = [f for f in features if f not in sorted_values]
+        # print(f"\nNot Sorted: {not_sorted}\n")
+
+        return parsed
 
 
 if __name__ == "__main__":

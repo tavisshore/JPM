@@ -133,15 +133,7 @@ class EnforceBalance(Layer):
                 f"Slack variable '{slack_name}' not found in feature names"
             )
 
-        self.slack_idx = feature_names.index(slack_name)
-
-        equity_idx_py = list(feature_mappings["equity"])
-        if self.slack_idx not in equity_idx_py:
-            raise ValueError(
-                f"Slack index {self.slack_idx} ('{slack_name}') "
-                f"is not in equity indices {equity_idx_py}. "
-                f"Include the slack feature in the equity mapping."
-            )
+        self.slack_idx = feature_names[slack_name]
 
         # Use float64 to minimise drift when rescaling and adjusting slack
         self.means = tf.constant(feature_means, dtype=tf.float64)

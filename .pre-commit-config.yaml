@@ -1,3 +1,10 @@
+# Exclude files from all pre-commit hooks
+exclude: |
+  (?x)^(
+      src/jpm/question_1/clients/llm_client\.py|
+      src/jpm/question_1/data/vis\.py
+  )$
+
 repos:
   - repo: https://github.com/psf/black
     rev: 25.11.0

@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Dict
 
 from jpm.question_1.config import Config
-from jpm.question_1.data.utils import get_bs_structure
+from jpm.question_1.data.ed import EdgarDataLoader
 from jpm.question_1.misc import format_money
 from jpm.question_1.models.metrics import TickerResults
 from jpm.question_1.vis import colour, print_table
@@ -14,26 +14,25 @@ from jpm.question_1.vis import colour, print_table
 class Assets:
     """Balance sheet assets split by current and non-current."""
 
-    current_assets: Dict[str, float]
-    non_current_assets: Dict[str, float]
+    assets: Dict[str, float]
+    # current_assets: Dict[str, float] = None
+    # non_current_assets: Dict[str, float] = None
 
     @property
     def total(self) -> float:
-        return sum(self.current_assets.values()) + sum(self.non_current_assets.values())
+        return sum(self.assets.values())  # + sum(self.non_current_assets.values())
 
 
 @dataclass
 class Liabilities:
     """Balance sheet liabilities split by current and non-current."""
 
-    current_liabilities: Dict[str, float]
-    non_current_liabilities: Dict[str, float]
+    liabilities: Dict[str, float]
+    # non_current_liabilities: Dict[str, float]
 
     @property
     def total(self) -> float:
-        return sum(self.current_liabilities.values()) + sum(
-            self.non_current_liabilities.values()
-        )
+        return sum(self.liabilities.values())
 
 
 @dataclass
@@ -53,16 +52,16 @@ class BalanceSheet:
     def __init__(
         self,
         config: Config,
+        data: EdgarDataLoader,
         results: TickerResults,
     ) -> None:
         self.config = config
         self.results = results
+        self.data = data
 
         self._feature_values = results.feature_values()
 
         # Ticker-specific structure -> eventually make universal (pt2?)
-        self.bs_structure = get_bs_structure(ticker=self.config.data.ticker)
-
         self.assets = self._build_assets()
         self.liabilities = self._build_liabilities()
         self.equity = self._build_equity()
@@ -122,35 +121,35 @@ class BalanceSheet:
         return float(self._feature_values.get(name, 0.0))
 
     def _build_assets(self) -> Assets:
-        assets_struct = self.bs_structure["assets"]
+        assets_struct = self.data.bs_structure["Assets"]
 
-        current_names = assets_struct.get("current_assets", [])
-        non_current_names = assets_struct.get("non_current_assets", [])
+        # current_names = assets_struct.get("current_assets", [])
+        # non_current_names = assets_struct.get("non_current_assets", [])
 
-        current = {name: self._get_value(name) for name in current_names}
-        non_current = {name: self._get_value(name) for name in non_current_names}
+        assets = {name: self._get_value(name) for name in assets_struct}
+        # non_current = {name: self._get_value(name) for name in non_current_names}
         # Preserve category split for later reporting
 
         return Assets(
-            current_assets=current,
-            non_current_assets=non_current,
+            assets=assets,
+            # non_current_assets=non_current,
         )
 
     def _build_liabilities(self) -> Liabilities:
-        liab_struct = self.bs_structure["liabilities"]
+        liab_struct = self.data.bs_structure["Liabilities"]
 
-        current_names = liab_struct.get("current_liabilities", [])
-        non_current_names = liab_struct.get("non_current_liabilities", [])
+        # current_names = liab_struct.get("current_liabilities", [])
+        # non_current_names = liab_struct.get("non_current_liabilities", [])
 
-        current = {name: self._get_value(name) for name in current_names}
-        non_current = {name: self._get_value(name) for name in non_current_names}
+        liabilities = {name: self._get_value(name) for name in liab_struct}
+        # non_current = {name: self._get_value(name) for name in non_current_names}
 
         return Liabilities(
-            current_liabilities=current,
-            non_current_liabilities=non_current,
+            liabilities=liabilities,
+            # non_current_liabilities=non_current,
         )
 
     def _build_equity(self) -> Equity:
-        equity_names = self.bs_structure.get("equity", [])
+        equity_names = self.data.bs_structure.get("Equity", [])
         items = {name: self._get_value(name) for name in equity_names}
         return Equity(items=items)

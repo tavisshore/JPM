@@ -1,5 +1,4 @@
-# JPM
-MLCOE Summer Associate Internship exercises and reproducible finance models.
+# JPM - MLCOE Internship Exercises
 
 ## Setup
 Create a clean Python 3.10 environment and install the package:
@@ -7,7 +6,7 @@ Create a clean Python 3.10 environment and install the package:
 conda create -n jpm python=3.10
 conda activate jpm
 python -m pip install .
-
+# Optional testing
 pytest -v
 ```
 
@@ -15,10 +14,11 @@ pytest -v
 EDGAR requires an email for downloads:
 ```bash
 export EDGAR_EMAIL="your_email@jpm.com"
+export JPM_CACHE_DIR="/PATH/TO/DESIRED/CACHE"
 ```
 The LLM clients requires API keys (currently just ChatGPT), this is soon to be required for both question parts as company financial statements are now being parsed by LLM to standardise:
 ```bash
-export OPENAI_API_KEY="your_key"
+export OPENAI_API_KEY="your_api_key"
 ```
 ## Question 1 - Balance Sheet Forecasting
 ### Part 1
@@ -35,17 +35,17 @@ export OPENAI_API_KEY="your_key"
 - **Custom models:**
   - Train **LSTM** forecaster:
     ```bash
-    python scripts/question_1/eval_lstm.py --cache_dir /PATH/TO/DESIRED/CACHE
+    python scripts/question_1/eval_lstm.py
     ```
 
 ### Part 2
 - **Ensemble model:**
     The LLM can be used to either adjust the LSTM estimation, or independently predict the future financial statement features before combining the output with the LSTM.
     ```bash
-    python scripts/question_1/eval_ensemble.py --cache_dir /PATH/TO/DESIRED/CACHE
+    python scripts/question_1/eval_ensemble.py
     ```
-    
-Downloaded SEC statements are cached under the chosen `--cache_dir`.
+
+Downloaded SEC statements are cached within ``.
 
 
 ## Question 3 - DeepHalo Reproduction

@@ -1,6 +1,7 @@
 from jpm.question_1.config import (
     Config,
     DataConfig,
+    LLMConfig,
     LossConfig,
     ModelConfig,
     TrainingConfig,
@@ -18,8 +19,10 @@ data_cfg = DataConfig.from_args(args)
 model_cfg = ModelConfig.from_args(args)
 train_cfg = TrainingConfig.from_args(args)
 loss_cfg = LossConfig.from_args(args)
-
-config = Config(data=data_cfg, model=model_cfg, training=train_cfg, loss=loss_cfg)
+llm_cfg = LLMConfig.from_args(args)
+config = Config(
+    data=data_cfg, model=model_cfg, training=train_cfg, loss=loss_cfg, llm=llm_cfg
+)
 
 data = EdgarDataLoader(config=config)
 
@@ -27,14 +30,14 @@ model = LSTMForecaster(config=config, data=data)
 model.fit()
 
 model.evaluate(stage="train")
-validation_results = model.evaluate(stage="val")
 
+validation_results = model.evaluate(stage="val")
 model.view_results(stage="val")
 
 # Pass outputs to BS Model
-bs = BalanceSheet(config=config, results=validation_results)
+bs = BalanceSheet(config=config, data=data, results=validation_results)
 bs.check_identity()
 
 # Income Statement to predict Net Income (Loss)
-i_s = IncomeStatement(config=config, results=validation_results)
+i_s = IncomeStatement(config=config, data=data, results=validation_results)
 i_s.view()
