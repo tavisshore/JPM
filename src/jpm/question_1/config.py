@@ -15,7 +15,7 @@ class DataConfig:
     horizon: int = 1
     batch_size: int = 32
     target_type: str = "full"
-    withhold_periods: int = 1  # test set size in quarters
+    withhold_periods: int = 2  # test set size in quarters
     # >1.0 weighs for the seasonal lag timestep
     seasonal_weight: float = 1.15  # 11
     seasonal_lag: int = 4  # don't change

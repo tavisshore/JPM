@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import math
+import os
 import random
 from pathlib import Path
 from typing import Any, Dict, List
@@ -143,9 +144,7 @@ def get_args():
 
     # Data
     p.add_argument("--ticker", type=str, default="AAPL")
-    p.add_argument(
-        "--cache_dir", type=str, default="/scratch/datasets/jpm"
-    )  # required=True)
+    p.add_argument("--cache_dir", type=str, default=None)  # required=True)
     p.add_argument("--target", type=str, default=None)
     p.add_argument("--batch_size", type=int, default=None)
     p.add_argument("--lookback", type=int, default=None)
@@ -174,4 +173,10 @@ def get_args():
     p.add_argument("--llm_max_tokens", type=int, default=None)
     p.add_argument("--adjust", type=bool, default=None)
 
-    return p.parse_args()
+    args = p.parse_args()
+
+    # Resolve cache_dir: CLI arg > env var > hardcoded default
+    if args.cache_dir is None:
+        args.cache_dir = os.getenv("JPM_CACHE_DIR", "/scratch/datasets/jpm")
+
+    return args
