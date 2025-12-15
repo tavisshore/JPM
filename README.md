@@ -45,7 +45,7 @@ export OPENAI_API_KEY="your_api_key"
     python scripts/question_1/eval_ensemble.py
     ```
 
-Downloaded SEC statements are cached within ``.
+Downloaded SEC statements are cached within `JPM_CACHE_DIR`.
 
 
 ## Question 3 - DeepHalo Reproduction
