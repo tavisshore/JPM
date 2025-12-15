@@ -31,6 +31,11 @@ if not email:
 edgar.set_identity(email)
 pd.set_option("future.no_silent_downcasting", True)
 
+pd.set_option("display.max_rows", None)
+pd.set_option("display.max_columns", None)
+pd.set_option("display.width", None)
+pd.set_option("display.max_colwidth", None)
+
 # Structure for LLM parsing
 # Keys are grouped hier for readability; LLM gets full JSON structure
 # Totals and __unmapped__ are included to capture any extra/missing items
@@ -142,7 +147,6 @@ income_statement_structure = {
         "Operating Expenses": {
             "Selling, General and Administrative": [],
             "Research and Development": [],
-            "Restructuring and Impairment": [],
             "Other Operating Expenses": [],
             "Total Operating Expenses": [],
         },
@@ -176,7 +180,6 @@ income_statement_structure = {
         "__unmapped__": [],
     },
     "derived": [
-        "Total Revenues",
         "Total Cost of Revenue",
         "Gross Profit",
         "Total Operating Expenses",
@@ -186,6 +189,10 @@ income_statement_structure = {
         "Total Taxes",
         "Comprehensive Income",
         "__unmapped__",
+        "Basic EPS",
+        "Diluted EPS",
+        "Weighted Average Shares Basic",
+        "Weighted Average Shares Diluted",
     ],
 }
 
@@ -351,34 +358,8 @@ class EdgarDataLoader:
         )
 
         self.val_dataset = tf.data.Dataset.from_tensor_slices((X_test, y_test)).batch(
-            self.config.data.batch_size
+            self.config.data.withhold_periods
         )
-
-    def get_final_window(self) -> tuple[pd.DataFrame, pd.Series]:
-        """Return the most recent lookback window and its target."""
-        if hasattr(self, "X_test") and self.X_test.size:
-            X_scaled = self.X_test[-1]
-            y_scaled = self.y_test[-1]
-        # elif hasattr(self, "X_train") and self.X_train.size:
-        # X_scaled = self.X_train[-1]
-        # y_scaled = self.y_train[-1]
-        else:
-            raise ValueError("No windowed data available; ensure create_dataset ran")
-
-        X_unscaled = X_scaled * self.full_std + self.full_mean
-        y_unscaled = y_scaled * self.target_std + self.target_mean
-
-        X_named = pd.DataFrame(X_unscaled, columns=self.data.columns)
-        y_named = pd.Series(y_unscaled, index=self.targets)
-        timestamp_index = self._get_timestamp_index()
-        start_idx = len(self.data) - (
-            self.config.data.lookback + self.config.data.horizon
-        )
-        X_named.index = timestamp_index[
-            start_idx : start_idx + self.config.data.lookback
-        ]
-        y_named.name = timestamp_index[-1]
-        return X_named, y_named
 
     def _validate_target_type(self) -> None:
         if self.config.data.target_type not in {"full", "bs", "net_income"}:
@@ -390,13 +371,40 @@ class EdgarDataLoader:
     def _load_or_fetch_data(self) -> pd.DataFrame:
         if self.cache_statement.exists() and not self.overwrite:
             try:
-                return pd.read_parquet(self.cache_statement)
+                self.data = pd.read_parquet(self.cache_statement)
             except (OSError, ValueError) as exc:
                 raise RuntimeError(
                     f"Failed to load cached statement at {self.cache_statement}"
                 ) from exc
-        self.company = Company(self.config.data.ticker)
-        self.create_statements()
+        else:
+            self.company = Company(self.config.data.ticker)
+            self.create_statements()
+
+        # Drop any columns with just zeros or nans
+        # self.data = self.data.loc[:, (self.data != 0).any(axis=0)]
+
+        # Calculate percentage of most common value in each column
+        threshold = 0.8
+        cols_to_drop = [
+            col
+            for col in self.data.columns
+            if (self.data[col].value_counts(dropna=False).iloc[0] / len(self.data))
+            > threshold
+        ]
+        self.data = self.data.drop(columns=cols_to_drop)
+
+        # self.data.to_excel(self.config.data.ticker + "_full_data.xlsx")
+        # Remove columns with very low variance
+
+        stds = self.data.std()
+        low_variance_cols = stds[stds < 1e-6].index.tolist()
+        if low_variance_cols:
+            print(
+                f"Dropping {len(low_variance_cols)} low-variance columns: \
+                    {low_variance_cols}"
+            )
+            self.data = self.data.drop(columns=low_variance_cols)
+
         return self.data
 
     def _validate_data(self) -> None:
@@ -713,6 +721,10 @@ class EdgarDataLoader:
             [self.bs_df, self.is_df, self.cf_df], axis=1, join="inner"
         )
 
+        for col in self.data.columns:
+            print(col)
+        print("\nFiltering empty values:")
+
         # Remove constant columns (std = 0)
         constant_cols = self.data.columns[self.data.std() == 0].tolist()
         if constant_cols:
@@ -725,6 +737,9 @@ class EdgarDataLoader:
         # self.data = self.data.dropna(axis=1, thresh=int(0.8 * len(self.data.index)))
         # Replace NaNs with 0 for modelling - Or mean etc?
         self.data = self.data.fillna(0)
+
+        for col in self.data.columns:
+            print(col)
 
         self._print_dataset_statistics()
 

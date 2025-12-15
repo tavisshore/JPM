@@ -20,7 +20,7 @@ The LLM clients requires API keys (currently just ChatGPT), this is soon to be r
 ```bash
 export OPENAI_API_KEY="your_api_key"
 ```
-## Question 1 - Balance Sheet Forecasting
+## Question 1 - Financial Statement Forecasting
 ### Part 1
 - **Vélez-Pareja:**
   - **Plugless:** from the paper *Forecasting Financial Statements with No plugs and No Circularity* [1]

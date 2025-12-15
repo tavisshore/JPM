@@ -82,7 +82,7 @@ class BalanceSheet:
     def total_liabilities_and_equity(self) -> float:
         return self.total_liabilities + self.total_equity
 
-    def check_identity(self, atol: float = 1e3) -> None:
+    def check_identity(self, atol: float = 1e3) -> float:
         """Check Assets ≈ Liabilities + Equity."""
         A = self.total_assets
         L_plus_E = self.total_liabilities_and_equity
@@ -116,6 +116,7 @@ class BalanceSheet:
             headers=["", "Assets", "Liabilities + Equity", "Difference"],
         )
         # Single-row table keeps the check consistent with other views
+        return diff_pct
 
     def _get_value(self, name: str) -> float:
         return float(self._feature_values.get(name, 0.0))
