@@ -11,7 +11,7 @@ class DataConfig:
     ticker: str = "AAPL"
     cache_dir: str = "/scratch/datasets/jpm"
     periods: int = 20  # quarters -> 15 years, post-2008
-    lookback: int = 4
+    lookback: int = 3
     horizon: int = 1
     batch_size: int = 32
     target_type: str = "full"
@@ -71,9 +71,9 @@ class DataConfig:
 class ModelConfig:
     """Model hyperparameters."""
 
-    lstm_units: int = 368  # 368
-    lstm_layers: int = 3
-    dense_units: int = 368  # 256
+    lstm_units: int = 256  # 368
+    lstm_layers: int = 2
+    dense_units: int = 256  # 256
     dropout: float = 0.1
     variational: bool = False
     probabilistic: bool = False
@@ -142,7 +142,7 @@ class LossConfig:
 
     enforce_balance: bool = False
     learn_identity: bool = False
-    identity_weight: float = 1e-2
+    identity_weight: float = 1e-4
     learn_subtotals: bool = False
     subcategory_weight: float = 1e-5
 
@@ -169,7 +169,7 @@ class LLMConfig:
     model: str = "gpt-5-mini"  # dev nano, eval mini
     temperature: float = 0.05
     max_tokens: int = 8192
-    adjust: bool = False
+    adjust: bool = True
 
     @classmethod
     def from_args(cls, args):

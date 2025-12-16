@@ -130,7 +130,7 @@ class LSTMForecaster:
                 loss=loss_fn,
                 metrics=["mae"],
             )
-        self.model.summary()
+        # self.model.summary()  # Disabled for batch processing
 
     def _build_optimizer(self):
         lr = self.config.training.lr
@@ -304,7 +304,7 @@ class LSTMForecaster:
         elif self.config.model.variational and self.config.model.mc_samples > 1:
             y_pred, pred_std = self._predict_variational(history)
         else:
-            y_pred = self.model.predict(history)
+            y_pred = self.model.predict(history, verbose=0)
         return y_pred, pred_std
 
     def _predict_probabilistic(
@@ -485,16 +485,7 @@ class LSTMForecaster:
         net_income_pred = 0.0
         net_income_gt = 0.0
         net_income_baseline_pred: dict[str, float] = {}
-        net_income_key = "net_income_loss"
-        if net_income_key not in self.data.feat_to_idx:
-            return {
-                "baseline_mae": net_income_baseline_mae,
-                "skill": net_income_skill,
-                "model_mae": net_income_model_mae,
-                "pred": net_income_pred,
-                "gt": net_income_gt,
-                "baseline_pred": net_income_baseline_pred,
-            }
+        net_income_key = "Net Income (Loss)"
 
         ni_idx = self.data.feat_to_idx[net_income_key]
         net_income_pred = float(y_pred_unscaled[:, ni_idx].mean())
@@ -507,6 +498,7 @@ class LSTMForecaster:
             history=history_unscaled,
             seasonal_lag=min(4, history_unscaled.shape[1]),
         )
+
         eps = 1e-12
         for name, pred in baselines_pred.items():
             mae = float(np.mean(np.abs(pred[:, ni_idx] - y_gt_unscaled[:, ni_idx])))

@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import gc
 import itertools
 import json
 from copy import deepcopy
+
+import tensorflow as tf
 
 from jpm.question_1.config import Config
 from jpm.question_1.data.ed import EdgarDataLoader
@@ -11,19 +14,19 @@ from jpm.question_1.models.lstm import LSTMForecaster
 
 GRID = {
     "data.batch_size": [32],
-    "data.lookback": [4, 5],
+    "data.lookback": [3, 4],
     "data.horizon": [1],
     "data.periods": [20],
     "data.seasonal_weight": [1.1],
-    "model.lstm_units": [368],
-    "model.lstm_layers": [3],
-    "model.dense_units": [368],
+    "model.lstm_units": [256],
+    "model.lstm_layers": [2],
+    "model.dense_units": [256],
     "model.dropout": [0.1],
     "model.variational": [False],
     "training.lr": [1e-4],
     "training.epochs": [250],
-    "loss.enforce_balance": [False],
-    "loss.learn_identity": [True],
+    "loss.enforce_balance": [False, True],
+    "loss.learn_identity": [False, True],
     "loss.identity_weight": [1e-4],
 }
 
@@ -40,6 +43,19 @@ def apply_config_value(cfg: Config, key: str, value) -> Config:
 def main():
     set_seed(42)
 
+    tickers = [
+        "NVDA",
+        "AAPL",
+        "AMZN",
+        "AVGO",
+        "META",
+        "TSLA",
+        "BRK.B",
+        "WMT",
+        "PLTR",
+        "GS",
+    ]
+
     base = Config()
     keys, values = zip(*GRID.items(), strict=True)
 
@@ -49,19 +65,25 @@ def main():
         for k, v in zip(keys, combo, strict=True):
             cfg = apply_config_value(cfg, k, v)
 
-        data = EdgarDataLoader(cfg)
-        model = LSTMForecaster(cfg, data)
-        history = model.fit()
+        val_maes = []
+        for _, ticker in enumerate(tickers, 1):
+            cfg.data.ticker = ticker
+            data = EdgarDataLoader(config=cfg)
+            model = LSTMForecaster(config=cfg, data=data)
+            history = model.fit(verbose=0)
+            val_maes.append(float(history.history["val_mae"][-1]))
 
-        hist = history.history
-        metric_name = "val_mae" if "val_mae" in hist else "mae"
-        val_mae = float(hist[metric_name][-1])
+            # Clear memory after each ticker
+            del model, data, history
+            gc.collect()
+            tf.keras.backend.clear_session()
+
+        val_mae = sum(val_maes) / len(val_maes)
 
         result = {
             "config": dict(zip(keys, combo, strict=True)),
             "val_mae": val_mae,
         }
-        print(json.dumps(result))
 
         if best is None or val_mae < best["val_mae"]:
             best = result
