@@ -20,6 +20,7 @@ The LLM clients requires API keys (currently just ChatGPT), this is soon to be r
 ```bash
 export OPENAI_API_KEY="your_api_key"
 ```
+
 ## Question 1 - Financial Statement Forecasting
 ### Part 1
 - **Vélez-Pareja:**
@@ -30,6 +31,8 @@ export OPENAI_API_KEY="your_api_key"
   - **Consistent:** from the paper *Constructing Consistent Financial Planning Models for Valuation* [2]
     ```bash
     python scripts/question_1/construct_vp.py
+
+    python scripts/question_1/construct_vp_tf.py <- TF model
     ```
 
 - **Custom models:**
@@ -49,8 +52,6 @@ export OPENAI_API_KEY="your_api_key"
     ```bash
     python scripts/question_1/parse_reports.py --company ['alibaba', 'exxon', ...]
     ```
-
-Downloaded SEC statements are cached within ``.
 
 
 ## Question 3 - DeepHalo Reproduction
