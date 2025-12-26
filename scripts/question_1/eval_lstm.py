@@ -6,19 +6,20 @@ import sys
 import numpy as np
 import tensorflow as tf
 
-from jpm.question_1.config import (
+from jpm.question_1 import (
+    BalanceSheet,
     Config,
     DataConfig,
+    EdgarDataLoader,
+    IncomeStatement,
     LLMConfig,
     LossConfig,
+    LSTMForecaster,
     ModelConfig,
     TrainingConfig,
+    get_args,
+    set_seed,
 )
-from jpm.question_1.data.ed import EdgarDataLoader
-from jpm.question_1.misc import get_args, set_seed
-from jpm.question_1.models.balance_sheet import BalanceSheet
-from jpm.question_1.models.income_statement import IncomeStatement
-from jpm.question_1.models.lstm import LSTMForecaster
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # Suppress TensorFlow logging
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # Use single GPU to avoid contention

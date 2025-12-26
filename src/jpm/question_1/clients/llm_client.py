@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Optional
 
 import pandas as pd
 from jpm.question_1.config import LLMConfig
+from jpm.question_1.misc import format_money
 from openai import OpenAI
 from pandas import DataFrame
 from pypdf import PdfReader, PdfWriter
@@ -412,7 +413,8 @@ class LLMClient:
             if val is None:
                 return "N/A".rjust(12 if not show_pct else 28)
             if fmt_type == "currency":
-                return f"${val:>12.2f}M"
+                # Convert millions to dollars and use format_money
+                return format_money(val * 1_000_000).rjust(12)
             elif show_pct:
                 return f"{val:>12.4f} ({val * 100:>6.2f}%)"
             else:
