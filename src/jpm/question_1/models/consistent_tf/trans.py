@@ -57,8 +57,6 @@ class Transactions:
             )
 
             previous_cum_ncb = self.calculated_cumulated_ncb.loc[year - 1]
-            print(previous_cum_ncb)
-            print(f"year: {year}")
 
             calculated_cum_ncb = (
                 previous_cum_ncb + self.discretionary.year_ncb.loc[year]
@@ -190,18 +188,17 @@ class OwnerTransactions:
     def owner_payments(
         self,
         year: int,
-        income_statement: "IncomeStatement",
+        previous_is: "IncomeStatement",
         depreciation: "DepreciationSchedule",
         policy: "PolicyTable",
     ) -> float:
         stock_repurchase_pct = policy.stock_repurchase_pct.loc[year]
 
-        dividends_t = income_statement.next_year_dividends
+        dividends_t = previous_is.next_year_dividends
 
         repurchased_stock_t = (
             depreciation.annual_depreciation.loc[year] * stock_repurchase_pct
         )
-
         payments_t = dividends_t + repurchased_stock_t
 
         self.payments_to_owners = pd.concat(
@@ -217,6 +214,32 @@ class OwnerTransactions:
             ]
         )
         return payments_t
+
+    def pretty_print(self) -> str:
+        """Pretty print OwnerTransactions data."""
+        lines = ["=" * 60, "OwnerTransactions", "=" * 60]
+
+        lines.append("\nInvested Equity:")
+        lines.append(str(self.invested_equity))
+
+        lines.append("\nDividends:")
+        lines.append(str(self.dividends))
+
+        lines.append("\nRepurchased Stock:")
+        lines.append(str(self.repurchased_stock))
+
+        lines.append("\nPayments to Owners:")
+        lines.append(str(self.payments_to_owners))
+
+        lines.append("\nNCB with Owners:")
+        lines.append(str(self.ncb_with_owners))
+
+        lines.append("\nNCB Previous Modules:")
+        lines.append(str(self.ncb_previous_modules))
+
+        lines.append("=" * 60)
+
+        return "\n".join(lines)
 
 
 @dataclass
@@ -362,3 +385,32 @@ class DiscretionaryTransactions:
             ]
         )
         return return_from_st
+
+    def pretty_print(self) -> str:
+        """Pretty print DiscretionaryTransactions data."""
+        lines = ["=" * 60, "DiscretionaryTransactions", "=" * 60]
+
+        lines.append("\nRedemption ST Investment:")
+        lines.append(str(self.redemption_st_investment))
+
+        lines.append("\nReturn from ST Investment:")
+        lines.append(str(self.return_from_st_investment))
+
+        lines.append("\nTotal Inflow ST Investment:")
+        lines.append(str(self.total_inflow_st_investment))
+
+        lines.append("\nST Investments:")
+        lines.append(str(self.st_investments))
+
+        lines.append("\nNCB Discretionary Transactions:")
+        lines.append(str(self.ncb_discretionary_transactions))
+
+        lines.append("\nYear NCB:")
+        lines.append(str(self.year_ncb))
+
+        lines.append("\nCumulated NCB:")
+        lines.append(str(self.cumulated_ncb))
+
+        lines.append("=" * 60)
+
+        return "\n".join(lines)

@@ -6,14 +6,14 @@ import sys
 import threading
 import time
 from contextlib import contextmanager
-from io import StringIO
+from io import BytesIO, StringIO
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
+from jpm.question_1.config import LLMConfig
 from openai import OpenAI
 from pandas import DataFrame
-
-from jpm.question_1.config import LLMConfig
+from pypdf import PdfReader, PdfWriter
 
 
 def count_leaf_list_values(d):
@@ -140,9 +140,9 @@ class LLMClient:
         data_csv = recent.to_csv(index=True)
 
         if adjust:
-            assert (
-                prediction is not None
-            ), "Prediction DataFrame required for adjust=True"
+            assert prediction is not None, (
+                "Prediction DataFrame required for adjust=True"
+            )
             predict_csv = prediction.to_csv(index=True)
             system_content = (
                 "You are a financial analyst. "
@@ -297,28 +297,179 @@ class LLMClient:
 
         return parsed
 
+    def parse_annual_report(
+        self,
+        pdf_path: str,
+        cfg: LLMConfig,
+        page_range: tuple[int, int] = (56, 58),
+    ) -> dict[str, float]:
+        """
+        Extract income statement and balance sheet data from PDF annual report.
+
+        Args:
+            pdf_path: Path to PDF file
+            cfg: LLM configuration
+            page_range: Tuple of (start_page, end_page) to extract from (1-indexed)
+
+        Returns:
+            Dictionary containing extracted financial metrics and calculated ratios
+        """
+
+        # Extract only the specified pages
+        reader = PdfReader(pdf_path)
+        writer = PdfWriter()
+
+        # pypdf uses 0-indexed pages, convert from 1-indexed input
+        for page_num in range(page_range[0] - 1, page_range[1]):
+            if page_num < len(reader.pages):
+                writer.add_page(reader.pages[page_num])
+
+        # Write to bytes buffer
+        pdf_buffer = BytesIO()
+        writer.write(pdf_buffer)
+        pdf_buffer.seek(0)
+
+        pdf_text = ""
+        for page_num in range(page_range[0] - 1, page_range[1]):
+            if page_num < len(reader.pages):
+                page = reader.pages[page_num]
+                pdf_text += page.extract_text() + "\n\n"
+
+        system_content = (
+            "You are a financial analyst expert. "
+            "Extract specific values from financial statements and calculate the requested ratios. "
+            "Return results as a structured JSON object with numerical values only."
+        )
+
+        user_content = (
+            "Analyze this excerpt from an annual report and provide the following for the latest year available:\n\n"
+            "1. Net income (current year)\n"
+            "2. Cost-to-income ratio\n"
+            "3. Quick ratio\n"
+            "4. Debt-to-equity ratio\n"
+            "5. Debt-to-assets ratio\n"
+            "6. Debt-to-capital ratio\n"
+            "7. Debt-to-EBITDA ratio\n"
+            "8. Interest coverage ratio\n\n"
+            "Return ONLY valid JSON with these exact keys:\n"
+            '{"net_income": <value>, "cost_to_income_ratio": <value>, '
+            '"quick_ratio": <value>, "debt_to_equity_ratio": <value>, '
+            '"debt_to_assets_ratio": <value>, "debt_to_capital_ratio": <value>, '
+            '"debt_to_ebitda_ratio": <value>, "interest_coverage_ratio": <value>}\n\n'
+            "Net income should be in millions. All ratios should be decimal values "
+            "(e.g., 0.65 for 65%).\n\n"
+            f"Here is the financial report excerpt:\n\n{pdf_text}"
+        )
+
+        messages = [
+            {"role": "system", "content": system_content},
+            {"role": "user", "content": user_content},
+        ]
+
+        raw = self.chat(messages, cfg)
+
+        try:
+            import json
+
+            data = json.loads(raw.strip())
+        except json.JSONDecodeError as exc:
+            # Try to extract JSON from markdown code blocks
+            import re
+
+            match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", raw, re.DOTALL)
+            if match:
+                data = json.loads(match.group(1))
+            else:
+                raise ValueError(
+                    f"Failed to parse LLM response as JSON: {exc}"
+                ) from exc
+
+        required_keys = [
+            "net_income",
+            "cost_to_income_ratio",
+            "quick_ratio",
+            "debt_to_equity_ratio",
+            "debt_to_assets_ratio",
+            "debt_to_capital_ratio",
+            "debt_to_ebitda_ratio",
+            "interest_coverage_ratio",
+        ]
+
+        missing = [k for k in required_keys if k not in data]
+        if missing:
+            raise ValueError(f"LLM response missing keys: {missing}")
+
+        # Pretty print the extracted data
+        self._pretty_print_financial_data(data)
+
+        return data
+
+    def _pretty_print_financial_data(self, data: dict) -> None:
+        """Pretty print extracted financial data."""
+
+        def format_value(val, fmt_type="ratio", show_pct=False):
+            """Format a value or return N/A if None."""
+            if val is None:
+                return "N/A".rjust(12 if not show_pct else 28)
+            if fmt_type == "currency":
+                return f"${val:>12.2f}M"
+            elif show_pct:
+                return f"{val:>12.4f} ({val * 100:>6.2f}%)"
+            else:
+                return f"{val:>12.4f}"
+
+        lines = ["=" * 70, "Extracted Financial Data", "=" * 70]
+
+        lines.append("\nINCOME METRICS:")
+        lines.append("-" * 70)
+        lines.append(
+            f"  Net Income:                    "
+            f"{format_value(data.get('net_income'), 'currency')}"
+        )
+
+        lines.append("\nFINANCIAL RATIOS:")
+        lines.append("-" * 70)
+
+        financial_ratios = [
+            ("Cost-to-Income Ratio:", "cost_to_income_ratio", True),
+            ("Quick Ratio:", "quick_ratio", False),
+            ("Interest Coverage Ratio:", "interest_coverage_ratio", False),
+        ]
+
+        for label, key, show_pct in financial_ratios:
+            lines.append(
+                f"  {label:30} {format_value(data.get(key), show_pct=show_pct)}"
+            )
+
+        lines.append("\nLEVERAGE RATIOS:")
+        lines.append("-" * 70)
+
+        leverage_ratios = [
+            ("Debt-to-Equity Ratio:", "debt_to_equity_ratio", True),
+            ("Debt-to-Assets Ratio:", "debt_to_assets_ratio", True),
+            ("Debt-to-Capital Ratio:", "debt_to_capital_ratio", True),
+            ("Debt-to-EBITDA Ratio:", "debt_to_ebitda_ratio", False),
+        ]
+
+        for label, key, show_pct in leverage_ratios:
+            lines.append(
+                f"  {label:30} {format_value(data.get(key), show_pct=show_pct)}"
+            )
+
+        lines.append("=" * 70)
+
+        print("\n".join(lines))
+
 
 if __name__ == "__main__":
     client = LLMClient()
-
-    df_example = pd.DataFrame(
-        {
-            "revenue": [100, 120, 150, 170],
-            "ebitda": [20, 25, 30, 32],
-        },
-        index=pd.period_range(start="2022Q1", periods=4, freq="Q"),
-    )
-
-    cfg_oa = LLMConfig(
+    llm_config = LLMConfig(
         provider="openai",
-        model="gpt-5-nano",
-        temperature=0.2,
-        max_tokens=512,
+        model="gpt-5-mini",
     )
 
-    print("=== Forecast next quarter (demo) ===")
-    try:
-        print(client.forecast_next_quarter(df_example, cfg_oa))
-    except Exception as exc:
-        print(f"Forecast call failed: {exc}")
-        print(f"Forecast call failed: {exc}")
+    data = client.parse_annual_report(
+        pdf_path="/scratch/datasets/jpm/gm_annual_report.pdf",
+        cfg=llm_config,
+        page_range=(61, 64),
+    )

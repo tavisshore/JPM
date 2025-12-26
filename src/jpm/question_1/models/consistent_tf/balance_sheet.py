@@ -78,19 +78,17 @@ class BalanceSheet:
         loan_summary = loanbook.book.schedule_summary(year)
         short_term_debt_cb = loan_summary.short_term.ending_balance
         long_term_debt_cb = loan_summary.long_term.ending_balance
-        print(f"year: {year}\n")
-        print()
-        print(loan_summary)
-        print()
+
         current_liabilities = ap_it + apr + short_term_debt_cb
         total_liabilities = current_liabilities + long_term_debt_cb
 
         equity_cb_vals = []
         eq_cb_prev = 0.0
-        for y in years:
+        for y in range(0, year + 1):
             eq_cb_curr = eq_cb_prev + transactions.owner.invested_equity.loc[y]
             equity_cb_vals.append(eq_cb_curr)
             eq_cb_prev = eq_cb_curr
+
         equity_investment_cb = equity_cb_vals[-1]
 
         retained_earnings_is = income_statement.cre
@@ -138,6 +136,133 @@ class BalanceSheet:
             check=check,
         )
 
+    @staticmethod
+    def _to_float(x: Any, idx: Optional[int] = None) -> float:
+        """
+        Convert a tf.Tensor (scalar or 1D) or numeric value to a Python float.
+
+        - Scalars: ignore idx
+        - 1D tensors/arrays: require idx (e.g. -1 for last year)
+        """
+        if isinstance(x, tf.Tensor):
+            arr = x.numpy()
+        else:
+            # Plain Python/NumPy scalar
+            return float(x)
+
+        if arr.shape == ():  # scalar
+            return float(arr.item())
+
+        if idx is None:
+            raise ValueError("idx is required for non-scalar fields")
+
+        return float(arr[idx])
+
+    def pretty_print(self, idx: int = -1) -> None:
+        """
+        Nicely print this BalanceSheet instance for a single year (chosen by
+        idx for vector fields like equity_investment_cb,
+        total_liabilities_and_equity, etc.).
+
+        Parameters
+        ----------
+        idx : int, default -1
+            Index into 1D fields (e.g. last element for year 4 if you have 0..4).
+        """
+        # Scalars
+        year = BalanceSheet._to_float(self.year)
+        cash = BalanceSheet._to_float(self.cash_cb)
+        ar = BalanceSheet._to_float(self.ar_it)
+        inventory = BalanceSheet._to_float(self.inventory_it)
+        app = BalanceSheet._to_float(self.app_it)
+        st_inv = BalanceSheet._to_float(self.st_investments_cb)
+        current_assets = BalanceSheet._to_float(self.current_assets)
+        net_fixed_assets = BalanceSheet._to_float(self.net_fixed_assets_it)
+        total_assets = BalanceSheet._to_float(self.total_assets)
+
+        ap = BalanceSheet._to_float(self.ap_it)
+        apr = BalanceSheet._to_float(self.apr)
+        std = BalanceSheet._to_float(self.short_term_debt_cb)
+        current_liabilities = BalanceSheet._to_float(self.current_liabilities)
+        ltd = BalanceSheet._to_float(self.long_term_debt_cb)
+        total_liabilities = BalanceSheet._to_float(self.total_liabilities)
+
+        current_year_ni = BalanceSheet._to_float(self.current_year_ni)
+
+        # Vector fields – take a specific index
+        equity_investment = BalanceSheet._to_float(self.equity_investment_cb, idx)
+        retained_earnings = BalanceSheet._to_float(
+            self.retained_earnings_is, 0
+        )  # shape (1,) in your printout
+        repurchase = BalanceSheet._to_float(self.repurchase_of_equity, idx)
+        total_liab_and_equity = BalanceSheet._to_float(
+            self.total_liabilities_and_equity, idx
+        )
+        check_val = BalanceSheet._to_float(self.check, idx)
+
+        # Derived equity (just for clarity)
+        equity_from_components = equity_investment + retained_earnings - repurchase
+        implied_equity_from_total = total_liab_and_equity - total_liabilities
+
+        imbalance = total_assets - total_liab_and_equity
+
+        lines = []
+        lines.append(f"Balance Sheet (year {int(year)}, idx={idx})")
+        lines.append("-" * 60)
+
+        # Assets
+        lines.append("ASSETS")
+        lines.append("  Current assets:")
+        lines.append(f"    Cash                         {cash:10.4f}")
+        lines.append(f"    Accounts receivable          {ar:10.4f}")
+        lines.append(f"    Inventory                    {inventory:10.4f}")
+        lines.append(f"    Other current (APP)          {app:10.4f}")
+        lines.append(f"    Short-term investments       {st_inv:10.4f}")
+        lines.append(f"    -> Current assets (given)    {current_assets:10.4f}")
+        lines.append("")
+        lines.append("  Non-current assets:")
+        lines.append(f"    Net fixed assets             {net_fixed_assets:10.4f}")
+        lines.append("")
+        lines.append(f"  TOTAL ASSETS                   {total_assets:10.4f}")
+        lines.append("")
+
+        # Liabilities
+        lines.append("LIABILITIES")
+        lines.append("  Current liabilities:")
+        lines.append(f"    Accounts payable             {ap:10.4f}")
+        lines.append(f"    APR                          {apr:10.4f}")
+        lines.append(f"    Short-term debt              {std:10.4f}")
+        lines.append(f"    -> Current liabilities       {current_liabilities:10.4f}")
+        lines.append("")
+        lines.append("  Long-term liabilities:")
+        lines.append(f"    Long-term debt               {ltd:10.4f}")
+        lines.append("")
+        lines.append(f"  TOTAL LIABILITIES              {total_liabilities:10.4f}")
+        lines.append("")
+
+        # Equity
+        lines.append("EQUITY")
+        lines.append(f"  Equity investment[idx]         {equity_investment:10.4f}")
+        lines.append(f"  Retained earnings              {retained_earnings:10.4f}")
+        lines.append(f"  Repurchase of equity[idx]      {repurchase:10.4f}")
+        lines.append(f"  -> Equity (components)         {equity_from_components:10.4f}")
+        lines.append("")
+        lines.append(f"  Liab + Equity (given)[idx]     {total_liab_and_equity:10.4f}")
+        lines.append(
+            f"  Implied equity = L+E - L       {implied_equity_from_total:10.4f}"
+        )
+        lines.append("")
+
+        # Check / imbalance
+        lines.append("CHECKS")
+        lines.append(f"  Assets - (Liabilities + Equity)[idx] = {imbalance:10.4f}")
+        lines.append(f"  check[idx] field                      = {check_val:10.4f}")
+        lines.append(
+            f"  Current year NI                       = {current_year_ni:10.4f}"
+        )
+
+        print("\n".join(lines))
+
 
 def _to_float(x: Any, idx: Optional[int] = None) -> float:
     """
@@ -164,7 +289,8 @@ def _to_float(x: Any, idx: Optional[int] = None) -> float:
 def pretty_print_balance_sheet(bs, idx: int = -1) -> None:
     """
     Nicely print a BalanceSheet instance for a single year (chosen by idx
-    for vector fields like equity_investment_cb, total_liabilities_and_equity, etc.).
+    for vector fields like equity_investment_cb,
+    total_liabilities_and_equity, etc.).
 
     Parameters
     ----------
