@@ -148,6 +148,7 @@ class CashBudget:
         cls,
         year: int,
         income_statement: "IncomeStatement",
+        previous_is: "IncomeStatement",
         sales_purchases: "SalesPurchasesSchedule",
         expenses: "AdminSellingExpenses",
         dep_and_investment: "DepreciationSchedule",
@@ -211,7 +212,7 @@ class CashBudget:
             forecast=forecast,
         )
         payments_to_owners = transactions.owner.owner_payments(
-            year, income_statement, dep_and_investment, policy
+            year, previous_is, dep_and_investment, policy
         )
 
         lt_loan = 0.0
@@ -254,14 +255,14 @@ class CashBudget:
             ncb_investment_assets=tf.constant([ncb_inv], dtype=tf.float32),
             ncb_after_capex=tf.constant([ncb_after_capex], dtype=tf.float32),
             st_loan_inflow=tf.constant([st_loan], dtype=tf.float32),
-            lt_loan_inflow=tf.constant([lt_loan], dtype=tf.float32),
+            lt_loan_inflow=tf.expand_dims(tf.cast(lt_loan, tf.float32), 0),
             principal_st_loan=tf.constant([st_loan_pp], dtype=tf.float32),
             interest_st_loan=tf.constant([st_loan_ip], dtype=tf.float32),
             total_st_loan_payment=tf.constant([st_loan_total], dtype=tf.float32),
             principal_lt_loan=tf.constant([lt_loan_pp], dtype=tf.float32),
             interest_lt_loan=tf.constant([lt_loan_ip], dtype=tf.float32),
             total_loan_payment=tf.constant([total_loan_payment], dtype=tf.float32),
-            ncb_financing_activities=tf.constant(
-                [st_loan + lt_loan - total_loan_payment], dtype=tf.float32
+            ncb_financing_activities=tf.expand_dims(
+                tf.cast(st_loan + lt_loan - total_loan_payment, tf.float32), 0
             ),
         )
