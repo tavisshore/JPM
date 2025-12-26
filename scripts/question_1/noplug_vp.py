@@ -29,7 +29,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from jpm.question_1.misc import as_series
+from jpm.question_1 import as_series
 from jpm.question_1.models.no_plug import (
     BalanceSheet,
     CashBudget,

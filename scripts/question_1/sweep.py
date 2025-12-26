@@ -7,10 +7,7 @@ from copy import deepcopy
 
 import tensorflow as tf
 
-from jpm.question_1.config import Config
-from jpm.question_1.data.ed import EdgarDataLoader
-from jpm.question_1.misc import set_seed
-from jpm.question_1.models.lstm import LSTMForecaster
+from jpm.question_1 import Config, EdgarDataLoader, LSTMForecaster, set_seed
 
 GRID = {
     "data.batch_size": [32],

@@ -44,6 +44,11 @@ export OPENAI_API_KEY="your_api_key"
     ```bash
     python scripts/question_1/eval_ensemble.py
     ```
+- **Annual Report Parsing:**
+    This script uses the same LLM client to parse pdf annual reports, extracting key financial information. Available files are stored within `assets/`:
+    ```bash
+    python scripts/question_1/parse_reports.py --company ['alibaba', 'exxon', ...]
+    ```
 
 Downloaded SEC statements are cached within ``.
 
