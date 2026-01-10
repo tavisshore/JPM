@@ -1,5 +1,4 @@
 # import os
-import json
 import math
 import os
 import re
@@ -22,6 +21,7 @@ from jpm.question_1.data.utils import (
     remove_duplicate_columns,
     xbrl_to_raw,
 )
+from jpm.question_1.data.vis import pretty_print_full_mapping
 from jpm.question_1.misc import get_leaf_keys
 
 # SEC requires user identification via email
@@ -723,14 +723,12 @@ class EdgarData:
             kind="cash_flow",
         )
 
-        breakpoint()
-
         self.data = pd.concat(
             [self.bs_df, self.is_df, self.cf_df], axis=1, join="inner"
         )
 
         # Get credit ratings, calculate ratios, and add col to self.data
-        self.get_ratings()
+        # self.get_ratings()
 
         if self.verbose:
             for col in self.data.columns:
@@ -821,15 +819,8 @@ class EdgarData:
                 organised_features, features_cache_path
             )
 
-        # if self.verbose:
-        # pretty_print_full_mapping(organised_features, show_summary=True)
-
-        print()
-        print(f"Input features: {len(input_columns)} for {kind}")
-        for col in input_columns:
-            print(f"- {col}")
-        print()
-        print(json.dumps(organised_features, indent=2))
+        if self.verbose:
+            pretty_print_full_mapping(organised_features, show_summary=True)
 
         # Create new DataFrame with organised columns
         mapped_df = remap_financial_dataframe(cleaned_df, organised_features)
