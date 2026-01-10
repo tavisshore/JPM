@@ -723,6 +723,19 @@ class EdgarData:
             kind="cash_flow",
         )
 
+        # Remove duplicate columns with priority: BS > IS > CF
+        # TODO: Check this is the ideal order
+        bs_cols = set(self.bs_df.columns)
+        is_cols = set(self.is_df.columns)
+        cf_cols = set(self.cf_df.columns)
+
+        # Remove IS columns that are also in BS
+        self.is_df = self.is_df.drop(columns=is_cols.intersection(bs_cols))
+        # Remove CF columns that are also in BS or IS
+        self.cf_df = self.cf_df.drop(
+            columns=cf_cols.intersection(bs_cols.union(is_cols))
+        )
+        # Combine all statements
         self.data = pd.concat(
             [self.bs_df, self.is_df, self.cf_df], axis=1, join="inner"
         )
@@ -962,5 +975,5 @@ class EdgarDataset:
 if __name__ == "__main__":
     config = Config()
     data = EdgarData(config=config, overwrite=False, verbose=False)
-    dataset = EdgarDataset(edgar_data=data, target="lstm", verbose=False)
+    # dataset = EdgarDataset(edgar_data=data, target="lstm", verbose=False)
     # print(data.data.head(1).T)
