@@ -13,6 +13,32 @@ import tensorflow as tf
 
 Nested = Dict[str, Any] | List[str]
 
+# Encode ratings
+RATINGS_MAPPINGS = {
+    "AAA": 1,
+    "AA+": 2,
+    "AA": 3,
+    "AA-": 4,
+    "A+": 5,
+    "A": 6,
+    "A-": 7,
+    "BBB+": 8,
+    "BBB": 9,
+    "BBB-": 10,
+    "BB+": 11,
+    "BB": 12,
+    "BB-": 13,
+    "B+": 14,
+    "B": 15,
+    "B-": 16,
+    "CCC+": 17,
+    "CCC": 18,
+    "CCC-": 19,
+    "CC": 20,
+    "C": 21,
+    "D": 22,
+}
+
 
 def find_subtree(d: Nested, target: str) -> Nested | None:
     """Locate the subtree whose key == target."""
@@ -66,6 +92,21 @@ def get_leaf_keys(d: Nested) -> List[str]:
             out.extend(get_leaf_keys(v))
         elif isinstance(v, list):
             out.append(k)
+    return out
+
+
+def get_leaf_paths(d: Nested, prefix: tuple = ()) -> List[tuple]:
+    """Return all paths from root to leaf values as tuples of keys."""
+    if isinstance(d, list):
+        return []
+
+    out = []
+    for k, v in d.items():
+        current_path = prefix + (k,)
+        if isinstance(v, dict):
+            out.extend(get_leaf_paths(v, current_path))
+        elif isinstance(v, list):
+            out.append(current_path)
     return out
 
 

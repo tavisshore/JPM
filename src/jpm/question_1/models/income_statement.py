@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Dict
 
 from jpm.question_1.config import Config
-from jpm.question_1.data.ed import EdgarDataLoader
+from jpm.question_1.data.ed import EdgarData
 from jpm.question_1.misc import format_money
 from jpm.question_1.models.metrics import Metric, TickerResults
 from jpm.question_1.vis import build_baseline_rows, colour, colour_mae, print_table
@@ -33,9 +33,7 @@ def _default_metric() -> "Metric":
 class IncomeStatement:
     """View helper that aggregates and prints income statement metrics."""
 
-    def __init__(
-        self, config: Config, data: EdgarDataLoader, results: TickerResults
-    ) -> None:
+    def __init__(self, config: Config, data: EdgarData, results: TickerResults) -> None:
         self.config = config
         self.results = results
 

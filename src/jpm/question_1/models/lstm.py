@@ -7,8 +7,8 @@ import tensorflow_probability as tfp
 
 from jpm.question_1.clients.llm_client import LLMClient
 from jpm.question_1.config import Config, LLMConfig, ModelConfig
-from jpm.question_1.data.ed import EdgarDataLoader
-from jpm.question_1.misc import set_seed
+from jpm.question_1.data.ed import EdgarData, EdgarDataset
+from jpm.question_1.misc import RATINGS_MAPPINGS, set_seed
 from jpm.question_1.models.losses import EnforceBalance, bs_loss
 from jpm.question_1.models.metrics import (
     Metric,
@@ -24,6 +24,8 @@ from jpm.question_1.vis import (
     print_table,
 )
 
+RATINGS_MAPPINGS = RATINGS_MAPPINGS
+
 # Keep keras tied to tf.keras so unit tests can patch tf.keras.* as expected
 keras = tf.keras
 
@@ -34,9 +36,10 @@ tfd = tfp.distributions
 class LSTMForecaster:
     """Wrapper around a Keras LSTM for balance sheet forecasting."""
 
-    def __init__(self, config: Config, data: EdgarDataLoader) -> None:
+    def __init__(self, config: Config, data: EdgarData, dataset: EdgarDataset) -> None:
         self.config = config
         self.data = data
+        self.dataset = dataset
         self.model = self._build_model()
         self._compile_model()
 
@@ -45,7 +48,7 @@ class LSTMForecaster:
 
     def _build_model(self) -> keras.Model:
         inputs = keras.layers.Input(
-            shape=(self.config.data.lookback, self.data.num_features),
+            shape=(self.config.data.lookback, self.dataset.num_features),
             dtype="float32",
             name="inputs",
         )
@@ -95,8 +98,8 @@ class LSTMForecaster:
 
             outputs = EnforceBalance(
                 feature_mappings=self.data.feature_mappings,
-                feature_means=self.data.target_mean,
-                feature_stds=self.data.target_std,
+                feature_means=self.dataset.target_mean,
+                feature_stds=self.dataset.target_std,
                 slack_name="Accumulated Other Comprehensive Income (AOCI)",
                 feature_names=self.data.name_to_target_idx,
             )(outputs)
@@ -118,8 +121,8 @@ class LSTMForecaster:
             )
         else:
             loss_fn = bs_loss(
-                feature_means=self.data.target_mean,
-                feature_stds=self.data.target_std,
+                feature_means=self.dataset.target_mean,
+                feature_stds=self.dataset.target_std,
                 feature_mappings=self.data.feature_mappings,
                 config=self.config.loss,
             )
@@ -144,7 +147,7 @@ class LSTMForecaster:
     def _kl_weight(self) -> float:
         """Approximate KL weight based on dataset cardinality."""
         try:
-            cardinality = int(self.data.train_dataset.cardinality().numpy())
+            cardinality = int(self.dataset.train_dataset.cardinality().numpy())
         except Exception:
             cardinality = -1
         if cardinality <= 0:
@@ -171,7 +174,7 @@ class LSTMForecaster:
         checkpoint_cb = keras.callbacks.ModelCheckpoint(
             filepath=self.config.training.checkpoint_path
             / "best_model_ckpt.weights.h5",
-            monitor="val_loss" if self.data.val_dataset is not None else "loss",
+            monitor="val_loss" if self.dataset.val_dataset is not None else "loss",
             save_best_only=True,
             save_weights_only=True,
         )
@@ -179,8 +182,8 @@ class LSTMForecaster:
             checkpoint_cb._implements_train_batch_hooks = lambda: False
 
         history = self.model.fit(
-            self.data.train_dataset,
-            validation_data=self.data.val_dataset,
+            self.dataset.train_dataset,
+            validation_data=self.dataset.val_dataset,
             epochs=self.config.training.epochs,
             callbacks=[checkpoint_cb],
             **kwargs,
@@ -211,7 +214,7 @@ class LSTMForecaster:
         if stage not in {"val", "train"}:
             raise ValueError("stage must be 'val' or 'train'")
 
-        ds = self.data.val_dataset if stage == "val" else self.data.train_dataset
+        ds = self.dataset.val_dataset if stage == "val" else self.dataset.train_dataset
         if ds is None:
             raise ValueError(f"{stage} dataset is not available for evaluation")
 
@@ -334,9 +337,9 @@ class LSTMForecaster:
     def _unscale(
         self, y_pred: np.ndarray, y_gt: np.ndarray, history: np.ndarray
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-        y_pred_unscaled = y_pred * self.data.target_std + self.data.target_mean
-        y_gt_unscaled = y_gt * self.data.target_std + self.data.target_mean
-        history_unscaled = history * self.data.target_std + self.data.target_mean
+        y_pred_unscaled = y_pred * self.dataset.target_std + self.dataset.target_mean
+        y_gt_unscaled = y_gt * self.dataset.target_std + self.dataset.target_mean
+        history_unscaled = history * self.dataset.target_std + self.dataset.target_mean
         return y_pred_unscaled, y_gt_unscaled, history_unscaled
 
     def _prediction_index(self, stage: str, count: int, for_history: bool = False):
@@ -388,7 +391,7 @@ class LSTMForecaster:
                 gt=float(y_gt_unscaled[:, idx].mean()),
                 std=float(per_feature_std[idx]),
             )
-            for name, idx in self.data.feat_to_idx.items()
+            for name, idx in self.dataset.feat_to_idx.items()
         }
         return feature_metrics, per_feature_std
 
@@ -469,7 +472,7 @@ class LSTMForecaster:
             net_income_baseline_pred=net_income_results["baseline_pred"],
             pred_std={
                 name: float(per_feature_std[idx])
-                for name, idx in self.data.feat_to_idx.items()
+                for name, idx in self.dataset.feat_to_idx.items()
             },
         )
 
@@ -487,7 +490,7 @@ class LSTMForecaster:
         net_income_baseline_pred: dict[str, float] = {}
         net_income_key = "Net Income (Loss)"
 
-        ni_idx = self.data.feat_to_idx[net_income_key]
+        ni_idx = self.dataset.feat_to_idx[net_income_key]
         net_income_pred = float(y_pred_unscaled[:, ni_idx].mean())
         net_income_gt = float(y_gt_unscaled[:, ni_idx].mean())
         net_income_model_mae = float(
@@ -580,7 +583,7 @@ if __name__ == "__main__":
 
     config = Config(data=data_cfg, model=model_cfg, training=train_cfg, loss=loss_cfg)
 
-    data = EdgarDataLoader(config=config)
+    data = EdgarData(config=config)
 
     model = LSTMForecaster(config=config, data=data)
     model.fit()

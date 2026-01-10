@@ -10,7 +10,8 @@ from jpm.question_1 import (
     BalanceSheet,
     Config,
     DataConfig,
-    EdgarDataLoader,
+    EdgarData,
+    EdgarDataset,
     IncomeStatement,
     LLMConfig,
     LossConfig,
@@ -74,9 +75,10 @@ for idx, ticker in enumerate(tickers, 1):
 
     config.data.ticker = ticker
 
-    data = EdgarDataLoader(config=config)
+    data = EdgarData(config=config)
+    dataset = EdgarDataset(edgar_data=data, target="lstm")
 
-    model = LSTMForecaster(config=config, data=data)
+    model = LSTMForecaster(config=config, data=data, dataset=dataset)
 
     model.fit(verbose=0)
 

@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Dict
 
 from jpm.question_1.config import Config
-from jpm.question_1.data.ed import EdgarDataLoader
+from jpm.question_1.data.ed import EdgarData
 from jpm.question_1.misc import format_money
 from jpm.question_1.models.metrics import TickerResults
 from jpm.question_1.vis import colour, print_table
@@ -52,7 +52,7 @@ class BalanceSheet:
     def __init__(
         self,
         config: Config,
-        data: EdgarDataLoader,
+        data: EdgarData,
         results: TickerResults,
     ) -> None:
         self.config = config

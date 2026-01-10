@@ -1,4 +1,3 @@
-
 from colorama import Back, Fore, Style, init
 
 # Initialize colorama
@@ -33,9 +32,9 @@ def pretty_print_mapping(mapping_dict, indent=0):
         if isinstance(value, dict):
             # Section header (like "Assets", "Current", etc.)
             if indent == 0:
-                print(f"\n{Fore.CYAN}{Back.BLACK}{'='*80}{Style.RESET_ALL}")
+                print(f"\n{Fore.CYAN}{Back.BLACK}{'=' * 80}{Style.RESET_ALL}")
                 print(f"{Fore.CYAN}{Back.BLACK} {key.upper()} {Style.RESET_ALL}")
-                print(f"{Fore.CYAN}{Back.BLACK}{'='*80}{Style.RESET_ALL}\n")
+                print(f"{Fore.CYAN}{Back.BLACK}{'=' * 80}{Style.RESET_ALL}\n")
             else:
                 print(f"{indent_str}{Fore.MAGENTA}▼ {key}{Style.RESET_ALL}")
 
@@ -97,21 +96,21 @@ def print_mapping_summary(mapping_dict):
     mapped, unmapped, old_features = count_mappings(mapping_dict)
     total_new = mapped + unmapped
 
-    print(f"\n{Fore.CYAN}{Back.BLACK}{'='*80}{Style.RESET_ALL}")
+    print(f"\n{Fore.CYAN}{Back.BLACK}{'=' * 80}{Style.RESET_ALL}")
     print(f"{Fore.CYAN}{Back.BLACK} MAPPING SUMMARY {Style.RESET_ALL}")
-    print(f"{Fore.CYAN}{Back.BLACK}{'='*80}{Style.RESET_ALL}\n")
+    print(f"{Fore.CYAN}{Back.BLACK}{'=' * 80}{Style.RESET_ALL}\n")
 
     print(f"{Fore.WHITE}Total New Features: {Fore.CYAN}{total_new}{Style.RESET_ALL}")
     print(
-        f"{Fore.GREEN}  ✓ Mapped: {mapped} ({100*mapped/total_new:.1f}%){Style.RESET_ALL}"
+        f"{Fore.GREEN}  ✓ Mapped: {mapped} ({100 * mapped / total_new:.1f}%){Style.RESET_ALL}"
     )
     print(
-        f"{Fore.RED}  ✗ Unmapped: {unmapped} ({100*unmapped/total_new:.1f}%){Style.RESET_ALL}"
+        f"{Fore.RED}  ✗ Unmapped: {unmapped} ({100 * unmapped / total_new:.1f}%): {mapping_dict['__unmapped__']} {Style.RESET_ALL}"
     )
     print(
         f"{Fore.WHITE}Total Old Features Used: {Fore.CYAN}{len(old_features)}{Style.RESET_ALL}"
     )
-    print(f"\n{Fore.CYAN}{'='*80}{Style.RESET_ALL}\n")
+    print(f"\n{Fore.CYAN}{'=' * 80}{Style.RESET_ALL}\n")
 
 
 def pretty_print_full_mapping(mapping_dict, show_summary=True):
@@ -126,13 +125,13 @@ def pretty_print_full_mapping(mapping_dict, show_summary=True):
         Whether to show summary statistics at the end
     """
 
-    print(f"\n{Fore.CYAN}{Style.BRIGHT}{'#'*80}{Style.RESET_ALL}")
-    print(f"{Fore.CYAN}{Style.BRIGHT}#{' '*78}#{Style.RESET_ALL}")
+    print(f"\n{Fore.CYAN}{Style.BRIGHT}{'#' * 80}{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}{Style.BRIGHT}#{' ' * 78}#{Style.RESET_ALL}")
     print(
-        f"{Fore.CYAN}{Style.BRIGHT}#  FEATURE MAPPING: OLD → NEW{' '*48}#{Style.RESET_ALL}"
+        f"{Fore.CYAN}{Style.BRIGHT}#  FEATURE MAPPING: OLD → NEW{' ' * 48}#{Style.RESET_ALL}"
     )
-    print(f"{Fore.CYAN}{Style.BRIGHT}#{' '*78}#{Style.RESET_ALL}")
-    print(f"{Fore.CYAN}{Style.BRIGHT}{'#'*80}{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}{Style.BRIGHT}#{' ' * 78}#{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}{Style.BRIGHT}{'#' * 80}{Style.RESET_ALL}")
 
     pretty_print_mapping(mapping_dict)
 

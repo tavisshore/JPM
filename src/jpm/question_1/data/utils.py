@@ -30,11 +30,32 @@ def xbrl_to_snake(name: str) -> str:
 
 
 def xbrl_to_raw(name: str) -> str:
-    # Drop common XBRL prefixes (e.g., us-gaap_) and normalize to snake_case
+    """
+    Remove XBRL prefixes and convert to snake_case.
+
+    Handles patterns like:
+    - us-gaap_PropertyPlantAndEquipment -> property plant and equipment
+    - amzn_LeaseLiabilityNoncurrent -> lease liability noncurrent
+    - dei_EntityRegistrantName -> entity registrant name
+
+    Args:
+        name: XBRL field name with prefix
+
+    Returns:
+        Normalized snake_case string without prefix
+    """
     if not isinstance(name, str) or not name:
-        raise ValueError("xbrl_to_snake expects a non-empty string")
-    name = re.sub(r"^[^-]+-[^_]+_", "", name)
+        raise ValueError("xbrl_to_raw expects a non-empty string")
+
+    # Remove XBRL namespace prefixes (e.g., us-gaap_, amzn_, dei_)
+    # Matches: <prefix>-<anything>_ OR <prefix>_
+    # Examples: us-gaap_, amzn_, dei_, ifrs-full_
+    name = re.sub(r"^[a-z0-9]+-[^_]+_", "", name)  # Handles us-gaap_, ifrs-full_
+    name = re.sub(r"^[a-z0-9]+_", "", name)  # Handles amzn_, dei_, etc.
+
+    # Convert CamelCase to space-separated
     s = re.sub(r"(?<!^)(?=[A-Z])", " ", name)
+
     return s.lower()
 
 
