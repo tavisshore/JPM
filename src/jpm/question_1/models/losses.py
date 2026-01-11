@@ -105,7 +105,7 @@ class EnforceBalance(Layer):
         feature_mappings,
         feature_means,
         feature_stds,
-        slack_name="accumulated_other_comprehensive_income_loss_net_of_tax",
+        slack_name="Accumulated Other Comprehensive Income",
         feature_names=None,
         **kwargs,
     ):
