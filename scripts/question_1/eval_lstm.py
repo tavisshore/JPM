@@ -69,9 +69,9 @@ all_config_results = {}
 for var_idx, variation in enumerate(CONFIG_VARIATIONS, 1):
     config_name = f"learn_identity={variation['learn_identity']}, \
         enforce_balance={variation['enforce_balance']}"
-    print(f"\n{'=' * 60}")
+    print(f"\n{'=' * 65}")
     print(f"Config {var_idx}/{len(CONFIG_VARIATIONS)}: {config_name}")
-    print(f"{'=' * 60}")
+    print(f"{'=' * 65}")
 
     # Create loss config with this variation
     loss_cfg_var = LossConfig(

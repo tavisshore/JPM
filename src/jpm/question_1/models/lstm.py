@@ -488,7 +488,7 @@ class LSTMForecaster:
         net_income_pred = 0.0
         net_income_gt = 0.0
         net_income_baseline_pred: dict[str, float] = {}
-        net_income_key = "Net Income (Loss)"
+        net_income_key = "Net Income"
 
         ni_idx = self.dataset.feat_to_idx[net_income_key]
         net_income_pred = float(y_pred_unscaled[:, ni_idx].mean())
