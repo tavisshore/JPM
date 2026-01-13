@@ -62,6 +62,7 @@ def xbrl_to_raw(name: str) -> str:
 def _is_consecutive_quarters(index, start: int, length: int) -> bool:
     """
     Check if `length` periods starting at `start` are consecutive quarters.
+    Handles both ascending (oldest first) and descending (newest first) order.
 
     Parameters:
     -----------
@@ -80,11 +81,22 @@ def _is_consecutive_quarters(index, start: int, length: int) -> bool:
     if index is None:
         return True  # No index provided, assume consecutive
 
-    for i in range(length - 1):
-        current = index[start + i]
-        next_period = index[start + i + 1]
-        # Check if next period is exactly 1 quarter after current
-        if next_period != current + 1:
+    if length < 2:
+        return True
+
+    # Use ordinal values for comparison (works with PeriodIndex)
+    first_ord = index[start].ordinal
+    second_ord = index[start + 1].ordinal
+    expected_diff = second_ord - first_ord  # +1 for ascending, -1 for descending
+
+    if abs(expected_diff) != 1:
+        return False  # First two aren't consecutive
+
+    # Check remaining periods maintain same direction
+    for i in range(1, length - 1):
+        current_ord = index[start + i].ordinal
+        next_ord = index[start + i + 1].ordinal
+        if next_ord - current_ord != expected_diff:
             return False
     return True
 

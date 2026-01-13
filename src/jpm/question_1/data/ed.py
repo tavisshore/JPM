@@ -1000,12 +1000,15 @@ class EdgarDataset:
         self._set_scaler_stats(scaler)
 
         if self.target == "lstm":
+            print(f"\nin: {self.data.index}\n")
             X_train, y_train, X_test, y_test = build_windows(
                 config=self.config,
                 X=X_scaled,
                 tgt_indices=self.tgt_indices,
                 index=self.data.index,
             )
+
+            print(X_train.shape, y_train.shape, X_test.shape, y_test.shape)
 
             X_train, X_test = self._apply_seasonal_weight(X_train, X_test)
             self.X_train, self.y_train = X_train, y_train
