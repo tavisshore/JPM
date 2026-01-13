@@ -100,7 +100,6 @@ class LSTMForecaster:
                 feature_mappings=self.data.feature_mappings,
                 feature_means=self.dataset.target_mean,
                 feature_stds=self.dataset.target_std,
-                slack_name="Accumulated Other Comprehensive Income",
                 feature_names=self.data.name_to_target_idx,
             )(outputs)
 

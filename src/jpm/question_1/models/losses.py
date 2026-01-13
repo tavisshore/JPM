@@ -2,6 +2,7 @@ import tensorflow as tf
 from tensorflow.keras.layers import Layer
 
 from jpm.question_1.config import LossConfig
+from jpm.question_1.data.structures import get_slack_name
 
 
 def bs_loss(
@@ -105,7 +106,6 @@ class EnforceBalance(Layer):
         feature_mappings,
         feature_means,
         feature_stds,
-        slack_name="Accumulated Other Comprehensive Income",
         feature_names=None,
         **kwargs,
     ):
@@ -127,6 +127,8 @@ class EnforceBalance(Layer):
 
         if feature_names is None:
             raise ValueError("feature_names required to find slack index")
+
+        slack_name = get_slack_name()
 
         if slack_name not in feature_names:
             raise ValueError(

@@ -54,8 +54,8 @@ CONFIG_VARIATIONS = [
 ]
 
 tickers = [
-    "AAPL",
     "MSFT",
+    "AAPL",
     "AMZN",
     "AVGO",
     "META",

@@ -56,6 +56,33 @@ MONTH_ABBR = {
 }
 
 
+def drop_constants(df, verbose=False):
+    # Drop columns that are all NaN first (avoids warnings from nanstd)
+    all_nan_cols = df.columns[df.isna().all()].tolist()
+    if all_nan_cols:
+        if verbose:
+            print(f"Dropping {len(all_nan_cols)} all-NaN columns: {all_nan_cols}")
+        df = df.drop(columns=all_nan_cols)
+
+    # Check for constant columns, treating NaN as missing (not as a value)
+    stds = df.apply(lambda x: np.nanstd(x.astype(float)))
+    constant_cols = stds[stds == 0].index.tolist()
+    if constant_cols:
+        if verbose:
+            print(f"Dropping {len(constant_cols)} constant columns: {constant_cols}")
+        df = df.drop(columns=constant_cols)
+
+    # Drop rows that are mostly NaN (should be rare after inner join)
+    df = df.dropna(axis=0, thresh=int(0.8 * len(df.columns)))
+
+    # If Income Before Taxes in columns, drop rows where it's 0
+    if "Income Before Taxes" in df.columns:
+        df = df[df["Income Before Taxes"].fillna(0) != 0]
+
+    # NOTE: fillna(0) moved to after all variance checks in _load_or_fetch_data
+    return df
+
+
 def calculate_credit_ratios(df):
     def col(name):
         return (
@@ -343,6 +370,67 @@ def lei_to_ticker(lei):
     return None
 
 
+def bs_identity_checker(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.fillna(0)
+
+    # Assets
+    assets = (
+        df["Cash and Equivalents"]
+        + df["Receivables"]
+        + df["Inventory"]
+        + df["Prepaid and Other Current Assets"]
+        + df["Marketable Securities (Short-term)"]
+        + df["Property, Plant, and Equipment (net)"]
+        + df["Intangible Assets (net)"]
+        + df["Goodwill"]
+        + df["Long-term Investments"]
+        + df["Deferred Tax Assets"]
+        + df["Other Non-Current Assets"]
+    )
+
+    # Liabilities
+    liabilities = (
+        df["Accounts Payable and Accrued Expenses"]
+        + df["Short-term Debt"]
+        + df["Deferred Revenue"]
+        + df["Other Current Liabilities"]
+        + df["Long-term Debt"]
+        + df["Deferred Tax Liabilities"]
+        + df["Lease Liabilities"]
+        + df["Other Non-Current Liabilities"]
+    )
+
+    equity = (
+        df["Common Stock and APIC"]
+        + df["Retained Earnings"]
+        - df["Treasury Stock"]
+        + df["Accumulated Other Comprehensive Income"]
+    )
+
+    accounting_id = assets - (liabilities + equity)
+
+    if accounting_id.abs().max() > 1e3:
+        num_discrepant = (accounting_id.abs() > 1e3).sum()
+        pct_discrepant = (num_discrepant / len(accounting_id)) * 100
+        print(
+            f"WARNING: {num_discrepant} periods ({pct_discrepant:.2f}%) "
+            "have significant discrepancy in accounting identity!\n"
+        )
+
+        if pct_discrepant > 25:
+            print(df.head(5).T)
+            raise ValueError(
+                "More than 25% of periods have significant discrepancy "
+                "in balance sheet identity. Check data quality."
+            )
+
+        # Get the windows where discrepancy occurs - remove these
+        discrepant_indices = accounting_id[accounting_id.abs() > 1e3].index
+        df = df.drop(index=discrepant_indices)
+
+    return df
+
+
 class RatingsHistoryDownloader:
     BASE_URL = "https://ratingshistory.info"
     API_URL = f"{BASE_URL}/api/public"
@@ -482,28 +570,47 @@ class EdgarData:
 
             self.create_statements()
 
-        # Calculate percentage of most common value in each column
-        threshold = 0.8
-        cols_to_drop = [
-            col
-            for col in self.data.columns
-            if (self.data[col].value_counts(dropna=False).iloc[0] / len(self.data))
-            > threshold
-        ]
+        if len(self.data) == 0:
+            raise ValueError(
+                f"No data available for {self.config.data.ticker}. "
+                "The data may have been filtered out entirely."
+            )
+
+        self._filter_low_quality_columns()
+        self.data = self.data.fillna(0)
+
+        return self.data
+
+    def _filter_low_quality_columns(self) -> None:
+        """Remove columns with low variance,
+        high frequency of single value, or all NaN."""
+        # Drop columns where most common value exceeds threshold
+        threshold = 0.5
+        cols_to_drop = []
+        for col in self.data.columns:
+            vc = self.data[col].value_counts(dropna=False)
+            if len(vc) > 0 and (vc.iloc[0] / len(self.data)) > threshold:
+                cols_to_drop.append(col)
         self.data = self.data.drop(columns=cols_to_drop)
 
-        # Remove columns with very low variance
-        stds = self.data.std()
+        # Drop all-NaN columns
+        all_nan_cols = self.data.columns[self.data.isna().all()].tolist()
+        if all_nan_cols:
+            if self.verbose:
+                print(f"Dropping {len(all_nan_cols)} all-NaN columns: {all_nan_cols}")
+            self.data = self.data.drop(columns=all_nan_cols)
+
+        # Remove columns with very low variance (before fillna to avoid
+        # treating NaN-heavy columns as constant after they become zeros)
+        stds = self.data.apply(lambda x: np.nanstd(x.astype(float)))
         low_variance_cols = stds[stds < 1e-6].index.tolist()
         if low_variance_cols:
             if self.verbose:
                 print(
-                    f"Dropping {len(low_variance_cols)} low-variance columns: \
-                    {low_variance_cols}"
+                    f"Dropping {len(low_variance_cols)} low-variance columns: "
+                    f"{low_variance_cols}"
                 )
             self.data = self.data.drop(columns=low_variance_cols)
-
-        return self.data
 
     def _get_timestamp_index(self) -> pd.DatetimeIndex:
         """Return a datetime index aligned to the original data index order."""
@@ -709,12 +816,16 @@ class EdgarData:
             kind="balance_sheet",
         )
 
+        self.bs_df = drop_constants(self.bs_df, verbose=self.verbose)
+        # Validate values - totals, identities, etc.
+
         self.is_df = self._process_statement(
             stmt=self.xbrls.statements.income_statement(
                 max_periods=self.config.data.periods
             ),
             kind="income_statement",
         )
+        self.is_df = drop_constants(self.is_df, verbose=self.verbose)
 
         self.cf_df = self._process_statement(
             stmt=self.xbrls.statements.cashflow_statement(
@@ -722,6 +833,7 @@ class EdgarData:
             ),
             kind="cash_flow",
         )
+        self.cf_df = drop_constants(self.cf_df, verbose=self.verbose)
 
         # Remove duplicate columns with priority: BS > IS > CF
         # TODO: Check this is the ideal order
@@ -743,30 +855,12 @@ class EdgarData:
         # Get credit ratings, calculate ratios, and add col to self.data
         # self.get_ratings()
 
+        # Print summary - number of rows etc.
         if self.verbose:
-            for col in self.data.columns:
-                print(col)
-            print("\nFiltering empty values:")
-
-        # Remove constant columns (std = 0)
-        constant_cols = self.data.columns[self.data.std() == 0].tolist()
-        if constant_cols:
-            if self.verbose:
-                print(
-                    f"Dropping {len(constant_cols)} constant columns: {constant_cols}"
-                )
-            self.data = self.data.drop(columns=constant_cols)
-
-        # Drop rows that are mostly NaN (should be rare after inner join)
-        # self.data = self.data.dropna(axis=0, thresh=int(0.8 * len(self.data.columns)))
-        # Remove columns with mostly NaN
-        # self.data = self.data.dropna(axis=1, thresh=int(0.8 * len(self.data.index)))
-        # Replace NaNs with 0 for modelling - Or mean etc?
-        self.data = self.data.fillna(0)
-
-        if self.verbose:
-            for col in self.data.columns:
-                print(col)
+            print(
+                f"Combined statement shape for {self.config.data.ticker}: "
+                f"{self.data.shape}"
+            )
 
         self.data.to_parquet(self.cache_statement)
 
@@ -838,6 +932,10 @@ class EdgarData:
         # Create new DataFrame with organised columns
         mapped_df = remap_financial_dataframe(cleaned_df, organised_features)
 
+        if kind == "balance_sheet":
+            # Drops columns that violate BS identity
+            mapped_df = bs_identity_checker(mapped_df)
+
         # Remove any leaves from derived structure that are in mapped_df
         mapped_df = mapped_df.drop(
             columns=get_fs_struct(kind)["drop_summations"], errors="ignore"
@@ -888,6 +986,9 @@ class EdgarDataset:
         # mask = (self.data.index == expected).cumprod().astype(bool)
         # self.data = self.data[mask]
 
+        # Some values aren't present until the new years Q1
+        # Drop new years back to where Income Before Taxes is not 0
+
         # Prepare the dataset
         self._prepare_dataset()
 
@@ -900,16 +1001,23 @@ class EdgarDataset:
 
         if self.target == "lstm":
             X_train, y_train, X_test, y_test = build_windows(
+                config=self.config,
                 X=X_scaled,
-                lookback=self.config.data.lookback,
-                horizon=self.config.data.horizon,
                 tgt_indices=self.tgt_indices,
-                withhold=self.config.data.withhold_periods,
+                index=self.data.index,
             )
 
             X_train, X_test = self._apply_seasonal_weight(X_train, X_test)
             self.X_train, self.y_train = X_train, y_train
             self.X_test, self.y_test = X_test, y_test
+
+            if len(X_train) == 0:
+                raise ValueError(
+                    f"\nNo valid consecutive windows found for training. "
+                    f"Data has {len(self.data)} periods with gaps. "
+                    f"Try reducing lookback ({self.config.data.lookback}) or "
+                    f"withhold ({self.config.data.withhold_periods}).\n"
+                )
 
             self.num_features = X_train.shape[-1]  # Input dim
             self.num_targets = len(self.tgt_indices)  # Output dim
@@ -974,6 +1082,8 @@ class EdgarDataset:
 
 if __name__ == "__main__":
     config = Config()
-    data = EdgarData(config=config, overwrite=False, verbose=False)
+    data = EdgarData(config=config, overwrite=True, verbose=True)
     # dataset = EdgarDataset(edgar_data=data, target="lstm", verbose=False)
     # print(data.data.head(1).T)
+
+    print(data.data.head(7).T)

@@ -59,57 +59,109 @@ def xbrl_to_raw(name: str) -> str:
     return s.lower()
 
 
+def _is_consecutive_quarters(index, start: int, length: int) -> bool:
+    """
+    Check if `length` periods starting at `start` are consecutive quarters.
+
+    Parameters:
+    -----------
+    index : pd.PeriodIndex or array-like
+        The index of the data (must support period arithmetic)
+    start : int
+        Starting position in the index
+    length : int
+        Number of periods to check
+
+    Returns:
+    --------
+    bool
+        True if all periods are consecutive quarters
+    """
+    if index is None:
+        return True  # No index provided, assume consecutive
+
+    for i in range(length - 1):
+        current = index[start + i]
+        next_period = index[start + i + 1]
+        # Check if next period is exactly 1 quarter after current
+        if next_period != current + 1:
+            return False
+    return True
+
+
 def build_windows(
+    config,
     X: np.ndarray,
-    lookback: int = 3,
-    horizon: int = 1,
     tgt_indices: Optional[List[int]] = None,
-    withhold: int = 2,
+    index=None,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
-    Build sliding windows over X and split the *last `withhold`
-    targets* into a test set.
+    Build sliding windows over X and split the *last `withhold_periods`
+    targets* into a test set. Only includes windows where all periods
+    in the window (lookback + horizon) are consecutive quarters.
+
+    Parameters:
+    -----------
+    X : np.ndarray
+        2D array of shape (time, features)
+    lookback : int
+        Number of historical periods in each window
+    horizon : int
+        Number of periods ahead to predict
+    tgt_indices : Optional[List[int]]
+        Indices of target features to predict (None = all features)
+    withhold_periods : int
+        Number of windows to withhold_periods for test set
+    index : pd.PeriodIndex, optional
+        Period index of the data. If provided, only windows with
+        consecutive quarters will be included.
 
     Returns:
         X_train: (N_train, lookback, F)
         y_train: (N_train, target_dim)
-        X_test:  (N_test, lookback, F)   where N_test == withhold
+        X_test:  (N_test, lookback, F)   where N_test == withhold_periods
         y_test:  (N_test, target_dim)
     """
-    _validate_window_args(X, lookback, horizon, tgt_indices, withhold)
+    _validate_window_args(
+        config,
+        X,
+        tgt_indices,
+    )
     T, F = X.shape
-    max_start = _max_start(T, lookback, horizon)
-    split_idx = _split_index(max_start, withhold)
+    max_start = _max_start(T, config.data.lookback, config.data.horizon)
 
-    X_train, y_train, X_test, y_test = _build_window_arrays(
-        X, lookback, horizon, tgt_indices, max_start, split_idx, F
+    X_train, y_train, X_test, y_test = _build_window_arrays_with_index(
+        config,
+        X,
+        tgt_indices,
+        max_start,
+        F,
+        index,
     )
     return X_train, y_train, X_test, y_test
 
 
 def _validate_window_args(
+    config,
     X: np.ndarray,
-    lookback: int,
-    horizon: int,
     tgt_indices: Optional[List[int]],
-    withhold: int,
 ) -> None:
     if not isinstance(X, np.ndarray):
         raise TypeError("X must be a numpy ndarray")
     if X.ndim != 2:
         raise ValueError(f"X must be 2D array of shape (time, features); got {X.shape}")
-    if lookback <= 0:
+    if config.data.lookback <= 0:
         raise ValueError("lookback must be positive")
-    if horizon <= 0:
+    if config.data.horizon <= 0:
         raise ValueError("horizon must be positive")
     if tgt_indices is not None and any(i < 0 or i >= X.shape[1] for i in tgt_indices):
         raise IndexError("tgt_indices contain out-of-bounds indices for X features")
-    if not isinstance(withhold, int):
-        raise TypeError("withhold must be an integer")
-    if withhold < 0:
-        raise ValueError("withhold must be >= 0")
+    if not isinstance(config.data.withhold_periods, int):
+        raise TypeError("withhold_periods must be an integer")
+    if config.data.withhold_periods < 0:
+        raise ValueError("withhold_periods must be >= 0")
 
-    if lookback + horizon > X.shape[0]:
+    if config.data.lookback + config.data.horizon > X.shape[0]:
         raise ValueError("Sequence too short for given lookback and horizon")
 
 
@@ -120,41 +172,66 @@ def _max_start(T: int, lookback: int, horizon: int) -> int:
     return max_start
 
 
-def _split_index(max_start: int, withhold: int) -> int:
-    if withhold > max_start:
-        raise ValueError(
-            f"withhold={withhold} is too large; max possible windows is {max_start}"
-        )
-    return max_start - withhold
-
-
-def _build_window_arrays(
+def _build_window_arrays_with_index(
+    config,
     X: np.ndarray,
-    lookback: int,
-    horizon: int,
     tgt_indices: Optional[List[int]],
     max_start: int,
-    split_idx: int,
     num_features: int,
+    index=None,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    X_train, y_train = [], []
-    X_test, y_test = [], []
+    """
+    Build window arrays, only including windows with consecutive quarters.
+    The last `withhold_periods` valid windows are used for testing.
+    """
+    all_windows = []
+    window_length = config.data.lookback + config.data.horizon
 
+    # Collect all valid windows (those with consecutive quarters)
     for t in range(max_start):
-        x_win, y_target = _extract_window(X, t, lookback, horizon, tgt_indices)
-        if t < split_idx:
-            X_train.append(x_win)
-            y_train.append(y_target)
-        else:
-            X_test.append(x_win)
-            y_test.append(y_target)
+        if _is_consecutive_quarters(index, t, window_length):
+            x_win, y_target = _extract_window(
+                X, t, config.data.lookback, config.data.horizon, tgt_indices
+            )
+            all_windows.append((x_win, y_target))
+
+    if len(all_windows) == 0:
+        target_dim = len(tgt_indices) if tgt_indices else X.shape[1]
+        return (
+            np.empty((0, config.data.lookback, num_features)),
+            np.empty((0, target_dim)),
+            np.empty((0, config.data.lookback, num_features)),
+            np.empty((0, target_dim)),
+        )
+
+    if config.data.withhold_periods > len(all_windows):
+        raise ValueError(
+            f"withhold_periods={config.data.withhold_periods} is too large;"
+            f"only {len(all_windows)} valid consecutive windows available"
+        )
+
+    # Split into train/test - last `withhold_periods` windows go to test
+    split_idx = len(all_windows) - config.data.withhold_periods
+
+    X_train = [w[0] for w in all_windows[:split_idx]]
+    y_train = [w[1] for w in all_windows[:split_idx]]
+    X_test = [w[0] for w in all_windows[split_idx:]]
+    y_test = [w[1] for w in all_windows[split_idx:]]
+
+    target_dim = all_windows[0][1].shape[-1] if all_windows[0][1].ndim > 0 else 1
 
     X_train_arr = (
-        np.stack(X_train) if X_train else np.empty((0, lookback, num_features))
+        np.stack(X_train)
+        if X_train
+        else np.empty((0, config.data.lookback, num_features))
     )
-    y_train_arr = np.stack(y_train) if y_train else np.empty((0, y_target.shape[-1]))
-    X_test_arr = np.stack(X_test) if X_test else np.empty((0, lookback, num_features))
-    y_test_arr = np.stack(y_test) if y_test else np.empty((0, y_target.shape[-1]))
+    y_train_arr = np.stack(y_train) if y_train else np.empty((0, target_dim))
+    X_test_arr = (
+        np.stack(X_test)
+        if X_test
+        else np.empty((0, config.data.lookback, num_features))
+    )
+    y_test_arr = np.stack(y_test) if y_test else np.empty((0, target_dim))
 
     return X_train_arr, y_train_arr, X_test_arr, y_test_arr
 
@@ -376,27 +453,27 @@ def print_duplicate_analysis(results, kind="balance sheet"):
 
     print(f"\n{Fore.CYAN}{'=' * 80}{Style.RESET_ALL}")
     print(
-        f"{Fore.CYAN}{Style.BRIGHT} {kind.capitalize()} \
-            DUPLICATE COLUMN ANALYSIS {Style.RESET_ALL}"
+        f"{Fore.CYAN}{Style.BRIGHT} {kind.capitalize()} "
+        f"DUPLICATE COLUMN ANALYSIS {Style.RESET_ALL}"
     )
     print(f"{Fore.CYAN}{'=' * 80}{Style.RESET_ALL}\n")
 
     summary = results["summary"]
     print(
-        f"{Fore.WHITE}Total Columns: \
-            {Fore.CYAN}{summary['total_columns']}{Style.RESET_ALL}"
+        f"{Fore.WHITE}Total Columns: "
+        f"{Fore.CYAN}{summary['total_columns']}{Style.RESET_ALL}"
     )
     print(
-        f"{Fore.YELLOW}Duplicate Groups Found: \
-            {Fore.CYAN}{summary['duplicate_groups_found']}{Style.RESET_ALL}"
+        f"{Fore.YELLOW}Duplicate Groups Found: "
+        f"{Fore.CYAN}{summary['duplicate_groups_found']}{Style.RESET_ALL}"
     )
     print(
-        f"{Fore.RED}Columns to Drop: \
-        {Fore.CYAN}{summary['columns_to_drop']}{Style.RESET_ALL}"
+        f"{Fore.RED}Columns to Drop: "
+        f"{Fore.CYAN}{summary['columns_to_drop']}{Style.RESET_ALL}"
     )
     print(
-        f"{Fore.GREEN}Columns Remaining: \
-            {Fore.CYAN}{summary['columns_remaining']}{Style.RESET_ALL}"
+        f"{Fore.GREEN}Columns Remaining: "
+        f"{Fore.CYAN}{summary['columns_remaining']}{Style.RESET_ALL}"
     )
 
     if results["duplicate_groups"]:

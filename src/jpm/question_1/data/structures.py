@@ -12,6 +12,11 @@ def get_fs_struct(fs: str) -> dict:
         raise ValueError(f"Unknown financial statement type: {fs}")
 
 
+def get_slack_name() -> str:
+    """Get the name of the slack term used in balance sheet predictions."""
+    return fs_structures["balance_sheet"]["slack_term"]
+
+
 fs_structures = {
     "balance_sheet": {
         "prediction_structure": {
@@ -64,6 +69,7 @@ fs_structures = {
             },
             "__unmapped__": [],
         },
+        "slack_term": "Accumulated Other Comprehensive Income",
         "drop_summations": [
             "Total Current Assets",
             "Total Non-Current Assets",
@@ -420,7 +426,14 @@ fs_structures = {
             },
             "__unmapped__": [],
         },
-        "drop_summations": [],
+        "drop_summations": [
+            "Basic EPS",
+            "Diluted EPS",
+            "Weighted Average Shares Outstanding (Basic)",
+            "Weighted Average Shares Outstanding (Diluted)",
+            "Other Comprehensive Income",
+            "Comprehensive Income",
+        ],
         "mapping_examples": {
             "Total Revenues": [
                 "Revenue",
