@@ -10,8 +10,8 @@ class DataConfig:
 
     ticker: str = "MSFT"  # Debug with MSFT AAPL AMZN
     cache_dir: str = "/scratch/datasets/jpm"
-    periods: int = 20  # quarters -> 15 years, post-2008
-    lookback: int = 3
+    periods: int = 60  # quarters -> 15 years, post-2008
+    lookback: int = 4
     horizon: int = 1
     batch_size: int = 32
     target_type: str = "full"
@@ -169,6 +169,7 @@ class LLMConfig:
     model: str = "gpt-5-mini"  # dev nano, eval mini
     temperature: float = 0.05
     max_tokens: int = 8192
+    use_llm: bool = False
     adjust: bool = True
 
     @classmethod

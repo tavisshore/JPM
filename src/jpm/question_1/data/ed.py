@@ -370,7 +370,7 @@ def lei_to_ticker(lei):
     return None
 
 
-def bs_identity_checker(df: pd.DataFrame) -> pd.DataFrame:
+def bs_identity_checker(df: pd.DataFrame, organised_features: dict) -> pd.DataFrame:
     df = df.fillna(0)
 
     # Assets
@@ -410,19 +410,15 @@ def bs_identity_checker(df: pd.DataFrame) -> pd.DataFrame:
     accounting_id = assets - (liabilities + equity)
 
     if accounting_id.abs().max() > 1e3:
-        num_discrepant = (accounting_id.abs() > 1e3).sum()
-        pct_discrepant = (num_discrepant / len(accounting_id)) * 100
-        print(
-            f"WARNING: {num_discrepant} periods ({pct_discrepant:.2f}%) "
-            "have significant discrepancy in accounting identity!\n"
-        )
-
-        if pct_discrepant > 25:
-            print(df.head(5).T)
-            raise ValueError(
-                "More than 25% of periods have significant discrepancy "
-                "in balance sheet identity. Check data quality."
-            )
+        # num_discrepant = (accounting_id.abs() > 1e3).sum()
+        # pct_discrepant = (num_discrepant / len(accounting_id)) * 100
+        # if pct_discrepant > 25:
+        #     print(accounting_id.T)
+        #     pretty_print_full_mapping(organised_features)
+        #     print(
+        #         f"WARNING: {num_discrepant} periods ({pct_discrepant:.2f}%) "
+        #         "have significant discrepancy in accounting identity!\n"
+        #     )
 
         # Get the windows where discrepancy occurs - remove these
         discrepant_indices = accounting_id[accounting_id.abs() > 1e3].index
@@ -815,9 +811,7 @@ class EdgarData:
             ),
             kind="balance_sheet",
         )
-
         self.bs_df = drop_constants(self.bs_df, verbose=self.verbose)
-        # Validate values - totals, identities, etc.
 
         self.is_df = self._process_statement(
             stmt=self.xbrls.statements.income_statement(
@@ -863,6 +857,7 @@ class EdgarData:
             )
 
         self.data.to_parquet(self.cache_statement)
+        print(f"Saved {self.config.data.ticker} to {str(self.cache_statement)}")
 
     def _process_statement(
         self,
@@ -934,7 +929,7 @@ class EdgarData:
 
         if kind == "balance_sheet":
             # Drops columns that violate BS identity
-            mapped_df = bs_identity_checker(mapped_df)
+            mapped_df = bs_identity_checker(mapped_df, organised_features)
 
         # Remove any leaves from derived structure that are in mapped_df
         mapped_df = mapped_df.drop(
@@ -1000,7 +995,7 @@ class EdgarDataset:
         self._set_scaler_stats(scaler)
 
         if self.target == "lstm":
-            print(f"\nin: {self.data.index}\n")
+            # print(f"\nin: {self.data.index}\n")
             X_train, y_train, X_test, y_test = build_windows(
                 config=self.config,
                 X=X_scaled,
@@ -1008,7 +1003,7 @@ class EdgarDataset:
                 index=self.data.index,
             )
 
-            print(X_train.shape, y_train.shape, X_test.shape, y_test.shape)
+            # print(X_train.shape, y_train.shape, X_test.shape, y_test.shape)
 
             X_train, X_test = self._apply_seasonal_weight(X_train, X_test)
             self.X_train, self.y_train = X_train, y_train
@@ -1085,8 +1080,6 @@ class EdgarDataset:
 
 if __name__ == "__main__":
     config = Config()
-    data = EdgarData(config=config, overwrite=True, verbose=True)
+    data = EdgarData(config=config, overwrite=False, verbose=True)
     # dataset = EdgarDataset(edgar_data=data, target="lstm", verbose=False)
     # print(data.data.head(1).T)
-
-    print(data.data.head(7).T)

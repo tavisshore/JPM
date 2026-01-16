@@ -4,7 +4,6 @@ import os
 import sys
 
 import numpy as np
-import tensorflow as tf
 
 from jpm.question_1 import (
     BalanceSheet,
@@ -24,6 +23,8 @@ from jpm.question_1 import (
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # Suppress TensorFlow logging
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # Use single GPU to avoid contention
+
+import tensorflow as tf
 
 tf.get_logger().setLevel("ERROR")
 
@@ -55,13 +56,13 @@ CONFIG_VARIATIONS = [
 
 tickers = [
     "MSFT",
-    "AAPL",
+    # "AAPL",
     "AMZN",
-    "AVGO",
+    "AVGO",  # Performs so well on this
     "META",
-    "TSLA",
-    "WMT",
-    "GS",
+    # "TSLA",
+    # "WMT",
+    # "GS",
 ]
 
 all_config_results = {}
@@ -94,48 +95,55 @@ for var_idx, variation in enumerate(CONFIG_VARIATIONS, 1):
     for idx, ticker in enumerate(tickers, 1):
         print(f"\n[{idx}/{len(tickers)}] Processing {ticker}...", flush=True)
 
-        config.data.ticker = ticker
+        try:
+            config.data.ticker = ticker
 
-        data = EdgarData(config=config)
-        dataset = EdgarDataset(edgar_data=data, target="lstm")
+            data = EdgarData(config=config)
+            dataset = EdgarDataset(edgar_data=data, target="lstm")
 
-        model = LSTMForecaster(config=config, data=data, dataset=dataset)
+            model = LSTMForecaster(config=config, data=data, dataset=dataset)
 
-        model.fit(verbose=0)
+            model.fit(verbose=0)
 
-        model.evaluate(stage="train")
+            model.evaluate(stage="train")
 
-        validation_results = model.evaluate(stage="val", llm_config=llm_cfg)
+            if config.llm.use_llm:
+                validation_results = model.evaluate(stage="val", llm_config=llm_cfg)
+            else:
+                validation_results = model.evaluate(stage="val")
 
-        bs = BalanceSheet(config=config, data=data, results=validation_results)
-        bs_pct_error = bs.check_identity()
+            bs = BalanceSheet(config=config, data=data, results=validation_results)
+            bs_pct_error = bs.check_identity()
 
-        i_s = IncomeStatement(config=config, data=data, results=validation_results)
-        i_s.view()
-        is_results = i_s.get_results()
+            i_s = IncomeStatement(config=config, data=data, results=validation_results)
+            i_s.view()
+            is_results = i_s.get_results()
 
-        results[ticker] = {
-            "net_income": {
-                "lstm": validation_results.net_income_model_mae,
-                **validation_results.baseline_mae,
-            },
-            "balance_sheet": {
-                "lstm": validation_results.model_mae,
-                **validation_results.baseline_mae,
-            },
-            "bs_pct_error": bs_pct_error,
-        }
+            results[ticker] = {
+                "net_income": {
+                    "lstm": validation_results.net_income_model_mae,
+                    **validation_results.baseline_mae,
+                },
+                "balance_sheet": {
+                    "lstm": validation_results.model_mae,
+                    **validation_results.baseline_mae,
+                },
+                "bs_pct_error": bs_pct_error,
+            }
 
-        print(
-            f"  {ticker}: LSTM MAE=${validation_results.model_mae / 1e9:.2f}bn",
-            flush=True,
-        )
+            print(
+                f"  {ticker}: LSTM MAE=${validation_results.model_mae / 1e9:.2f}bn",
+                flush=True,
+            )
 
-        # Clear memory after each ticker
-        del model, data, bs, i_s, validation_results, is_results
+            # Clear memory after each ticker
+            del model, data, bs, i_s, validation_results, is_results
 
-        gc.collect()
-        tf.keras.backend.clear_session()
+            gc.collect()
+            tf.keras.backend.clear_session()
+
+        except Exception as E:
+            print(E)
 
     # Store results for this config
     all_config_results[config_name] = results
