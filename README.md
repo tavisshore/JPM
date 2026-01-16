@@ -14,7 +14,6 @@ pytest -v
 EDGAR requires an email for downloads:
 ```bash
 export EDGAR_EMAIL="your_email@jpm.com"
-export JPM_CACHE_DIR="/PATH/TO/DESIRED/CACHE"
 ```
 The LLM clients requires API keys (currently just ChatGPT), this is soon to be required for both question parts as company financial statements are now being parsed by LLM to standardise:
 ```bash

@@ -12,11 +12,12 @@ from jpm.question_1.config import (
     ModelConfig,
     TrainingConfig,
 )
-from jpm.question_1.data.ed import EdgarDataLoader
+from jpm.question_1.data.ed import EdgarData, EdgarDataset
 from jpm.question_1.misc import as_series, get_args, set_seed
 from jpm.question_1.models.balance_sheet import BalanceSheet
 from jpm.question_1.models.income_statement import IncomeStatement
 from jpm.question_1.models.lstm import LSTMForecaster
+from jpm.question_1.models.xgb import XGBoostForecaster
 
 __all__ = [
     # Config classes
@@ -27,11 +28,13 @@ __all__ = [
     "ModelConfig",
     "TrainingConfig",
     # Data loaders
-    "EdgarDataLoader",
+    "EdgarData",
+    "EdgarDataset",
     # Models
     "BalanceSheet",
     "IncomeStatement",
     "LSTMForecaster",
+    "XGBoostForecaster",
     # Clients
     "LLMClient",
     # Utilities

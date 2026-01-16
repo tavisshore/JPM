@@ -1,7 +1,8 @@
 """Data loading and processing utilities."""
 
-from jpm.question_1.data.ed import EdgarDataLoader
+from jpm.question_1.data.ed import EdgarData, EdgarDataset
 
 __all__ = [
-    "EdgarDataLoader",
+    "EdgarData",
+    "EdgarDataset",
 ]
