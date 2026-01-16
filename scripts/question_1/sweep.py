@@ -7,7 +7,7 @@ from copy import deepcopy
 
 import tensorflow as tf
 
-from jpm.question_1 import Config, EdgarDataLoader, LSTMForecaster, set_seed
+from jpm.question_1 import Config, EdgarData, EdgarDataset, LSTMForecaster, set_seed
 
 GRID = {
     "data.batch_size": [32],
@@ -65,8 +65,10 @@ def main():
         val_maes = []
         for _, ticker in enumerate(tickers, 1):
             cfg.data.ticker = ticker
-            data = EdgarDataLoader(config=cfg)
-            model = LSTMForecaster(config=cfg, data=data)
+            data = EdgarData(config=cfg)
+            dataset = EdgarDataset(edgar_data=data, target="lstm")
+
+            model = LSTMForecaster(config=cfg, data=data, dataset=dataset)
             history = model.fit(verbose=0)
             val_maes.append(float(history.history["val_mae"][-1]))
 

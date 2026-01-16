@@ -184,7 +184,7 @@ def get_args():
     p = argparse.ArgumentParser()
 
     # Data
-    p.add_argument("--ticker", type=str, default="AAPL")
+    p.add_argument("--ticker", type=str, default="MSFT")
     p.add_argument("--cache_dir", type=str, default=None)  # required=True)
     p.add_argument("--target", type=str, default=None)
     p.add_argument("--batch_size", type=int, default=None)

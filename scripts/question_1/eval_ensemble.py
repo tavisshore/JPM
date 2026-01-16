@@ -2,7 +2,8 @@ from jpm.question_1 import (
     BalanceSheet,
     Config,
     DataConfig,
-    EdgarDataLoader,
+    EdgarData,
+    EdgarDataset,
     IncomeStatement,
     LLMConfig,
     LossConfig,
@@ -25,9 +26,11 @@ config = Config(
     data=data_cfg, model=model_cfg, training=train_cfg, loss=loss_cfg, llm=llm_cfg
 )
 
-data = EdgarDataLoader(config=config)
+data = EdgarData(config=config)
+dataset = EdgarDataset(edgar_data=data, target="lstm")
 
-model = LSTMForecaster(config=config, data=data)
+
+model = LSTMForecaster(config=config, data=data, dataset=dataset)
 model.fit()
 
 # model.evaluate(stage="train")
@@ -35,9 +38,9 @@ validation_results = model.evaluate(stage="val", llm_config=llm_cfg)
 model.view_results(stage="val")
 
 # Pass outputs to BS Model
-bs = BalanceSheet(config=config, results=validation_results)
-bs.check_identity()
+bs = BalanceSheet(config=config, data=data, results=validation_results)
+bs_pct_error = bs.check_identity()
 
-# Income Statement to predict Net Income (Loss)
-i_s = IncomeStatement(config=config, results=validation_results)
+i_s = IncomeStatement(config=config, data=data, results=validation_results)
 i_s.view()
+is_results = i_s.get_results()

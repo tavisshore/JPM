@@ -736,7 +736,7 @@ class LLMClient:
         self,
         pdf_path: str,
         cfg: LLMConfig,
-        page_range: tuple[int, int] = (56, 58),
+        page_range: list[tuple[int, int]] = [(56, 58)],
     ) -> dict[str, float]:
         """
         Extract income statement and balance sheet data from PDF annual report.
@@ -755,9 +755,10 @@ class LLMClient:
         writer = PdfWriter()
 
         # pypdf uses 0-indexed pages, convert from 1-indexed input
-        for page_num in range(page_range[0] - 1, page_range[1]):
-            if page_num < len(reader.pages):
-                writer.add_page(reader.pages[page_num])
+        for start, end in page_range:
+            for page_num in range(start - 1, end):
+                if page_num < len(reader.pages):
+                    writer.add_page(reader.pages[page_num])
 
         # Write to bytes buffer
         pdf_buffer = BytesIO()
@@ -765,10 +766,14 @@ class LLMClient:
         pdf_buffer.seek(0)
 
         pdf_text = ""
-        for page_num in range(page_range[0] - 1, page_range[1]):
-            if page_num < len(reader.pages):
-                page = reader.pages[page_num]
-                pdf_text += page.extract_text() + "\n\n"
+        for start, end in page_range:
+            for page_num in range(start - 1, end):
+                if page_num < len(reader.pages):
+                    page = reader.pages[page_num]
+                    pdf_text += page.extract_text() + "\n\n"
+
+        # print(pdf_text)
+        # breakpoint()
 
         system_content = (
             "You are a financial analyst expert. "
@@ -778,8 +783,16 @@ class LLMClient:
 
         user_content = (
             "Analyze this excerpt from an annual report and provide the following for the latest year available:\n\n"
-            "1. Net income (current year)\n"
-            "2. Cost-to-income ratio\n"
+            "CRITICAL INSTRUCTIONS:\n"
+            "- Convert ALL monetary values to USD using the exchange rate on the report publication date\n"
+            "- Identify the report's original currency (EUR, CNY, JPY, GBP, etc.)\n"
+            "- For Cost-to-income ratio:\n"
+            "  * BANKS/FINANCIAL INSTITUTIONS: Use (Operating Expenses / Operating Income)\n"
+            "  * NON-FINANCIAL COMPANIES: Use (Operating Expenses / Revenue) or Operating Expense Ratio\n"
+            "  * Do NOT use cost-to-income for manufacturers unless explicitly calculating operating expense ratio\n\n"
+            "Required values:\n"
+            "1. Net income (in USD millions, converted if necessary)\n"
+            "2. Cost-to-income ratio (use appropriate calculation based on company type)\n"
             "3. Quick ratio\n"
             "4. Debt-to-equity ratio\n"
             "5. Debt-to-assets ratio\n"
@@ -790,9 +803,10 @@ class LLMClient:
             '{"net_income": <value>, "cost_to_income_ratio": <value>, '
             '"quick_ratio": <value>, "debt_to_equity_ratio": <value>, '
             '"debt_to_assets_ratio": <value>, "debt_to_capital_ratio": <value>, '
-            '"debt_to_ebitda_ratio": <value>, "interest_coverage_ratio": <value>}\n\n'
-            "Net income should be in millions. All ratios should be decimal values "
-            "(e.g., 0.65 for 65%).\n\n"
+            '"debt_to_ebitda_ratio": <value>, "interest_coverage_ratio": <value>, '
+            '"original_currency": "<currency_code>", "exchange_rate": <rate>, "report_date": "<YYYY-MM-DD>"}\n\n'
+            "Net income should be in USD millions after conversion. All ratios should be decimal values "
+            "(e.g., 0.65 for 65%). Include the original currency, exchange rate used, and report publication date.\n\n"
             f"Here is the financial report excerpt:\n\n{pdf_text}"
         )
 
