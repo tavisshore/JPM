@@ -7,7 +7,7 @@ from jpm.question_1 import LLMClient, LLMConfig
 input_reports = {
     "alibaba": {
         "path": "assets/question_1/alibaba_report.pdf",
-        "pages": [(330, 333)],
+        "pages": [(254, 264), (269, 270), (307, 317), (324, 328)],
         # [(330, 333)],  # US GAAP values?
         # [(254, 264), (269, 270), (307, 317), (324, 328)], # Wider report in CNY
     },
@@ -21,7 +21,7 @@ input_reports = {
     },
     "goog": {
         "path": "assets/question_1/goog_report.pdf",
-        "pages": [(57, 61), (70, 74), (76, 79), (81, 84)],
+        "pages": [(49, 49), (57, 61), (70, 74), (76, 79), (81, 84)],
     },
     "jpm": {
         "path": "assets/question_1/jpm_report.pdf",
@@ -31,8 +31,14 @@ input_reports = {
         "path": "assets/question_1/lvmh_report.pdf",
         "pages": [(24, 28), (39, 57)],
     },
-    "msft": {"path": "assets/question_1/msft_report.pdf", "pages": [(44, 48)]},
-    "tencent": {"path": "assets/question_1/tencent_report.pdf", "pages": [(124, 134)]},
+    "msft": {
+        "path": "assets/question_1/msft_report.pdf",
+        "pages": [(44, 48), (57, 60)],
+    },
+    "tencent": {
+        "path": "assets/question_1/tencent_report.pdf",
+        "pages": [(124, 134), (186, 186)],
+    },
     "vw": {"path": "assets/question_1/vw_report.pdf", "pages": [(472, 478)]},
 }
 
@@ -50,13 +56,9 @@ if __name__ == "__main__":
     client = LLMClient()
     llm_config = LLMConfig(
         provider="openai",
-        model="gpt-4o",
+        model="gpt-4o-2024-08-06",
     )
 
     report = input_reports[args.company]
 
-    data = client.parse_annual_report(
-        pdf_path=report["path"],
-        cfg=llm_config,
-        page_range=report["pages"],
-    )
+    data = client.parse_annual_report(report)

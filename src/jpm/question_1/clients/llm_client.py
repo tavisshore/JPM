@@ -12,6 +12,10 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
+from openai import OpenAI
+from pandas import DataFrame
+from pypdf import PdfReader
+
 from jpm.question_1.clients.prompts import (
     get_predict_prompt,
     get_report_prompt,
@@ -20,9 +24,6 @@ from jpm.question_1.clients.prompts import (
 from jpm.question_1.clients.utils import apply_statement_specific_fixes, get_fx_rate
 from jpm.question_1.config import LLMConfig
 from jpm.question_1.misc import format_money
-from openai import OpenAI
-from pandas import DataFrame
-from pypdf import PdfReader
 
 
 class LLMClient:
@@ -197,12 +198,10 @@ class LLMClient:
         with open(cache_path, "w", encoding="utf-8") as f:
             json.dump(features, f, ensure_ascii=False, indent=4)
 
-    def parse_annual_report(
-        self,
-        pdf_path: str,
-        cfg: LLMConfig,
-        page_range: list[tuple[int, int]] = [(56, 58)],
-    ) -> dict[str, float]:
+    def parse_annual_report(self, report: dict) -> dict[str, float] | None:
+        pdf_path = report["path"]
+        page_range = report["pages"]
+
         reader = PdfReader(pdf_path)
         pdf_text = ""
         for start, end in page_range:
@@ -229,7 +228,11 @@ class LLMClient:
             raw_values = json.loads(content)
 
             CA = float(raw_values["current_assets"])
-            INV = float(raw_values["inventories"])
+            INV = (
+                float(raw_values["inventories"])
+                if raw_values["inventories"] is not None
+                else 0
+            )  # TODO: Goog report doesn't disclose, raise or solve
             CL = float(raw_values["current_liabilities"])
             TD = float(raw_values["financial_liabilities_noncurrent"]) + float(
                 raw_values["financial_liabilities_current"]
@@ -264,6 +267,7 @@ class LLMClient:
                 "exchange_rate": fx_rate,
                 "report_date": fiscal_year_end,
             }
+            self._pretty_print_financial_data(result)
 
         except json.JSONDecodeError as e:
             print(f"JSON Parse Error: {e}")
@@ -276,8 +280,6 @@ class LLMClient:
 
             traceback.print_exc()
             result = None
-
-        self._pretty_print_financial_data(result)
 
         return result
 
