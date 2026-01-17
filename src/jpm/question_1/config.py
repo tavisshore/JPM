@@ -166,8 +166,8 @@ class LossConfig:
 @dataclass
 class LLMConfig:
     provider: str = "openai"
-    model: str = "gpt-5-mini"  # dev nano, eval mini
-    temperature: float = 0.05
+    model: str = "gpt-5-mini"  # dev nano, eval mini, gpt-4o-2024-08-06
+    temperature: float = 0.0  # 0.05
     max_tokens: int = 8192
     use_llm: bool = False
     adjust: bool = True

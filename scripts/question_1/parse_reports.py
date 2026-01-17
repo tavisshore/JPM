@@ -50,7 +50,7 @@ if __name__ == "__main__":
     client = LLMClient()
     llm_config = LLMConfig(
         provider="openai",
-        model="gpt-5-mini",
+        model="gpt-4o",
     )
 
     report = input_reports[args.company]
