@@ -15,9 +15,7 @@ unit = pytest.mark.unit
 integration = pytest.mark.integration
 
 
-# =============================================================================
 # Tests for helper functions and dataclasses
-# =============================================================================
 
 
 @unit
@@ -65,9 +63,7 @@ def test_income_statement_section_empty():
     assert section.total_gt == 0.0
 
 
-# =============================================================================
 # Tests for IncomeStatement class
-# =============================================================================
 
 
 def make_mock_data(is_structure=None):

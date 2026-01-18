@@ -8,9 +8,7 @@ unit = pytest.mark.unit
 integration = pytest.mark.integration
 
 
-# =============================================================================
 # Tests for refactored helper functions (_bs_*, _derived_*, _should_calculate)
-# =============================================================================
 
 
 @unit

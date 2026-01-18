@@ -10,9 +10,7 @@ unit = pytest.mark.unit
 integration = pytest.mark.integration
 
 
-# =============================================================================
 # Tests for count_leaf_list_values and leaf_list_values
-# =============================================================================
 
 
 @unit
@@ -65,9 +63,7 @@ def test_leaf_list_values_nested():
     assert sorted(result) == ["a", "b", "c"]
 
 
-# =============================================================================
 # Tests for income statement fix functions
-# =============================================================================
 
 
 @unit
@@ -134,9 +130,7 @@ def test_fix_income_statement_applies_all_fixes():
     )
 
 
-# =============================================================================
 # Tests for balance sheet fix functions
-# =============================================================================
 
 
 @unit
@@ -153,9 +147,7 @@ def test_fix_balance_sheet_verifies_share_counts(capsys):
     assert "Verified unmapped share count" in captured.out
 
 
-# =============================================================================
 # Tests for cash flow fix functions
-# =============================================================================
 
 
 @unit
@@ -243,9 +235,7 @@ def test_apply_statement_specific_fixes_unknown_type():
     assert result == mapped
 
 
-# =============================================================================
 # Tests for FX rate functions
-# =============================================================================
 
 
 @unit
@@ -274,9 +264,7 @@ def test_get_fx_rate_unknown_currency_fallback():
         assert rate == 1.0
 
 
-# =============================================================================
 # Tests for JSON parsing functions
-# =============================================================================
 
 
 @unit
@@ -393,9 +381,7 @@ def test_parse_llm_list_response_invalid_raises():
         utils.parse_llm_list_response(response)
 
 
-# =============================================================================
 # Tests for cash flow debt proceeds fixes
-# =============================================================================
 
 
 @unit
@@ -445,9 +431,7 @@ def test_fix_cash_flow_noncurrent_assets_moves_to_operating():
     )
 
 
-# =============================================================================
 # Edge cases and error handling
-# =============================================================================
 
 
 @unit

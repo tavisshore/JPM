@@ -4,12 +4,10 @@ from jpm.question_1 import CreditDataset, CreditRatingModel
 
 
 def main():
-    # Configuration
     DATA_DIR = "/scratch/datasets/jpm/ratings"
     MODEL_DIR = "/scratch/projects/JPM/temp"
     PLOTS_DIR = Path(MODEL_DIR) / "plots"
 
-    # Model hyperparameters
     PARAMS = {
         "max_depth": 6,
         "learning_rate": 0.1,
@@ -22,15 +20,11 @@ def main():
         "use_gpu": True,  # Set to False if no GPU
         "random_state": 42,
     }
-
-    # Create output directories
     PLOTS_DIR.mkdir(parents=True, exist_ok=True)
 
     print("=" * 70)
     print("CREDIT RATING PREDICTION - XGBoost Training")
     print("=" * 70)
-
-    # Load dataset
     print("\n[1/5] Loading dataset...")
     dataset = CreditDataset(
         data_dir=DATA_DIR,
@@ -42,11 +36,9 @@ def main():
     )
     dataset.load()
 
-    # Get dataset info
     print("\n[2/5] Dataset summary...")
     info = dataset.get_info()
 
-    # Get training data
     print("\n[3/5] Preparing training data...")
     X_train, y_train = dataset.get_train_data()
     X_val, y_val = dataset.get_val_data()
@@ -56,29 +48,23 @@ def main():
     print(f"Validation samples: {len(X_val)}")
     print(f"Test samples: {len(X_test)}")
 
-    # Build and train model
     print("\n[4/5] Training XGBoost model...")
     model = CreditRatingModel(
         n_classes=info["n_classes"], n_features=info["n_features"], **PARAMS
     )
 
     model.build()
-    model.train(X_train, y_train, X_val, y_val, verbose=True)
+    model.train(X_train, y_train, X_val, y_val, verbose=False)
 
-    # Evaluate on test set
     print("\n[5/5] Evaluating model...")
     test_metrics = model.evaluate(
         X_test, y_test, class_names=info["classes"], split_name="test"
     )
 
     # Feature importance
-    print("\nComputing feature importance...")
     feature_imp = model.compute_feature_importance(info["feature_names"])
-    print("\nTop 15 Important Features:")
-    print(feature_imp.head(15).to_string(index=False))
 
     # Generate plots
-    print("\nGenerating visualizations...")
     model.plot_training_history(save_path=PLOTS_DIR / "training_history.png")
     model.plot_confusion_matrix(
         y_test,
@@ -98,7 +84,6 @@ def main():
     )
 
     # Make predictions on future quarters
-    print("\nMaking predictions on future quarters...")
     X_predict = dataset.get_predict_data()
     predictions = model.predict(X_predict)
     probabilities = model.predict_proba(X_predict)
@@ -116,11 +101,7 @@ def main():
         results[f"top_{i + 1}_rating"] = dataset.decode_labels(top_idx)
         results[f"top_{i + 1}_prob"] = probabilities[range(len(probabilities)), top_idx]
 
-    print("\nPredictions for future quarters:")
-    print(results.to_string(index=False))
-
     # Save everything
-    print("\nSaving model and results...")
     model.save(MODEL_DIR)
     results.to_csv(Path(MODEL_DIR) / "predictions.csv", index=False)
     feature_imp.to_csv(Path(MODEL_DIR) / "feature_importance.csv", index=False)

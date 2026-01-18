@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Dict
 
 from jpm.question_1.config import Config
+from jpm.question_1.data.datasets.statements import StatementsDataset
 from jpm.question_1.data.ed import EdgarData
 from jpm.question_1.misc import format_money
 from jpm.question_1.models.metrics import TickerResults
@@ -53,11 +54,13 @@ class BalanceSheet:
         self,
         config: Config,
         data: EdgarData,
+        dataset: StatementsDataset,
         results: TickerResults,
     ) -> None:
         self.config = config
         self.results = results
         self.data = data
+        self.dataset = dataset
 
         self._feature_values = results.feature_values()
 
@@ -122,7 +125,7 @@ class BalanceSheet:
         return float(self._feature_values.get(name, 0.0))
 
     def _build_assets(self) -> Assets:
-        assets_struct = self.data.bs_structure["Assets"]
+        assets_struct = self.dataset.bs_structure["Assets"]
 
         # current_names = assets_struct.get("current_assets", [])
         # non_current_names = assets_struct.get("non_current_assets", [])
@@ -137,7 +140,7 @@ class BalanceSheet:
         )
 
     def _build_liabilities(self) -> Liabilities:
-        liab_struct = self.data.bs_structure["Liabilities"]
+        liab_struct = self.dataset.bs_structure["Liabilities"]
 
         # current_names = liab_struct.get("current_liabilities", [])
         # non_current_names = liab_struct.get("non_current_liabilities", [])
@@ -151,6 +154,6 @@ class BalanceSheet:
         )
 
     def _build_equity(self) -> Equity:
-        equity_names = self.data.bs_structure.get("Equity", [])
+        equity_names = self.dataset.bs_structure.get("Equity", [])
         items = {name: self._get_value(name) for name in equity_names}
         return Equity(items=items)

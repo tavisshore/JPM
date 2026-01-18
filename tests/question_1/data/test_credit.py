@@ -10,9 +10,7 @@ unit = pytest.mark.unit
 integration = pytest.mark.integration
 
 
-# =============================================================================
 # Tests for helper functions
-# =============================================================================
 
 
 @unit
@@ -68,9 +66,7 @@ def test_safe_ratio_negative_infinity():
     assert result.isna().all()
 
 
-# =============================================================================
 # Tests for derived values calculation
-# =============================================================================
 
 
 @unit
@@ -130,9 +126,7 @@ def test_calculate_derived_values_missing_columns():
     assert fcf is None
 
 
-# =============================================================================
 # Tests for leverage ratios
-# =============================================================================
 
 
 @unit
@@ -171,9 +165,7 @@ def test_calculate_leverage_ratios_debt_to_assets():
     assert ratios_df["Debt_to_Assets"].iloc[1] == 0.25
 
 
-# =============================================================================
 # Tests for profitability ratios
-# =============================================================================
 
 
 @unit
@@ -232,9 +224,7 @@ def test_calculate_profitability_ratios_margins():
     assert ratios_df["Gross_Margin"].iloc[0] == 0.3
 
 
-# =============================================================================
 # Tests for liquidity ratios
-# =============================================================================
 
 
 @unit
@@ -291,9 +281,7 @@ def test_calculate_liquidity_ratios_cash_ratio():
     assert ratios_df["Cash_Ratio"].iloc[0] == 0.5
 
 
-# =============================================================================
 # Tests for efficiency ratios
-# =============================================================================
 
 
 @unit
@@ -330,9 +318,7 @@ def test_calculate_efficiency_ratios_inventory_turnover():
     assert ratios_df["Inventory_Turnover"].iloc[0] == 6.0
 
 
-# =============================================================================
 # Tests for coverage ratios
-# =============================================================================
 
 
 @unit
@@ -366,9 +352,7 @@ def test_calculate_coverage_ratios_debt_to_ebitda():
     assert ratios_df["Debt_to_EBITDA"].iloc[0] == 3.0
 
 
-# =============================================================================
 # Tests for size metrics
-# =============================================================================
 
 
 @unit
@@ -395,9 +379,7 @@ def test_calculate_size_metrics_handles_negative():
     assert ratios_df["Log_Total_Assets"].iloc[0] == 0.0
 
 
-# =============================================================================
 # Tests for main calculate_credit_ratios function
-# =============================================================================
 
 
 @integration

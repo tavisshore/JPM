@@ -13,12 +13,12 @@ from edgar.xbrl import XBRLS
 
 from jpm.question_1.config import Config
 from jpm.question_1.data.credit import calculate_credit_ratios
-from jpm.question_1.data.structures import get_fs_struct
 from jpm.question_1.data.utils import (
     add_derived_columns,
     bs_identity_checker,
     drop_constants,
     drop_non_numeric_columns,
+    remap_financial_dataframe,
     remove_duplicate_columns,
     standardise_rating,
     ticker_to_name,
@@ -26,7 +26,6 @@ from jpm.question_1.data.utils import (
     ytd_to_quarterly,
 )
 from jpm.question_1.data.vis import pretty_print_full_mapping
-from jpm.question_1.misc import get_leaf_keys
 
 # SEC requires user identification via email
 email = os.getenv("EDGAR_EMAIL")
@@ -58,91 +57,6 @@ MONTH_ABBR = {
     11: "NOV",
     12: "DEC",
 }
-
-
-def _extract_leaf_mappings(mapping):
-    """Extract only leaf-level column mappings from nested mapping structure."""
-    leaf_map = {}
-
-    for key, value in mapping.items():
-        if key == "__unmapped__":
-            continue
-
-        if isinstance(value, dict):
-            nested_maps = _extract_leaf_mappings(value)
-            leaf_map.update(nested_maps)
-        elif isinstance(value, list):
-            leaf_map[key] = value
-
-    return leaf_map
-
-
-def _is_mutually_exclusive(df, cols):
-    """
-    Check if columns are mutually exclusive (alternate taxonomies).
-    Returns True if columns never have non-zero values simultaneously.
-    """
-    if len(cols) <= 1:
-        return False
-
-    # Count rows where multiple columns are non-zero
-    non_zero = (df[cols] != 0) & (df[cols].notna())
-    simultaneous_nonzero = (non_zero.sum(axis=1) > 1).sum()
-
-    # If <5% of rows have multiple non-zero values, treat as mutually exclusive
-    threshold = len(df) * 0.05
-    return simultaneous_nonzero < threshold
-
-
-def _map_single_column(df, new_col, old_cols):
-    """Map a single column based on source columns."""
-    if not old_cols:
-        return np.nan
-
-    existing_cols = [col for col in old_cols if col in df.columns]
-
-    if not existing_cols:
-        return np.nan
-    if len(existing_cols) == 1:
-        return df[existing_cols[0]]
-
-    # Multiple sources - determine if mutually exclusive or aggregate
-    if _is_mutually_exclusive(df, existing_cols):
-        # Alternate taxonomies - coalesce (prefer non-null/non-zero values)
-        result = df[existing_cols].replace(0, np.nan).bfill(axis=1).iloc[:, 0]
-        return result.fillna(0)
-
-    # True aggregation - sum all sources
-    return df[existing_cols].sum(axis=1)
-
-
-def remap_financial_dataframe(df, column_mapping):
-    """
-    Remap and aggregate dataframe columns according to mapping structure.
-
-    Handles two types of multi-source mappings:
-    1. Alternate taxonomies (mutually exclusive) - coalesce (take first non-null)
-    2. True aggregations (can coexist) - sum
-
-    Parameters:
-    -----------
-    df : pd.DataFrame
-        Source dataframe with original column names
-    column_mapping : dict
-        Nested dictionary mapping new column names to lists of existing column names
-
-    Returns:
-    --------
-    pd.DataFrame
-        New dataframe with remapped columns
-    """
-    flat_mapping = _extract_leaf_mappings(column_mapping)
-    new_df = pd.DataFrame(index=df.index)
-
-    for new_col, old_cols in flat_mapping.items():
-        new_df[new_col] = _map_single_column(df, new_col, old_cols)
-
-    return new_df
 
 
 class RatingsHistoryDownloader:
@@ -283,10 +197,9 @@ class EdgarData:
         self._load_data()
 
     def _load_data(self) -> None:
-        """Load data from cache or fetch from SEC, then prepare targets."""
+        """Load data from cache or fetch from SEC"""
         self._validate_target_type()
         self.data = self._load_or_fetch_data()
-        self._prepare_targets()
 
     def _validate_target_type(self) -> None:
         if self.config.data.target_type not in {"full", "bs", "net_income"}:
@@ -328,97 +241,6 @@ class EdgarData:
         if isinstance(self.data.index, pd.PeriodIndex):
             return self.data.index.to_timestamp()
         return pd.DatetimeIndex(self.data.index)
-
-    def _prepare_targets(self, tar=None) -> None:
-        self.targets = list(self.data.columns)
-        self.tgt_indices = list(range(len(self.targets)))
-
-        fs_structure = get_fs_struct("all")
-        balance_sheet_structure = fs_structure["balance_sheet"]
-        income_statement_structure = fs_structure["income_statement"]
-
-        bs_keys = get_leaf_keys(balance_sheet_structure["prediction_structure"])
-        bs_final_keys = [
-            k for k in bs_keys if k not in balance_sheet_structure["drop_summations"]
-        ]
-        self.bs_keys = bs_final_keys
-
-        # Store FS structures with leaf keys and no __unmapped__
-        self.bs_structure = {
-            "Assets": [
-                k
-                for k in remap_financial_dataframe(
-                    self.data, balance_sheet_structure["prediction_structure"]["Assets"]
-                ).columns.tolist()
-                if k not in balance_sheet_structure["drop_summations"]
-            ],
-            "Liabilities": [
-                k
-                for k in remap_financial_dataframe(
-                    self.data,
-                    balance_sheet_structure["prediction_structure"]["Liabilities"],
-                ).columns.tolist()
-                if k not in balance_sheet_structure["drop_summations"]
-            ],
-            "Equity": [
-                k
-                for k in remap_financial_dataframe(
-                    self.data, balance_sheet_structure["prediction_structure"]["Equity"]
-                ).columns.tolist()
-                if k not in balance_sheet_structure["drop_summations"]
-            ],
-        }
-
-        self.is_structure = {
-            "Revenues": [
-                k
-                for k in remap_financial_dataframe(
-                    self.data,
-                    income_statement_structure["prediction_structure"]["Revenues"],
-                ).columns.tolist()
-                if k not in income_statement_structure["drop_summations"]
-            ],
-            "Expenses": [
-                k
-                for k in remap_financial_dataframe(
-                    self.data,
-                    income_statement_structure["prediction_structure"][
-                        "Cost of Revenue"
-                    ],
-                ).columns.tolist()
-                if k not in income_statement_structure["drop_summations"]
-            ],
-        }
-
-        self.name_to_target_idx = {name: i for i, name in enumerate(self.targets)}
-
-        asset_mappings = [
-            self.name_to_target_idx[n]
-            for n in get_leaf_keys(
-                balance_sheet_structure["prediction_structure"]["Assets"]
-            )
-            if n in self.name_to_target_idx
-        ]
-        liability_mappings = [
-            self.name_to_target_idx[n]
-            for n in get_leaf_keys(
-                balance_sheet_structure["prediction_structure"]["Liabilities"]
-            )
-            if n in self.name_to_target_idx
-        ]
-        equity_mappings = [
-            self.name_to_target_idx[n]
-            for n in get_leaf_keys(
-                balance_sheet_structure["prediction_structure"]["Equity"]
-            )
-            if n in self.name_to_target_idx
-        ]
-
-        self.feature_mappings = {
-            "assets": asset_mappings,
-            "liabilities": liability_mappings,
-            "equity": equity_mappings,
-        }
 
     def get_ratings(self):
         """Training Data for Credit Rating Prediction."""
