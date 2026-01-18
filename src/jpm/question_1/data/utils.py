@@ -453,51 +453,199 @@ def remove_duplicate_columns(
     return cleaned_df
 
 
-def bs_identity_checker(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.fillna(0)
+def _bs_has_data(df, col_name):
+    """Check if a field is actually populated (exists and has non-zero values)."""
+    return col_name in df.columns and (df[col_name] != 0).any()
 
-    # Assets
-    assets = (
-        df["Cash and Equivalents"]
-        + df["Receivables"]
-        + df["Inventory"]
-        + df["Prepaid and Other Current Assets"]
-        + df["Marketable Securities (Short-term)"]
-        + df["Property, Plant, and Equipment (net)"]
-        + df["Intangible Assets (net)"]
-        + df["Goodwill"]
-        + df["Long-term Investments"]
-        + df["Deferred Tax Assets"]
-        + df["Other Non-Current Assets"]
+
+def _bs_get_field(df, col_name):
+    """Get field value safely, returning 0 if missing or empty."""
+    return df[col_name] if _bs_has_data(df, col_name) else 0
+
+
+def _bs_get_deferred_tax_components(df, mappings):
+    """Handle net vs split deferred tax positions. Returns (dta, dtl, has_net_dt)."""
+    dta_sources = mappings.get("Deferred Tax Assets", [])
+    has_net_dt = any("net" in src.lower() for src in dta_sources)
+
+    if has_net_dt and _bs_has_data(df, "Deferred Tax Assets"):
+        net_dt = df["Deferred Tax Assets"]
+        return net_dt.clip(lower=0), (-net_dt).clip(lower=0), True
+
+    return (
+        _bs_get_field(df, "Deferred Tax Assets"),
+        _bs_get_field(df, "Deferred Tax Liabilities"),
+        False,
     )
 
-    # Liabilities
-    liabilities = (
-        df["Accounts Payable and Accrued Expenses"]
-        + df["Short-term Debt"]
-        + df["Deferred Revenue"]
-        + df["Other Current Liabilities"]
-        + df["Long-term Debt"]
-        + df["Deferred Tax Liabilities"]
-        + df["Lease Liabilities"]
-        + df["Other Non-Current Liabilities"]
+
+def _bs_reconstruct_assets(df, dta_component):
+    """Reconstruct total assets from components."""
+    return (
+        _bs_get_field(df, "Cash and Equivalents")
+        + _bs_get_field(df, "Receivables")
+        + _bs_get_field(df, "Inventory")
+        + _bs_get_field(df, "Prepaid and Other Current Assets")
+        + _bs_get_field(df, "Marketable Securities (Short-term)")
+        + _bs_get_field(df, "Property, Plant, and Equipment (net)")
+        + _bs_get_field(df, "Intangible Assets (net)")
+        + _bs_get_field(df, "Goodwill")
+        + _bs_get_field(df, "Long-term Investments")
+        + dta_component
+        + _bs_get_field(df, "Other Non-Current Assets")
     )
+
+
+def _bs_reconstruct_liabilities(df, dtl_component):
+    """Reconstruct total liabilities from components."""
+    return (
+        _bs_get_field(df, "Accounts Payable and Accrued Expenses")
+        + _bs_get_field(df, "Short-term Debt")
+        + _bs_get_field(df, "Deferred Revenue")
+        + _bs_get_field(df, "Other Current Liabilities")
+        + _bs_get_field(df, "Long-term Debt")
+        + dtl_component
+        + _bs_get_field(df, "Lease Liabilities")
+        + _bs_get_field(df, "Other Non-Current Liabilities")
+    )
+
+
+def _bs_reconstruct_equity(df, mappings):
+    """Reconstruct total equity from components. Returns (equity, has_treasury)."""
+    treasury_sources = mappings.get("Treasury Stock", [])
+    has_treasury = len(treasury_sources) > 0 and _bs_has_data(df, "Treasury Stock")
 
     equity = (
-        df["Common Stock and APIC"]
-        + df["Retained Earnings"]
-        - df["Treasury Stock"]
-        + df["Accumulated Other Comprehensive Income"]
+        _bs_get_field(df, "Common Stock and APIC")
+        + _bs_get_field(df, "Retained Earnings")
+        + _bs_get_field(df, "Accumulated Other Comprehensive Income")
+    )
+
+    if has_treasury:
+        equity -= _bs_get_field(df, "Treasury Stock")
+
+    return equity, has_treasury
+
+
+def _bs_print_diagnostics(
+    df,
+    threshold,
+    dta_component,
+    dtl_component,
+    has_net_dt,
+    has_treasury,
+    assets_reconstructed,
+    liabilities_reconstructed,
+    equity_reconstructed,
+):
+    """Print balance sheet validation diagnostics."""
+    print("\n" + "=" * 80)
+    print(" BALANCE SHEET VALIDATION DIAGNOSTICS")
+    print("=" * 80)
+
+    if has_net_dt:
+        print("ℹ Net Deferred Tax: Split into DTA/DTL by sign")
+        print(f"  - Periods with DTA: {(dta_component > 0).sum()}")
+        print(f"  - Periods with DTL: {(dtl_component > 0).sum()}")
+
+    if not has_treasury:
+        print(
+            "⚠ Treasury Stock: Not available - equity reconstruction may be incomplete"
+        )
+
+    if not _bs_has_data(df, "Lease Liabilities"):
+        print(
+            "ℹ Lease Liabilities: Not mapped (likely in Other Non-Current Liabilities)"
+        )
+
+    # Compare reconstructed vs reported
+    for name, reconstructed, col in [
+        ("Assets", assets_reconstructed, "Total Assets"),
+        ("Liabilities", liabilities_reconstructed, "Total Liabilities"),
+        ("Equity", equity_reconstructed, "Total Equity"),
+    ]:
+        if _bs_has_data(df, col):
+            diff = (df[col] - reconstructed).abs()
+            n_mismatch = (diff > threshold).sum()
+            if n_mismatch > 0:
+                print(f"\n⚠ {name}: Reconstructed != Reported for {n_mismatch} rows")
+                print(f"  Median diff: ${diff.median():,.0f}")
+                print(f"  Max diff: ${diff.max():,.0f}")
+                if name == "Equity" and not has_treasury:
+                    print("  (Likely due to missing Treasury Stock)")
+
+
+def bs_identity_checker(
+    df: pd.DataFrame, mappings: dict, threshold: float = 1e6
+) -> pd.DataFrame:
+    """
+    Validate balance sheet accounting identity (Assets = Liabilities + Equity).
+
+    Uses mappings to intelligently handle:
+    - Net deferred tax positions
+    - Missing fields (Treasury Stock, Lease Liabilities)
+    - Composite/rollup features
+
+    Args:
+        df: DataFrame with standardized balance sheet columns
+        mappings: Dict mapping new features to lists of old features
+        threshold: Maximum acceptable identity discrepancy
+
+    Returns:
+        DataFrame with rows passing identity validation
+    """
+    df = df.fillna(0)
+
+    dta_component, dtl_component, has_net_dt = _bs_get_deferred_tax_components(
+        df, mappings
+    )
+    assets_reconstructed = _bs_reconstruct_assets(df, dta_component)
+    liabilities_reconstructed = _bs_reconstruct_liabilities(df, dtl_component)
+    equity_reconstructed, has_treasury = _bs_reconstruct_equity(df, mappings)
+
+    _bs_print_diagnostics(
+        df,
+        threshold,
+        dta_component,
+        dtl_component,
+        has_net_dt,
+        has_treasury,
+        assets_reconstructed,
+        liabilities_reconstructed,
+        equity_reconstructed,
+    )
+
+    # Prefer reported totals for identity check
+    assets = (
+        df["Total Assets"] if _bs_has_data(df, "Total Assets") else assets_reconstructed
+    )
+    liabilities = (
+        df["Total Liabilities"]
+        if _bs_has_data(df, "Total Liabilities")
+        else liabilities_reconstructed
+    )
+    equity = (
+        df["Total Equity"] if _bs_has_data(df, "Total Equity") else equity_reconstructed
     )
 
     accounting_id = assets - (liabilities + equity)
+    mask = accounting_id.abs() <= threshold
+    discrepancies = accounting_id[~mask]
 
-    if accounting_id.abs().max() > 1e3:
-        # Get the windows where discrepancy occurs - remove these
-        discrepant_indices = accounting_id[accounting_id.abs() > 1e3].index
-        df = df.drop(index=discrepant_indices)
+    if len(discrepancies) > 0:
+        print(f"\n{'=' * 80}")
+        print(
+            f"❌ IDENTITY FAILURES: {len(discrepancies)} rows exceed threshold ${threshold:,.0f}"
+        )
+        print(f"{'=' * 80}")
+    else:
+        print(f"\n{'=' * 80}")
+        print(
+            f"✓ IDENTITY VALIDATED: All {len(df)} rows pass (threshold ${threshold:,.0f})"
+        )
+        print(f"{'=' * 80}")
 
-    return df
+    return df[mask]
 
 
 def drop_constants(df, verbose=False):
@@ -527,24 +675,47 @@ def drop_constants(df, verbose=False):
     return df
 
 
-def ytd_to_quarterly(df):
+def ytd_to_quarterly(df, exclude_columns=None):
     """
-    Convert YTD to quarterly.
-    Expects: rows = PeriodIndex (quarterly), columns = metrics
+    Convert YTD cumulative to quarterly values.
+
+    Args:
+        df: DataFrame with YTD values
+        exclude_columns: List of columns to NOT convert (stock variables)
     """
     df = df.copy()
-    df = df.sort_index()
+    df = df.sort_index(ascending=True)
 
-    quarterly = pd.DataFrame(index=df.index, columns=df.columns)
+    if exclude_columns is None:
+        exclude_columns = []
 
+    # Separate stock vs flow columns
+    flow_cols = [col for col in df.columns if col not in exclude_columns]
+    stock_cols = exclude_columns
+
+    # Only convert flow columns
+    quarterly = pd.DataFrame(index=df.index, columns=df.columns, dtype=float)
+
+    # Copy stock columns as-is
+    for col in stock_cols:
+        quarterly[col] = df[col]
+
+    # Convert flow columns
     for i, idx in enumerate(df.index):
-        # Q1 of fiscal year (quarter 1)
-        is_q1 = idx.quarter == 1
-
-        if i == 0 or is_q1:
-            quarterly.loc[idx] = df.loc[idx]
+        if i == 0:
+            quarterly.loc[idx, flow_cols] = df.loc[idx, flow_cols]
         else:
-            quarterly.loc[idx] = df.loc[idx] - df.loc[df.index[i - 1]]
+            prev_idx = df.index[i - 1]
+            current = df.loc[idx, flow_cols]
+            prev = df.loc[prev_idx, flow_cols]
+
+            # Detect fiscal year reset
+            is_fy_reset = (current < prev).sum() > len(flow_cols) * 0.5
+
+            if is_fy_reset:
+                quarterly.loc[idx, flow_cols] = current
+            else:
+                quarterly.loc[idx, flow_cols] = current - prev
 
     return quarterly
 
@@ -647,86 +818,140 @@ def ticker_to_name(names, llm_client):
     return llm_mapping
 
 
+def _derived_col(d, name):
+    """Safely get column, returning 0 if missing."""
+    return d[name].fillna(0) if name in d.columns else pd.Series(0, index=d.index)
+
+
+def _should_calculate(d, col_name):
+    """Check if column needs calculation (missing or all zero/NaN)."""
+    if col_name not in d.columns:
+        return True
+    col_data = d[col_name]
+    return col_data.isna().all() or (col_data == 0).all()
+
+
+def _add_derived_assets(d):
+    """Add derived asset columns."""
+    if _should_calculate(d, "Total Current Assets"):
+        d["Total Current Assets"] = (
+            _derived_col(d, "Cash and Equivalents")
+            + _derived_col(d, "Receivables")
+            + _derived_col(d, "Inventory")
+            + _derived_col(d, "Prepaid and Other Current Assets")
+            + _derived_col(d, "Marketable Securities (Short-term)")
+        )
+
+    if _should_calculate(d, "Total Non-Current Assets"):
+        d["Total Non-Current Assets"] = (
+            _derived_col(d, "Property, Plant, and Equipment (net)")
+            + _derived_col(d, "Intangible Assets (net)")
+            + _derived_col(d, "Goodwill")
+            + _derived_col(d, "Long-term Investments")
+            + _derived_col(d, "Deferred Tax Assets")
+            + _derived_col(d, "Other Non-Current Assets")
+        )
+
+    if _should_calculate(d, "Total Assets"):
+        has_current = not _should_calculate(d, "Total Current Assets")
+        has_noncurrent = not _should_calculate(d, "Total Non-Current Assets")
+        if has_current and has_noncurrent:
+            d["Total Assets"] = (
+                d["Total Current Assets"] + d["Total Non-Current Assets"]
+            )
+        elif "Total Assets" not in d.columns:
+            d["Total Assets"] = d.get("Total Current Assets", 0) + d.get(
+                "Total Non-Current Assets", 0
+            )
+
+
+def _add_derived_liabilities(d):
+    """Add derived liability columns."""
+    if _should_calculate(d, "Total Current Liabilities"):
+        d["Total Current Liabilities"] = (
+            _derived_col(d, "Accounts Payable and Accrued Expenses")
+            + _derived_col(d, "Short-term Debt")
+            + _derived_col(d, "Deferred Revenue")
+            + _derived_col(d, "Other Current Liabilities")
+        )
+
+    if _should_calculate(d, "Total Non-Current Liabilities"):
+        d["Total Non-Current Liabilities"] = (
+            _derived_col(d, "Long-term Debt")
+            + _derived_col(d, "Deferred Tax Liabilities")
+            + _derived_col(d, "Lease Liabilities")
+            + _derived_col(d, "Other Non-Current Liabilities")
+        )
+
+    if _should_calculate(d, "Total Liabilities"):
+        has_current = not _should_calculate(d, "Total Current Liabilities")
+        has_noncurrent = not _should_calculate(d, "Total Non-Current Liabilities")
+        if has_current and has_noncurrent:
+            d["Total Liabilities"] = (
+                d["Total Current Liabilities"] + d["Total Non-Current Liabilities"]
+            )
+        elif "Total Liabilities" not in d.columns:
+            d["Total Liabilities"] = d.get("Total Current Liabilities", 0) + d.get(
+                "Total Non-Current Liabilities", 0
+            )
+
+
+def _add_derived_equity(d):
+    """Add derived equity columns."""
+    if _should_calculate(d, "Total Equity"):
+        d["Total Equity"] = (
+            _derived_col(d, "Common Stock and APIC")
+            + _derived_col(d, "Retained Earnings")
+            - _derived_col(d, "Treasury Stock")
+            + _derived_col(d, "Accumulated Other Comprehensive Income")
+        )
+
+
+def _add_derived_income(d):
+    """Add derived income statement columns."""
+    if _should_calculate(d, "Gross Profit"):
+        if (
+            "Gross Profit" not in d.columns
+            and "Total Revenues" in d.columns
+            and "Total Cost of Revenue" in d.columns
+        ):
+            d["Gross Profit"] = _derived_col(d, "Total Revenues") - _derived_col(
+                d, "Total Cost of Revenue"
+            )
+
+    if _should_calculate(d, "Operating Income") and "Operating Income" not in d.columns:
+        if "Gross Profit" in d.columns and "Total Operating Expenses" in d.columns:
+            d["Operating Income"] = _derived_col(d, "Gross Profit") - _derived_col(
+                d, "Total Operating Expenses"
+            )
+        elif (
+            "Total Revenues" in d.columns
+            and "Total Cost of Revenue" in d.columns
+            and "Total Operating Expenses" in d.columns
+        ):
+            d["Operating Income"] = (
+                _derived_col(d, "Total Revenues")
+                - _derived_col(d, "Total Cost of Revenue")
+                - _derived_col(d, "Total Operating Expenses")
+            )
+
+    if _should_calculate(d, "Total Debt"):
+        d["Total Debt"] = _derived_col(d, "Short-term Debt") + _derived_col(
+            d, "Long-term Debt"
+        )
+
+
 def add_derived_columns(df):
+    """
+    Add derived columns only if they don't already exist or are all zero/NaN.
+    Preserves mapped values from standardized financial statements.
+    """
     d = df.copy()
 
-    def col(name):
-        return d[name].fillna(0) if name in d.columns else pd.Series(0, index=d.index)
-
-    # Assets
-    d["Total Current Assets"] = (
-        col("Cash and Cash Equivalents")
-        + col("Accounts Receivable")
-        + col("Inventory")
-        + col("Prepaid Expenses")
-        + col("Marketable Securities (Short-term Investments)")
-        + col("Other Current Assets")
-    )
-
-    d["Total Non-Current Assets"] = (
-        col("Property, Plant, and Equipment (PP&E)")
-        + col("Intangible Assets")
-        + col("Goodwill")
-        + col("Marketable Securities (Non-current)")
-        + col("Long-term Investments")
-        + col("Deferred Tax Assets")
-        + col("Other Non-Current Assets")
-    )
-
-    d["Total Assets"] = d["Total Current Assets"] + d["Total Non-Current Assets"]
-
-    # Liabilities
-    d["Total Current Liabilities"] = (
-        col("Accounts Payable")
-        + col("Accrued Expenses")
-        + col("Short-term Debt")
-        + col("Current Portion of Long-term Debt")
-        + col("Unearned Revenue (Deferred Revenue)")
-        + col("Income Taxes Payable")
-        + col("Other Current Liabilities")
-    )
-
-    d["Total Non-Current Liabilities"] = (
-        col("Long-term Debt")
-        + col("Deferred Tax Liabilities")
-        # + col("Pension Liabilities")
-        + col("Lease Liabilities")
-        + col("Other Non-Current Liabilities")
-    )
-
-    d["Total Liabilities"] = (
-        d["Total Current Liabilities"] + d["Total Non-Current Liabilities"]
-    )
-
-    # Equity
-    d["Total Equity"] = (
-        col("Additional Paid-in Capital")
-        + col("Retained Earnings")
-        + col("Treasury Stock")
-        + col("Accumulated Other Comprehensive Income (AOCI)")
-    )
-
-    # Income Statement
-    d["Total Cost of Revenue"] = (
-        col("Cost of Goods Sold")
-        + col("Cost of Services")
-        + col("Other Cost of Revenue")
-    )
-    d["Gross Profit"] = col("Total Revenues") - d["Total Cost of Revenue"]
-    d["Total Operating Expenses"] = (
-        col("Selling, General and Administrative")
-        + col("Research and Development")
-        + col("Other Operating Expenses")
-    )
-    d["Operating Income (Loss)"] = d["Gross Profit"] - d["Total Operating Expenses"]
-
-    # Cash Flow
-    d["Net Cash Provided by (Used in) Operating Activities"] = (
-        col("Net Income (Loss)")
-        + col("Stock-Based Compensation")
-        + col("Changes in Working Capital")
-        + col("Other Operating Activities")
-    )
+    _add_derived_assets(d)
+    _add_derived_liabilities(d)
+    _add_derived_equity(d)
+    _add_derived_income(d)
 
     return d
 

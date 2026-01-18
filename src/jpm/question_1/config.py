@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, fields
+from dataclasses import dataclass, field, fields
 from pathlib import Path
 
 
@@ -186,8 +186,8 @@ class LLMConfig:
 class Config:
     """Root configuration grouping data, model, training, and loss settings."""
 
-    data: DataConfig = DataConfig()
-    model: ModelConfig = ModelConfig()
-    training: TrainingConfig = TrainingConfig()
-    loss: LossConfig = LossConfig()
-    llm: LLMConfig = LLMConfig()
+    data: DataConfig = field(default_factory=DataConfig)
+    model: ModelConfig = field(default_factory=ModelConfig)
+    training: TrainingConfig = field(default_factory=TrainingConfig)
+    loss: LossConfig = field(default_factory=LossConfig)
+    llm: LLMConfig = field(default_factory=LLMConfig)

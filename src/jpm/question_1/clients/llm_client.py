@@ -49,24 +49,31 @@ class LLMClient:
         self._openai: OpenAI = OpenAI(api_key=openai_api_key)
 
     def chat(
-        self,
-        messages: List[Dict[str, Any]],
-        cfg: LLMConfig,
+        self, messages: List[Dict[str, Any]], cfg: LLMConfig, verbose: bool = False
     ) -> str:
         if cfg.provider == "openai":
-            return self._chat_openai(messages, cfg)
+            return self._chat_openai(messages, cfg, verbose)
         else:
             raise ValueError(f"Unknown provider: {cfg.provider}")
 
     def _chat_openai(
-        self,
-        messages: List[Dict[str, Any]],
-        cfg: LLMConfig,
+        self, messages: List[Dict[str, Any]], cfg: LLMConfig, verbose: bool = False
     ) -> str:
         if self._openai is None:
             raise RuntimeError("OpenAI client not initialised (missing API key).")
-
-        with self._spinner(f"Waiting for {cfg.provider} {cfg.model} response"):
+        if verbose:
+            with self._spinner(f"Waiting for {cfg.provider} {cfg.model} response"):
+                if "nano" not in cfg.model:
+                    resp = self._openai.chat.completions.create(
+                        model=cfg.model,
+                        messages=messages,
+                    )
+                else:
+                    resp = self._openai.chat.completions.create(
+                        model=cfg.model,
+                        messages=messages,
+                    )
+        else:
             if "nano" not in cfg.model:
                 resp = self._openai.chat.completions.create(
                     model=cfg.model,

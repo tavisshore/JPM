@@ -8,10 +8,8 @@ import edgar
 import numpy as np
 import pandas as pd
 import requests
-import tensorflow as tf
 from edgar import Company
 from edgar.xbrl import XBRLS
-from sklearn.preprocessing import StandardScaler
 
 from jpm.question_1.config import Config
 from jpm.question_1.data.credit import calculate_credit_ratios
@@ -19,7 +17,6 @@ from jpm.question_1.data.structures import get_fs_struct
 from jpm.question_1.data.utils import (
     add_derived_columns,
     bs_identity_checker,
-    build_windows,
     drop_constants,
     drop_non_numeric_columns,
     remove_duplicate_columns,
@@ -63,9 +60,69 @@ MONTH_ABBR = {
 }
 
 
+def _extract_leaf_mappings(mapping):
+    """Extract only leaf-level column mappings from nested mapping structure."""
+    leaf_map = {}
+
+    for key, value in mapping.items():
+        if key == "__unmapped__":
+            continue
+
+        if isinstance(value, dict):
+            nested_maps = _extract_leaf_mappings(value)
+            leaf_map.update(nested_maps)
+        elif isinstance(value, list):
+            leaf_map[key] = value
+
+    return leaf_map
+
+
+def _is_mutually_exclusive(df, cols):
+    """
+    Check if columns are mutually exclusive (alternate taxonomies).
+    Returns True if columns never have non-zero values simultaneously.
+    """
+    if len(cols) <= 1:
+        return False
+
+    # Count rows where multiple columns are non-zero
+    non_zero = (df[cols] != 0) & (df[cols].notna())
+    simultaneous_nonzero = (non_zero.sum(axis=1) > 1).sum()
+
+    # If <5% of rows have multiple non-zero values, treat as mutually exclusive
+    threshold = len(df) * 0.05
+    return simultaneous_nonzero < threshold
+
+
+def _map_single_column(df, new_col, old_cols):
+    """Map a single column based on source columns."""
+    if not old_cols:
+        return np.nan
+
+    existing_cols = [col for col in old_cols if col in df.columns]
+
+    if not existing_cols:
+        return np.nan
+    if len(existing_cols) == 1:
+        return df[existing_cols[0]]
+
+    # Multiple sources - determine if mutually exclusive or aggregate
+    if _is_mutually_exclusive(df, existing_cols):
+        # Alternate taxonomies - coalesce (prefer non-null/non-zero values)
+        result = df[existing_cols].replace(0, np.nan).bfill(axis=1).iloc[:, 0]
+        return result.fillna(0)
+
+    # True aggregation - sum all sources
+    return df[existing_cols].sum(axis=1)
+
+
 def remap_financial_dataframe(df, column_mapping):
     """
     Remap and aggregate dataframe columns according to mapping structure.
+
+    Handles two types of multi-source mappings:
+    1. Alternate taxonomies (mutually exclusive) - coalesce (take first non-null)
+    2. True aggregations (can coexist) - sum
 
     Parameters:
     -----------
@@ -77,50 +134,13 @@ def remap_financial_dataframe(df, column_mapping):
     Returns:
     --------
     pd.DataFrame
-        New dataframe with remapped columns, values summed where multiple sources exist
+        New dataframe with remapped columns
     """
-
-    def extract_leaf_mappings(mapping):
-        """Extract only leaf-level column mappings."""
-        leaf_map = {}
-
-        for key, value in mapping.items():
-            if key == "__unmapped__":
-                continue
-
-            if isinstance(value, dict):
-                # Recurse into nested structure
-                nested_maps = extract_leaf_mappings(value)
-                leaf_map.update(nested_maps)
-            elif isinstance(value, list):
-                # Leaf node - direct mapping
-                leaf_map[key] = value
-
-        return leaf_map
-
-    # Extract flat mapping
-    flat_mapping = extract_leaf_mappings(column_mapping)
-
-    # Create new dataframe
+    flat_mapping = _extract_leaf_mappings(column_mapping)
     new_df = pd.DataFrame(index=df.index)
 
-    # Process each mapped column
     for new_col, old_cols in flat_mapping.items():
-        if not old_cols:  # Empty list - column will be NaN
-            new_df[new_col] = np.nan
-        else:
-            # Find which columns actually exist in the source dataframe
-            existing_cols = [col for col in old_cols if col in df.columns]
-
-            if existing_cols:
-                # Sum the existing columns
-                if len(existing_cols) == 1:
-                    new_df[new_col] = df[existing_cols[0]]
-                else:
-                    new_df[new_col] = df[existing_cols].sum(axis=1)
-            else:
-                # None of the source columns exist
-                new_df[new_col] = np.nan
+        new_df[new_col] = _map_single_column(df, new_col, old_cols)
 
     return new_df
 
@@ -163,7 +183,6 @@ class RatingsHistoryDownloader:
         filename = self._find_latest_moodys_financial(files)
 
         raw_data = Path(self.config.data.cache_dir) / filename
-        output_file = Path(self.config.data.cache_dir) / f"{ticker}_ratings.csv"
 
         # Downloads the latest moodys corporate data
         if not raw_data.exists():
@@ -185,10 +204,8 @@ class RatingsHistoryDownloader:
                             f.write(chunk)
                             pbar.update(len(chunk))
                 else:
-                    print(f"Downloading {filename}...", end="", flush=True)
                     for chunk in resp.iter_content(chunk_size=8192):
                         f.write(chunk)
-                    print(" Done!")
 
         # Processes moodys data for the particular ticker - returning quarterly ratings
         # if not output_file.exists():
@@ -236,9 +253,7 @@ class RatingsHistoryDownloader:
         df["quarter"] = pd.to_datetime(df["quarter"]).dt.to_period("Q")
         df = df[["rating", "quarter"]]
         df = df.set_index("quarter")
-        df.to_csv(output_file)
-        # else:
-        # df = pd.read_csv(output_file, index_col="quarter")
+
         df.index = pd.PeriodIndex(df.index, freq="Q")
         return df
 
@@ -253,12 +268,13 @@ class EdgarData:
         self.overwrite = overwrite
         self.verbose = verbose
         self.cache_statement = Path(
-            f"{self.config.data.cache_dir}/{self.config.data.ticker}.parquet"
+            f"{self.config.data.cache_dir}/statements/{self.config.data.ticker}.parquet"
         )
         self.ratings_data_path = Path(
-            f"{self.config.data.cache_dir}/{self.config.data.ticker}_ratings.parquet"
+            f"{self.config.data.cache_dir}/ratings/{self.config.data.ticker}_ratings.parquet"
         )
         self.cache_statement.parent.mkdir(parents=True, exist_ok=True)
+        self.ratings_data_path.parent.mkdir(parents=True, exist_ok=True)
 
         # Lazy import to avoid circular dependency
         from jpm.question_1.clients.llm_client import LLMClient
@@ -296,47 +312,16 @@ class EdgarData:
 
             self.create_statements()
 
+        # Get credit ratings, calculate ratios -> separate attr and csv
+        self.get_ratings()
+
         if len(self.data) == 0:
             raise ValueError(
                 f"No data available for {self.config.data.ticker}. "
                 "The data may have been filtered out entirely."
             )
 
-        self._filter_low_quality_columns()
-        self.data = self.data.fillna(0)
-
         return self.data
-
-    def _filter_low_quality_columns(self) -> None:
-        """Remove columns with low variance,
-        high frequency of single value, or all NaN."""
-        # Drop columns where most common value exceeds threshold
-        threshold = 0.5
-        cols_to_drop = []
-        for col in self.data.columns:
-            vc = self.data[col].value_counts(dropna=False)
-            if len(vc) > 0 and (vc.iloc[0] / len(self.data)) > threshold:
-                cols_to_drop.append(col)
-        self.data = self.data.drop(columns=cols_to_drop)
-
-        # Drop all-NaN columns
-        all_nan_cols = self.data.columns[self.data.isna().all()].tolist()
-        if all_nan_cols:
-            if self.verbose:
-                print(f"Dropping {len(all_nan_cols)} all-NaN columns: {all_nan_cols}")
-            self.data = self.data.drop(columns=all_nan_cols)
-
-        # Remove columns with very low variance (before fillna to avoid
-        # treating NaN-heavy columns as constant after they become zeros)
-        stds = self.data.apply(lambda x: np.nanstd(x.astype(float)))
-        low_variance_cols = stds[stds < 1e-6].index.tolist()
-        if low_variance_cols:
-            if self.verbose:
-                print(
-                    f"Dropping {len(low_variance_cols)} low-variance columns: "
-                    f"{low_variance_cols}"
-                )
-            self.data = self.data.drop(columns=low_variance_cols)
 
     def _get_timestamp_index(self) -> pd.DatetimeIndex:
         """Return a datetime index aligned to the original data index order."""
@@ -437,7 +422,7 @@ class EdgarData:
 
     def get_ratings(self):
         """Training Data for Credit Rating Prediction."""
-        if not self.ratings_data_path.exists():
+        if not self.ratings_data_path.exists() or self.overwrite:
             # Download and process credit ratings
             downloader = RatingsHistoryDownloader(config=self.config)
             _ratings_df = downloader.download_moodys_financial(
@@ -456,9 +441,9 @@ class EdgarData:
             )
 
             self.ratings_data = calculate_credit_ratios(df_combined)
-            self.ratings_data.to_csv(self.ratings_data_path)
+            self.ratings_data.to_parquet(self.ratings_data_path)
         else:
-            self.ratings_data = pd.read_csv(self.ratings_data_path, index_col="quarter")
+            self.ratings_data = pd.read_parquet(self.ratings_data_path)
 
     def create_statements(self) -> None:
         self.filings = self.company.get_filings(form=["10-Q", "10-K"])
@@ -497,8 +482,7 @@ class EdgarData:
         )
         self.eq_df = drop_constants(self.eq_df, verbose=self.verbose)
 
-        # Remove duplicate columns with priority: BS > IS > CF
-        # TODO: Check this is the ideal order
+        # Remove duplicate columns with priority: BS > IS > CF > E
         bs_cols = set(self.bs_df.columns)
         is_cols = set(self.is_df.columns)
         cf_cols = set(self.cf_df.columns)
@@ -519,23 +503,7 @@ class EdgarData:
             [self.bs_df, self.is_df, self.cf_df, self.eq_df], axis=1, join="inner"
         )
 
-        # Get credit ratings, calculate ratios -> separate attr and csv
-        self.get_ratings()
-
-        # Print summary - number of rows etc.
-        if self.verbose:
-            print(
-                f"Combined statement shape for {self.config.data.ticker}: "
-                f"{self.data.shape}\n"
-            )
-            print(
-                f"\nbs: {self.bs_df.shape}, is: {self.is_df.shape}, \
-                    cf: {self.cf_df.shape}, q: {self.eq_df.shape}\n"
-            )
-            print(self.data.head(2).T)
-
         self.data.to_parquet(self.cache_statement)
-        print(f"Saved {self.config.data.ticker} to {str(self.cache_statement)}")
 
     def _process_statement(
         self,
@@ -576,14 +544,17 @@ class EdgarData:
         collapsed = drop_non_numeric_columns(collapsed)
 
         cleaned_df = remove_duplicate_columns(collapsed, verbose=self.verbose)
-
         input_columns = cleaned_df.columns.tolist()
 
         # Cache LLM mapping results
         cache_dir = self.config.data.cache_dir
         ticker = self.config.data.ticker
         kind_slug = kind.replace(" ", "_")
-        features_cache_path = Path(f"{cache_dir}/{ticker}_{kind_slug}_features.json")
+        features_cache_path = Path(
+            f"{cache_dir}/features/{ticker}_{kind_slug}_features.json"
+        )
+        features_cache_path.parent.mkdir(parents=True, exist_ok=True)
+
         if features_cache_path.exists() and not self.overwrite:
             organised_features = self.llm_client.load_cached_features(
                 features_cache_path
@@ -608,160 +579,31 @@ class EdgarData:
 
         if kind == "balance_sheet":
             # Drops columns that violate BS identity
-            mapped_df = bs_identity_checker(mapped_df)
+            mapped_df = bs_identity_checker(df=mapped_df, mappings=organised_features)
+        else:
+            # Subtract values to obtain quarterly only (from cumulative)
+            exclude = []
+            if kind == "equity":
+                exclude = [
+                    "Accumulated Other Comprehensive Income",
+                    "Additional Paid-in Capital",
+                    "Common Stock",
+                    "Retained Earnings",
+                    "Total Equity",
+                    "Treasury Stock",
+                ]
 
-        # Remove any leaves from derived structure that are in mapped_df
-        # mapped_df = mapped_df.drop(
-        #     columns=get_fs_struct(kind)["drop_summations"], errors="ignore"
-        # )
-        # Now doing at dataset time
-
-        # For IS and CF, subtract values to obtain quarterly only (from cumulative)
-        if kind in {"income statement", "cash flow statement"}:
-            mapped_df = ytd_to_quarterly(mapped_df)
+            mapped_df = ytd_to_quarterly(mapped_df, exclude_columns=exclude)
 
         return mapped_df
 
 
-class EdgarDataset:
-    """Prepares train/val datasets from EdgarData for model training."""
-
-    def __init__(
-        self, edgar_data: "EdgarData", target: str = "lstm", verbose: bool = False
-    ) -> None:
-        """
-        Initialize dataset from EdgarData.
-
-        Parameters:
-        -----------
-        edgar_data : EdgarData
-            Instance of EdgarData with loaded and processed financial data
-        target : str
-            Target model type ("lstm" or "xgboost")
-        verbose : bool
-            Whether to print detailed information during processing
-        """
-        self.edgar_data = edgar_data
-        self.config = edgar_data.config
-        self.target = target
-        self.verbose = verbose
-
-        # Copy necessary attributes from EdgarData
-        self.data = edgar_data.data
-        self.tgt_indices = edgar_data.tgt_indices
-        self.targets = edgar_data.targets
-
-        # TODO Starting from now, go back quarterly - remove data after a break
-        # print(f"Searching for break in data for {self.config.data.ticker}...")
-        # self.data = self.data.sort_index(ascending=False)
-        # quarterly_index = self.data.index.asfreq("Q")
-        # expected = pd.period_range(
-        #     end=quarterly_index[0], periods=len(self.data), freq="Q"
-        # )[::-1]
-        # mask = (self.data.index == expected).cumprod().astype(bool)
-        # self.data = self.data[mask]
-
-        # Some values aren't present until the new years Q1
-        # Drop new years back to where Income Before Taxes is not 0
-
-        # Prepare the dataset
-        self._prepare_dataset()
-
-    def _prepare_dataset(self) -> None:
-        """Prepare scaled features and create train/val datasets."""
-        self._set_feature_index()
-
-        X_scaled, scaler = self._scale_features()
-        self._set_scaler_stats(scaler)
-
-        if self.target == "lstm":
-            # print(f"\nin: {self.data.index}\n")
-            X_train, y_train, X_test, y_test = build_windows(
-                config=self.config,
-                X=X_scaled,
-                tgt_indices=self.tgt_indices,
-                index=self.data.index,
-            )
-
-            # print(X_train.shape, y_train.shape, X_test.shape, y_test.shape)
-
-            X_train, X_test = self._apply_seasonal_weight(X_train, X_test)
-            self.X_train, self.y_train = X_train, y_train
-            self.X_test, self.y_test = X_test, y_test
-
-            if len(X_train) == 0:
-                raise ValueError(
-                    f"\nNo valid consecutive windows found for training. "
-                    f"Data has {len(self.data)} periods with gaps. "
-                    f"Try reducing lookback ({self.config.data.lookback}) or "
-                    f"withhold ({self.config.data.withhold_periods}).\n"
-                )
-
-            self.num_features = X_train.shape[-1]  # Input dim
-            self.num_targets = len(self.tgt_indices)  # Output dim
-
-            # Minimal tf.data pipeline with shuffle/prefetch to smooth training
-            self.train_dataset = (
-                tf.data.Dataset.from_tensor_slices(
-                    (X_train.astype("float64"), y_train.astype("float64"))
-                )
-                .shuffle(len(X_train))
-                .batch(self.config.data.batch_size)
-                .prefetch(tf.data.AUTOTUNE)
-            )
-
-            self.val_dataset = tf.data.Dataset.from_tensor_slices(
-                (X_test, y_test)
-            ).batch(self.config.data.withhold_periods)
-        elif self.target == "xgboost":
-            # TODO: Implement xgboost dataset preparation
-            pass
-
-    def _set_feature_index(self) -> None:
-        """Create feature name to index mapping."""
-        self.feat_to_idx = {n: i for i, n in enumerate(self.data.columns.tolist())}
-
-    def _scale_features(self) -> tuple[np.ndarray, StandardScaler]:
-        """Scale features using StandardScaler."""
-        scaler = StandardScaler()
-        X_scaled = scaler.fit_transform(self.data.values.astype("float64"))
-        return X_scaled, scaler
-
-    def _set_scaler_stats(self, scaler: StandardScaler) -> None:
-        """Store scaler statistics for later use."""
-        self.full_mean = np.asarray(scaler.mean_, dtype="float64")
-        self.full_std = np.asarray(scaler.scale_, dtype="float64")
-        self.target_mean = self.full_mean[self.tgt_indices]
-        self.target_std = self.full_std[self.tgt_indices]
-
-    def _apply_seasonal_weight(
-        self, X_train: np.ndarray, X_test: np.ndarray
-    ) -> tuple[np.ndarray, np.ndarray]:
-        """Apply seasonal weighting to training and test data."""
-        seasonal_step = self.config.data.seasonal_lag
-        if self.config.data.seasonal_weight == 1.0 or seasonal_step <= 0:
-            return X_train, X_test
-
-        seasonal_indices = []
-        idx = self.config.data.lookback - seasonal_step
-        while idx >= 0:
-            seasonal_indices.append(idx)
-            idx -= seasonal_step
-
-        if not seasonal_indices:
-            return X_train, X_test
-
-        X_train = X_train.copy()
-        X_test = X_test.copy()
-        X_train[:, seasonal_indices, :] *= self.config.data.seasonal_weight
-        X_test[:, seasonal_indices, :] *= self.config.data.seasonal_weight
-        return X_train, X_test
-
-
 if __name__ == "__main__":
     config = Config()
-    data = EdgarData(config=config, overwrite=True, verbose=True)
-
+    data = EdgarData(config=config, overwrite=False, verbose=True)
+    print(data.data.sample(6).T)
+    print()
+    print(data.ratings_data.sample(6).T)
     # Getting ratings
     # dataset = EdgarDataset(edgar_data=data, target="lstm", verbose=False)
     # print(data.data.head(1).T)
