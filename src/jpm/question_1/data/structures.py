@@ -6,6 +6,8 @@ def get_fs_struct(fs: str) -> dict:
         return fs_structures["income_statement"]
     elif fs == "cash_flow":
         return fs_structures["cash_flow"]
+    elif fs == "equity":
+        return fs_structures["equity"]
     elif fs == "all":
         return fs_structures
     else:
@@ -58,7 +60,7 @@ fs_structures = {
                 "Total Liabilities": [],
             },
             "Equity": {
-                "Common Stock and APIC": [],  # Single combined category
+                "Common Stock and APIC": [],
                 "Retained Earnings": [],
                 "Treasury Stock": [],
                 "Accumulated Other Comprehensive Income": [],
@@ -653,6 +655,7 @@ fs_structures = {
                 "Other Non-Cash Items": [],
                 "Changes in Operating Assets and Liabilities": [],
                 "Net Cash from Operating Activities": [],
+                "Interest Paid": [],
             },
             "Investing Activities": {
                 "Capital Expenditures": [],
@@ -840,6 +843,12 @@ fs_structures = {
                 "Cash at End of Year",
                 "Ending Cash Balance",
             ],
+            "Interest Paid": [
+                "Interest Paid",
+                "Interest Paid Net",
+                "Cash Paid for Interest",
+                "Interest Paid on Debt",
+            ],
         },
         "classification_guidelines": {
             "General Rules": [
@@ -869,6 +878,171 @@ fs_structures = {
                 "Operating": "Net income +, depreciation +, A/R increase -, A/P +",
                 "Investing": "CapEx -, asset sales +, investment purchases -",
                 "Financing": "Debt proceeds +, repayment -, issuance +, dividends -",
+            },
+        },
+    },
+    "equity": {
+        "prediction_structure": {
+            "Beginning Balance": {
+                "Common Stock": [],
+                "Additional Paid-in Capital": [],
+                "Retained Earnings": [],
+                "Accumulated Other Comprehensive Income": [],
+                "Treasury Stock": [],
+                "Total Equity": [],
+            },
+            "Net Income": [],
+            "Other Comprehensive Income": {
+                "Foreign Currency Translation": [],
+                "Unrealized Gains/Losses on Securities": [],
+                "Derivatives and Hedging": [],
+                "Other OCI": [],
+                "Total Other Comprehensive Income": [],
+            },
+            "Comprehensive Income": [],
+            "Dividends Declared": [],
+            "Dividends Paid": [],
+            "Stock Issuance": {
+                "Stock-Based Compensation": [],
+                "Exercise of Stock Options": [],
+                "Other Stock Issuance": [],
+                "Total Stock Issuance Value": [],
+            },
+            "Stock Repurchases": [],
+            "Tax Effects from Stock Compensation": [],
+            "Other Equity Adjustments": [],
+            "Ending Balance": {
+                "Common Stock": [],
+                "Additional Paid-in Capital": [],
+                "Retained Earnings": [],
+                "Accumulated Other Comprehensive Income": [],
+                "Treasury Stock": [],
+                "Total Equity": [],
+            },
+            "__unmapped__": [],
+        },
+        "drop_summations": [],
+        "mapping_examples": {
+            "Net Income": [
+                "Net Income",
+                "Net Income (Loss)",
+                "Net Income Attributable to Parent",
+            ],
+            "Foreign Currency Translation": [
+                "Foreign Currency Translation Adjustment",
+                "Other Comprehensive Income Loss Foreign Currency",
+                "Currency Translation Adjustment",
+            ],
+            "Unrealized Gains/Losses on Securities": [
+                "Unrealized Gains (Losses) on Securities",
+                "Other Comprehensive Income Unrealized Holding Gain Loss",
+                "Available-for-Sale Securities Adjustment",
+            ],
+            "Derivatives and Hedging": [
+                "Derivatives Qualifying as Hedges",
+                "Cash Flow Hedges",
+                "Other Comprehensive Income Derivatives",
+            ],
+            "Total Other Comprehensive Income": [
+                "Other Comprehensive Income (Loss)",
+                "Total Other Comprehensive Income Net of Tax",
+            ],
+            "Comprehensive Income": [
+                "Comprehensive Income",
+                "Comprehensive Income Net of Tax",
+                "Total Comprehensive Income",
+            ],
+            "Dividends Declared": [
+                "Dividends Declared",
+                "Common Stock Dividends Declared",
+                "Cash Dividends Declared",
+            ],
+            "Dividends Paid": [
+                "Dividends Paid",
+                "Dividends Common Stock Cash",
+                "Cash Dividends Paid",
+                "Payment of Dividends",
+            ],
+            "Stock-Based Compensation": [
+                "Stock-Based Compensation",
+                "Adjustments to Additional Paid in Capital Sharebased Compensation",
+                "Share-Based Compensation Expense",
+                "Equity Compensation",
+            ],
+            "Exercise of Stock Options": [
+                "Proceeds from Stock Options Exercised",
+                "Stock Issued During Period Value New Issues",
+                "Issuance of Common Stock",
+            ],
+            "Stock Repurchases": [
+                "Stock Repurchased and Retired",
+                "Treasury Stock Purchases",
+                "Repurchase of Common Stock",
+                "Share Buybacks",
+            ],
+            "Tax Effects from Stock Compensation": [
+                "Adjustment to Additional Paid in Capital Income Tax Effect",
+                "Tax Benefit from Stock-Based Compensation",
+                "Excess Tax Benefit from Share-Based Compensation",
+            ],
+            "Common Stock": [
+                "Common Stock Value",
+                "Common Stock Par Value",
+            ],
+            "Additional Paid-in Capital": [
+                "Additional Paid-in Capital",
+                "APIC",
+                "Capital in Excess of Par",
+            ],
+            "Retained Earnings": [
+                "Retained Earnings",
+                "Accumulated Deficit",
+            ],
+            "Accumulated Other Comprehensive Income": [
+                "Accumulated Other Comprehensive Income",
+                "AOCI",
+                "Accumulated Other Comprehensive Loss",
+            ],
+            "Treasury Stock": [
+                "Treasury Stock",
+                "Treasury Stock at Cost",
+            ],
+            "Total Equity": [
+                "Total Stockholders' Equity",
+                "Total Equity",
+                "Stockholders' Equity",
+            ],
+            "Other Equity Adjustments": [
+                "Stockholders Equity Other",
+                "Other Changes in Equity",
+                "Adoption of New Accounting Standards",
+                "Cumulative Effect of Accounting Change",
+            ],
+        },
+        "classification_guidelines": {
+            "General Rules": [
+                "Equity statement shows changes in equity accounts over period",
+                "Debits decrease equity, credits increase equity",
+                "Net Income flows to Retained Earnings",
+                "OCI bypasses income statement but affects equity",
+            ],
+            "Specific Mappings": {
+                "Net Income": "Links to income statement net income",
+                "Dividends Paid": "Reduces retained earnings (cash outflow)",
+                "Stock Repurchases": "Reduces equity \
+                    (typically increases treasury stock)",
+                "Stock-Based Compensation": "Increases APIC (non-cash)",
+                "Comprehensive Income": "Net Income + OCI",
+            },
+            "Edge Cases": {
+                "Dividends per Share": "Supplemental info → __unmapped__",
+                "Shares Outstanding": "Share count not dollar value → __unmapped__",
+                "Accounting Changes": "Restatements → Other Equity Adjustments",
+                "Noncontrolling Interest": "If separate line → __unmapped__",
+            },
+            "Sign Conventions": {
+                "Increases to Equity": "Net income +, stock issuance +, OCI gains +",
+                "Decreases to Equity": "Dividends -, buybacks -, OCI losses -",
             },
         },
     },

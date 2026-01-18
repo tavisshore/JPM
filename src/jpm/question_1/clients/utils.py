@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import json
 import os
+import re
 from typing import List
 
 
@@ -367,3 +369,67 @@ def get_fx_rate(currency: str, date: str) -> float:
     except Exception:
         print(f"Warning: Using fallback FX rate for {currency} on {date}")
         return FX_RATES.get((currency, date), 1.0)
+
+
+def parse_llm_json_response(response_text: str) -> dict:
+    """
+    Parse LLM response into Python dict, handling markdown code \
+        blocks and other formatting.
+
+    Args:
+        response_text: Raw text response from LLM
+
+    Returns:
+        Parsed dictionary
+    """
+    # Remove markdown code blocks if present
+    text = re.sub(r"```json\s*", "", response_text)
+    text = re.sub(r"```\s*", "", text)
+
+    # Strip whitespace
+    text = text.strip()
+
+    # Parse JSON
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError as e:
+        # Try to extract JSON from text if wrapped in other content
+        json_match = re.search(r"\{.*\}", text, re.DOTALL)
+        if json_match:
+            return json.loads(json_match.group())
+        raise ValueError(f"Could not parse JSON from response: {e}") from None
+
+
+def parse_llm_list_response(response_text: str) -> list[str]:
+    """
+    Parse LLM response into Python list of strings, \
+        handling markdown code blocks and other formatting.
+
+    Args:
+        response_text: Raw text response from LLM
+
+    Returns:
+        Parsed list of strings
+    """
+    # Remove markdown code blocks if present
+    text = re.sub(r"```json\s*", "", response_text)
+    text = re.sub(r"```\s*", "", text)
+
+    # Strip whitespace
+    text = text.strip()
+
+    # Parse JSON
+    try:
+        result = json.loads(text)
+        # Ensure it's a list
+        if isinstance(result, list):
+            return [str(item) for item in result if item is not None]
+        else:
+            raise ValueError(f"Expected list, got {type(result)}")
+    except json.JSONDecodeError as e:
+        # Try to extract JSON array from text if wrapped in other content
+        json_match = re.search(r"\[.*\]", text, re.DOTALL)
+        if json_match:
+            result = json.loads(json_match.group())
+            return [str(item) for item in result if item is not None]
+        raise ValueError(f"Could not parse JSON list from response: {e}") from None

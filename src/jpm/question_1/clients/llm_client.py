@@ -15,13 +15,20 @@ import pandas as pd
 from openai import OpenAI
 from pandas import DataFrame
 from pypdf import PdfReader
+from tqdm import tqdm
 
 from jpm.question_1.clients.prompts import (
+    get_company_name_prompt,
     get_predict_prompt,
     get_report_prompt,
     get_statement_prompt,
+    get_ticker_prompt,
 )
-from jpm.question_1.clients.utils import apply_statement_specific_fixes, get_fx_rate
+from jpm.question_1.clients.utils import (
+    apply_statement_specific_fixes,
+    get_fx_rate,
+    parse_llm_json_response,
+)
 from jpm.question_1.config import LLMConfig
 from jpm.question_1.misc import format_money
 
@@ -339,3 +346,49 @@ class LLMClient:
         lines.append("=" * 70)
 
         print("\n".join(lines))
+
+    def company_name_to_ticker(
+        self,
+        company_names: list,
+        cfg: LLMConfig,
+    ) -> dict:
+        batch_size = 25
+        all_results = {}
+        num_batches = (len(company_names) + batch_size - 1) // batch_size
+
+        for i in tqdm(
+            range(0, len(company_names), batch_size),
+            desc="Processing company batches",
+            total=num_batches,
+        ):
+            batch = company_names[i : i + batch_size]
+            try:
+                prompt = get_ticker_prompt(batch)
+                response = self.chat(prompt, cfg)
+                response = parse_llm_json_response(response)
+                all_results.update(response)
+                print(response)
+            except Exception as e:
+                print(f"\nBatch {i // batch_size} failed: {e}")
+                for name in tqdm(batch, desc="Fallback individual calls", leave=False):
+                    try:
+                        prompt = get_ticker_prompt([name])
+                        response = self.chat(prompt, cfg)
+                        response = parse_llm_json_response(response)
+                        all_results[name] = response
+                    except:
+                        all_results[name] = None
+
+        return response
+
+    def ticker_to_company_name(
+        self,
+        ticker: str,
+        cfg: LLMConfig,
+    ) -> dict:
+        prompt = get_company_name_prompt([ticker])
+        response = self.chat(prompt, cfg)
+        result = parse_llm_json_response(response)
+        name_variations = result.get(ticker, [])
+        # response = parse_llm_list_response(response[ticker])
+        return name_variations

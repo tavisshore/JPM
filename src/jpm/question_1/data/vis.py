@@ -113,7 +113,7 @@ def print_mapping_summary(mapping_dict):
     print(f"\n{Fore.CYAN}{'=' * 80}{Style.RESET_ALL}\n")
 
 
-def pretty_print_full_mapping(mapping_dict, show_summary=True):
+def pretty_print_full_mapping(mapping_dict, show_summary=True, statement_type=""):
     """
     Complete pretty print with optional summary.
 
@@ -126,11 +126,11 @@ def pretty_print_full_mapping(mapping_dict, show_summary=True):
     """
 
     print(f"\n{Fore.CYAN}{Style.BRIGHT}{'#' * 80}{Style.RESET_ALL}")
-    print(f"{Fore.CYAN}{Style.BRIGHT}#{' ' * 78}#{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}{Style.BRIGHT}#{' ' * 78}{Style.RESET_ALL}")
     print(
-        f"{Fore.CYAN}{Style.BRIGHT}#  FEATURE MAPPING: OLD → NEW{' ' * 48}#{Style.RESET_ALL}"
+        f"{Fore.CYAN}{Style.BRIGHT}#  {statement_type.upper()}: OLD → NEW{' ' * 48}{Style.RESET_ALL}"
     )
-    print(f"{Fore.CYAN}{Style.BRIGHT}#{' ' * 78}#{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}{Style.BRIGHT}#{' ' * 78}{Style.RESET_ALL}")
     print(f"{Fore.CYAN}{Style.BRIGHT}{'#' * 80}{Style.RESET_ALL}")
 
     pretty_print_mapping(mapping_dict)

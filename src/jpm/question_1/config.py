@@ -8,7 +8,7 @@ from pathlib import Path
 class DataConfig:
     """Data-related configuration."""
 
-    ticker: str = "MSFT"  # Debug with MSFT AAPL AMZN
+    ticker: str = "AAPL"  # Debug with MSFT AAPL AMZN
     cache_dir: str = "/scratch/datasets/jpm"
     periods: int = 60  # quarters -> 15 years, post-2008
     lookback: int = 4
