@@ -42,6 +42,7 @@ fix = true
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "C", "I", "B"]
+ignore = ["E501"]  # Ignore line-too-long errors
 
 [tool.pytest.ini_options]
 minversion = "8.0"

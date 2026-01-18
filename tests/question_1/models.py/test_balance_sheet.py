@@ -1,9 +1,8 @@
 import types
 from unittest.mock import Mock
 
-import pytest
-
 import jpm.question_1.models.balance_sheet as bs_mod
+import pytest
 from jpm.question_1.models.balance_sheet import (
     Assets,
     BalanceSheet,

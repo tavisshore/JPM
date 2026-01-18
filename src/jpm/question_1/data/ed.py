@@ -1,5 +1,4 @@
 # import os
-import math
 import os
 import re
 from pathlib import Path
@@ -9,17 +8,22 @@ import edgar
 import numpy as np
 import pandas as pd
 import requests
-import tensorflow as tf
 from edgar import Company
 from edgar.xbrl import XBRLS
-from sklearn.preprocessing import StandardScaler
 
 from jpm.question_1.config import Config
+from jpm.question_1.data.credit import calculate_credit_ratios
 from jpm.question_1.data.structures import get_fs_struct
 from jpm.question_1.data.utils import (
-    build_windows,
+    add_derived_columns,
+    bs_identity_checker,
+    drop_constants,
+    drop_non_numeric_columns,
     remove_duplicate_columns,
+    standardise_rating,
+    ticker_to_name,
     xbrl_to_raw,
+    ytd_to_quarterly,
 )
 from jpm.question_1.data.vis import pretty_print_full_mapping
 from jpm.question_1.misc import get_leaf_keys
@@ -56,212 +60,69 @@ MONTH_ABBR = {
 }
 
 
-def drop_constants(df, verbose=False):
-    # Drop columns that are all NaN first (avoids warnings from nanstd)
-    all_nan_cols = df.columns[df.isna().all()].tolist()
-    if all_nan_cols:
-        if verbose:
-            print(f"Dropping {len(all_nan_cols)} all-NaN columns: {all_nan_cols}")
-        df = df.drop(columns=all_nan_cols)
+def _extract_leaf_mappings(mapping):
+    """Extract only leaf-level column mappings from nested mapping structure."""
+    leaf_map = {}
 
-    # Check for constant columns, treating NaN as missing (not as a value)
-    stds = df.apply(lambda x: np.nanstd(x.astype(float)))
-    constant_cols = stds[stds == 0].index.tolist()
-    if constant_cols:
-        if verbose:
-            print(f"Dropping {len(constant_cols)} constant columns: {constant_cols}")
-        df = df.drop(columns=constant_cols)
+    for key, value in mapping.items():
+        if key == "__unmapped__":
+            continue
 
-    # Drop rows that are mostly NaN (should be rare after inner join)
-    df = df.dropna(axis=0, thresh=int(0.8 * len(df.columns)))
+        if isinstance(value, dict):
+            nested_maps = _extract_leaf_mappings(value)
+            leaf_map.update(nested_maps)
+        elif isinstance(value, list):
+            leaf_map[key] = value
 
-    # If Income Before Taxes in columns, drop rows where it's 0
-    if "Income Before Taxes" in df.columns:
-        df = df[df["Income Before Taxes"].fillna(0) != 0]
-
-    # NOTE: fillna(0) moved to after all variance checks in _load_or_fetch_data
-    return df
+    return leaf_map
 
 
-def calculate_credit_ratios(df):
-    def col(name):
-        return (
-            df[name].fillna(0) if name in df.columns else pd.Series(0, index=df.index)
-        )
+def _is_mutually_exclusive(df, cols):
+    """
+    Check if columns are mutually exclusive (alternate taxonomies).
+    Returns True if columns never have non-zero values simultaneously.
+    """
+    if len(cols) <= 1:
+        return False
 
-    ratios = pd.DataFrame(index=df.index)
+    # Count rows where multiple columns are non-zero
+    non_zero = (df[cols] != 0) & (df[cols].notna())
+    simultaneous_nonzero = (non_zero.sum(axis=1) > 1).sum()
 
-    # Derived values
-    total_debt = (
-        col("Short-term Debt")
-        + col("Current Portion of Long-term Debt")
-        + col("Long-term Debt")
-    )
-    ebit = col("Operating Income (Loss)")
-    ebitda = ebit
-    total_capital = total_debt + col("Total Equity")
-    cfo = col("Net Cash Provided by (Used in) Operating Activities")
-    capex = col("Capital Expenditures").abs()
-    fcf = cfo - capex
-    quick_assets = col("Total Current Assets") - col("Inventory")
-
-    # Interest proxy - try multiple sources
-    # For banks, interest paid/received may be netted or in IS
-    interest_paid_cf = col("Cash Paid for Interest")
-    interest_net_cf = col("Interest Paid Net of Interest Received")
-    interest_is = col("Net Interest Income (Expense)").abs()
-
-    # Priority: 1) Cash paid for interest, 2) Net interest from CF, 3) Interest from IS
-    interest_paid = interest_paid_cf.where(
-        interest_paid_cf > 0, interest_net_cf.where(interest_net_cf > 0, interest_is)
-    ).replace(0, float("nan"))
-
-    # Leverage
-    ratios["debt_to_equity"] = total_debt / col("Total Equity").replace(0, float("nan"))
-    ratios["debt_to_assets"] = total_debt / col("Total Assets").replace(0, float("nan"))
-    ratios["debt_to_capital"] = total_debt / total_capital.replace(0, float("nan"))
-    ratios["debt_to_ebitda"] = total_debt / ebitda.replace(0, float("nan"))
-    ratios["liabilities_to_assets"] = col("Total Liabilities") / col(
-        "Total Assets"
-    ).replace(0, float("nan"))
-
-    # Coverage (using Cash Paid for Interest as proxy)
-    ratios["interest_coverage"] = ebit / interest_paid
-    ratios["ebitda_interest_coverage"] = ebitda / interest_paid
-    ratios["cfo_interest_coverage"] = cfo / interest_paid
-
-    # Profitability
-    revenue = col("Total Revenues").replace(0, float("nan"))
-    ratios["gross_margin"] = col("Gross Profit") / revenue
-    ratios["operating_margin"] = ebit / revenue
-    ratios["net_margin"] = col("Net Income (Loss)") / revenue
-    ratios["roa"] = col("Net Income (Loss)") / col("Total Assets").replace(
-        0, float("nan")
-    )
-    ratios["roe"] = col("Net Income (Loss)") / col("Total Equity").replace(
-        0, float("nan")
-    )
-    ratios["roic"] = ebit / total_capital.replace(0, float("nan"))
-
-    # Liquidity
-    current_liab = col("Total Current Liabilities").replace(0, float("nan"))
-    ratios["current_ratio"] = col("Total Current Assets") / current_liab
-    ratios["quick_ratio"] = quick_assets / current_liab
-    ratios["cash_ratio"] = col("Cash and Cash Equivalents") / current_liab
-    ratios["cash_to_short_term_debt"] = col("Cash and Cash Equivalents") / col(
-        "Short-term Debt"
-    ).replace(0, float("nan"))
-
-    # Cash Flow
-    ratios["cfo_to_debt"] = cfo / total_debt.replace(0, float("nan"))
-    ratios["fcf_to_debt"] = fcf / total_debt.replace(0, float("nan"))
-    ratios["cfo_to_liabilities"] = cfo / col("Total Liabilities").replace(
-        0, float("nan")
-    )
-
-    # Size
-    ratios["log_assets"] = col("Total Assets").apply(
-        lambda x: math.log(x) if x > 0 else float("nan")
-    )
-    ratios["log_revenue"] = col("Total Revenues").apply(
-        lambda x: math.log(x) if x > 0 else float("nan")
-    )
-
-    # Stability
-    ratios["retained_earnings_to_assets"] = col("Retained Earnings") / col(
-        "Total Assets"
-    ).replace(0, float("nan"))
-
-    return ratios
+    # If <5% of rows have multiple non-zero values, treat as mutually exclusive
+    threshold = len(df) * 0.05
+    return simultaneous_nonzero < threshold
 
 
-def add_derived_columns(df):
-    d = df.copy()
+def _map_single_column(df, new_col, old_cols):
+    """Map a single column based on source columns."""
+    if not old_cols:
+        return np.nan
 
-    def col(name):
-        return d[name].fillna(0) if name in d.columns else pd.Series(0, index=d.index)
+    existing_cols = [col for col in old_cols if col in df.columns]
 
-    # Assets
-    d["Total Current Assets"] = (
-        col("Cash and Cash Equivalents")
-        + col("Accounts Receivable")
-        + col("Inventory")
-        + col("Prepaid Expenses")
-        + col("Marketable Securities (Short-term Investments)")
-        + col("Other Current Assets")
-    )
+    if not existing_cols:
+        return np.nan
+    if len(existing_cols) == 1:
+        return df[existing_cols[0]]
 
-    d["Total Non-Current Assets"] = (
-        col("Property, Plant, and Equipment (PP&E)")
-        + col("Intangible Assets")
-        + col("Goodwill")
-        + col("Marketable Securities (Non-current)")
-        + col("Long-term Investments")
-        + col("Deferred Tax Assets")
-        + col("Other Non-Current Assets")
-    )
+    # Multiple sources - determine if mutually exclusive or aggregate
+    if _is_mutually_exclusive(df, existing_cols):
+        # Alternate taxonomies - coalesce (prefer non-null/non-zero values)
+        result = df[existing_cols].replace(0, np.nan).bfill(axis=1).iloc[:, 0]
+        return result.fillna(0)
 
-    d["Total Assets"] = d["Total Current Assets"] + d["Total Non-Current Assets"]
-
-    # Liabilities
-    d["Total Current Liabilities"] = (
-        col("Accounts Payable")
-        + col("Accrued Expenses")
-        + col("Short-term Debt")
-        + col("Current Portion of Long-term Debt")
-        + col("Unearned Revenue (Deferred Revenue)")
-        + col("Income Taxes Payable")
-        + col("Other Current Liabilities")
-    )
-
-    d["Total Non-Current Liabilities"] = (
-        col("Long-term Debt")
-        + col("Deferred Tax Liabilities")
-        # + col("Pension Liabilities")
-        + col("Lease Liabilities")
-        + col("Other Non-Current Liabilities")
-    )
-
-    d["Total Liabilities"] = (
-        d["Total Current Liabilities"] + d["Total Non-Current Liabilities"]
-    )
-
-    # Equity
-    d["Total Equity"] = (
-        col("Additional Paid-in Capital")
-        + col("Retained Earnings")
-        + col("Treasury Stock")
-        + col("Accumulated Other Comprehensive Income (AOCI)")
-    )
-
-    # Income Statement
-    d["Total Cost of Revenue"] = (
-        col("Cost of Goods Sold")
-        + col("Cost of Services")
-        + col("Other Cost of Revenue")
-    )
-    d["Gross Profit"] = col("Total Revenues") - d["Total Cost of Revenue"]
-    d["Total Operating Expenses"] = (
-        col("Selling, General and Administrative")
-        + col("Research and Development")
-        + col("Other Operating Expenses")
-    )
-    d["Operating Income (Loss)"] = d["Gross Profit"] - d["Total Operating Expenses"]
-
-    # Cash Flow
-    d["Net Cash Provided by (Used in) Operating Activities"] = (
-        col("Net Income (Loss)")
-        + col("Stock-Based Compensation")
-        + col("Changes in Working Capital")
-        + col("Other Operating Activities")
-    )
-
-    return d
+    # True aggregation - sum all sources
+    return df[existing_cols].sum(axis=1)
 
 
 def remap_financial_dataframe(df, column_mapping):
     """
     Remap and aggregate dataframe columns according to mapping structure.
+
+    Handles two types of multi-source mappings:
+    1. Alternate taxonomies (mutually exclusive) - coalesce (take first non-null)
+    2. True aggregations (can coexist) - sum
 
     Parameters:
     -----------
@@ -273,158 +134,15 @@ def remap_financial_dataframe(df, column_mapping):
     Returns:
     --------
     pd.DataFrame
-        New dataframe with remapped columns, values summed where multiple sources exist
+        New dataframe with remapped columns
     """
-
-    def extract_leaf_mappings(mapping):
-        """Extract only leaf-level column mappings."""
-        leaf_map = {}
-
-        for key, value in mapping.items():
-            if key == "__unmapped__":
-                continue
-
-            if isinstance(value, dict):
-                # Recurse into nested structure
-                nested_maps = extract_leaf_mappings(value)
-                leaf_map.update(nested_maps)
-            elif isinstance(value, list):
-                # Leaf node - direct mapping
-                leaf_map[key] = value
-
-        return leaf_map
-
-    # Extract flat mapping
-    flat_mapping = extract_leaf_mappings(column_mapping)
-
-    # Create new dataframe
+    flat_mapping = _extract_leaf_mappings(column_mapping)
     new_df = pd.DataFrame(index=df.index)
 
-    # Process each mapped column
     for new_col, old_cols in flat_mapping.items():
-        if not old_cols:  # Empty list - column will be NaN
-            new_df[new_col] = np.nan
-        else:
-            # Find which columns actually exist in the source dataframe
-            existing_cols = [col for col in old_cols if col in df.columns]
-
-            if existing_cols:
-                # Sum the existing columns
-                if len(existing_cols) == 1:
-                    new_df[new_col] = df[existing_cols[0]]
-                else:
-                    new_df[new_col] = df[existing_cols].sum(axis=1)
-            else:
-                # None of the source columns exist
-                new_df[new_col] = np.nan
+        new_df[new_col] = _map_single_column(df, new_col, old_cols)
 
     return new_df
-
-
-def ytd_to_quarterly(df):
-    """
-    Convert YTD to quarterly.
-    Expects: rows = PeriodIndex (quarterly), columns = metrics
-    """
-    df = df.copy()
-    df = df.sort_index()
-
-    quarterly = pd.DataFrame(index=df.index, columns=df.columns)
-
-    for i, idx in enumerate(df.index):
-        # Q1 of fiscal year (quarter 1)
-        is_q1 = idx.quarter == 1
-
-        if i == 0 or is_q1:
-            quarterly.loc[idx] = df.loc[idx]
-        else:
-            quarterly.loc[idx] = df.loc[idx] - df.loc[df.index[i - 1]]
-
-    return quarterly
-
-
-def lei_to_ticker(lei):
-    if pd.isna(lei):
-        return None
-
-    try:
-        gleif = requests.get(
-            f"https://api.gleif.org/api/v1/lei-records/{lei}", timeout=10
-        )
-        gleif.raise_for_status()
-        name = gleif.json()["data"]["attributes"]["entity"]["legalName"]["name"]
-
-        figi = requests.post(
-            "https://api.openfigi.com/v3/search",
-            json={"query": name, "securityType": "Common Stock"},
-            timeout=10,
-        )
-        figi.raise_for_status()
-        data = figi.json().get("data", [])
-
-        if data:
-            return data[0].get("ticker")
-    except (requests.RequestException, KeyError, IndexError):
-        pass
-
-    return None
-
-
-def bs_identity_checker(df: pd.DataFrame, organised_features: dict) -> pd.DataFrame:
-    df = df.fillna(0)
-
-    # Assets
-    assets = (
-        df["Cash and Equivalents"]
-        + df["Receivables"]
-        + df["Inventory"]
-        + df["Prepaid and Other Current Assets"]
-        + df["Marketable Securities (Short-term)"]
-        + df["Property, Plant, and Equipment (net)"]
-        + df["Intangible Assets (net)"]
-        + df["Goodwill"]
-        + df["Long-term Investments"]
-        + df["Deferred Tax Assets"]
-        + df["Other Non-Current Assets"]
-    )
-
-    # Liabilities
-    liabilities = (
-        df["Accounts Payable and Accrued Expenses"]
-        + df["Short-term Debt"]
-        + df["Deferred Revenue"]
-        + df["Other Current Liabilities"]
-        + df["Long-term Debt"]
-        + df["Deferred Tax Liabilities"]
-        + df["Lease Liabilities"]
-        + df["Other Non-Current Liabilities"]
-    )
-
-    equity = (
-        df["Common Stock and APIC"]
-        + df["Retained Earnings"]
-        - df["Treasury Stock"]
-        + df["Accumulated Other Comprehensive Income"]
-    )
-
-    accounting_id = assets - (liabilities + equity)
-
-    if accounting_id.abs().max() > 1e3:
-        # num_discrepant = (accounting_id.abs() > 1e3).sum()
-        # pct_discrepant = (num_discrepant / len(accounting_id)) * 100
-        # if pct_discrepant > 25:
-        #     print(accounting_id.T)
-        #     pretty_print_full_mapping(organised_features)
-        #     print(
-        #         f"WARNING: {num_discrepant} periods ({pct_discrepant:.2f}%) "
-        #         "have significant discrepancy in accounting identity!\n"
-        #     )
-
-        # Get the windows where discrepancy occurs - remove these
-        discrepant_indices = accounting_id[accounting_id.abs() > 1e3].index
-        df = df.drop(index=discrepant_indices)
-
-    return df
 
 
 class RatingsHistoryDownloader:
@@ -448,70 +166,95 @@ class RatingsHistoryDownloader:
     def _find_latest_moodys_financial(self, files: list[str]) -> str | None:
         """Find the most recent Moody's Financial CSV (sorted by date prefix)."""
         moodys_financial = [
-            f for f in files if "Moody's Investors Service Financial" in f
+            f for f in files if "Moody's Investors Service Corporate" in f
         ]
         if not moodys_financial:
             return None
         # Files are named with YYYYMMDD prefix, so lexicographic sort works
         return sorted(moodys_financial, reverse=True)[0]
 
-    def download_moodys_financial(self) -> pd.DataFrame:
-        """Download the latest Moody's Financial ratings CSV."""
+    def download_moodys_financial(self, llm_client, ticker=None) -> pd.DataFrame:
+        """Download the latest Moody's Financial ratings CSV.
+        1. Download latest csv from https://ratingshistory.info/
+        2. For each record, add the company's corresponding ticker
+        3. Make the df a quarter update of companies rating
+        """
         files = self._fetch_available_files()
         filename = self._find_latest_moodys_financial(files)
 
-        output_file = Path(self.config.data.cache_dir) / filename
+        raw_data = Path(self.config.data.cache_dir) / filename
 
-        if output_file.exists():
-            ratings_df = pd.read_csv(output_file, dtype=str)
-            return ratings_df
+        # Downloads the latest moodys corporate data
+        if not raw_data.exists():
+            url = f"{self.API_URL}/{quote(filename)}"
+            resp = self.session.get(url, timeout=30, stream=True)
+            resp.raise_for_status()
+            total_size = int(resp.headers.get("content-length", 0))
+            with open(raw_data, "wb") as f:
+                if total_size > 0:
+                    from tqdm import tqdm
 
-        if not filename:
-            raise ValueError("No Moody's Financial CSV found on ratingshistory.info")
+                    with tqdm(
+                        total=total_size,
+                        unit="B",
+                        unit_scale=True,
+                        desc=f"Downloading {filename}",
+                    ) as pbar:
+                        for chunk in resp.iter_content(chunk_size=8192):
+                            f.write(chunk)
+                            pbar.update(len(chunk))
+                else:
+                    for chunk in resp.iter_content(chunk_size=8192):
+                        f.write(chunk)
 
-        url = f"{self.API_URL}/{quote(filename)}"
-        resp = self.session.get(url, timeout=30, stream=True)
-        resp.raise_for_status()
-
-        with open(output_file, "wb") as f:
-            for chunk in resp.iter_content(chunk_size=8192):
-                f.write(chunk)
-
-        ratings_df = pd.read_csv(output_file, dtype=str)
-
+        # Processes moodys data for the particular ticker - returning quarterly ratings
+        # if not output_file.exists():
+        ratings_df = pd.read_csv(raw_data, dtype=str)
         ratings_df = ratings_df[
-            ["obligor_name", "rating", "rating_action_date", "legal_entity_identifier"]
+            ["obligor_name", "rating", "rating_type", "rating_action_date"]
         ]
-
-        # Ratings to exclude (withdrawn, not-prime, short-term, etc.)
         EXCLUDE_RATINGS = {"WR", "NR", "NP", "P-1", "P-2", "P-3"}
-
-        # Create numeric mapping (lower = better credit)
-        # rating_to_numeric = {r: i for i, r in enumerate(MOODYS_LONG_TERM)}
-
-        # Filter and normalize
         df_clean = ratings_df[~ratings_df["rating"].isin(EXCLUDE_RATINGS)].copy()
-        # df_clean["rating_numeric"] = df_clean["rating"].map(rating_to_numeric)
+        df_clean["rating_action_date"] = pd.to_datetime(df_clean["rating_action_date"])
+        df_clean = df_clean.dropna(subset=["rating"])
 
-        df_clean["quarter"] = pd.to_datetime(
-            df_clean["rating_action_date"]
-        ).dt.to_period("Q")
-        df = df_clean.drop(columns=["rating_action_date"])
-        # Drop any unmapped ratings
-        # df_clean = df_clean.dropna(subset=["rating_numeric"])
-        # df_clean["rating_numeric"] = df_clean["rating_numeric"].astype(int)
+        name_variations = ticker_to_name(ticker, llm_client)
+        df_clean = df_clean[df_clean["obligor_name"].isin(name_variations)]
+        df_clean["rating"] = df_clean["rating"].apply(standardise_rating)
+        # Try organisational ratings, otherwise fallback to instrument
+        df_ratings = df_clean[df_clean["rating_type"] == "Organization"]
+        if df_ratings.empty:
+            df_ratings = df_clean[df_clean["rating_type"] == "Instrument"]
+        df_clean = df_ratings.drop(columns=["rating_type"])
 
-        # Get unique LEIs to minimize API calls
-        unique_leis = df["legal_entity_identifier"].dropna().unique()
-        lei_ticker_map = {lei: lei_to_ticker(lei) for lei in unique_leis}
+        # Now convert into quarterly ratings to join with FS data
+        results = []
+        df_clean = df_clean.sort_values("rating_action_date").reset_index(drop=True)
+        for i in range(len(df_clean)):
+            start_date = df_clean.loc[i, "rating_action_date"]
+            rating = df_clean.loc[i, "rating"]
 
-        # Map tickers and drop rows without
-        df["ticker"] = df["legal_entity_identifier"].map(lei_ticker_map)
-        df = df.dropna(subset=["ticker"])
+            # End date is either next rating change or today
+            if i < len(df_clean) - 1:
+                end_date = df_clean.loc[i + 1, "rating_action_date"]
+            else:
+                end_date = pd.Timestamp.now()
 
-        # overwrite
-        df.to_csv(output_file, index=False)
+            quarters = pd.date_range(start=start_date, end=end_date, freq="QE")
+            for quarter in quarters:
+                results.append(
+                    {
+                        "rating": rating,
+                        "quarter": quarter,
+                    }
+                )
 
+        df = pd.DataFrame(results)
+        df["quarter"] = pd.to_datetime(df["quarter"]).dt.to_period("Q")
+        df = df[["rating", "quarter"]]
+        df = df.set_index("quarter")
+
+        df.index = pd.PeriodIndex(df.index, freq="Q")
         return df
 
 
@@ -525,15 +268,18 @@ class EdgarData:
         self.overwrite = overwrite
         self.verbose = verbose
         self.cache_statement = Path(
-            f"{self.config.data.cache_dir}/{self.config.data.ticker}.parquet"
+            f"{self.config.data.cache_dir}/statements/{self.config.data.ticker}.parquet"
+        )
+        self.ratings_data_path = Path(
+            f"{self.config.data.cache_dir}/ratings/{self.config.data.ticker}_ratings.parquet"
         )
         self.cache_statement.parent.mkdir(parents=True, exist_ok=True)
+        self.ratings_data_path.parent.mkdir(parents=True, exist_ok=True)
 
         # Lazy import to avoid circular dependency
         from jpm.question_1.clients.llm_client import LLMClient
 
         self.llm_client = LLMClient()
-        # Load and prepare data
         self._load_data()
 
     def _load_data(self) -> None:
@@ -566,47 +312,16 @@ class EdgarData:
 
             self.create_statements()
 
+        # Get credit ratings, calculate ratios -> separate attr and csv
+        self.get_ratings()
+
         if len(self.data) == 0:
             raise ValueError(
                 f"No data available for {self.config.data.ticker}. "
                 "The data may have been filtered out entirely."
             )
 
-        self._filter_low_quality_columns()
-        self.data = self.data.fillna(0)
-
         return self.data
-
-    def _filter_low_quality_columns(self) -> None:
-        """Remove columns with low variance,
-        high frequency of single value, or all NaN."""
-        # Drop columns where most common value exceeds threshold
-        threshold = 0.5
-        cols_to_drop = []
-        for col in self.data.columns:
-            vc = self.data[col].value_counts(dropna=False)
-            if len(vc) > 0 and (vc.iloc[0] / len(self.data)) > threshold:
-                cols_to_drop.append(col)
-        self.data = self.data.drop(columns=cols_to_drop)
-
-        # Drop all-NaN columns
-        all_nan_cols = self.data.columns[self.data.isna().all()].tolist()
-        if all_nan_cols:
-            if self.verbose:
-                print(f"Dropping {len(all_nan_cols)} all-NaN columns: {all_nan_cols}")
-            self.data = self.data.drop(columns=all_nan_cols)
-
-        # Remove columns with very low variance (before fillna to avoid
-        # treating NaN-heavy columns as constant after they become zeros)
-        stds = self.data.apply(lambda x: np.nanstd(x.astype(float)))
-        low_variance_cols = stds[stds < 1e-6].index.tolist()
-        if low_variance_cols:
-            if self.verbose:
-                print(
-                    f"Dropping {len(low_variance_cols)} low-variance columns: "
-                    f"{low_variance_cols}"
-                )
-            self.data = self.data.drop(columns=low_variance_cols)
 
     def _get_timestamp_index(self) -> pd.DatetimeIndex:
         """Return a datetime index aligned to the original data index order."""
@@ -707,98 +422,28 @@ class EdgarData:
 
     def get_ratings(self):
         """Training Data for Credit Rating Prediction."""
-        # Download and process credit ratings
-        downloader = RatingsHistoryDownloader(config=self.config)
-        _ratings_df = downloader.download_moodys_financial()  # noqa: F841
+        if not self.ratings_data_path.exists() or self.overwrite:
+            # Download and process credit ratings
+            downloader = RatingsHistoryDownloader(config=self.config)
+            _ratings_df = downloader.download_moodys_financial(
+                self.llm_client, self.config.data.ticker
+            )  # noqa: F841
 
-        # Calculate ratios from self.data and create separate df
-        # Usage:
-        df = add_derived_columns(self.data)
-        # full_df = pd.concat([financial_df, ratios_df], axis=1)
+            # Select only the relevant company's data
+            # Calculate ratios from self.data and add to ratings_df
+            df = add_derived_columns(self.data)
 
-        # 1. Total Revenues should be positive — likely a sign convention issue
-        # df["Total Revenues"] = df["Total Revenues"].abs()
+            df.index = df.index.asfreq("Q-DEC")
+            _ratings_df.index = _ratings_df.index.asfreq("Q-DEC")
 
-        # 2. Convert Interest Expense to numeric (it's stored as object)
-        # df["Interest Expense"] = pd.to_numeric(
-        #     df["Interest Expense"], errors="coerce"
-        # )
-
-        # 3. Check your data pipeline — these columns may not be populating correctly
-        # empty_cols = df.columns[df.isna().all()].tolist()
-        # print(f"Empty columns: {empty_cols}")
-
-        # print(df["Interest Expense"].describe())
-        # print(df["Short-term Debt"].describe())
-        # print(df["Total Revenues"].describe())
-        # print()
-        print("\n=== BALANCE SHEET COLUMNS ===")
-        bs_cols = [col for col in df.columns if col in self.bs_df.columns]
-        print(f"BS columns: {len(bs_cols)}")
-
-        print("\n=== INCOME STATEMENT COLUMNS ===")
-        is_cols = [col for col in df.columns if col in self.is_df.columns]
-        print(f"IS columns: {len(is_cols)}")
-        print(is_cols)
-
-        print("\n=== CASH FLOW COLUMNS ===")
-        cf_cols = [col for col in df.columns if col in self.cf_df.columns]
-        print(f"CF columns: {len(cf_cols)}")
-        print(cf_cols)
-
-        print("\n=== KEY VALUES FROM LAST QUARTER ===")
-        print(
-            df[
-                [
-                    "Operating Income (Loss)",
-                    "Cash Paid for Interest",
-                    "Net Cash Provided by (Used in) Operating Activities",
-                    "Total Revenues",
-                    "Cost of Goods Sold",
-                ]
-            ].iloc[-1]
-        )
-
-        print("\n=== CHECKING FOR INTEREST-RELATED COLUMNS ===")
-        interest_cols = [col for col in df.columns if "interest" in col.lower()]
-        print(f"Interest columns found: {interest_cols}")
-        if interest_cols:
-            print("\nLatest quarter values:")
-            print(df[interest_cols].iloc[-1])
-
-            # Show which source would be used for interest calculation
-            cf_interest = df.get(
-                "Cash Paid for Interest", pd.Series(0, index=df.index)
-            ).iloc[-1]
-            net_interest = df.get(
-                "Interest Paid Net of Interest Received", pd.Series(0, index=df.index)
-            ).iloc[-1]
-            is_interest = (
-                df.get("Net Interest Income (Expense)", pd.Series(0, index=df.index))
-                .abs()
-                .iloc[-1]
+            df_combined = pd.merge(
+                df, _ratings_df, left_index=True, right_index=True, how="inner"
             )
 
-            print("\nInterest source priority check:")
-            print(f"  1. Cash Paid for Interest (CF): {cf_interest}")
-            print(f"  2. Interest Paid Net (CF): {net_interest}")
-            print(f"  3. Net Interest Income/Expense (IS): {is_interest}")
-
-            if cf_interest > 0:
-                print(f"  → Using Cash Flow interest: {cf_interest}")
-            elif net_interest > 0:
-                print(f"  → Using Net CF interest: {net_interest}")
-            elif is_interest > 0:
-                print(f"  → Using Income Statement interest: {is_interest}")
-            else:
-                print("  → WARNING: No interest data available!")
-
-        print()
-        ratios_df = calculate_credit_ratios(df)
-        print("\n=== CALCULATED RATIOS (Latest Quarter) ===")
-        print(ratios_df.head(1).T)
-        print()
-        breakpoint()
+            self.ratings_data = calculate_credit_ratios(df_combined)
+            self.ratings_data.to_parquet(self.ratings_data_path)
+        else:
+            self.ratings_data = pd.read_parquet(self.ratings_data_path)
 
     def create_statements(self) -> None:
         self.filings = self.company.get_filings(form=["10-Q", "10-K"])
@@ -829,11 +474,19 @@ class EdgarData:
         )
         self.cf_df = drop_constants(self.cf_df, verbose=self.verbose)
 
-        # Remove duplicate columns with priority: BS > IS > CF
-        # TODO: Check this is the ideal order
+        self.eq_df = self._process_statement(
+            stmt=self.xbrls.statements.statement_of_equity(
+                max_periods=self.config.data.periods
+            ),
+            kind="equity",
+        )
+        self.eq_df = drop_constants(self.eq_df, verbose=self.verbose)
+
+        # Remove duplicate columns with priority: BS > IS > CF > E
         bs_cols = set(self.bs_df.columns)
         is_cols = set(self.is_df.columns)
         cf_cols = set(self.cf_df.columns)
+        eq_cols = set(self.eq_df.columns)
 
         # Remove IS columns that are also in BS
         self.is_df = self.is_df.drop(columns=is_cols.intersection(bs_cols))
@@ -841,23 +494,16 @@ class EdgarData:
         self.cf_df = self.cf_df.drop(
             columns=cf_cols.intersection(bs_cols.union(is_cols))
         )
+        # Remove E columns that are also in BS, IS, or CF
+        self.eq_df = self.eq_df.drop(
+            columns=eq_cols.intersection(bs_cols.union(is_cols).union(cf_cols))
+        )
         # Combine all statements
         self.data = pd.concat(
-            [self.bs_df, self.is_df, self.cf_df], axis=1, join="inner"
+            [self.bs_df, self.is_df, self.cf_df, self.eq_df], axis=1, join="inner"
         )
 
-        # Get credit ratings, calculate ratios, and add col to self.data
-        # self.get_ratings()
-
-        # Print summary - number of rows etc.
-        if self.verbose:
-            print(
-                f"Combined statement shape for {self.config.data.ticker}: "
-                f"{self.data.shape}"
-            )
-
         self.data.to_parquet(self.cache_statement)
-        print(f"Saved {self.config.data.ticker} to {str(self.cache_statement)}")
 
     def _process_statement(
         self,
@@ -895,18 +541,20 @@ class EdgarData:
 
         collapsed = collapsed.dropna(axis=1, how="all")
         collapsed = collapsed.fillna(0)
+        collapsed = drop_non_numeric_columns(collapsed)
 
-        cleaned_df, results = remove_duplicate_columns(
-            collapsed, kind, verbose=self.verbose
-        )
-
+        cleaned_df = remove_duplicate_columns(collapsed, verbose=self.verbose)
         input_columns = cleaned_df.columns.tolist()
 
         # Cache LLM mapping results
         cache_dir = self.config.data.cache_dir
         ticker = self.config.data.ticker
         kind_slug = kind.replace(" ", "_")
-        features_cache_path = Path(f"{cache_dir}/{ticker}_{kind_slug}_features.json")
+        features_cache_path = Path(
+            f"{cache_dir}/features/{ticker}_{kind_slug}_features.json"
+        )
+        features_cache_path.parent.mkdir(parents=True, exist_ok=True)
+
         if features_cache_path.exists() and not self.overwrite:
             organised_features = self.llm_client.load_cached_features(
                 features_cache_path
@@ -922,164 +570,40 @@ class EdgarData:
             )
 
         if self.verbose:
-            pretty_print_full_mapping(organised_features, show_summary=True)
+            pretty_print_full_mapping(
+                organised_features, show_summary=True, statement_type=kind
+            )
 
         # Create new DataFrame with organised columns
         mapped_df = remap_financial_dataframe(cleaned_df, organised_features)
 
         if kind == "balance_sheet":
             # Drops columns that violate BS identity
-            mapped_df = bs_identity_checker(mapped_df, organised_features)
+            mapped_df = bs_identity_checker(df=mapped_df, mappings=organised_features)
+        else:
+            # Subtract values to obtain quarterly only (from cumulative)
+            exclude = []
+            if kind == "equity":
+                exclude = [
+                    "Accumulated Other Comprehensive Income",
+                    "Additional Paid-in Capital",
+                    "Common Stock",
+                    "Retained Earnings",
+                    "Total Equity",
+                    "Treasury Stock",
+                ]
 
-        # Remove any leaves from derived structure that are in mapped_df
-        mapped_df = mapped_df.drop(
-            columns=get_fs_struct(kind)["drop_summations"], errors="ignore"
-        )
-
-        # For IS and CF, subtract values to obtain quarterly only (from cumulative)
-        if kind in {"income statement", "cash flow statement"}:
-            mapped_df = ytd_to_quarterly(mapped_df)
+            mapped_df = ytd_to_quarterly(mapped_df, exclude_columns=exclude)
 
         return mapped_df
-
-
-class EdgarDataset:
-    """Prepares train/val datasets from EdgarData for model training."""
-
-    def __init__(
-        self, edgar_data: "EdgarData", target: str = "lstm", verbose: bool = False
-    ) -> None:
-        """
-        Initialize dataset from EdgarData.
-
-        Parameters:
-        -----------
-        edgar_data : EdgarData
-            Instance of EdgarData with loaded and processed financial data
-        target : str
-            Target model type ("lstm" or "xgboost")
-        verbose : bool
-            Whether to print detailed information during processing
-        """
-        self.edgar_data = edgar_data
-        self.config = edgar_data.config
-        self.target = target
-        self.verbose = verbose
-
-        # Copy necessary attributes from EdgarData
-        self.data = edgar_data.data
-        self.tgt_indices = edgar_data.tgt_indices
-        self.targets = edgar_data.targets
-
-        # TODO Starting from now, go back quarterly - remove data after a break
-        # print(f"Searching for break in data for {self.config.data.ticker}...")
-        # self.data = self.data.sort_index(ascending=False)
-        # quarterly_index = self.data.index.asfreq("Q")
-        # expected = pd.period_range(
-        #     end=quarterly_index[0], periods=len(self.data), freq="Q"
-        # )[::-1]
-        # mask = (self.data.index == expected).cumprod().astype(bool)
-        # self.data = self.data[mask]
-
-        # Some values aren't present until the new years Q1
-        # Drop new years back to where Income Before Taxes is not 0
-
-        # Prepare the dataset
-        self._prepare_dataset()
-
-    def _prepare_dataset(self) -> None:
-        """Prepare scaled features and create train/val datasets."""
-        self._set_feature_index()
-
-        X_scaled, scaler = self._scale_features()
-        self._set_scaler_stats(scaler)
-
-        if self.target == "lstm":
-            # print(f"\nin: {self.data.index}\n")
-            X_train, y_train, X_test, y_test = build_windows(
-                config=self.config,
-                X=X_scaled,
-                tgt_indices=self.tgt_indices,
-                index=self.data.index,
-            )
-
-            # print(X_train.shape, y_train.shape, X_test.shape, y_test.shape)
-
-            X_train, X_test = self._apply_seasonal_weight(X_train, X_test)
-            self.X_train, self.y_train = X_train, y_train
-            self.X_test, self.y_test = X_test, y_test
-
-            if len(X_train) == 0:
-                raise ValueError(
-                    f"\nNo valid consecutive windows found for training. "
-                    f"Data has {len(self.data)} periods with gaps. "
-                    f"Try reducing lookback ({self.config.data.lookback}) or "
-                    f"withhold ({self.config.data.withhold_periods}).\n"
-                )
-
-            self.num_features = X_train.shape[-1]  # Input dim
-            self.num_targets = len(self.tgt_indices)  # Output dim
-
-            # Minimal tf.data pipeline with shuffle/prefetch to smooth training
-            self.train_dataset = (
-                tf.data.Dataset.from_tensor_slices(
-                    (X_train.astype("float64"), y_train.astype("float64"))
-                )
-                .shuffle(len(X_train))
-                .batch(self.config.data.batch_size)
-                .prefetch(tf.data.AUTOTUNE)
-            )
-
-            self.val_dataset = tf.data.Dataset.from_tensor_slices(
-                (X_test, y_test)
-            ).batch(self.config.data.withhold_periods)
-        elif self.target == "xgboost":
-            # TODO: Implement xgboost dataset preparation
-            pass
-
-    def _set_feature_index(self) -> None:
-        """Create feature name to index mapping."""
-        self.feat_to_idx = {n: i for i, n in enumerate(self.data.columns.tolist())}
-
-    def _scale_features(self) -> tuple[np.ndarray, StandardScaler]:
-        """Scale features using StandardScaler."""
-        scaler = StandardScaler()
-        X_scaled = scaler.fit_transform(self.data.values.astype("float64"))
-        return X_scaled, scaler
-
-    def _set_scaler_stats(self, scaler: StandardScaler) -> None:
-        """Store scaler statistics for later use."""
-        self.full_mean = np.asarray(scaler.mean_, dtype="float64")
-        self.full_std = np.asarray(scaler.scale_, dtype="float64")
-        self.target_mean = self.full_mean[self.tgt_indices]
-        self.target_std = self.full_std[self.tgt_indices]
-
-    def _apply_seasonal_weight(
-        self, X_train: np.ndarray, X_test: np.ndarray
-    ) -> tuple[np.ndarray, np.ndarray]:
-        """Apply seasonal weighting to training and test data."""
-        seasonal_step = self.config.data.seasonal_lag
-        if self.config.data.seasonal_weight == 1.0 or seasonal_step <= 0:
-            return X_train, X_test
-
-        seasonal_indices = []
-        idx = self.config.data.lookback - seasonal_step
-        while idx >= 0:
-            seasonal_indices.append(idx)
-            idx -= seasonal_step
-
-        if not seasonal_indices:
-            return X_train, X_test
-
-        X_train = X_train.copy()
-        X_test = X_test.copy()
-        X_train[:, seasonal_indices, :] *= self.config.data.seasonal_weight
-        X_test[:, seasonal_indices, :] *= self.config.data.seasonal_weight
-        return X_train, X_test
 
 
 if __name__ == "__main__":
     config = Config()
     data = EdgarData(config=config, overwrite=False, verbose=True)
+    print(data.data.sample(6).T)
+    print()
+    print(data.ratings_data.sample(6).T)
+    # Getting ratings
     # dataset = EdgarDataset(edgar_data=data, target="lstm", verbose=False)
     # print(data.data.head(1).T)

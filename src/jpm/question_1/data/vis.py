@@ -68,52 +68,81 @@ def print_mapping_summary(mapping_dict):
     """
 
     def count_mappings(d):
-        """Recursively count features."""
-        mapped_count = 0
-        unmapped_count = 0
-        total_old_features = set()
+        """Recursively count new feature categories and old features."""
+        mapped_new_features = 0  # New categories with mappings
+        unmapped_new_features = 0  # New categories without mappings
+        mapped_old_features = set()  # Old features that were mapped
+        unmapped_old_features = set()  # Old features in __unmapped__
 
         for key, value in d.items():
             if key == "__unmapped__":
                 if isinstance(value, list):
-                    total_old_features.update(value)
+                    unmapped_old_features.update(value)
                 continue
 
             if isinstance(value, dict):
-                m, u, old = count_mappings(value)
-                mapped_count += m
-                unmapped_count += u
-                total_old_features.update(old)
+                # Recurse into nested structure
+                m_new, u_new, m_old, u_old = count_mappings(value)
+                mapped_new_features += m_new
+                unmapped_new_features += u_new
+                mapped_old_features.update(m_old)
+                unmapped_old_features.update(u_old)
             elif isinstance(value, list):
+                # Leaf node: new feature category
                 if value:
-                    mapped_count += 1
-                    total_old_features.update(value)
+                    mapped_new_features += 1
+                    mapped_old_features.update(value)
                 else:
-                    unmapped_count += 1
+                    unmapped_new_features += 1
 
-        return mapped_count, unmapped_count, total_old_features
+        return (
+            mapped_new_features,
+            unmapped_new_features,
+            mapped_old_features,
+            unmapped_old_features,
+        )
 
-    mapped, unmapped, old_features = count_mappings(mapping_dict)
-    total_new = mapped + unmapped
+    mapped_new, unmapped_new, mapped_old, unmapped_old = count_mappings(mapping_dict)
 
     print(f"\n{Fore.CYAN}{Back.BLACK}{'=' * 80}{Style.RESET_ALL}")
     print(f"{Fore.CYAN}{Back.BLACK} MAPPING SUMMARY {Style.RESET_ALL}")
     print(f"{Fore.CYAN}{Back.BLACK}{'=' * 80}{Style.RESET_ALL}\n")
 
-    print(f"{Fore.WHITE}Total New Features: {Fore.CYAN}{total_new}{Style.RESET_ALL}")
+    # New feature categories summary
+    total_new = mapped_new + unmapped_new
     print(
-        f"{Fore.GREEN}  ✓ Mapped: {mapped} ({100 * mapped / total_new:.1f}%){Style.RESET_ALL}"
+        f"{Fore.WHITE}New Feature Categories: {Fore.CYAN}{total_new}{Style.RESET_ALL}"
     )
     print(
-        f"{Fore.RED}  ✗ Unmapped: {unmapped} ({100 * unmapped / total_new:.1f}%): {mapping_dict['__unmapped__']} {Style.RESET_ALL}"
+        f"{Fore.GREEN}  ✓ Mapped: {mapped_new} "
+        f"({100 * mapped_new / total_new:.1f}%){Style.RESET_ALL}"
     )
     print(
-        f"{Fore.WHITE}Total Old Features Used: {Fore.CYAN}{len(old_features)}{Style.RESET_ALL}"
+        f"{Fore.RED}  ✗ Unmapped: {unmapped_new} "
+        f"({100 * unmapped_new / total_new:.1f}%){Style.RESET_ALL}"
     )
+
+    # Old feature fields summary
+    total_old = len(mapped_old) + len(unmapped_old)
+    print(f"\n{Fore.WHITE}Old Feature Fields: {Fore.CYAN}{total_old}{Style.RESET_ALL}")
+    print(
+        f"{Fore.GREEN}  ✓ Mapped: {len(mapped_old)} "
+        f"({100 * len(mapped_old) / total_old:.1f}%){Style.RESET_ALL}"
+    )
+    print(
+        f"{Fore.RED}  ✗ Unmapped: {len(unmapped_old)} "
+        f"({100 * len(unmapped_old) / total_old:.1f}%){Style.RESET_ALL}"
+    )
+
+    # Show unmapped fields if there are any
+    if unmapped_old:
+        unmapped_list = sorted(list(unmapped_old))
+        print(f"{Fore.YELLOW}    Fields: {unmapped_list}{Style.RESET_ALL}")
+
     print(f"\n{Fore.CYAN}{'=' * 80}{Style.RESET_ALL}\n")
 
 
-def pretty_print_full_mapping(mapping_dict, show_summary=True):
+def pretty_print_full_mapping(mapping_dict, show_summary=True, statement_type=""):
     """
     Complete pretty print with optional summary.
 
@@ -126,11 +155,11 @@ def pretty_print_full_mapping(mapping_dict, show_summary=True):
     """
 
     print(f"\n{Fore.CYAN}{Style.BRIGHT}{'#' * 80}{Style.RESET_ALL}")
-    print(f"{Fore.CYAN}{Style.BRIGHT}#{' ' * 78}#{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}{Style.BRIGHT}#{' ' * 78}{Style.RESET_ALL}")
     print(
-        f"{Fore.CYAN}{Style.BRIGHT}#  FEATURE MAPPING: OLD → NEW{' ' * 48}#{Style.RESET_ALL}"
+        f"{Fore.CYAN}{Style.BRIGHT}#  {statement_type.upper()}: OLD → NEW{' ' * 48}{Style.RESET_ALL}"
     )
-    print(f"{Fore.CYAN}{Style.BRIGHT}#{' ' * 78}#{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}{Style.BRIGHT}#{' ' * 78}{Style.RESET_ALL}")
     print(f"{Fore.CYAN}{Style.BRIGHT}{'#' * 80}{Style.RESET_ALL}")
 
     pretty_print_mapping(mapping_dict)

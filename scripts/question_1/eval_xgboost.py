@@ -1,42 +1,155 @@
-"""Evaluate XGBoost model for financial forecasting."""
+from pathlib import Path
 
-from jpm.question_1 import (
-    BalanceSheet,
-    Config,
-    DataConfig,
-    EdgarDataLoader,
-    IncomeStatement,
-    LossConfig,
-    ModelConfig,
-    TrainingConfig,
-    XGBoostForecaster,
-    get_args,
-    set_seed,
-)
+from jpm.question_1 import CreditDataset, CreditRatingModel
 
-set_seed(42)
-args = get_args()
 
-data_cfg = DataConfig.from_args(args)
-model_cfg = ModelConfig.from_args(args)
-train_cfg = TrainingConfig.from_args(args)
-loss_cfg = LossConfig.from_args(args)
-config = Config(data=data_cfg, model=model_cfg, training=train_cfg, loss=loss_cfg)
+def main():
+    # Configuration
+    DATA_DIR = "/scratch/datasets/jpm/ratings"
+    MODEL_DIR = "/scratch/projects/JPM/temp"
+    PLOTS_DIR = Path(MODEL_DIR) / "plots"
 
-data = EdgarDataLoader(config=config)
+    # Model hyperparameters
+    PARAMS = {
+        "max_depth": 6,
+        "learning_rate": 0.1,
+        "n_estimators": 200,
+        "subsample": 0.8,
+        "colsample_bytree": 0.8,
+        "reg_alpha": 0.0,
+        "reg_lambda": 1.0,
+        "early_stopping_rounds": 20,
+        "use_gpu": True,  # Set to False if no GPU
+        "random_state": 42,
+    }
 
-# Train XGBoost model
-model = XGBoostForecaster(config=config, data=data)
-model.fit(verbose=1, max_depth=8, n_estimators=200)
+    # Create output directories
+    PLOTS_DIR.mkdir(parents=True, exist_ok=True)
 
-# Evaluate on validation set
-validation_results = model.evaluate(stage="val")
-model.view_results(stage="val")
+    print("=" * 70)
+    print("CREDIT RATING PREDICTION - XGBoost Training")
+    print("=" * 70)
 
-# Pass outputs to BS Model
-bs = BalanceSheet(config=config, data=data, results=validation_results)
-bs.check_identity()
+    # Load dataset
+    print("\n[1/5] Loading dataset...")
+    dataset = CreditDataset(
+        data_dir=DATA_DIR,
+        pattern="*_ratings.parquet",
+        val_size=0.15,
+        test_size=0.15,
+        random_state=42,
+        verbose=True,
+    )
+    dataset.load()
 
-# Income Statement to predict Net Income (Loss)
-i_s = IncomeStatement(config=config, data=data, results=validation_results)
-i_s.view()
+    # Get dataset info
+    print("\n[2/5] Dataset summary...")
+    info = dataset.get_info()
+
+    # Get training data
+    print("\n[3/5] Preparing training data...")
+    X_train, y_train = dataset.get_train_data()
+    X_val, y_val = dataset.get_val_data()
+    X_test, y_test = dataset.get_test_data()
+
+    print(f"Training samples: {len(X_train)}")
+    print(f"Validation samples: {len(X_val)}")
+    print(f"Test samples: {len(X_test)}")
+
+    # Build and train model
+    print("\n[4/5] Training XGBoost model...")
+    model = CreditRatingModel(
+        n_classes=info["n_classes"], n_features=info["n_features"], **PARAMS
+    )
+
+    model.build()
+    model.train(X_train, y_train, X_val, y_val, verbose=True)
+
+    # Evaluate on test set
+    print("\n[5/5] Evaluating model...")
+    test_metrics = model.evaluate(
+        X_test, y_test, class_names=info["classes"], split_name="test"
+    )
+
+    # Feature importance
+    print("\nComputing feature importance...")
+    feature_imp = model.compute_feature_importance(info["feature_names"])
+    print("\nTop 15 Important Features:")
+    print(feature_imp.head(15).to_string(index=False))
+
+    # Generate plots
+    print("\nGenerating visualizations...")
+    model.plot_training_history(save_path=PLOTS_DIR / "training_history.png")
+    model.plot_confusion_matrix(
+        y_test,
+        model.predict(X_test),
+        class_names=info["classes"],
+        save_path=PLOTS_DIR / "confusion_matrix.png",
+    )
+    model.plot_confusion_matrix(
+        y_test,
+        model.predict(X_test),
+        class_names=info["classes"],
+        normalize=True,
+        save_path=PLOTS_DIR / "confusion_matrix_normalized.png",
+    )
+    model.plot_feature_importance(
+        top_n=20, save_path=PLOTS_DIR / "feature_importance.png"
+    )
+
+    # Make predictions on future quarters
+    print("\nMaking predictions on future quarters...")
+    X_predict = dataset.get_predict_data()
+    predictions = model.predict(X_predict)
+    probabilities = model.predict_proba(X_predict)
+
+    predicted_ratings = dataset.decode_labels(predictions)
+    meta_predict = dataset.get_metadata("predict")
+
+    results = meta_predict.copy()
+    results["predicted_rating"] = predicted_ratings
+    results["confidence"] = probabilities.max(axis=1)
+
+    # Add top 3 predictions with probabilities
+    for i in range(min(3, probabilities.shape[1])):
+        top_idx = probabilities.argsort(axis=1)[:, -(i + 1)]
+        results[f"top_{i + 1}_rating"] = dataset.decode_labels(top_idx)
+        results[f"top_{i + 1}_prob"] = probabilities[range(len(probabilities)), top_idx]
+
+    print("\nPredictions for future quarters:")
+    print(results.to_string(index=False))
+
+    # Save everything
+    print("\nSaving model and results...")
+    model.save(MODEL_DIR)
+    results.to_csv(Path(MODEL_DIR) / "predictions.csv", index=False)
+    feature_imp.to_csv(Path(MODEL_DIR) / "feature_importance.csv", index=False)
+
+    # Save test predictions for analysis
+    test_meta = dataset.get_metadata("test")
+    test_preds = model.predict(X_test)
+    test_probs = model.predict_proba(X_test)
+
+    test_results = test_meta.copy()
+    test_results["predicted_rating"] = dataset.decode_labels(test_preds)
+    test_results["confidence"] = test_probs.max(axis=1)
+    test_results["correct"] = (
+        test_results["target_rating"] == test_results["predicted_rating"]
+    )
+
+    test_results.to_csv(Path(MODEL_DIR) / "test_predictions.csv", index=False)
+
+    print("\n" + "=" * 70)
+    print("TRAINING COMPLETE")
+    print("=" * 70)
+    print(f"Model saved to: {MODEL_DIR}")
+    print(f"Plots saved to: {PLOTS_DIR}")
+    print(f"\nTest Accuracy: {test_metrics['accuracy']:.4f}")
+    print(f"Test F1 Score: {test_metrics['f1']:.4f}")
+    if test_metrics["auc"]:
+        print(f"Test AUC:      {test_metrics['auc']:.4f}")
+    print("=" * 70 + "\n")
+
+
+if __name__ == "__main__":
+    main()

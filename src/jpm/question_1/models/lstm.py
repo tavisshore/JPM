@@ -7,7 +7,7 @@ import tensorflow_probability as tfp
 
 from jpm.question_1.clients.llm_client import LLMClient
 from jpm.question_1.config import Config, LLMConfig, ModelConfig
-from jpm.question_1.data.ed import EdgarData, EdgarDataset
+from jpm.question_1.data import EdgarData, StatementsDataset
 from jpm.question_1.misc import RATINGS_MAPPINGS, set_seed
 from jpm.question_1.models.losses import EnforceBalance, bs_loss
 from jpm.question_1.models.metrics import (
@@ -36,7 +36,9 @@ tfd = tfp.distributions
 class LSTMForecaster:
     """Wrapper around a Keras LSTM for balance sheet forecasting."""
 
-    def __init__(self, config: Config, data: EdgarData, dataset: EdgarDataset) -> None:
+    def __init__(
+        self, config: Config, data: EdgarData, dataset: StatementsDataset
+    ) -> None:
         self.config = config
         self.data = data
         self.dataset = dataset

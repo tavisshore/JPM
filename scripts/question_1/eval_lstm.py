@@ -56,13 +56,9 @@ CONFIG_VARIATIONS = [
 
 tickers = [
     "MSFT",
-    # "AAPL",
     "AMZN",
     "AVGO",  # Performs so well on this
     "META",
-    # "TSLA",
-    # "WMT",
-    # "GS",
 ]
 
 all_config_results = {}

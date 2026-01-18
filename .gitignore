@@ -70,7 +70,7 @@ Thumbs.db
 # Cache and Data
 # -------------------------
 cache/
-
+temp/
 temp.*
 *.xlsx
 ckpts/*

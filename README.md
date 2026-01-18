@@ -19,6 +19,13 @@ The LLM clients requires API keys (currently just ChatGPT), this is soon to be r
 ```bash
 export OPENAI_API_KEY="your_api_key"
 ```
+We use `https://www.exchangerate-api.com/` to retrieve exchange rates for particular dates - this must be set to sucessfully parse non-USD reports.
+```bash
+export FX_API_KEY='your_fx_api_key'
+
+WRDS ratings API (pending)
+export WRDS_USERNAME=your_username
+```
 
 ## Question 1 - Financial Statement Forecasting
 ### Part 1

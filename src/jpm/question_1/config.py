@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, fields
+from dataclasses import dataclass, field, fields
 from pathlib import Path
 
 
@@ -8,7 +8,7 @@ from pathlib import Path
 class DataConfig:
     """Data-related configuration."""
 
-    ticker: str = "MSFT"  # Debug with MSFT AAPL AMZN
+    ticker: str = "AAPL"  # Debug with MSFT AAPL AMZN
     cache_dir: str = "/scratch/datasets/jpm"
     periods: int = 60  # quarters -> 15 years, post-2008
     lookback: int = 4
@@ -166,8 +166,8 @@ class LossConfig:
 @dataclass
 class LLMConfig:
     provider: str = "openai"
-    model: str = "gpt-5-mini"  # dev nano, eval mini
-    temperature: float = 0.05
+    model: str = "gpt-5-mini"  # dev nano, eval mini, gpt-4o-2024-08-06
+    temperature: float = 0.0  # 0.05
     max_tokens: int = 8192
     use_llm: bool = False
     adjust: bool = True
@@ -186,8 +186,8 @@ class LLMConfig:
 class Config:
     """Root configuration grouping data, model, training, and loss settings."""
 
-    data: DataConfig = DataConfig()
-    model: ModelConfig = ModelConfig()
-    training: TrainingConfig = TrainingConfig()
-    loss: LossConfig = LossConfig()
-    llm: LLMConfig = LLMConfig()
+    data: DataConfig = field(default_factory=DataConfig)
+    model: ModelConfig = field(default_factory=ModelConfig)
+    training: TrainingConfig = field(default_factory=TrainingConfig)
+    loss: LossConfig = field(default_factory=LossConfig)
+    llm: LLMConfig = field(default_factory=LLMConfig)

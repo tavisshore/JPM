@@ -1,422 +1,475 @@
-from __future__ import annotations
+#!/usr/bin/env python3
+"""
+CreditRatingModel class for XGBoost-based credit rating prediction.
+"""
 
+import json
+from pathlib import Path
+from typing import Dict, List, Optional
+
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+import seaborn as sns
 import xgboost as xgb
-
-from jpm.question_1.config import Config
-from jpm.question_1.data.ed import EdgarData
-from jpm.question_1.models.metrics import (
-    Metric,
-    TickerResults,
-    baseline_skill_scores,
-    compute_baseline_predictions,
-)
-from jpm.question_1.vis import (
-    build_baseline_rows,
-    build_equity_rows,
-    build_section_rows,
-    make_row,
-    print_table,
+from sklearn.metrics import (
+    accuracy_score,
+    classification_report,
+    confusion_matrix,
+    precision_recall_fscore_support,
+    roc_auc_score,
 )
 
 
-class XGBoostForecaster:
-    """Wrapper around XGBoost for balance sheet forecasting."""
+class CreditRatingModel:
+    """
+    XGBoost model for credit rating prediction with training and evaluation.
+    """
 
-    def __init__(self, config: Config, data: EdgarData) -> None:
-        self.config = config
-        self.data = data
-        self.model = None
-        self.train_results = None
-        self.val_results = None
+    def __init__(
+        self,
+        n_classes: int,
+        n_features: int,
+        max_depth: int = 6,
+        learning_rate: float = 0.1,
+        n_estimators: int = 100,
+        subsample: float = 0.8,
+        colsample_bytree: float = 0.8,
+        reg_alpha: float = 0.0,
+        reg_lambda: float = 1.0,
+        random_state: int = 42,
+        early_stopping_rounds: int = 10,
+        use_gpu: bool = False,
+    ):
+        self.n_classes = n_classes
+        self.n_features = n_features
+        self.max_depth = max_depth
+        self.learning_rate = learning_rate
+        self.n_estimators = n_estimators
+        self.subsample = subsample
+        self.colsample_bytree = colsample_bytree
+        self.reg_alpha = reg_alpha
+        self.reg_lambda = reg_lambda
+        self.random_state = random_state
+        self.early_stopping_rounds = early_stopping_rounds
+        self.use_gpu = use_gpu
 
-        if not self.config.training.checkpoint_path.exists():
-            self.config.training.checkpoint_path.mkdir(parents=True)
+        self.model: Optional[xgb.XGBClassifier] = None
+        self.history: Dict[str, List[float]] = {"train": [], "val": []}
+        self.best_iteration: Optional[int] = None
+        self.feature_importance: Optional[pd.DataFrame] = None
 
-    def _prepare_data(self, ds) -> tuple[np.ndarray, np.ndarray]:
-        """Convert TensorFlow dataset to numpy arrays for XGBoost."""
-        x_batches = []
-        y_batches = []
-        for x_batch, y_batch in ds:
-            x_batches.append(x_batch.numpy())
-            y_batches.append(y_batch.numpy())
-
-        if not x_batches:
-            raise ValueError("No batches found in dataset")
-
-        x = np.concatenate(x_batches, axis=0)
-        y = np.concatenate(y_batches, axis=0)
-
-        # Reshape x: (samples, timesteps, features) → (samples, timesteps*features)
-        # XGBoost expects 2D input
-        x_reshaped = x.reshape(x.shape[0], -1)
-
-        return x_reshaped, y
-
-    def fit(self, **kwargs):
-        """Train the XGBoost model."""
-        # Prepare training data
-        x_train, y_train = self._prepare_data(self.data.train_dataset)
-
-        # Create DMatrix for XGBoost
-        dtrain = xgb.DMatrix(x_train, label=y_train)
-
-        # Prepare validation data if available
-        eval_list = [(dtrain, "train")]
-        if self.data.val_dataset is not None:
-            x_val, y_val = self._prepare_data(self.data.val_dataset)
-            dval = xgb.DMatrix(x_val, label=y_val)
-            eval_list.append((dval, "val"))
-
-        # XGBoost parameters
+    def build(self) -> "CreditRatingModel":
+        """Build XGBoost classifier."""
         params = {
-            "objective": "reg:squarederror",
-            "tree_method": "hist",
-            "max_depth": kwargs.get("max_depth", 6),
-            "learning_rate": self.config.training.lr,
-            "n_estimators": kwargs.get("n_estimators", 100),
-            "subsample": kwargs.get("subsample", 0.8),
-            "colsample_bytree": kwargs.get("colsample_bytree", 0.8),
-            "verbosity": kwargs.get("verbose", 0),
+            "objective": "multi:softprob",
+            "num_class": self.n_classes,
+            "max_depth": self.max_depth,
+            "learning_rate": self.learning_rate,
+            "n_estimators": self.n_estimators,
+            "subsample": self.subsample,
+            "colsample_bytree": self.colsample_bytree,
+            "reg_alpha": self.reg_alpha,
+            "reg_lambda": self.reg_lambda,
+            "random_state": self.random_state,
+            "eval_metric": "mlogloss",
+            "device": "cuda" if self.use_gpu else "cpu",  # Changed from tree_method
         }
 
-        # Train model
-        evals_result = {}
-        self.model = xgb.train(
-            params,
-            dtrain,
-            num_boost_round=self.config.training.epochs,
-            evals=eval_list,
-            evals_result=evals_result,
-            verbose_eval=kwargs.get("verbose", 0) > 0,
+        self.model = xgb.XGBClassifier(**params)
+        print(f"Model built with {self.n_classes} classes, {self.n_features} features")
+        print(f"Device: {'GPU (CUDA)' if self.use_gpu else 'CPU'}")
+        return self
+
+    def train(
+        self,
+        X_train: np.ndarray,
+        y_train: np.ndarray,
+        X_val: np.ndarray,
+        y_val: np.ndarray,
+        verbose: bool = True,
+    ) -> "CreditRatingModel":
+        """Train the model with early stopping."""
+        if self.model is None:
+            raise ValueError("Model not built. Call build() first.")
+
+        print("Training XGBoost model...")
+
+        # Ensure data types are correct
+        X_train = X_train.astype(np.float32)
+        X_val = X_val.astype(np.float32)
+        y_train = y_train.astype(np.int32)
+        y_val = y_val.astype(np.int32)
+
+        self.model.fit(
+            X_train,
+            y_train,
+            eval_set=[(X_train, y_train), (X_val, y_val)],
+            verbose=verbose,
         )
 
-        # Save model
-        model_path = self.config.training.checkpoint_path / "best_model.json"
-        self.model.save_model(str(model_path))
+        # Extract training history
+        results = self.model.evals_result()
+        self.history["train"] = results["validation_0"]["mlogloss"]
+        self.history["val"] = results["validation_1"]["mlogloss"]
 
-        # Return history-like object for compatibility
-        class History:
-            def __init__(self, results):
-                self.history = {
-                    "loss": results.get("train", {}).get("rmse", []),
-                    "val_loss": results.get("val", {}).get("rmse", []),
-                }
+        # Get best iteration - use last iteration if no early stopping
+        self.best_iteration = len(self.history["train"]) - 1
 
-        return History(evals_result)
+        print(f"Training complete. Iterations: {len(self.history['train'])}")
+        print(f"Final train loss: {self.history['train'][-1]:.4f}")
+        print(f"Final val loss: {self.history['val'][-1]:.4f}")
+        print(f"Best val loss: {min(self.history['val']):.4f}")
 
-    def predict(self, x):
-        """Make predictions with the XGBoost model."""
+        return self
+
+    def predict(self, X: np.ndarray) -> np.ndarray:
+        """Predict class labels."""
         if self.model is None:
-            raise ValueError("Model not trained. Call fit() first.")
+            raise ValueError("Model not trained.")
+        return self.model.predict(X)
 
-        # Reshape if necessary
-        if len(x.shape) == 3:
-            x = x.reshape(x.shape[0], -1)
-
-        dmatrix = xgb.DMatrix(x)
-        return self.model.predict(dmatrix)
-
-    def save(self, path: str):
-        """Save the model to disk."""
+    def predict_proba(self, X: np.ndarray) -> np.ndarray:
+        """Predict class probabilities."""
         if self.model is None:
-            raise ValueError("Model not trained. Call fit() first.")
-        self.model.save_model(path)
+            raise ValueError("Model not trained.")
+        return self.model.predict_proba(X)
+
+    def evaluate(
+        self,
+        X: np.ndarray,
+        y: np.ndarray,
+        class_names: Optional[List[str]] = None,
+        split_name: str = "test",
+    ) -> Dict:
+        """Evaluate model performance."""
+        if self.model is None:
+            raise ValueError("Model not trained.")
+
+        y_pred = self.predict(X)
+        y_proba = self.predict_proba(X)
+
+        # Get unique classes in predictions to match class_names
+        unique_classes = np.unique(np.concatenate([y, y_pred]))
+
+        # Filter class_names to only include classes present in data
+        if class_names is not None and len(class_names) != len(unique_classes):
+            class_names = [class_names[i] for i in unique_classes]
+
+        # Basic metrics
+        accuracy = accuracy_score(y, y_pred)
+        precision, recall, f1, support = precision_recall_fscore_support(
+            y, y_pred, average="weighted", zero_division=0
+        )
+
+        # Per-class metrics
+        precision_per_class, recall_per_class, f1_per_class, _ = (
+            precision_recall_fscore_support(y, y_pred, average=None, zero_division=0)
+        )
+
+        # AUC (one-vs-rest for multiclass)
+        try:
+            auc = roc_auc_score(y, y_proba, multi_class="ovr", average="weighted")
+        except ValueError:
+            auc = None
+
+        metrics = {
+            "accuracy": accuracy,
+            "precision": precision,
+            "recall": recall,
+            "f1": f1,
+            "auc": auc,
+            "precision_per_class": precision_per_class.tolist(),
+            "recall_per_class": recall_per_class.tolist(),
+            "f1_per_class": f1_per_class.tolist(),
+        }
+
+        print(f"\n{'=' * 60}")
+        print(f"{split_name.upper()} SET EVALUATION")
+        print(f"{'=' * 60}")
+        print(f"Accuracy:  {accuracy:.4f}")
+        print(f"Precision: {precision:.4f}")
+        print(f"Recall:    {recall:.4f}")
+        print(f"F1 Score:  {f1:.4f}")
+        if auc:
+            print(f"AUC:       {auc:.4f}")
+
+        # Detailed classification report - use labels parameter
+        print(
+            f"\n{classification_report(y, y_pred, labels=unique_classes, target_names=class_names, zero_division=0)}"
+        )
+
+        # Confusion matrix
+        cm = confusion_matrix(y, y_pred, labels=unique_classes)
+        print("\nConfusion Matrix:")
+        print(cm)
+
+        return metrics
+
+    def compute_feature_importance(
+        self, feature_names: List[str], importance_type: str = "weight"
+    ) -> pd.DataFrame:
+        """
+        Compute and return feature importance.
+
+        importance_type: 'weight', 'gain', or 'cover'
+        """
+        if self.model is None:
+            raise ValueError("Model not trained.")
+
+        importance = self.model.get_booster().get_score(importance_type=importance_type)
+
+        # Convert to DataFrame
+        importance_df = pd.DataFrame(
+            [
+                {"feature": feature_names[int(k.replace("f", ""))], "importance": v}
+                for k, v in importance.items()
+            ]
+        )
+
+        importance_df = importance_df.sort_values(
+            "importance", ascending=False
+        ).reset_index(drop=True)
+        self.feature_importance = importance_df
+
+        return importance_df
+
+    def plot_training_history(self, save_path: Optional[str] = None):
+        """Plot training and validation loss curves."""
+        if not self.history["train"]:
+            print("No training history available.")
+            return
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(self.history["train"], label="Train Loss", linewidth=2)
+        plt.plot(self.history["val"], label="Val Loss", linewidth=2)
+
+        if self.best_iteration is not None:
+            plt.axvline(
+                x=self.best_iteration,
+                color="r",
+                linestyle="--",
+                label=f"Best Iteration ({self.best_iteration})",
+            )
+
+        plt.xlabel("Iteration", fontsize=12)
+        plt.ylabel("Log Loss", fontsize=12)
+        plt.title("Training History", fontsize=14, fontweight="bold")
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+
+        if save_path:
+            plt.savefig(save_path, dpi=300, bbox_inches="tight")
+            print(f"Training history plot saved to {save_path}")
+        else:
+            plt.show()
+
+        plt.close()
+
+    def plot_confusion_matrix(
+        self,
+        y_true: np.ndarray,
+        y_pred: np.ndarray,
+        class_names: List[str],
+        save_path: Optional[str] = None,
+        normalize: bool = False,
+    ):
+        """Plot confusion matrix."""
+        cm = confusion_matrix(y_true, y_pred)
+
+        if normalize:
+            cm = cm.astype("float") / cm.sum(axis=1)[:, np.newaxis]
+            fmt = ".2f"
+            title = "Normalized Confusion Matrix"
+        else:
+            fmt = "d"
+            title = "Confusion Matrix"
+
+        plt.figure(figsize=(10, 8))
+        sns.heatmap(
+            cm,
+            annot=True,
+            fmt=fmt,
+            cmap="Blues",
+            xticklabels=class_names,
+            yticklabels=class_names,
+            cbar_kws={"label": "Proportion" if normalize else "Count"},
+        )
+        plt.xlabel("Predicted", fontsize=12)
+        plt.ylabel("True", fontsize=12)
+        plt.title(title, fontsize=14, fontweight="bold")
+        plt.tight_layout()
+
+        if save_path:
+            plt.savefig(save_path, dpi=300, bbox_inches="tight")
+            print(f"Confusion matrix saved to {save_path}")
+        else:
+            plt.show()
+
+        plt.close()
+
+    def plot_feature_importance(self, top_n: int = 20, save_path: Optional[str] = None):
+        """Plot top feature importances."""
+        if self.feature_importance is None:
+            print(
+                "Feature importance not computed. Call compute_feature_importance() first."
+            )
+            return
+
+        top_features = self.feature_importance.head(top_n)
+
+        plt.figure(figsize=(10, max(6, top_n * 0.3)))
+        plt.barh(range(len(top_features)), top_features["importance"])
+        plt.yticks(range(len(top_features)), top_features["feature"])
+        plt.xlabel("Importance", fontsize=12)
+        plt.ylabel("Feature", fontsize=12)
+        plt.title(f"Top {top_n} Feature Importances", fontsize=14, fontweight="bold")
+        plt.gca().invert_yaxis()
+        plt.tight_layout()
+
+        if save_path:
+            plt.savefig(save_path, dpi=300, bbox_inches="tight")
+            print(f"Feature importance plot saved to {save_path}")
+        else:
+            plt.show()
+
+        plt.close()
+
+    def save(self, output_dir: str = "/scratch/models/credit_rating"):
+        """Save model and training artifacts."""
+        if self.model is None:
+            raise ValueError("Model not trained.")
+
+        output_path = Path(output_dir)
+        output_path.mkdir(parents=True, exist_ok=True)
+
+        # Save XGBoost model
+        self.model.save_model(str(output_path / "xgboost_model.json"))
+
+        # Save training history and metadata
+        metadata = {
+            "n_classes": self.n_classes,
+            "n_features": self.n_features,
+            "max_depth": self.max_depth,
+            "learning_rate": self.learning_rate,
+            "n_estimators": self.n_estimators,
+            "best_iteration": self.best_iteration,
+            "history": self.history,
+        }
+
+        with open(output_path / "metadata.json", "w") as f:
+            json.dump(metadata, f, indent=2)
+
+        # Save feature importance if available
+        if self.feature_importance is not None:
+            self.feature_importance.to_csv(
+                output_path / "feature_importance.csv", index=False
+            )
+
+        print(f"Model saved to {output_path}")
 
     @classmethod
-    def load(cls, path: str, config: Config, data: EdgarData) -> "XGBoostForecaster":
-        """Load a saved model from disk."""
-        obj = cls(config=config, data=data)
-        obj.model = xgb.Booster()
-        obj.model.load_model(path)
-        return obj
+    def load(cls, model_dir: str) -> "CreditRatingModel":
+        """Load saved model."""
+        model_path = Path(model_dir)
 
-    def evaluate(self, stage: str = "val") -> TickerResults:
-        """Evaluate the model on train or validation data."""
-        if stage not in {"val", "train"}:
-            raise ValueError("stage must be 'val' or 'train'")
+        # Load metadata
+        with open(model_path / "metadata.json", "r") as f:
+            metadata = json.load(f)
 
-        ds = self.data.val_dataset if stage == "val" else self.data.train_dataset
-        if ds is None:
-            raise ValueError(f"{stage} dataset is not available for evaluation")
-
-        history, y_gt = self._collect_batches(ds, stage)
-        y_pred = self._predict_with_uncertainty(history)
-
-        y_pred_unscaled, y_gt_unscaled, history_unscaled = self._unscale(
-            y_pred, y_gt, history
+        # Create instance
+        instance = cls(
+            n_classes=metadata["n_classes"],
+            n_features=metadata["n_features"],
+            max_depth=metadata["max_depth"],
+            learning_rate=metadata["learning_rate"],
+            n_estimators=metadata["n_estimators"],
         )
 
-        feature_metrics, per_feature_std = self._compute_feature_metrics(
-            y_pred_unscaled, y_gt_unscaled
-        )
+        # Build and load model
+        instance.build()
+        instance.model.load_model(str(model_path / "xgboost_model.json"))
+        instance.history = metadata["history"]
+        instance.best_iteration = metadata["best_iteration"]
 
-        ticker_results = self._build_results(
-            y_pred_unscaled,
-            y_gt_unscaled,
-            feature_metrics,
-            per_feature_std,
-            history_unscaled,
-        )
+        # Load feature importance if available
+        importance_path = model_path / "feature_importance.csv"
+        if importance_path.exists():
+            instance.feature_importance = pd.read_csv(importance_path)
 
-        if stage == "val":
-            self.val_results = ticker_results
-        else:
-            self.train_results = ticker_results
-        return ticker_results
-
-    def _collect_batches(self, ds, stage: str) -> tuple[np.ndarray, np.ndarray]:
-        """Collect batches from dataset into numpy arrays."""
-        x_batches = []
-        y_batches = []
-        for x_batch, y_batch in ds:
-            x_batches.append(x_batch.numpy())
-            y_batches.append(y_batch.numpy())
-        if not x_batches:
-            raise ValueError(f"No batches found when evaluating {stage} dataset")
-        history = np.concatenate(x_batches, axis=0)
-        y_gt = np.concatenate(y_batches, axis=0)
-        return history, y_gt
-
-    def _predict_with_uncertainty(self, history: np.ndarray) -> np.ndarray:
-        """Make predictions (no uncertainty for XGBoost by default)."""
-        return self.predict(history)
-
-    def _unscale(
-        self, y_pred: np.ndarray, y_gt: np.ndarray, history: np.ndarray
-    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """Unscale predictions and targets back to original scale."""
-        y_pred_unscaled = y_pred * self.data.target_std + self.data.target_mean
-        y_gt_unscaled = y_gt * self.data.target_std + self.data.target_mean
-        history_unscaled = history * self.data.target_std + self.data.target_mean
-        return y_pred_unscaled, y_gt_unscaled, history_unscaled
-
-    def _compute_feature_metrics(
-        self,
-        y_pred_unscaled: np.ndarray,
-        y_gt_unscaled: np.ndarray,
-    ) -> tuple[dict[str, Metric], np.ndarray]:
-        """Compute per-feature metrics."""
-        per_feature_mae, per_feature_std = self._per_feature_errors(
-            y_pred_unscaled, y_gt_unscaled
-        )
-
-        feature_metrics = {
-            name: Metric(
-                value=float(y_pred_unscaled[:, idx].mean()),
-                mae=float(per_feature_mae[idx]),
-                gt=float(y_gt_unscaled[:, idx].mean()),
-                std=float(per_feature_std[idx]),
-            )
-            for name, idx in self.data.feat_to_idx.items()
-        }
-        return feature_metrics, per_feature_std
-
-    def _per_feature_errors(
-        self,
-        y_pred_unscaled: np.ndarray,
-        y_gt_unscaled: np.ndarray,
-    ) -> tuple[np.ndarray, np.ndarray]:
-        """Compute per-feature MAE and std."""
-        err = y_pred_unscaled - y_gt_unscaled
-        abs_err = np.abs(err)
-        per_feature_mae = np.mean(abs_err, axis=0)
-        per_feature_std = np.std(err, axis=0)
-        return per_feature_mae, per_feature_std
-
-    def _build_results(
-        self,
-        y_pred_unscaled: np.ndarray,
-        y_gt_unscaled: np.ndarray,
-        feature_metrics: dict[str, Metric],
-        per_feature_std: np.ndarray,
-        history_unscaled: np.ndarray,
-    ) -> TickerResults:
-        """Build TickerResults object from predictions and ground truth."""
-        asset_idx = self.data.feature_mappings["assets"]
-        liability_idx = self.data.feature_mappings["liabilities"]
-        equity_idx = self.data.feature_mappings["equity"]
-
-        assets_pred = np.sum(y_pred_unscaled[:, asset_idx], axis=-1)
-        liabilities_pred = np.sum(y_pred_unscaled[:, liability_idx], axis=-1)
-        equity_pred = np.sum(y_pred_unscaled[:, equity_idx], axis=-1)
-
-        assets_gt = np.sum(y_gt_unscaled[:, asset_idx], axis=-1)
-        liabilities_gt = np.sum(y_gt_unscaled[:, liability_idx], axis=-1)
-        equity_gt = np.sum(y_gt_unscaled[:, equity_idx], axis=-1)
-
-        mae_assets = np.mean(np.abs(assets_pred - assets_gt))
-        mae_liabilities = np.mean(np.abs(liabilities_pred - liabilities_gt))
-        mae_equity = np.mean(np.abs(equity_pred - equity_gt))
-
-        baseline_results = baseline_skill_scores(
-            y_true=y_gt_unscaled,
-            model_pred=y_pred_unscaled,
-            history=history_unscaled,
-            seasonal_lag=min(4, history_unscaled.shape[1]),
-        )
-
-        net_income_results = self._net_income_baselines(
-            y_pred_unscaled, y_gt_unscaled, history_unscaled
-        )
-
-        return TickerResults(
-            assets=Metric(
-                value=float(assets_pred.mean()),
-                mae=float(mae_assets),
-                gt=float(assets_gt.mean()),
-            ),
-            liabilities=Metric(
-                value=float(liabilities_pred.mean()),
-                mae=float(mae_liabilities),
-                gt=float(liabilities_gt.mean()),
-            ),
-            equity=Metric(
-                value=float(equity_pred.mean()),
-                mae=float(mae_equity),
-                gt=float(equity_gt.mean()),
-            ),
-            features=feature_metrics,
-            model_mae=baseline_results["model_mae"],
-            baseline_mae=baseline_results["baseline_mae"],
-            skill=baseline_results["skill"],
-            net_income_model_mae=net_income_results["model_mae"],
-            net_income_baseline_mae=net_income_results["baseline_mae"],
-            net_income_skill=net_income_results["skill"],
-            net_income_pred=net_income_results["pred"],
-            net_income_gt=net_income_results["gt"],
-            net_income_baseline_pred=net_income_results["baseline_pred"],
-            pred_std={
-                name: float(per_feature_std[idx])
-                for name, idx in self.data.feat_to_idx.items()
-            },
-        )
-
-    def _net_income_baselines(
-        self,
-        y_pred_unscaled: np.ndarray,
-        y_gt_unscaled: np.ndarray,
-        history_unscaled: np.ndarray,
-    ) -> dict[str, dict[str, float] | float]:
-        """Compute net income baselines and metrics."""
-        net_income_baseline_mae: dict[str, float] = {}
-        net_income_skill: dict[str, float] = {}
-        net_income_model_mae = 0.0
-        net_income_pred = 0.0
-        net_income_gt = 0.0
-        net_income_baseline_pred: dict[str, float] = {}
-        net_income_key = "Net Income (Loss)"
-
-        ni_idx = self.data.feat_to_idx[net_income_key]
-        net_income_pred = float(y_pred_unscaled[:, ni_idx].mean())
-        net_income_gt = float(y_gt_unscaled[:, ni_idx].mean())
-        net_income_model_mae = float(
-            np.mean(np.abs(y_pred_unscaled[:, ni_idx] - y_gt_unscaled[:, ni_idx]))
-        )
-
-        baselines_pred = compute_baseline_predictions(
-            history=history_unscaled,
-            seasonal_lag=min(4, history_unscaled.shape[1]),
-        )
-
-        eps = 1e-12
-        for name, pred in baselines_pred.items():
-            mae = float(np.mean(np.abs(pred[:, ni_idx] - y_gt_unscaled[:, ni_idx])))
-            net_income_baseline_mae[name] = mae
-            denom = mae if mae > eps else eps
-            net_income_skill[name] = 1.0 - net_income_model_mae / denom
-            net_income_baseline_pred[name] = float(pred[:, ni_idx].mean())
-
-        return {
-            "baseline_mae": net_income_baseline_mae,
-            "skill": net_income_skill,
-            "model_mae": net_income_model_mae,
-            "pred": net_income_pred,
-            "gt": net_income_gt,
-            "baseline_pred": net_income_baseline_pred,
-        }
-
-    def view_results(self, stage: str = "val") -> None:
-        """Display evaluation results in formatted tables."""
-        results = self.val_results if stage == "val" else self.train_results
-
-        print(f"\033[1mResults for {stage} dataset ({self.config.data.ticker}):\033[0m")
-
-        # Summary Table
-        overall_rows = [
-            make_row("Assets", results.assets),
-            make_row("Liabilities", results.liabilities),
-            make_row("Equity", results.equity),
-        ]
-        print_table("Overall", overall_rows)
-
-        # Detailed per-feature tables
-        assets_rows = build_section_rows(
-            self.data.bs_structure["Assets"], results.features
-        )
-        print_table("Assets", assets_rows)
-
-        liabilities_rows = build_section_rows(
-            self.data.bs_structure["Liabilities"], results.features
-        )
-        print_table("Liabilities", liabilities_rows)
-
-        equity_rows = build_equity_rows(
-            self.data.bs_structure["Equity"], results.features
-        )
-        print_table("Equity", equity_rows)
-
-        if results.baseline_mae:
-            baseline_rows = build_baseline_rows(
-                results.baseline_mae, results.skill, results.model_mae
-            )
-            print_table(
-                "Baseline Comparison (Balance Sheet)",
-                baseline_rows,
-                headers=("Method", "MAE", "Error diff"),
-            )
-
-        print()
+        print(f"Model loaded from {model_path}")
+        return instance
 
 
+# Example usage
 if __name__ == "__main__":
-    from jpm.question_1 import (
-        BalanceSheet,
-        Config,
-        DataConfig,
-        EdgarData,
-        IncomeStatement,
-        LossConfig,
-        ModelConfig,
-        TrainingConfig,
-        get_args,
-        set_seed,
+    from credit_dataset import CreditDataset
+
+    # Load dataset
+    dataset = CreditDataset(data_dir="/scratch/datasets/jpm")
+    dataset.load()
+
+    # Get data
+    X_train, y_train = dataset.get_train_data()
+    X_val, y_val = dataset.get_val_data()
+    X_test, y_test = dataset.get_test_data()
+
+    info = dataset.get_info()
+
+    # Build and train model
+    model = CreditRatingModel(
+        n_classes=info["n_classes"],
+        n_features=info["n_features"],
+        max_depth=6,
+        learning_rate=0.1,
+        n_estimators=200,
+        early_stopping_rounds=20,
     )
 
-    set_seed(42)
-    args = get_args()
+    model.build()
+    model.train(X_train, y_train, X_val, y_val, verbose=True)
 
-    data_cfg = DataConfig.from_args(args)
-    model_cfg = ModelConfig.from_args(args)
-    train_cfg = TrainingConfig.from_args(args)
-    loss_cfg = LossConfig.from_args(args)
+    # Evaluate
+    test_metrics = model.evaluate(
+        X_test, y_test, class_names=info["classes"], split_name="test"
+    )
 
-    config = Config(data=data_cfg, model=model_cfg, training=train_cfg, loss=loss_cfg)
+    # Feature importance
+    feature_imp = model.compute_feature_importance(info["feature_names"])
+    print("\nTop 10 Features:")
+    print(feature_imp.head(10))
 
-    data = EdgarData(config=config)
+    # Plots
+    output_dir = Path("/scratch/models/credit_rating")
+    output_dir.mkdir(parents=True, exist_ok=True)
 
-    model = XGBoostForecaster(config=config, data=data)
-    model.fit(verbose=1)
+    model.plot_training_history(save_path=output_dir / "training_history.png")
+    model.plot_confusion_matrix(
+        y_test,
+        model.predict(X_test),
+        class_names=info["classes"],
+        save_path=output_dir / "confusion_matrix.png",
+    )
+    model.plot_feature_importance(
+        top_n=20, save_path=output_dir / "feature_importance.png"
+    )
 
-    model.evaluate(stage="train")
-    validation_results = model.evaluate(stage="val")
+    # Make predictions on future quarters
+    X_predict = dataset.get_predict_data()
+    predictions = model.predict(X_predict)
+    probabilities = model.predict_proba(X_predict)
 
-    model.view_results(stage="val")
+    predicted_ratings = dataset.decode_labels(predictions)
+    meta_predict = dataset.get_metadata("predict")
 
-    # Pass outputs to BS Model
-    bs = BalanceSheet(config=config, data=data, results=validation_results)
-    bs.check_identity()
+    results = meta_predict.copy()
+    results["predicted_rating"] = predicted_ratings
+    results["confidence"] = probabilities.max(axis=1)
 
-    # Income Statement to predict Net Income (Loss)
-    i_s = IncomeStatement(config=config, data=data, results=validation_results)
-    i_s.view()
+    print("\nPredictions for future quarters:")
+    print(results)
+
+    # Save
+    model.save()
+    results.to_csv(output_dir / "predictions.csv", index=False)
