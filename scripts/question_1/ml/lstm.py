@@ -10,19 +10,19 @@ from jpm.question_1 import (
     Config,
     DataConfig,
     EdgarData,
-    EdgarDataset,
     IncomeStatement,
     LLMConfig,
     LossConfig,
     LSTMForecaster,
     ModelConfig,
+    StatementsDataset,
     TrainingConfig,
     get_args,
     set_seed,
 )
 
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # Suppress TensorFlow logging
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # Use single GPU to avoid contention
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 import tensorflow as tf
 
@@ -47,17 +47,17 @@ train_cfg = TrainingConfig.from_args(args)
 loss_cfg = LossConfig.from_args(args)
 llm_cfg = LLMConfig.from_args(args)
 
-# Config variations to evaluate
+
 CONFIG_VARIATIONS = [
-    {"learn_identity": False, "enforce_balance": False},
-    {"learn_identity": True, "enforce_balance": False},
+    # {"learn_identity": False, "enforce_balance": False},
+    # {"learn_identity": True, "enforce_balance": False},
     {"learn_identity": True, "enforce_balance": True},
 ]
 
 tickers = [
     "MSFT",
     "AMZN",
-    "AVGO",  # Performs so well on this
+    "AVGO",
     "META",
 ]
 
@@ -70,7 +70,6 @@ for var_idx, variation in enumerate(CONFIG_VARIATIONS, 1):
     print(f"Config {var_idx}/{len(CONFIG_VARIATIONS)}: {config_name}")
     print(f"{'=' * 65}")
 
-    # Create loss config with this variation
     loss_cfg_var = LossConfig(
         enforce_balance=variation["enforce_balance"],
         learn_identity=variation["learn_identity"],
@@ -91,55 +90,56 @@ for var_idx, variation in enumerate(CONFIG_VARIATIONS, 1):
     for idx, ticker in enumerate(tickers, 1):
         print(f"\n[{idx}/{len(tickers)}] Processing {ticker}...", flush=True)
 
-        try:
-            config.data.ticker = ticker
+        # try:
+        config.data.ticker = ticker
 
-            data = EdgarData(config=config)
-            dataset = EdgarDataset(edgar_data=data, target="lstm")
+        data = EdgarData(config=config)
+        dataset = StatementsDataset(edgar_data=data)
+        model = LSTMForecaster(config=config, data=data, dataset=dataset)
+        model.fit(verbose=0)
+        model.evaluate(stage="train")
 
-            model = LSTMForecaster(config=config, data=data, dataset=dataset)
+        if config.llm.use_llm:
+            validation_results = model.evaluate(stage="val", llm_config=llm_cfg)
+        else:
+            validation_results = model.evaluate(stage="val")
 
-            model.fit(verbose=0)
+        bs = BalanceSheet(
+            config=config, data=data, dataset=dataset, results=validation_results
+        )
+        bs_pct_error = bs.check_identity()
 
-            model.evaluate(stage="train")
+        i_s = IncomeStatement(
+            config=config, dataset=dataset, results=validation_results
+        )
+        i_s.view()
+        is_results = i_s.get_results()
 
-            if config.llm.use_llm:
-                validation_results = model.evaluate(stage="val", llm_config=llm_cfg)
-            else:
-                validation_results = model.evaluate(stage="val")
+        results[ticker] = {
+            "net_income": {
+                "lstm": validation_results.net_income_model_mae,
+                **validation_results.baseline_mae,
+            },
+            "balance_sheet": {
+                "lstm": validation_results.model_mae,
+                **validation_results.baseline_mae,
+            },
+            "bs_pct_error": bs_pct_error,
+        }
 
-            bs = BalanceSheet(config=config, data=data, results=validation_results)
-            bs_pct_error = bs.check_identity()
+        print(
+            f"  {ticker}: LSTM MAE=${validation_results.model_mae / 1e9:.2f}bn",
+            flush=True,
+        )
 
-            i_s = IncomeStatement(config=config, data=data, results=validation_results)
-            i_s.view()
-            is_results = i_s.get_results()
+        # Clear memory after each ticker
+        del model, data, dataset, bs, i_s, validation_results, is_results
 
-            results[ticker] = {
-                "net_income": {
-                    "lstm": validation_results.net_income_model_mae,
-                    **validation_results.baseline_mae,
-                },
-                "balance_sheet": {
-                    "lstm": validation_results.model_mae,
-                    **validation_results.baseline_mae,
-                },
-                "bs_pct_error": bs_pct_error,
-            }
+        gc.collect()
+        tf.keras.backend.clear_session()
 
-            print(
-                f"  {ticker}: LSTM MAE=${validation_results.model_mae / 1e9:.2f}bn",
-                flush=True,
-            )
-
-            # Clear memory after each ticker
-            del model, data, bs, i_s, validation_results, is_results
-
-            gc.collect()
-            tf.keras.backend.clear_session()
-
-        except Exception as E:
-            print(E)
+        # except Exception as E:
+        #     print(E)
 
     # Store results for this config
     all_config_results[config_name] = results
@@ -184,6 +184,5 @@ for config_name, results in all_config_results.items():
             {np.mean(bs_pct_vals):.2%} (+/- {np.std(bs_pct_vals):.2%})"
     )
 
-# Save all results to JSON
-with open("lstm_evaluation_results_all_configs.json", "w") as f:
+with open("temp/lstm_evaluation_results_all_configs.json", "w") as f:
     json.dump(all_config_results, f, indent=2)

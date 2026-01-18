@@ -18,9 +18,7 @@ unit = pytest.mark.unit
 integration = pytest.mark.integration
 
 
-# =============================================================================
 # Tests for refactored helper functions in ed.py
-# =============================================================================
 
 
 @unit

@@ -199,9 +199,7 @@ def test_raises_on_insufficient_data():
         StatementsDataset(mock_edgar, target="lstm")
 
 
-# =============================================================================
 # Tests for seasonal weighting
-# =============================================================================
 
 
 @unit
@@ -258,9 +256,7 @@ def test_seasonal_weight_zero_lag():
     assert dataset.X_train is not None
 
 
-# =============================================================================
 # Tests for filter_low_quality_columns
-# =============================================================================
 
 
 @unit
@@ -294,9 +290,7 @@ def test_filter_low_quality_columns_removes_all_nan():
     assert dataset.data is not None
 
 
-# =============================================================================
 # Verbose mode tests
-# =============================================================================
 
 
 @unit

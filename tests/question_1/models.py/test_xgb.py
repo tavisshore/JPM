@@ -41,9 +41,7 @@ def sample_data():
     return X_train, y_train, X_val, y_val
 
 
-# =============================================================================
 # Initialization Tests
-# =============================================================================
 
 
 @unit
@@ -89,9 +87,7 @@ def test_init_default_state():
     assert model.feature_importance is None
 
 
-# =============================================================================
 # Build Tests
-# =============================================================================
 
 
 @unit
@@ -126,9 +122,7 @@ def test_build_sets_cpu_tree_method():
     assert params["tree_method"] == "hist"
 
 
-# =============================================================================
 # Training Tests
-# =============================================================================
 
 
 @unit
@@ -166,9 +160,7 @@ def test_train_history_decreases(model, sample_data):
     assert model.history["train"][0] >= min(model.history["train"])
 
 
-# =============================================================================
 # Prediction Tests
-# =============================================================================
 
 
 @unit
@@ -217,9 +209,7 @@ def test_predict_proba_returns_probabilities(model, sample_data):
     assert np.all(proba >= 0) and np.all(proba <= 1)
 
 
-# =============================================================================
 # Evaluation Tests
-# =============================================================================
 
 
 @unit
@@ -269,9 +259,7 @@ def test_evaluate_prints_report(model, sample_data, capsys):
     assert "Confusion Matrix" in captured.out
 
 
-# =============================================================================
 # Feature Importance Tests
-# =============================================================================
 
 
 @unit
@@ -300,9 +288,7 @@ def test_feature_importance_returns_dataframe(model, sample_data):
     assert model.feature_importance is not None
 
 
-# =============================================================================
 # Save/Load Tests
-# =============================================================================
 
 
 @integration
@@ -362,9 +348,7 @@ def test_save_raises_without_training(model, tmp_path):
         model.save(str(save_dir))
 
 
-# =============================================================================
 # Plotting Tests (mock matplotlib)
-# =============================================================================
 
 
 @unit
@@ -407,9 +391,7 @@ def test_plot_confusion_matrix_with_save(model, sample_data, tmp_path):
     assert save_path.exists()
 
 
-# =============================================================================
 # Edge Cases
-# =============================================================================
 
 
 @integration

@@ -975,3 +975,88 @@ def drop_non_numeric_columns(df):
             numeric_cols.append(col)
 
     return df[numeric_cols]
+
+
+def remap_financial_dataframe(df, column_mapping):
+    """
+    Remap and aggregate dataframe columns according to mapping structure.
+
+    Handles two types of multi-source mappings:
+    1. Alternate taxonomies (mutually exclusive) - coalesce (take first non-null)
+    2. True aggregations (can coexist) - sum
+
+    Parameters:
+    -----------
+    df : pd.DataFrame
+        Source dataframe with original column names
+    column_mapping : dict
+        Nested dictionary mapping new column names to lists of existing column names
+
+    Returns:
+    --------
+    pd.DataFrame
+        New dataframe with remapped columns
+    """
+    flat_mapping = _extract_leaf_mappings(column_mapping)
+    new_df = pd.DataFrame(index=df.index)
+
+    for new_col, old_cols in flat_mapping.items():
+        new_df[new_col] = _map_single_column(df, new_col, old_cols)
+
+    return new_df
+
+
+def _extract_leaf_mappings(mapping):
+    """Extract only leaf-level column mappings from nested mapping structure."""
+    leaf_map = {}
+
+    for key, value in mapping.items():
+        if key == "__unmapped__":
+            continue
+
+        if isinstance(value, dict):
+            nested_maps = _extract_leaf_mappings(value)
+            leaf_map.update(nested_maps)
+        elif isinstance(value, list):
+            leaf_map[key] = value
+
+    return leaf_map
+
+
+def _map_single_column(df, new_col, old_cols):
+    """Map a single column based on source columns."""
+    if not old_cols:
+        return np.nan
+
+    existing_cols = [col for col in old_cols if col in df.columns]
+
+    if not existing_cols:
+        return np.nan
+    if len(existing_cols) == 1:
+        return df[existing_cols[0]]
+
+    # Multiple sources - determine if mutually exclusive or aggregate
+    if _is_mutually_exclusive(df, existing_cols):
+        # Alternate taxonomies - coalesce (prefer non-null/non-zero values)
+        result = df[existing_cols].replace(0, np.nan).bfill(axis=1).iloc[:, 0]
+        return result.fillna(0)
+
+    # True aggregation - sum all sources
+    return df[existing_cols].sum(axis=1)
+
+
+def _is_mutually_exclusive(df, cols):
+    """
+    Check if columns are mutually exclusive (alternate taxonomies).
+    Returns True if columns never have non-zero values simultaneously.
+    """
+    if len(cols) <= 1:
+        return False
+
+    # Count rows where multiple columns are non-zero
+    non_zero = (df[cols] != 0) & (df[cols].notna())
+    simultaneous_nonzero = (non_zero.sum(axis=1) > 1).sum()
+
+    # If <5% of rows have multiple non-zero values, treat as mutually exclusive
+    threshold = len(df) * 0.05
+    return simultaneous_nonzero < threshold

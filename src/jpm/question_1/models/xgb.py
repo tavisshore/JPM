@@ -93,8 +93,6 @@ class CreditRatingModel:
         if self.model is None:
             raise ValueError("Model not built. Call build() first.")
 
-        print("Training XGBoost model...")
-
         # Ensure data types are correct
         X_train = X_train.astype(np.float32)
         X_val = X_val.astype(np.float32)
@@ -115,11 +113,6 @@ class CreditRatingModel:
 
         # Get best iteration - use last iteration if no early stopping
         self.best_iteration = len(self.history["train"]) - 1
-
-        print(f"Training complete. Iterations: {len(self.history['train'])}")
-        print(f"Final train loss: {self.history['train'][-1]:.4f}")
-        print(f"Final val loss: {self.history['val'][-1]:.4f}")
-        print(f"Best val loss: {min(self.history['val']):.4f}")
 
         return self
 
@@ -199,11 +192,6 @@ class CreditRatingModel:
             f"\n{classification_report(y, y_pred, labels=unique_classes, target_names=class_names, zero_division=0)}"
         )
 
-        # Confusion matrix
-        cm = confusion_matrix(y, y_pred, labels=unique_classes)
-        print("\nConfusion Matrix:")
-        print(cm)
-
         return metrics
 
     def compute_feature_importance(
@@ -261,7 +249,6 @@ class CreditRatingModel:
 
         if save_path:
             plt.savefig(save_path, dpi=300, bbox_inches="tight")
-            print(f"Training history plot saved to {save_path}")
         else:
             plt.show()
 
@@ -303,7 +290,6 @@ class CreditRatingModel:
 
         if save_path:
             plt.savefig(save_path, dpi=300, bbox_inches="tight")
-            print(f"Confusion matrix saved to {save_path}")
         else:
             plt.show()
 
@@ -330,7 +316,6 @@ class CreditRatingModel:
 
         if save_path:
             plt.savefig(save_path, dpi=300, bbox_inches="tight")
-            print(f"Feature importance plot saved to {save_path}")
         else:
             plt.show()
 
@@ -400,76 +385,3 @@ class CreditRatingModel:
 
         print(f"Model loaded from {model_path}")
         return instance
-
-
-# Example usage
-if __name__ == "__main__":
-    from credit_dataset import CreditDataset
-
-    # Load dataset
-    dataset = CreditDataset(data_dir="/scratch/datasets/jpm")
-    dataset.load()
-
-    # Get data
-    X_train, y_train = dataset.get_train_data()
-    X_val, y_val = dataset.get_val_data()
-    X_test, y_test = dataset.get_test_data()
-
-    info = dataset.get_info()
-
-    # Build and train model
-    model = CreditRatingModel(
-        n_classes=info["n_classes"],
-        n_features=info["n_features"],
-        max_depth=6,
-        learning_rate=0.1,
-        n_estimators=200,
-        early_stopping_rounds=20,
-    )
-
-    model.build()
-    model.train(X_train, y_train, X_val, y_val, verbose=True)
-
-    # Evaluate
-    test_metrics = model.evaluate(
-        X_test, y_test, class_names=info["classes"], split_name="test"
-    )
-
-    # Feature importance
-    feature_imp = model.compute_feature_importance(info["feature_names"])
-    print("\nTop 10 Features:")
-    print(feature_imp.head(10))
-
-    # Plots
-    output_dir = Path("/scratch/models/credit_rating")
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    model.plot_training_history(save_path=output_dir / "training_history.png")
-    model.plot_confusion_matrix(
-        y_test,
-        model.predict(X_test),
-        class_names=info["classes"],
-        save_path=output_dir / "confusion_matrix.png",
-    )
-    model.plot_feature_importance(
-        top_n=20, save_path=output_dir / "feature_importance.png"
-    )
-
-    # Make predictions on future quarters
-    X_predict = dataset.get_predict_data()
-    predictions = model.predict(X_predict)
-    probabilities = model.predict_proba(X_predict)
-
-    predicted_ratings = dataset.decode_labels(predictions)
-    meta_predict = dataset.get_metadata("predict")
-
-    results = meta_predict.copy()
-    results["predicted_rating"] = predicted_ratings
-    results["confidence"] = probabilities.max(axis=1)
-
-    print("\nPredictions for future quarters:")
-    print(results)
-
-    # Save
-    model.save()
-    results.to_csv(output_dir / "predictions.csv", index=False)

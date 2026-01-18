@@ -99,10 +99,10 @@ class LSTMForecaster:
                 )
 
             outputs = EnforceBalance(
-                feature_mappings=self.data.feature_mappings,
+                feature_mappings=self.dataset.feature_mappings,
                 feature_means=self.dataset.target_mean,
                 feature_stds=self.dataset.target_std,
-                feature_names=self.data.name_to_target_idx,
+                feature_names=self.dataset.name_to_target_idx,
             )(outputs)
 
         model = keras.Model(inputs=inputs, outputs=outputs, name="lstm_model")
@@ -124,7 +124,7 @@ class LSTMForecaster:
             loss_fn = bs_loss(
                 feature_means=self.dataset.target_mean,
                 feature_stds=self.dataset.target_std,
-                feature_mappings=self.data.feature_mappings,
+                feature_mappings=self.dataset.feature_mappings,
                 config=self.config.loss,
             )
 
@@ -157,14 +157,16 @@ class LSTMForecaster:
 
     def _build_output_layer(self):
         if not self.config.model.variational:
-            return keras.layers.Dense(len(self.data.targets), name="next_quarter")
+            return keras.layers.Dense(
+                len(self.dataset.tgt_indices), name="next_quarter"
+            )
 
         kl_weight = self._kl_weight()
         make_prior_fn = tfp.layers.default_multivariate_normal_fn
         make_posterior_fn = tfp.layers.default_mean_field_normal_fn()
 
         return tfp.layers.DenseVariational(
-            len(self.data.targets),
+            len(self.dataset.tgt_indices),
             make_prior_fn=make_prior_fn,
             make_posterior_fn=make_posterior_fn,
             kl_weight=kl_weight,
@@ -418,9 +420,9 @@ class LSTMForecaster:
         per_feature_std: np.ndarray,
         history_unscaled: np.ndarray,
     ) -> TickerResults:
-        asset_idx = self.data.feature_mappings["assets"]
-        liability_idx = self.data.feature_mappings["liabilities"]
-        equity_idx = self.data.feature_mappings["equity"]
+        asset_idx = self.dataset.feature_mappings["assets"]
+        liability_idx = self.dataset.feature_mappings["liabilities"]
+        equity_idx = self.dataset.feature_mappings["equity"]
 
         assets_pred = np.sum(y_pred_unscaled[:, asset_idx], axis=-1)
         liabilities_pred = np.sum(y_pred_unscaled[:, liability_idx], axis=-1)
