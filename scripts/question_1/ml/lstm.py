@@ -49,8 +49,8 @@ llm_cfg = LLMConfig.from_args(args)
 
 
 CONFIG_VARIATIONS = [
-    # {"learn_identity": False, "enforce_balance": False},
-    # {"learn_identity": True, "enforce_balance": False},
+    {"learn_identity": False, "enforce_balance": False},
+    {"learn_identity": True, "enforce_balance": False},
     {"learn_identity": True, "enforce_balance": True},
 ]
 
