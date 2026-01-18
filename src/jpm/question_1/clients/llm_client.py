@@ -267,7 +267,9 @@ class LLMClient:
             EBITDA = EBIT + IE + DA
 
             result = {
+                # In bonus question
                 "net_income": round(NI * fx_rate, 2),
+                # Ratios
                 "cost_to_income_ratio": round(OE / REV, 4) if REV != 0 else None,
                 "quick_ratio": round((CA - INV) / CL, 4) if CL != 0 else None,
                 "debt_to_equity_ratio": round(TD / EQ, 4) if EQ != 0 else None,

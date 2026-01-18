@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-"""
-CreditRatingModel class for XGBoost-based credit rating prediction.
-"""
-
 import json
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -16,30 +11,32 @@ from sklearn.metrics import (
     accuracy_score,
     classification_report,
     confusion_matrix,
+    mean_absolute_error,
     precision_recall_fscore_support,
-    roc_auc_score,
 )
 
 
 class CreditRatingModel:
     """
-    XGBoost model for credit rating prediction with training and evaluation.
+    XGBoost ordinal regression model for credit rating prediction.
+    Treats ratings as ordered categories (0=worst, n-1=best).
     """
 
     def __init__(
         self,
         n_classes: int,
         n_features: int,
-        max_depth: int = 6,
-        learning_rate: float = 0.1,
-        n_estimators: int = 100,
-        subsample: float = 0.8,
-        colsample_bytree: float = 0.8,
-        reg_alpha: float = 0.0,
-        reg_lambda: float = 1.0,
-        random_state: int = 42,
-        early_stopping_rounds: int = 10,
-        use_gpu: bool = False,
+        max_depth=4,
+        learning_rate=0.05,
+        n_estimators=300,
+        subsample=0.8,
+        colsample_bytree=0.8,
+        reg_alpha=0.1,
+        reg_lambda=1.0,
+        min_child_weight=3,
+        gamma=0.5,
+        random_state=42,
+        use_gpu=True,
     ):
         self.n_classes = n_classes
         self.n_features = n_features
@@ -50,20 +47,21 @@ class CreditRatingModel:
         self.colsample_bytree = colsample_bytree
         self.reg_alpha = reg_alpha
         self.reg_lambda = reg_lambda
+        self.min_child_weight = min_child_weight
+        self.gamma = gamma
         self.random_state = random_state
-        self.early_stopping_rounds = early_stopping_rounds
+        # self.early_stopping_rounds = early_stopping_rounds
         self.use_gpu = use_gpu
 
-        self.model: Optional[xgb.XGBClassifier] = None
+        self.model: Optional[xgb.XGBRegressor] = None
         self.history: Dict[str, List[float]] = {"train": [], "val": []}
         self.best_iteration: Optional[int] = None
         self.feature_importance: Optional[pd.DataFrame] = None
 
     def build(self) -> "CreditRatingModel":
-        """Build XGBoost classifier."""
+        """Build XGBoost regressor for ordinal regression."""
         params = {
-            "objective": "multi:softprob",
-            "num_class": self.n_classes,
+            "objective": "reg:squarederror",
             "max_depth": self.max_depth,
             "learning_rate": self.learning_rate,
             "n_estimators": self.n_estimators,
@@ -71,13 +69,17 @@ class CreditRatingModel:
             "colsample_bytree": self.colsample_bytree,
             "reg_alpha": self.reg_alpha,
             "reg_lambda": self.reg_lambda,
+            "min_child_weight": self.min_child_weight,
+            "gamma": self.gamma,
             "random_state": self.random_state,
-            "eval_metric": "mlogloss",
-            "device": "cuda" if self.use_gpu else "cpu",  # Changed from tree_method
+            "eval_metric": "mae",
+            "device": "cuda" if self.use_gpu else "cpu",
         }
 
-        self.model = xgb.XGBClassifier(**params)
-        print(f"Model built with {self.n_classes} classes, {self.n_features} features")
+        self.model = xgb.XGBRegressor(**params)
+        print(
+            f"Ordinal regression model built with {self.n_classes} ordered classes, {self.n_features} features"
+        )
         print(f"Device: {'GPU (CUDA)' if self.use_gpu else 'CPU'}")
         return self
 
@@ -87,6 +89,7 @@ class CreditRatingModel:
         y_train: np.ndarray,
         X_val: np.ndarray,
         y_val: np.ndarray,
+        sample_weight: Optional[np.ndarray] = None,
         verbose: bool = True,
     ) -> "CreditRatingModel":
         """Train the model with early stopping."""
@@ -96,37 +99,66 @@ class CreditRatingModel:
         # Ensure data types are correct
         X_train = X_train.astype(np.float32)
         X_val = X_val.astype(np.float32)
-        y_train = y_train.astype(np.int32)
-        y_val = y_val.astype(np.int32)
+        y_train = y_train.astype(np.float32)  # Regression target
+        y_val = y_val.astype(np.float32)
 
         self.model.fit(
             X_train,
             y_train,
             eval_set=[(X_train, y_train), (X_val, y_val)],
+            sample_weight=sample_weight,
             verbose=verbose,
         )
 
         # Extract training history
         results = self.model.evals_result()
-        self.history["train"] = results["validation_0"]["mlogloss"]
-        self.history["val"] = results["validation_1"]["mlogloss"]
+        self.history["train"] = results["validation_0"]["mae"]
+        self.history["val"] = results["validation_1"]["mae"]
 
-        # Get best iteration - use last iteration if no early stopping
+        # Get best iteration
         self.best_iteration = len(self.history["train"]) - 1
 
         return self
 
     def predict(self, X: np.ndarray) -> np.ndarray:
-        """Predict class labels."""
+        """Predict class labels by rounding regression output."""
+        if self.model is None:
+            raise ValueError("Model not trained.")
+
+        # Get continuous predictions and round to nearest class
+        raw_pred = self.model.predict(X)
+        # Clip to valid range [0, n_classes-1] and round
+        return np.clip(np.round(raw_pred), 0, self.n_classes - 1).astype(int)
+
+    def predict_raw(self, X: np.ndarray) -> np.ndarray:
+        """Predict raw continuous values (before rounding)."""
         if self.model is None:
             raise ValueError("Model not trained.")
         return self.model.predict(X)
 
     def predict_proba(self, X: np.ndarray) -> np.ndarray:
-        """Predict class probabilities."""
+        """
+        Approximate class probabilities using distance from predicted value.
+        Not true probabilities but useful for compatibility.
+        """
         if self.model is None:
             raise ValueError("Model not trained.")
-        return self.model.predict_proba(X)
+
+        raw_pred = self.model.predict(X)
+        n_samples = len(raw_pred)
+        proba = np.zeros((n_samples, self.n_classes))
+
+        for i, pred in enumerate(raw_pred):
+            # Clip to valid range
+            pred = np.clip(pred, 0, self.n_classes - 1)
+            # Assign probability based on distance to each class
+            for c in range(self.n_classes):
+                distance = abs(pred - c)
+                proba[i, c] = np.exp(-distance)  # Exponential decay
+            # Normalize to sum to 1
+            proba[i] /= proba[i].sum()
+
+        return proba
 
     def evaluate(
         self,
@@ -140,9 +172,9 @@ class CreditRatingModel:
             raise ValueError("Model not trained.")
 
         y_pred = self.predict(X)
-        y_proba = self.predict_proba(X)
+        y_raw = self.predict_raw(X)
 
-        # Get unique classes in predictions to match class_names
+        # Get unique classes in predictions
         unique_classes = np.unique(np.concatenate([y, y_pred]))
 
         # Filter class_names to only include classes present in data
@@ -151,6 +183,12 @@ class CreditRatingModel:
 
         # Basic metrics
         accuracy = accuracy_score(y, y_pred)
+        mae = mean_absolute_error(y, y_pred)
+        mae_raw = mean_absolute_error(y, y_raw)
+
+        # Within-1 accuracy (prediction within 1 rating level)
+        within_1_acc = np.mean(np.abs(y - y_pred) <= 1)
+
         precision, recall, f1, support = precision_recall_fscore_support(
             y, y_pred, average="weighted", zero_division=0
         )
@@ -160,34 +198,31 @@ class CreditRatingModel:
             precision_recall_fscore_support(y, y_pred, average=None, zero_division=0)
         )
 
-        # AUC (one-vs-rest for multiclass)
-        try:
-            auc = roc_auc_score(y, y_proba, multi_class="ovr", average="weighted")
-        except ValueError:
-            auc = None
-
         metrics = {
             "accuracy": accuracy,
+            "mae": mae,
+            "mae_raw": mae_raw,
+            "within_1_accuracy": within_1_acc,
             "precision": precision,
             "recall": recall,
             "f1": f1,
-            "auc": auc,
             "precision_per_class": precision_per_class.tolist(),
             "recall_per_class": recall_per_class.tolist(),
             "f1_per_class": f1_per_class.tolist(),
         }
 
         print(f"\n{'=' * 60}")
-        print(f"{split_name.upper()} SET EVALUATION")
+        print(f"{split_name.upper()} SET EVALUATION (Ordinal Regression)")
         print(f"{'=' * 60}")
-        print(f"Accuracy:  {accuracy:.4f}")
-        print(f"Precision: {precision:.4f}")
-        print(f"Recall:    {recall:.4f}")
-        print(f"F1 Score:  {f1:.4f}")
-        if auc:
-            print(f"AUC:       {auc:.4f}")
+        print(f"Exact Accuracy:        {accuracy:.4f}")
+        print(f"Within-1 Accuracy:     {within_1_acc:.4f}")
+        print(f"MAE (rounded):         {mae:.4f}")
+        print(f"MAE (continuous):      {mae_raw:.4f}")
+        print(f"Weighted Precision:    {precision:.4f}")
+        print(f"Weighted Recall:       {recall:.4f}")
+        print(f"Weighted F1 Score:     {f1:.4f}")
 
-        # Detailed classification report - use labels parameter
+        # Detailed classification report
         print(
             f"\n{classification_report(y, y_pred, labels=unique_classes, target_names=class_names, zero_division=0)}"
         )
@@ -222,15 +257,15 @@ class CreditRatingModel:
 
         return importance_df
 
-    def plot_training_history(self, save_path: Optional[str] = None):
-        """Plot training and validation loss curves."""
+    def plot_training_history(self, save_path: Optional[Path] = None):
+        """Plot training and validation MAE curves."""
         if not self.history["train"]:
             print("No training history available.")
             return
 
         plt.figure(figsize=(10, 6))
-        plt.plot(self.history["train"], label="Train Loss", linewidth=2)
-        plt.plot(self.history["val"], label="Val Loss", linewidth=2)
+        plt.plot(self.history["train"], label="Train MAE", linewidth=2)
+        plt.plot(self.history["val"], label="Val MAE", linewidth=2)
 
         if self.best_iteration is not None:
             plt.axvline(
@@ -241,8 +276,10 @@ class CreditRatingModel:
             )
 
         plt.xlabel("Iteration", fontsize=12)
-        plt.ylabel("Log Loss", fontsize=12)
-        plt.title("Training History", fontsize=14, fontweight="bold")
+        plt.ylabel("Mean Absolute Error", fontsize=12)
+        plt.title(
+            "Training History (Ordinal Regression)", fontsize=14, fontweight="bold"
+        )
         plt.legend()
         plt.grid(True, alpha=0.3)
         plt.tight_layout()
@@ -259,19 +296,19 @@ class CreditRatingModel:
         y_true: np.ndarray,
         y_pred: np.ndarray,
         class_names: List[str],
-        save_path: Optional[str] = None,
-        normalize: bool = False,
+        save_path: Optional[Path] = None,
+        normalise: bool = False,
     ):
         """Plot confusion matrix."""
         cm = confusion_matrix(y_true, y_pred)
 
-        if normalize:
+        if normalise:
             cm = cm.astype("float") / cm.sum(axis=1)[:, np.newaxis]
             fmt = ".2f"
-            title = "Normalized Confusion Matrix"
+            title = "Normalised Confusion Matrix (Ordinal)"
         else:
             fmt = "d"
-            title = "Confusion Matrix"
+            title = "Confusion Matrix (Ordinal)"
 
         plt.figure(figsize=(10, 8))
         sns.heatmap(
@@ -281,7 +318,7 @@ class CreditRatingModel:
             cmap="Blues",
             xticklabels=class_names,
             yticklabels=class_names,
-            cbar_kws={"label": "Proportion" if normalize else "Count"},
+            cbar_kws={"label": "Proportion" if normalise else "Count"},
         )
         plt.xlabel("Predicted", fontsize=12)
         plt.ylabel("True", fontsize=12)
@@ -295,7 +332,9 @@ class CreditRatingModel:
 
         plt.close()
 
-    def plot_feature_importance(self, top_n: int = 20, save_path: Optional[str] = None):
+    def plot_feature_importance(
+        self, top_n: int = 20, save_path: Optional[Path] = None
+    ):
         """Plot top feature importances."""
         if self.feature_importance is None:
             print(
@@ -321,19 +360,19 @@ class CreditRatingModel:
 
         plt.close()
 
-    def save(self, output_dir: str = "/scratch/models/credit_rating"):
+    def save(self, output_dir: Path = Path("/scratch/models/credit_rating")):
         """Save model and training artifacts."""
         if self.model is None:
             raise ValueError("Model not trained.")
 
-        output_path = Path(output_dir)
-        output_path.mkdir(parents=True, exist_ok=True)
+        output_dir.mkdir(parents=True, exist_ok=True)
 
         # Save XGBoost model
-        self.model.save_model(str(output_path / "xgboost_model.json"))
+        self.model.save_model(str(output_dir / "xgboost_model.json"))
 
         # Save training history and metadata
         metadata = {
+            "model_type": "ordinal_regression",
             "n_classes": self.n_classes,
             "n_features": self.n_features,
             "max_depth": self.max_depth,
@@ -343,16 +382,16 @@ class CreditRatingModel:
             "history": self.history,
         }
 
-        with open(output_path / "metadata.json", "w") as f:
+        with open(output_dir / "metadata.json", "w") as f:
             json.dump(metadata, f, indent=2)
 
         # Save feature importance if available
         if self.feature_importance is not None:
             self.feature_importance.to_csv(
-                output_path / "feature_importance.csv", index=False
+                output_dir / "feature_importance.csv", index=False
             )
 
-        print(f"Model saved to {output_path}")
+        print(f"Model saved to {output_dir}")
 
     @classmethod
     def load(cls, model_dir: str) -> "CreditRatingModel":

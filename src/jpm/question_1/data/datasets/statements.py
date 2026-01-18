@@ -141,13 +141,14 @@ class StatementsDataset:
         # Removing non-BS columns that correlate, little info etc.
         self._get_structure()
         bs_cols = [item for lst in self.bs_structure.values() for item in lst] + [
-            "Net Income"
+            "Net Income",
+            "Total Revenues",
         ]
+
         self.data = prune_features_for_lstm(self.data, keep_columns=bs_cols)
         self.tgt_indices = list(range(len(self.data.columns)))
 
         self._prepare_targets()
-
         self._set_feature_index()
 
         X_scaled, scaler = self._scale_features()
