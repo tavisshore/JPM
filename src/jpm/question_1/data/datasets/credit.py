@@ -3,7 +3,6 @@
 CreditDataset class for credit rating prediction with TensorFlow/XGBoost.
 """
 
-import pickle
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -11,25 +10,19 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
 
 
 class CreditDataset:
-    """
-    Dataset manager for credit rating prediction from quarterly financial ratios.
-    Handles loading, preprocessing, and serving data for TensorFlow XGBoost.
-    """
-
     def __init__(
         self,
-        data_dir: str = "/scratch/datasets/jpm/ratings",
+        data_dir: Path = Path("/scratch/datasets/jpm/ratings"),
         pattern: str = "*_ratings.parquet",
         val_size: float = 0.1,
         test_size: float = 0.1,
         random_state: int = 42,
         verbose: bool = False,
     ):
-        self.data_dir = Path(data_dir)
+        self.data_dir = data_dir
         self.pattern = pattern
         self.val_size = val_size
         self.test_size = test_size
@@ -37,7 +30,6 @@ class CreditDataset:
         self.verbose = verbose
 
         self.feature_cols: List[str] = []
-        self.label_encoder = LabelEncoder()
         self.is_fitted = False
 
         self._X_train: Optional[np.ndarray] = None
@@ -139,10 +131,36 @@ class CreditDataset:
             if col not in ["quarter", "rating", "target_rating", "ticker", "index"]
         ]
 
-        # Encode ratings
-        df_all["target_encoded"] = self.label_encoder.fit_transform(
-            df_all["target_rating"]
-        )
+        # Define rating collapse mapping - Simplifies with such small data
+        self.rating_map = {
+            "Aaa": 0,  # Prime (2 samples)
+            "Aa3": 1,
+            "Aa2": 1,
+            "Aa1": 1,  # High Grade (11 samples)
+            "A3": 2,
+            "A2": 2,
+            "A1": 2,  # Upper Medium (41 samples)
+            "Baa3": 3,
+            "Baa2": 3,
+            "Baa1": 3,  # Lower Medium (12 samples)
+        }
+
+        # Decode to rating names
+        self.class_names = {
+            "0": "Prime",
+            "1": "High",
+            "2": "Medium",
+            "3": "Low",
+            # For this exercise - still good though
+        }
+
+        # Apply mapping to collapse classes
+        df_all["target_encoded"] = df_all["target_rating"].map(self.rating_map)
+
+        # Verify no missing mappings
+        if df_all["target_encoded"].isna().any():
+            unmapped = df_all[df_all["target_encoded"].isna()]["target_rating"].unique()
+            raise ValueError(f"Unmapped ratings found: {unmapped}")
 
         # Split data
         X = df_all[self.feature_cols].values
@@ -276,11 +294,11 @@ class CreditDataset:
 
         return metadata_map[split].copy()
 
-    def decode_labels(self, encoded_labels: np.ndarray) -> np.ndarray:
-        """Convert encoded labels back to original ratings."""
-        if not self.is_fitted:
-            raise ValueError("Dataset not loaded. Call load() first.")
-        return self.label_encoder.inverse_transform(encoded_labels)
+    def decode_labels(self, indices):
+        labels = []
+        for ind in indices:
+            labels.append(self.class_names[str(ind)])
+        return labels
 
     def get_info(self) -> Dict:
         """Get dataset information."""
@@ -292,18 +310,15 @@ class CreditDataset:
         val_dist = pd.Series(self._y_val).value_counts().sort_index()
         test_dist = pd.Series(self._y_test).value_counts().sort_index()
 
-        # Decode to rating names
-        class_names = self.label_encoder.classes_
-
         info = {
             "n_train": len(self._X_train),
             "n_val": len(self._X_val),
             "n_test": len(self._X_test),
             "n_predict": len(self._X_predict),
             "n_features": len(self.feature_cols),
-            "n_classes": len(self.label_encoder.classes_),
+            "n_classes": len(self.rating_map.values()),
             "feature_names": self.feature_cols,
-            "classes": self.label_encoder.classes_.tolist(),
+            "classes": list(self.class_names.values()),
         }
 
         # Pretty print
@@ -319,7 +334,7 @@ class CreditDataset:
         )
         print("-" * 70)
 
-        for i, rating in enumerate(class_names):
+        for i, rating in enumerate(list(self.class_names.values())):
             train_count = train_dist.get(i, 0)
             val_count = val_dist.get(i, 0)
             test_count = test_dist.get(i, 0)
@@ -364,18 +379,6 @@ class CreditDataset:
         self._meta_val.to_parquet(output_path / "meta_val.parquet")
         self._meta_test.to_parquet(output_path / "meta_test.parquet")
         self._meta_predict.to_parquet(output_path / "meta_predict.parquet")
-
-        # Save encoder and config
-        metadata = {
-            "feature_names": self.feature_cols,
-            "label_encoder": self.label_encoder,
-            "rating_classes": self.label_encoder.classes_.tolist(),
-            "n_features": len(self.feature_cols),
-            "n_classes": len(self.label_encoder.classes_),
-        }
-
-        with open(output_path / "metadata.pkl", "wb") as f:
-            pickle.dump(metadata, f)
 
         if self.verbose:
             print(f"Datasets saved to {output_path}")

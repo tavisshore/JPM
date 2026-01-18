@@ -122,7 +122,6 @@ class RatingsHistoryDownloader:
                         f.write(chunk)
 
         # Processes moodys data for the particular ticker - returning quarterly ratings
-        # if not output_file.exists():
         ratings_df = pd.read_csv(raw_data, dtype=str)
         ratings_df = ratings_df[
             ["obligor_name", "rating", "rating_type", "rating_action_date"]
@@ -244,28 +243,28 @@ class EdgarData:
 
     def get_ratings(self):
         """Training Data for Credit Rating Prediction."""
-        if not self.ratings_data_path.exists() or self.overwrite:
-            # Download and process credit ratings
-            downloader = RatingsHistoryDownloader(config=self.config)
-            _ratings_df = downloader.download_moodys_financial(
-                self.llm_client, self.config.data.ticker
-            )  # noqa: F841
+        # if not self.ratings_data_path.exists() or self.overwrite:
+        # Download and process credit ratings
+        downloader = RatingsHistoryDownloader(config=self.config)
+        _ratings_df = downloader.download_moodys_financial(
+            self.llm_client, self.config.data.ticker
+        )  # noqa: F841
 
-            # Select only the relevant company's data
-            # Calculate ratios from self.data and add to ratings_df
-            df = add_derived_columns(self.data)
+        # Select only the relevant company's data
+        # Calculate ratios from self.data and add to ratings_df
+        df = add_derived_columns(self.data)
 
-            df.index = df.index.asfreq("Q-DEC")
-            _ratings_df.index = _ratings_df.index.asfreq("Q-DEC")
+        df.index = df.index.asfreq("Q-DEC")
+        _ratings_df.index = _ratings_df.index.asfreq("Q-DEC")
 
-            df_combined = pd.merge(
-                df, _ratings_df, left_index=True, right_index=True, how="inner"
-            )
+        df_combined = pd.merge(
+            df, _ratings_df, left_index=True, right_index=True, how="inner"
+        )
 
-            self.ratings_data = calculate_credit_ratios(df_combined)
-            self.ratings_data.to_parquet(self.ratings_data_path)
-        else:
-            self.ratings_data = pd.read_parquet(self.ratings_data_path)
+        self.ratings_data = calculate_credit_ratios(df_combined)
+        self.ratings_data.to_parquet(self.ratings_data_path)
+        # else:
+        # self.ratings_data = pd.read_parquet(self.ratings_data_path)
 
     def create_statements(self) -> None:
         self.filings = self.company.get_filings(form=["10-Q", "10-K"])

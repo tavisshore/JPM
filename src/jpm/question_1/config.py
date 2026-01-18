@@ -10,6 +10,7 @@ class DataConfig:
 
     ticker: str = "AAPL"  # Debug with MSFT AAPL AMZN
     cache_dir: str = "/scratch/datasets/jpm"
+    save_dir: str = "/scratch/projects/JPM/temp"
     periods: int = 60  # quarters -> 15 years, post-2008
     lookback: int = 4
     horizon: int = 1

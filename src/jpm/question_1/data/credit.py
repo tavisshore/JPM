@@ -219,6 +219,10 @@ def _calculate_efficiency_ratios(df, ratios_df):
             _safe_get(df, "Total Revenues"),
             _safe_get(df, "Property, Plant, and Equipment (net)"),
         )
+    if "Operating Expenses" in df.columns and "Total Revenues" in df.columns:
+        ratios_df["Cost_to_Income"] = _safe_ratio(
+            _safe_get(df, "Operating Expenses"), _safe_get(df, "Total Revenues")
+        )
 
 
 def _calculate_cash_flow_ratios(df, ratios_df, free_cash_flow):
@@ -359,6 +363,49 @@ def _calculate_size_metrics(df, ratios_df):
         )
 
 
+def _calculate_jpm_ratios(df, ratios_df, total_debt, ebitda):
+    # Quick Ratio
+    if (
+        "Total Current Assets" in df.columns
+        and "Inventory" in df.columns
+        and "Total Current Liabilities" in df.columns
+    ):
+        quick_assets = _safe_get(df, "Total Current Assets") - _safe_get(
+            df, "Inventory"
+        ).fillna(0)
+        ratios_df["Quick_Ratio"] = _safe_ratio(
+            quick_assets, _safe_get(df, "Total Current Liabilities")
+        )
+    # Debt to Equity
+    if total_debt is not None and "Total Equity" in df.columns:
+        ratios_df["Debt_to_Equity"] = _safe_ratio(
+            total_debt, _safe_get(df, "Total Equity")
+        )
+    # Debt to Assets
+    if total_debt is not None and "Total Assets" in df.columns:
+        ratios_df["Debt_to_Assets"] = _safe_ratio(
+            total_debt, _safe_get(df, "Total Assets")
+        )
+    # Debt to Capital
+    if total_debt is not None and "Total Equity" in df.columns:
+        total_capital = total_debt + _safe_get(df, "Total Equity")
+        ratios_df["Total_Debt_to_Total_Capital"] = _safe_ratio(
+            total_debt, total_capital
+        )
+    # Debt to EBITDA
+    if total_debt is not None and ebitda is not None:
+        ratios_df["Debt_to_EBITDA"] = _safe_ratio(total_debt, ebitda)
+    # Interest Coverage
+    if "Operating Income" in df.columns and "Interest Paid" in df.columns:
+        ratios_df["EBIT_to_Interest"] = _safe_ratio(
+            _safe_get(df, "Operating Income"), _safe_get(df, "Interest Paid")
+        )
+    if "Operating Expenses" in df.columns and "Total Revenues" in df.columns:
+        ratios_df["Cost_to_Income"] = _safe_ratio(
+            _safe_get(df, "Operating Expenses"), _safe_get(df, "Total Revenues")
+        )
+
+
 def calculate_credit_ratios(df):
     """
     Calculate financial ratios for credit rating \
@@ -392,30 +439,22 @@ def calculate_credit_ratios(df):
     if free_cash_flow is not None:
         ratios_df["Free_Cash_Flow"] = free_cash_flow
 
-    # Calculate all ratio categories
-    _calculate_leverage_ratios(df, ratios_df, total_debt)
-    _calculate_coverage_ratios(df, ratios_df, total_debt, ebitda, free_cash_flow)
-    _calculate_profitability_ratios(df, ratios_df, ebitda)
-    _calculate_liquidity_ratios(df, ratios_df)
-    _calculate_efficiency_ratios(df, ratios_df)
-    _calculate_cash_flow_ratios(df, ratios_df, free_cash_flow)
-    _calculate_capital_structure_ratios(df, ratios_df)
-    _calculate_dividend_ratios(df, ratios_df)
-    _calculate_growth_ratios(df, ratios_df)
-    _calculate_quality_metrics(df, ratios_df)
-    _calculate_size_metrics(df, ratios_df)
+    # Ratios in bonus question
+    _calculate_jpm_ratios(df, ratios_df, total_debt, ebitda)
 
-    # REPLACE INFINITIES WITH NaN (safety check)
+    # Full ratios instead
+    # _calculate_liquidity_ratios(df, ratios_df)
+    # _calculate_leverage_ratios(df, ratios_df, total_debt)
+    # _calculate_coverage_ratios(df, ratios_df, total_debt, ebitda, free_cash_flow)
+    # _calculate_profitability_ratios(df, ratios_df, ebitda)
+    # _calculate_efficiency_ratios(df, ratios_df)
+    # _calculate_cash_flow_ratios(df, ratios_df, free_cash_flow)
+    # _calculate_capital_structure_ratios(df, ratios_df)
+    # _calculate_dividend_ratios(df, ratios_df)
+    # _calculate_growth_ratios(df, ratios_df)
+    # _calculate_quality_metrics(df, ratios_df)
+    # _calculate_size_metrics(df, ratios_df)
+
     ratios_df = ratios_df.replace([np.inf, -np.inf], np.nan)
-
+    ratios_df = ratios_df.drop(columns=["Total_Debt", "EBITDA", "Free_Cash_Flow"])
     return ratios_df
-
-
-# Usage example:
-
-#
-# # Prepare for XGBoost
-# feature_cols = [col for col in ratios_df.columns
-#                 if col not in ['ticker', 'obligor_name', 'rating']]
-# X = ratios_df[feature_cols]
-# y = ratios_df['rating']

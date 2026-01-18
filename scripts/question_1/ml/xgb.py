@@ -1,33 +1,41 @@
 from pathlib import Path
 
-from jpm.question_1 import CreditDataset, CreditRatingModel
+from jpm.question_1 import (
+    Config,
+    CreditDataset,
+    CreditRatingModel,
+    DataConfig,
+    LLMConfig,
+    LossConfig,
+    ModelConfig,
+    TrainingConfig,
+    get_args,
+    set_seed,
+)
 
 
-def main():
-    DATA_DIR = "/scratch/datasets/jpm/ratings"
-    MODEL_DIR = "/scratch/projects/JPM/temp"
-    PLOTS_DIR = Path(MODEL_DIR) / "plots"
+def main(cfg: Config):
+    data_dir = Path(cfg.data.cache_dir) / "ratings"
+    save_dir = Path(cfg.data.save_dir)
+    save_dir.mkdir(parents=True, exist_ok=True)
+    plots_dir = save_dir / "plots"
+    plots_dir.mkdir(parents=True, exist_ok=True)
 
     PARAMS = {
-        "max_depth": 6,
-        "learning_rate": 0.1,
-        "n_estimators": 200,
+        "max_depth": 4,
+        "learning_rate": 0.05,
+        "n_estimators": 300,
         "subsample": 0.8,
         "colsample_bytree": 0.8,
-        "reg_alpha": 0.0,
+        "reg_alpha": 0.1,
         "reg_lambda": 1.0,
-        "early_stopping_rounds": 20,
         "use_gpu": True,  # Set to False if no GPU
         "random_state": 42,
     }
-    PLOTS_DIR.mkdir(parents=True, exist_ok=True)
 
-    print("=" * 70)
-    print("CREDIT RATING PREDICTION - XGBoost Training")
-    print("=" * 70)
     print("\n[1/5] Loading dataset...")
     dataset = CreditDataset(
-        data_dir=DATA_DIR,
+        data_dir=data_dir,
         pattern="*_ratings.parquet",
         val_size=0.15,
         test_size=0.15,
@@ -65,22 +73,22 @@ def main():
     feature_imp = model.compute_feature_importance(info["feature_names"])
 
     # Generate plots
-    model.plot_training_history(save_path=PLOTS_DIR / "training_history.png")
+    model.plot_training_history(save_path=plots_dir / "training_history.png")
     model.plot_confusion_matrix(
         y_test,
         model.predict(X_test),
         class_names=info["classes"],
-        save_path=PLOTS_DIR / "confusion_matrix.png",
+        save_path=plots_dir / "confusion_matrix.png",
     )
     model.plot_confusion_matrix(
         y_test,
         model.predict(X_test),
         class_names=info["classes"],
-        normalize=True,
-        save_path=PLOTS_DIR / "confusion_matrix_normalized.png",
+        normalise=True,
+        save_path=plots_dir / "confusion_matrix_normalised.png",
     )
     model.plot_feature_importance(
-        top_n=20, save_path=PLOTS_DIR / "feature_importance.png"
+        top_n=20, save_path=plots_dir / "feature_importance.png"
     )
 
     # Make predictions on future quarters
@@ -102,9 +110,9 @@ def main():
         results[f"top_{i + 1}_prob"] = probabilities[range(len(probabilities)), top_idx]
 
     # Save everything
-    model.save(MODEL_DIR)
-    results.to_csv(Path(MODEL_DIR) / "predictions.csv", index=False)
-    feature_imp.to_csv(Path(MODEL_DIR) / "feature_importance.csv", index=False)
+    model.save(save_dir)
+    results.to_csv(Path(save_dir) / "predictions.csv", index=False)
+    feature_imp.to_csv(Path(save_dir) / "feature_importance.csv", index=False)
 
     # Save test predictions for analysis
     test_meta = dataset.get_metadata("test")
@@ -118,19 +126,33 @@ def main():
         test_results["target_rating"] == test_results["predicted_rating"]
     )
 
-    test_results.to_csv(Path(MODEL_DIR) / "test_predictions.csv", index=False)
+    test_results.to_csv(Path(save_dir) / "test_predictions.csv", index=False)
 
     print("\n" + "=" * 70)
     print("TRAINING COMPLETE")
     print("=" * 70)
-    print(f"Model saved to: {MODEL_DIR}")
-    print(f"Plots saved to: {PLOTS_DIR}")
+    print(f"Model saved to: {save_dir}")
+    print(f"Plots saved to: {plots_dir}")
     print(f"\nTest Accuracy: {test_metrics['accuracy']:.4f}")
     print(f"Test F1 Score: {test_metrics['f1']:.4f}")
-    if test_metrics["auc"]:
-        print(f"Test AUC:      {test_metrics['auc']:.4f}")
     print("=" * 70 + "\n")
 
 
 if __name__ == "__main__":
-    main()
+    set_seed(42)
+    args = get_args()
+
+    data_cfg = DataConfig.from_args(args)
+    model_cfg = ModelConfig.from_args(args)
+    train_cfg = TrainingConfig.from_args(args)
+    loss_cfg = LossConfig.from_args(args)
+    llm_cfg = LLMConfig.from_args(args)
+    config = Config(
+        data=data_cfg,
+        model=model_cfg,
+        training=train_cfg,
+        loss=loss_cfg,
+        llm=llm_cfg,
+    )
+
+    main(config)

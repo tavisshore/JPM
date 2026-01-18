@@ -3,12 +3,12 @@ from jpm.question_1 import (
     Config,
     DataConfig,
     EdgarData,
-    EdgarDataset,
     IncomeStatement,
     LLMConfig,
     LossConfig,
     LSTMForecaster,
     ModelConfig,
+    StatementsDataset,
     TrainingConfig,
     get_args,
     set_seed,
@@ -27,7 +27,7 @@ config = Config(
 )
 
 data = EdgarData(config=config)
-dataset = EdgarDataset(edgar_data=data, target="lstm")
+dataset = StatementsDataset(edgar_data=data)
 
 
 model = LSTMForecaster(config=config, data=data, dataset=dataset)
@@ -38,9 +38,9 @@ validation_results = model.evaluate(stage="val", llm_config=llm_cfg)
 model.view_results(stage="val")
 
 # Pass outputs to BS Model
-bs = BalanceSheet(config=config, data=data, results=validation_results)
+bs = BalanceSheet(config=config, data=data, dataset=dataset, results=validation_results)
 bs_pct_error = bs.check_identity()
 
-i_s = IncomeStatement(config=config, data=data, results=validation_results)
+i_s = IncomeStatement(config=config, dataset=dataset, results=validation_results)
 i_s.view()
 is_results = i_s.get_results()
