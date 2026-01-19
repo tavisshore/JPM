@@ -3,13 +3,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from jpm.question_1.config import (
-    Config,
-    DataConfig,
-    LossConfig,
-    ModelConfig,
-    TrainingConfig,
-)
+from jpm.question_1.config import Config, DataConfig, LSTMConfig
 
 unit = pytest.mark.unit
 integration = pytest.mark.integration
@@ -49,12 +43,12 @@ def test_model_config_from_args_handles_partial_args():
         dropout=None,
     )
 
-    cfg = ModelConfig.from_args(args)
+    cfg = LSTMConfig.from_args(args)
 
     assert cfg.lstm_units == 256
     assert cfg.dense_units == 64
-    assert cfg.lstm_layers == ModelConfig().lstm_layers
-    assert cfg.dropout == ModelConfig().dropout
+    assert cfg.lstm_layers == LSTMConfig().lstm_layers
+    assert cfg.dropout == LSTMConfig().dropout
 
 
 @unit
@@ -69,13 +63,13 @@ def test_training_config_from_args_preserves_paths_and_scheduler():
         decay_rate=0.8,
     )
 
-    cfg = TrainingConfig.from_args(args)
+    cfg = LSTMConfig.from_args(args)
 
     assert cfg.lr == pytest.approx(5e-4)
     assert cfg.epochs == 20
     assert cfg.checkpoint_path == Path("custom_ckpts")
     assert cfg.scheduler == "cosine"
-    assert cfg.decay_steps == TrainingConfig().decay_steps
+    assert cfg.decay_steps == LSTMConfig().decay_steps
     assert cfg.decay_rate == pytest.approx(0.8)
 
 
@@ -90,12 +84,12 @@ def test_loss_config_from_args_overrides_selected_fields():
         subcategory_weight=5e-5,
     )
 
-    cfg = LossConfig.from_args(args)
+    cfg = LSTMConfig.from_args(args)
 
     assert cfg.enforce_balance is True
     assert cfg.learn_identity is True
     assert cfg.identity_weight == pytest.approx(0.2)
-    assert cfg.learn_subtotals == LossConfig().learn_subtotals
+    assert cfg.learn_subtotals == LSTMConfig().learn_subtotals
     assert cfg.subcategory_weight == pytest.approx(5e-5)
 
 
@@ -104,14 +98,10 @@ def test_config_composes_custom_subconfigs():
     """Config should compose sub-configs created via from_args helpers."""
     data_args = SimpleNamespace(ticker="AAPL", periods=8)
     model_args = SimpleNamespace(lstm_units=64, dense_units=32)
-    training_args = SimpleNamespace(lr=1e-4, epochs=50)
-    loss_args = SimpleNamespace(enforce_balance=True, identity_weight=0.5)
 
     cfg = Config(
         data=DataConfig.from_args(data_args),
-        model=ModelConfig.from_args(model_args),
-        training=TrainingConfig.from_args(training_args),
-        loss=LossConfig.from_args(loss_args),
+        model=LSTMConfig.from_args(model_args),
     )
 
     assert cfg.data.ticker == "AAPL"

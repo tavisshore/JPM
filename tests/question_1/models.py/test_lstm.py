@@ -6,62 +6,29 @@ import numpy as np
 import pytest
 import tensorflow as tf
 
-from jpm.question_1.config import (
-    Config,
-    DataConfig,
-    LossConfig,
-    ModelConfig,
-    TrainingConfig,
-)
+from jpm.question_1.config import Config, DataConfig, LSTMConfig
 from jpm.question_1.models.lstm import LSTMForecaster
 from jpm.question_1.models.metrics import Metric
+from tests.question_1.conftest import DummyDataLoader, DummyStatementsDataset
 
 unit = pytest.mark.unit
 integration = pytest.mark.integration
 
 
-class DummyDataLoader:
-    def __init__(self, with_val: bool = True):
-        self.num_features = 2
-        self.targets = [0, 1]
-        self.feature_mappings = {
-            "assets": [0],
-            "liabilities": [1],
-            "equity": [],
-        }
-        self.bs_keys = ["feature0", "feature1"]
-        self.bs_structure = {
-            "assets": {"current_assets": ["feature0"], "non_current_assets": []},
-            "liabilities": {
-                "current_liabilities": ["feature1"],
-                "non_current_liabilities": [],
-            },
-            "equity": ["feature1"],
-        }
-        self.target_mean = np.array([0.0, 0.0], dtype=np.float64)
-        self.target_std = np.array([1.0, 1.0], dtype=np.float64)
-        self.feat_to_idx = {"feature0": 0, "feature1": 1}
-        x = np.zeros((2, 1, 2), dtype=np.float64)
-        y = np.zeros((2, 2), dtype=np.float64)
-        self.train_dataset = tf.data.Dataset.from_tensor_slices((x, y)).batch(2)
-        self.val_dataset = (
-            tf.data.Dataset.from_tensor_slices((x, y)).batch(2) if with_val else None
-        )
-
-
 def _build_config(tmp_path: Path, scheduler: str = "constant"):
     return Config(
         data=DataConfig(lookback=1, horizon=1, batch_size=2, periods=1),
-        model=ModelConfig(lstm_units=4, lstm_layers=1, dense_units=1, dropout=0.0),
-        training=TrainingConfig(
+        model=LSTMConfig(
+            lstm_units=4,
+            lstm_layers=1,
+            dense_units=1,
+            dropout=0.0,
             lr=0.01,
             epochs=1,
             checkpoint_path=tmp_path / "ckpts",
             scheduler=scheduler,
             decay_steps=10,
             decay_rate=0.9,
-        ),
-        loss=LossConfig(
             enforce_balance=False,
             learn_identity=False,
             learn_subtotals=False,
@@ -74,7 +41,8 @@ def test_build_optimizer_constant_scheduler_returns_scalar_lr(tmp_path):
     """_build_optimizer should return a scalar LR when scheduler=constant."""
     config = _build_config(tmp_path, scheduler="constant")
     data = DummyDataLoader()
-    forecaster = LSTMForecaster(config=config, data=data)
+    dataset = DummyStatementsDataset()
+    forecaster = LSTMForecaster(config=config, data=data, dataset=dataset)
 
     optimizer = forecaster._build_optimizer()
     lr = optimizer.learning_rate
@@ -88,10 +56,10 @@ def test_build_model_wraps_with_enforce_balance(tmp_path):
     config = _build_config(tmp_path)
     config.loss.enforce_balance = True
     data = DummyDataLoader()
-
+    dataset = DummyStatementsDataset()
     with patch("jpm.question_1.models.lstm.EnforceBalance") as eb_mock:
         eb_mock.return_value = lambda tensor: tensor
-        LSTMForecaster(config=config, data=data)
+        LSTMForecaster(config=config, data=data, dataset=dataset)
 
     eb_mock.assert_called_once()
     _, kwargs = eb_mock.call_args
@@ -106,9 +74,9 @@ def test_build_model_without_enforce_balance_skips_wrapper(tmp_path):
     config = _build_config(tmp_path)
     config.loss.enforce_balance = False
     data = DummyDataLoader()
-
+    dataset = DummyStatementsDataset()
     with patch("jpm.question_1.models.lstm.EnforceBalance") as eb_mock:
-        LSTMForecaster(config=config, data=data)
+        LSTMForecaster(config=config, data=data, dataset=dataset)
 
     eb_mock.assert_not_called()
 
@@ -118,7 +86,7 @@ def test_compile_uses_bs_loss_and_optimizer(tmp_path):
     """_compile_model should wire bs_loss output and optimizer into compile()."""
     config = _build_config(tmp_path)
     data = DummyDataLoader()
-
+    dataset = DummyStatementsDataset()
     with (
         patch(
             "jpm.question_1.models.lstm.bs_loss",
@@ -127,7 +95,7 @@ def test_compile_uses_bs_loss_and_optimizer(tmp_path):
         patch.object(tf.keras.Model, "compile") as compile_mock,
         patch.object(LSTMForecaster, "_build_optimizer", return_value="OPT"),
     ):
-        LSTMForecaster(config=config, data=data)
+        LSTMForecaster(config=config, data=data, dataset=dataset)
 
     loss_mock.assert_called_once()
     compile_mock.assert_called()
@@ -142,12 +110,12 @@ def test_model_compiles_with_bs_loss_and_callbacks(tmp_path):
     """Full model construction should succeed and produce valid predictions."""
     config = _build_config(tmp_path)
     data = DummyDataLoader()
-
+    dataset = DummyStatementsDataset()
     with patch(
         "jpm.question_1.models.lstm.bs_loss",
         wraps=lambda *args, **kwargs: tf.keras.losses.MSE,
     ):
-        forecaster = LSTMForecaster(config=config, data=data)
+        forecaster = LSTMForecaster(config=config, data=data, dataset=dataset)
 
     batch = next(iter(data.train_dataset))[0]
     preds = forecaster.model(batch)
@@ -159,8 +127,8 @@ def test_evaluate_returns_ticker_results(tmp_path):
     """evaluate() should return a TickerResults with populated metrics."""
     config = _build_config(tmp_path)
     data = DummyDataLoader()
-
-    forecaster = LSTMForecaster(config=config, data=data)
+    dataset = DummyStatementsDataset()
+    forecaster = LSTMForecaster(config=config, data=data, dataset=dataset)
 
     results = forecaster.evaluate(stage="val")
     assert isinstance(results.assets, Metric)
@@ -173,7 +141,8 @@ def test_fit_uses_validation_monitor(tmp_path, monkeypatch):
     """fit() should monitor val_loss when a validation dataset exists."""
     config = _build_config(tmp_path)
     data = DummyDataLoader()
-    forecaster = LSTMForecaster(config=config, data=data)
+    dataset = DummyStatementsDataset()
+    forecaster = LSTMForecaster(config=config, data=data, dataset=dataset)
 
     checkpoint_holder = {}
 
@@ -201,7 +170,8 @@ def test_fit_without_validation_uses_loss_monitor(tmp_path, monkeypatch):
     """fit() should monitor training loss when validation data is absent."""
     config = _build_config(tmp_path)
     data = DummyDataLoader(with_val=False)
-    forecaster = LSTMForecaster(config=config, data=data)
+    dataset = DummyStatementsDataset()
+    forecaster = LSTMForecaster(config=config, data=data, dataset=dataset)
 
     checkpoint_holder = {}
 
@@ -229,7 +199,8 @@ def test_predict_delegates_to_model(tmp_path):
     """predict() should delegate directly to the underlying Keras model."""
     config = _build_config(tmp_path)
     data = DummyDataLoader()
-    forecaster = LSTMForecaster(config=config, data=data)
+    dataset = DummyStatementsDataset()
+    forecaster = LSTMForecaster(config=config, data=data, dataset=dataset)
     predict_mock = MagicMock(return_value="preds")
     forecaster.model.predict = predict_mock
 
@@ -259,7 +230,8 @@ def test_view_results_prints_tables(monkeypatch, tmp_path):
     """view_results should render the summary and section tables."""
     config = _build_config(tmp_path)
     data = DummyDataLoader()
-    forecaster = LSTMForecaster(config=config, data=data)
+    dataset = DummyStatementsDataset()
+    forecaster = LSTMForecaster(config=config, data=data, dataset=dataset)
 
     metric = Metric(value=1.0, mae=0.1, gt=0.9)
     forecaster.val_results = SimpleNamespace(

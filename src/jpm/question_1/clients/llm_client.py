@@ -29,7 +29,7 @@ from jpm.question_1.clients.utils import (
     get_fx_rate,
     parse_llm_json_response,
 )
-from jpm.question_1.config import LLMConfig
+from jpm.question_1.config import Config, LLMConfig
 from jpm.question_1.misc import format_money
 
 
@@ -127,6 +127,7 @@ class LLMClient:
         feature_columns: Optional[List[str]] = None,
         max_rows: int = 4,
         adjust: bool = False,
+        verbose: bool = False,
     ) -> DataFrame:
         if history is None or history.empty:
             raise ValueError("DataFrame must contain quarterly financial data.")
@@ -141,7 +142,7 @@ class LLMClient:
 
         prompt = get_predict_prompt(adjust, data_csv, prediction)
 
-        raw = self.chat(prompt, cfg)
+        raw = self.chat(prompt, cfg, verbose)
 
         try:
             parsed = pd.read_csv(StringIO(raw), index_col=0)
@@ -212,9 +213,9 @@ class LLMClient:
         with open(cache_path, "w", encoding="utf-8") as f:
             json.dump(features, f, ensure_ascii=False, indent=4)
 
-    def parse_annual_report(self, report: dict) -> dict[str, float] | None:
-        pdf_path = report["path"]
-        page_range = report["pages"]
+    def parse_annual_report(self, config: Config) -> dict[str, float] | None:
+        pdf_path = config.data.get_report_path()
+        page_range = config.data.get_report_pages()
 
         reader = PdfReader(pdf_path)
         pdf_text = ""
@@ -269,16 +270,16 @@ class LLMClient:
             result = {
                 # In bonus question
                 "net_income": round(NI * fx_rate, 2),
-                # Ratios
-                "cost_to_income_ratio": round(OE / REV, 4) if REV != 0 else None,
-                "quick_ratio": round((CA - INV) / CL, 4) if CL != 0 else None,
-                "debt_to_equity_ratio": round(TD / EQ, 4) if EQ != 0 else None,
-                "debt_to_assets_ratio": round(TD / TA, 4) if TA != 0 else None,
-                "debt_to_capital_ratio": round(TD / (TD + EQ), 4)
+                # Ratios (names match training data feature columns)
+                "Cost_to_Income": round(OE / REV, 4) if REV != 0 else None,
+                "Quick_Ratio": round((CA - INV) / CL, 4) if CL != 0 else None,
+                "Debt_to_Equity": round(TD / EQ, 4) if EQ != 0 else None,
+                "Debt_to_Assets": round(TD / TA, 4) if TA != 0 else None,
+                "Total_Debt_to_Total_Capital": round(TD / (TD + EQ), 4)
                 if (TD + EQ) != 0
                 else None,
-                "debt_to_ebitda_ratio": round(TD / EBITDA, 4) if EBITDA != 0 else None,
-                "interest_coverage_ratio": round(EBIT / IE, 4) if IE != 0 else None,
+                "Debt_to_EBITDA": round(TD / EBITDA, 4) if EBITDA != 0 else None,
+                "Interest_Coverage": round(EBIT / IE, 4) if IE != 0 else None,
                 "original_currency": currency,
                 "exchange_rate": fx_rate,
                 "report_date": fiscal_year_end,
@@ -327,9 +328,9 @@ class LLMClient:
         lines.append("-" * 70)
 
         financial_ratios = [
-            ("Cost-to-Income Ratio:", "cost_to_income_ratio", True),
-            ("Quick Ratio:", "quick_ratio", False),
-            ("Interest Coverage Ratio:", "interest_coverage_ratio", False),
+            ("Cost-to-Income Ratio:", "Cost_to_Income", True),
+            ("Quick Ratio:", "Quick_Ratio", False),
+            ("Interest Coverage Ratio:", "Interest_Coverage", False),
         ]
 
         for label, key, show_pct in financial_ratios:
@@ -341,10 +342,10 @@ class LLMClient:
         lines.append("-" * 70)
 
         leverage_ratios = [
-            ("Debt-to-Equity Ratio:", "debt_to_equity_ratio", True),
-            ("Debt-to-Assets Ratio:", "debt_to_assets_ratio", True),
-            ("Debt-to-Capital Ratio:", "debt_to_capital_ratio", True),
-            ("Debt-to-EBITDA Ratio:", "debt_to_ebitda_ratio", False),
+            ("Debt-to-Equity Ratio:", "Debt_to_Equity", True),
+            ("Debt-to-Assets Ratio:", "Debt_to_Assets", True),
+            ("Debt-to-Capital Ratio:", "Total_Debt_to_Total_Capital", True),
+            ("Debt-to-EBITDA Ratio:", "Debt_to_EBITDA", False),
         ]
 
         for label, key, show_pct in leverage_ratios:

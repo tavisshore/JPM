@@ -87,7 +87,7 @@ class RatingsHistoryDownloader:
         # Files are named with YYYYMMDD prefix, so lexicographic sort works
         return sorted(moodys_financial, reverse=True)[0]
 
-    def download_moodys_financial(self, llm_client, ticker=None) -> pd.DataFrame:
+    def download_moodys_financial(self, llm_client, ticker=None) -> pd.DataFrame | None:
         """Download the latest Moody's Financial ratings CSV.
         1. Download latest csv from https://ratingshistory.info/
         2. For each record, add the company's corresponding ticker
@@ -163,6 +163,10 @@ class RatingsHistoryDownloader:
                 )
 
         df = pd.DataFrame(results)
+
+        if "quarter" not in df.columns or df.empty:
+            return None
+
         df["quarter"] = pd.to_datetime(df["quarter"]).dt.to_period("Q")
         df = df[["rating", "quarter"]]
         df = df.set_index("quarter")
@@ -175,7 +179,7 @@ class EdgarData:
     """Load and process Edgar filings from SEC or cache."""
 
     def __init__(
-        self, config: Config, overwrite: bool = False, verbose: bool = False
+        self, config: Config, overwrite: bool = False, verbose: bool = True
     ) -> None:
         self.config = config
         self.overwrite = overwrite
@@ -250,6 +254,10 @@ class EdgarData:
             self.llm_client, self.config.data.ticker
         )  # noqa: F841
 
+        if _ratings_df is None or _ratings_df.empty:
+            print(f"No Moody's ratings found for {self.config.data.ticker}.")
+            self.ratings_data = pd.DataFrame()
+            return
         # Select only the relevant company's data
         # Calculate ratios from self.data and add to ratings_df
         df = add_derived_columns(self.data)

@@ -6,7 +6,7 @@ import tensorflow as tf
 import tensorflow_probability as tfp
 
 from jpm.question_1.clients.llm_client import LLMClient
-from jpm.question_1.config import Config, LLMConfig, ModelConfig
+from jpm.question_1.config import Config, LLMConfig
 from jpm.question_1.data import EdgarData, StatementsDataset
 from jpm.question_1.misc import RATINGS_MAPPINGS, set_seed
 from jpm.question_1.models.losses import EnforceBalance, bs_loss
@@ -45,8 +45,8 @@ class LSTMForecaster:
         self.model = self._build_model()
         self._compile_model()
 
-        if not self.config.training.checkpoint_path.exists():
-            self.config.training.checkpoint_path.mkdir(parents=True)
+        if not self.config.lstm.checkpoint_path.exists():
+            self.config.lstm.checkpoint_path.mkdir(parents=True)
 
     def _build_model(self) -> keras.Model:
         inputs = keras.layers.Input(
@@ -56,25 +56,25 @@ class LSTMForecaster:
         )
 
         x = inputs
-        for i in range(self.config.model.lstm_layers):
-            return_sequences = i < self.config.model.lstm_layers - 1
+        for i in range(self.config.lstm.lstm_layers):
+            return_sequences = i < self.config.lstm.lstm_layers - 1
             x = keras.layers.LSTM(
-                self.config.model.lstm_units,
+                self.config.lstm.lstm_units,
                 return_sequences=return_sequences,
                 name=f"lstm_{i + 1}",
             )(x)
 
-        if self.config.model.dropout > 0:
-            x = keras.layers.Dropout(self.config.model.dropout, name="dropout")(x)
+        if self.config.lstm.dropout > 0:
+            x = keras.layers.Dropout(self.config.lstm.dropout, name="dropout")(x)
 
-        if self.config.model.dense_units > 0:
+        if self.config.lstm.dense_units > 0:
             x = keras.layers.Dense(
-                self.config.model.dense_units,
+                self.config.lstm.dense_units,
                 activation="relu",
                 name="dense",
             )(x)
 
-        if self.config.model.probabilistic:
+        if self.config.lstm.probabilistic:
             n = len(self.data.targets)
             params_size = tfpl.MultivariateNormalTriL.params_size(n)
 
@@ -92,8 +92,8 @@ class LSTMForecaster:
 
         # EnforceBalance is a post-processing constraint layer
         # Not for probabilistic outputs
-        if self.config.loss.enforce_balance:
-            if self.config.model.probabilistic:
+        if self.config.lstm.enforce_balance:
+            if self.config.lstm.probabilistic:
                 raise ValueError(
                     "enforce_balance + probabilistic=True is not currently supported. "
                 )
@@ -109,7 +109,7 @@ class LSTMForecaster:
         return model
 
     def _compile_model(self):
-        if self.config.model.probabilistic:
+        if self.config.lstm.probabilistic:
 
             def nll(y_true, y_pred_dist):
                 return -tf.reduce_mean(y_pred_dist.log_prob(y_true))
@@ -125,7 +125,7 @@ class LSTMForecaster:
                 feature_means=self.dataset.target_mean,
                 feature_stds=self.dataset.target_std,
                 feature_mappings=self.dataset.feature_mappings,
-                config=self.config.loss,
+                config=self.config.lstm,
             )
 
             keras.Model.compile(
@@ -137,11 +137,11 @@ class LSTMForecaster:
         # self.model.summary()  # Disabled for batch processing
 
     def _build_optimizer(self):
-        lr = self.config.training.lr
-        if self.config.training.scheduler == "cosine":
+        lr = self.config.lstm.lr
+        if self.config.lstm.scheduler == "cosine":
             lr = keras.optimizers.schedules.CosineDecayRestarts(
-                initial_learning_rate=self.config.training.lr,
-                first_decay_steps=self.config.training.decay_steps,
+                initial_learning_rate=self.config.lstm.lr,
+                first_decay_steps=self.config.lstm.decay_steps,
             )
         return keras.optimizers.Adam(learning_rate=lr)
 
@@ -156,7 +156,7 @@ class LSTMForecaster:
         return 1.0 / cardinality
 
     def _build_output_layer(self):
-        if not self.config.model.variational:
+        if not self.config.lstm.variational:
             return keras.layers.Dense(
                 len(self.dataset.tgt_indices), name="next_quarter"
             )
@@ -175,8 +175,7 @@ class LSTMForecaster:
 
     def fit(self, **kwargs):
         checkpoint_cb = keras.callbacks.ModelCheckpoint(
-            filepath=self.config.training.checkpoint_path
-            / "best_model_ckpt.weights.h5",
+            filepath=self.config.lstm.checkpoint_path / "best_model_ckpt.weights.h5",
             monitor="val_loss" if self.dataset.val_dataset is not None else "loss",
             save_best_only=True,
             save_weights_only=True,
@@ -187,13 +186,11 @@ class LSTMForecaster:
         history = self.model.fit(
             self.dataset.train_dataset,
             validation_data=self.dataset.val_dataset,
-            epochs=self.config.training.epochs,
+            epochs=self.config.lstm.epochs,
             callbacks=[checkpoint_cb],
             **kwargs,
         )
-        weights_path = (
-            self.config.training.checkpoint_path / "best_model_ckpt.weights.h5"
-        )
+        weights_path = self.config.lstm.checkpoint_path / "best_model_ckpt.weights.h5"
         if weights_path.exists():
             self.model.load_weights(weights_path)
         return history
@@ -229,11 +226,9 @@ class LSTMForecaster:
         )
 
         if llm_config:
-            # Add in LLM client forecast here, and then average the two - comparing
-            # There's no training involved so only for val
             history_df = pd.DataFrame(
                 history_unscaled[0],
-                columns=self.data.targets,
+                columns=self.dataset.targets,
                 index=self._prediction_index(
                     stage, history_unscaled[0].shape[0], for_history=True
                 ),
@@ -242,7 +237,7 @@ class LSTMForecaster:
 
             y_pred_unscaled_df = pd.DataFrame(
                 y_pred_unscaled,
-                columns=self.data.targets,
+                columns=self.dataset.targets,
                 index=self._prediction_index(stage, y_pred_unscaled.shape[0]),
                 copy=False,
             )
@@ -251,11 +246,14 @@ class LSTMForecaster:
 
             if llm_config.adjust:
                 llm_estimation = llm_client.forecast_next_quarter(
-                    history=history_df, prediction=y_pred_unscaled_df, cfg=llm_config
+                    history=history_df,
+                    prediction=y_pred_unscaled_df,
+                    cfg=llm_config,
+                    verbose=True,
                 )
             else:
                 llm_estimation = llm_client.forecast_next_quarter(
-                    history=history_df, cfg=llm_config
+                    history=history_df, cfg=llm_config, verbose=True
                 )
 
             y_pred_unscaled = y_pred_unscaled_df.apply(pd.to_numeric, errors="coerce")
@@ -305,9 +303,9 @@ class LSTMForecaster:
         self, history: np.ndarray
     ) -> tuple[np.ndarray, np.ndarray | None]:
         pred_std = None
-        if self.config.model.probabilistic:
+        if self.config.lstm.probabilistic:
             y_pred, pred_std = self._predict_probabilistic(history)
-        elif self.config.model.variational and self.config.model.mc_samples > 1:
+        elif self.config.lstm.variational and self.config.lstm.mc_samples > 1:
             y_pred, pred_std = self._predict_variational(history)
         else:
             y_pred = self.model.predict(history, verbose=0)
@@ -316,10 +314,10 @@ class LSTMForecaster:
     def _predict_probabilistic(
         self, history: np.ndarray
     ) -> tuple[np.ndarray, np.ndarray]:
-        if self.config.model.mc_samples > 1:
+        if self.config.lstm.mc_samples > 1:
             dists = [
                 self.model(history, training=False)
-                for _ in range(self.config.model.mc_samples)
+                for _ in range(self.config.lstm.mc_samples)
             ]
             means = np.stack([d.mean().numpy() for d in dists], axis=0)
             stds = np.stack([d.stddev().numpy() for d in dists], axis=0)
@@ -333,7 +331,7 @@ class LSTMForecaster:
     ) -> tuple[np.ndarray, np.ndarray]:
         samples = [
             self.model.predict(history, verbose=0)
-            for _ in range(self.config.model.mc_samples)
+            for _ in range(self.config.lstm.mc_samples)
         ]
         return np.mean(samples, axis=0), np.std(samples, axis=0)
 
@@ -537,17 +535,17 @@ class LSTMForecaster:
 
         # Detailed per-feature tables
         assets_rows = build_section_rows(
-            self.data.bs_structure["Assets"], results.features
+            self.dataset.bs_structure["Assets"], results.features
         )
         print_table("Assets", assets_rows)
 
         liabilities_rows = build_section_rows(
-            self.data.bs_structure["Liabilities"], results.features
+            self.dataset.bs_structure["Liabilities"], results.features
         )
         print_table("Liabilities", liabilities_rows)
 
         equity_rows = build_equity_rows(
-            self.data.bs_structure["Equity"], results.features
+            self.dataset.bs_structure["Equity"], results.features
         )
         print_table("Equity", equity_rows)
 
@@ -567,24 +565,16 @@ class LSTMForecaster:
 if __name__ == "__main__":
     from jpm.question_1.models.balance_sheet import BalanceSheet
     from jpm.question_1.models.income_statement import IncomeStatement
-    from src.jpm.question_1.config import (
-        Config,
-        DataConfig,
-        LossConfig,
-        ModelConfig,
-        TrainingConfig,
-    )
+    from src.jpm.question_1.config import Config, DataConfig, LSTMConfig
     from src.jpm.question_1.misc import set_seed, train_args
 
     set_seed(42)
     args = train_args()
 
     data_cfg = DataConfig.from_args(args)
-    model_cfg = ModelConfig.from_args(args)
-    train_cfg = TrainingConfig.from_args(args)
-    loss_cfg = LossConfig.from_args(args)
+    lstm_cfg = LSTMConfig.from_args(args)
 
-    config = Config(data=data_cfg, model=model_cfg, training=train_cfg, loss=loss_cfg)
+    config = Config(data=data_cfg, lstm=lstm_cfg)
 
     data = EdgarData(config=config)
 

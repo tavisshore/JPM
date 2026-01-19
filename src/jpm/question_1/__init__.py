@@ -8,9 +8,8 @@ from jpm.question_1.config import (
     Config,
     DataConfig,
     LLMConfig,
-    LossConfig,
-    ModelConfig,
-    TrainingConfig,
+    LSTMConfig,
+    XGBConfig,
 )
 from jpm.question_1.data import CreditDataset, EdgarData, StatementsDataset
 from jpm.question_1.misc import as_series, get_args, set_seed
@@ -24,9 +23,8 @@ __all__ = [
     "Config",
     "DataConfig",
     "LLMConfig",
-    "LossConfig",
-    "ModelConfig",
-    "TrainingConfig",
+    "LSTMConfig",
+    "XGBConfig",
     # Data loaders
     "EdgarData",
     # Datasets

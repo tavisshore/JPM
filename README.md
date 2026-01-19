@@ -13,18 +13,15 @@ pytest -v
 ## Environment
 EDGAR requires an email for downloads:
 ```bash
-export EDGAR_EMAIL="your_email@jpm.com"
+export EDGAR_EMAIL="your_email@address.com"
 ```
-The LLM clients requires API keys (currently just ChatGPT), this is soon to be required for both question parts as company financial statements are now being parsed by LLM to standardise:
+The LLM clients requires API keys (currently just ChatGPT):
 ```bash
 export OPENAI_API_KEY="your_api_key"
 ```
 We use `https://www.exchangerate-api.com/` to retrieve exchange rates for particular dates - this must be set to sucessfully parse non-USD reports.
 ```bash
 export FX_API_KEY='your_fx_api_key'
-
-WRDS ratings API (pending)
-export WRDS_USERNAME=your_username
 ```
 
 ## Question 1 - Financial Statement Forecasting
@@ -32,33 +29,39 @@ export WRDS_USERNAME=your_username
 - **Vélez-Pareja:**
   - **Plugless:** from the paper *Forecasting Financial Statements with No plugs and No Circularity* [1]
     ```bash
-    python scripts/question_1/noplug_vp.py
+    python scripts/question_1/valez/noplug_vp.py
     ```
   - **Consistent:** from the paper *Constructing Consistent Financial Planning Models for Valuation* [2]
     ```bash
-    python scripts/question_1/construct_vp.py
-
-    python scripts/question_1/construct_vp_tf.py <- TF model
+    python scripts/question_1/valez/construct_vp.py    # <- pd.series model
+    python scripts/question_1/valez/construct_vp_tf.py # <- TF model
     ```
 
-- **Custom models:**
+- **Time-series Forecasting:**
   - Train **LSTM** forecaster:
     ```bash
-    python scripts/question_1/eval_lstm.py
+    python scripts/question_1/ml/lstm.py
     ```
 
 ### Part 2
 - **Ensemble model:**
     The LLM can be used to either adjust the LSTM estimation, or independently predict the future financial statement features before combining the output with the LSTM.
     ```bash
-    python scripts/question_1/eval_ensemble.py
-    ```
-- **Annual Report Parsing:**
-    This script uses the same LLM client to parse pdf annual reports, extracting key financial information. Available files are stored within `assets/`:
-    ```bash
-    python scripts/question_1/parse_reports.py --company ['alibaba', 'exxon', ...]
+    python scripts/question_1/ml/ensemble.py
     ```
 
+- **Annual Report Parsing:**
+    This script uses the same LLM client to parse pdf annual reports, extracting key financial information. Available reports are stored within `assets/`:
+    (the argument for parsing is `ticker` although it's the name - to be compatible throughout the config)
+    ```bash
+    python scripts/question_1/ml/parse_reports.py --ticker ['alibaba', 'exxon', 'evergrande' ...]
+    ```
+#### Part B: Bonus 1
+- **Credit Rating:**
+    This script trains an XGBoost model on credit ratings data constructed from our SEC data and `ratingshistory.info`:
+    ```bash
+    python scripts/question_1/ml/pipeline.py --ticker ['alibaba', 'exxon', 'evergrande' ...]
+    ```
 
 ## Question 3 - DeepHalo Reproduction
 The experiments are implemented as Python modules and can be invoked directly.
