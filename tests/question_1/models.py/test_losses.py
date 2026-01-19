@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import tensorflow as tf
 
-from jpm.question_1.config import LossConfig
+from jpm.question_1.config import LSTMConfig
 from jpm.question_1.models.losses import EnforceBalance, bs_loss
 
 unit = pytest.mark.unit
@@ -19,7 +19,7 @@ def test_bs_loss_returns_mse_when_regularizers_disabled():
         "liabilities": [2],
         "equity": [3],
     }
-    config = LossConfig(
+    config = LSTMConfig(
         learn_identity=False,
         learn_subtotals=False,
     )
@@ -49,7 +49,7 @@ def test_bs_loss_includes_identity_penalty_when_enabled():
         "liabilities": [2],
         "equity": [3],
     }
-    config = LossConfig(
+    config = LSTMConfig(
         learn_identity=True,
         identity_weight=2.0,
         learn_subtotals=False,
@@ -98,7 +98,7 @@ def test_bs_loss_includes_subtotal_penalties_when_enabled():
         "current_liabilities": [3],
         "non_current_liabilities": [],  # omit index 4 to induce violation
     }
-    config = LossConfig(
+    config = LSTMConfig(
         learn_identity=False,
         learn_subtotals=True,
         subcategory_weight=3.5,
@@ -169,7 +169,7 @@ def test_bs_loss_combines_identity_and_subtotals_with_scaling():
         "current_liabilities": [2],
         "non_current_liabilities": [3],
     }
-    config = LossConfig(
+    config = LSTMConfig(
         learn_identity=True,
         identity_weight=0.75,
         learn_subtotals=True,

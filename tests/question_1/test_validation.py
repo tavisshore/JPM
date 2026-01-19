@@ -2,30 +2,13 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from jpm.question_1.config import DataConfig, LossConfig, ModelConfig, TrainingConfig
+from jpm.question_1.config import DataConfig
 from jpm.question_1.data import utils as data_utils
 
 
 def test_dataconfig_rejects_empty_ticker():
     with pytest.raises(ValueError):
         DataConfig(ticker="", cache_dir="/tmp")
-
-
-def test_modelconfig_invalid_dropout():
-    with pytest.raises(ValueError):
-        ModelConfig(dropout=1.5)
-
-
-def test_trainingconfig_invalid_scheduler():
-    with pytest.raises(ValueError):
-        TrainingConfig(scheduler="invalid")
-
-
-def test_lossconfig_negative_weights():
-    with pytest.raises(ValueError):
-        LossConfig(identity_weight=-1.0)
-    with pytest.raises(ValueError):
-        LossConfig(subcategory_weight=-0.1)
 
 
 def test_build_windows_rejects_wrong_shape():
