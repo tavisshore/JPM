@@ -1,16 +1,51 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field, fields
+from dataclasses import asdict, dataclass, field, fields
 from pathlib import Path
+
+REPORTS = {
+    "alibaba": {
+        "path": "assets/question_1/alibaba_report.pdf",
+        "pages": [(254, 264), (269, 270), (307, 317), (324, 328)],
+    },
+    "exxon": {
+        "path": "assets/question_1/exxon_report.pdf",
+        "pages": [(88, 92), (101, 101), (103, 105), (107, 110)],
+    },
+    "gm": {
+        "path": "assets/question_1/gm_report.pdf",
+        "pages": [(61, 64), (72, 88), (95, 101)],
+    },
+    "goog": {
+        "path": "assets/question_1/goog_report.pdf",
+        "pages": [(49, 49), (57, 61), (70, 74), (76, 79), (81, 84)],
+    },
+    "jpm": {
+        "path": "assets/question_1/jpm_report.pdf",
+        "pages": [(174, 178), (188, 189), (195, 197)],
+    },
+    "lvmh": {
+        "path": "assets/question_1/lvmh_report.pdf",
+        "pages": [(24, 28), (39, 57)],
+    },
+    "msft": {
+        "path": "assets/question_1/msft_report.pdf",
+        "pages": [(44, 48), (57, 60)],
+    },
+    "tencent": {
+        "path": "assets/question_1/tencent_report.pdf",
+        "pages": [(124, 134), (186, 186)],
+    },
+    "vw": {"path": "assets/question_1/vw_report.pdf", "pages": [(472, 478)]},
+}
 
 
 @dataclass
 class DataConfig:
-    """Data-related configuration."""
-
-    ticker: str = "AAPL"  # Debug with MSFT AAPL AMZN
-    cache_dir: str = "/scratch/datasets/jpm"
-    save_dir: str = "/scratch/projects/JPM/temp"
+    ticker: str = "AAPL"
+    cache_dir: Path = Path("/scratch/datasets/jpm")
+    save_dir: Path = Path("/scratch/projects/JPM/temp")
+    plots_dir: Path = Path("/scratch/projects/JPM/temp/plots")
     periods: int = 60  # quarters -> 15 years, post-2008
     lookback: int = 4
     horizon: int = 1
@@ -18,20 +53,19 @@ class DataConfig:
     target_type: str = "full"
     withhold_periods: int = 1  # test set size in quarters
     # >1.0 weighs for the seasonal lag timestep
-    seasonal_weight: float = 1.1  # 11
-    seasonal_lag: int = 4  # don't change
+    seasonal_weight: float = 1.1
+    seasonal_lag: int = 4
 
     def __post_init__(self) -> None:
         self._validate_strings()
         self._validate_positive_ints()
         self._validate_positive_floats()
         self._validate_choices()
+        self._create_directories()
 
     def _validate_strings(self) -> None:
         if not isinstance(self.ticker, str) or not self.ticker.strip():
             raise ValueError("ticker must be a non-empty string")
-        if self.cache_dir is None or not str(self.cache_dir).strip():
-            raise ValueError("cache_dir must be provided")
 
     def _validate_positive_ints(self) -> None:
         for name, val in (
@@ -54,33 +88,67 @@ class DataConfig:
         if self.target_type not in {"full", "bs", "net_income"}:
             raise ValueError("target_type must be one of {'full', 'bs', 'net_income'}")
 
+    def _create_directories(self) -> None:
+        self.cache_dir.mkdir(parents=True, exist_ok=True)
+        self.save_dir.mkdir(parents=True, exist_ok=True)
+        self.plots_dir.mkdir(parents=True, exist_ok=True)
+
+    def get_report_path(self) -> str | None:
+        """Get the report path for the current ticker."""
+        key = self.ticker.lower()
+        if key in REPORTS:
+            return REPORTS[key]["path"]
+        return None
+
+    def get_report_pages(self) -> list[tuple[int, int]] | None:
+        """Get the report pages for the current ticker."""
+        key = self.ticker.lower()
+        if key in REPORTS:
+            return REPORTS[key]["pages"]
+        return None
+
     @classmethod
     def from_args(cls, args):
-        """Create a DataConfig from argparse.Namespace."""
         kwargs = {}
+        path_fields = {"cache_dir", "save_dir", "plots_dir"}
         for f in fields(cls):
             arg_val = getattr(args, f.name, None)
             if f.name == "seasonal_lag":
                 kwargs[f.name] = f.default  # keep seasonal lag fixed
                 continue
-            kwargs[f.name] = f.default if arg_val is None else arg_val
-        # Populate fields from CLI, otherwise use defaults
+            val = f.default if arg_val is None else arg_val
+            if f.name in path_fields and isinstance(val, str):
+                val = Path(val)
+            kwargs[f.name] = val
         return cls(**kwargs)
 
 
 @dataclass
-class ModelConfig:
-    """Model hyperparameters."""
-
-    lstm_units: int = 256  # 368
+class LSTMConfig:
+    # Model architecture
+    lstm_units: int = 256
     lstm_layers: int = 2
-    dense_units: int = 256  # 256
+    dense_units: int = 256
     dropout: float = 0.1
     variational: bool = False
     probabilistic: bool = False
     mc_samples: int = 1
+    # Training hyperparameters
+    lr: float = 1e-4
+    decay_steps: int = 100
+    decay_rate: float = 0.9
+    scheduler: str = "exponential"
+    epochs: int = 500
+    checkpoint_path: Path = Path("ckpts")
+    # Loss configuration
+    enforce_balance: bool = False
+    learn_identity: bool = False
+    identity_weight: float = 1e-4
+    learn_subtotals: bool = False
+    subcategory_weight: float = 1e-5
 
-    def __post_init__(self) -> None:
+    def __post_init__(self) -> None:  # noqa: C901
+        # Model validation
         if self.lstm_units <= 0:
             raise ValueError("lstm_units must be positive")
         if self.lstm_layers <= 0:
@@ -91,30 +159,7 @@ class ModelConfig:
             raise ValueError("dropout must be in [0, 1)")
         if self.mc_samples <= 0:
             raise ValueError("mc_samples must be positive")
-
-    @classmethod
-    def from_args(cls, args):
-        """Create a ModelConfig from argparse.Namespace."""
-        kwargs = {}
-        for f in fields(cls):
-            arg_val = getattr(args, f.name, None)
-            kwargs[f.name] = f.default if arg_val is None else arg_val
-        # Avoid leaving unspecified fields unset when mixing CLI and defaults
-        return cls(**kwargs)
-
-
-@dataclass
-class TrainingConfig:
-    """Training hyperparameters."""
-
-    lr: float = 1e-4
-    decay_steps: int = 100
-    decay_rate: float = 0.9
-    scheduler: str = "exponential"
-    epochs: int = 500  # Raise again after dev
-    checkpoint_path: Path = Path("ckpts")
-
-    def __post_init__(self) -> None:
+        # Training validation
         if self.lr <= 0:
             raise ValueError("lr must be positive")
         if self.decay_steps <= 0:
@@ -125,29 +170,7 @@ class TrainingConfig:
             raise ValueError("epochs must be positive")
         if self.scheduler not in {"exponential", "cosine", "constant"}:
             raise ValueError("scheduler must be 'exponential', 'cosine', or 'constant'")
-
-    @classmethod
-    def from_args(cls, args):
-        """Create a TrainingConfig from argparse.Namespace."""
-        kwargs = {}
-        for f in fields(cls):
-            arg_val = getattr(args, f.name, None)
-            kwargs[f.name] = f.default if arg_val is None else arg_val
-        # Keeps learning-rate scheduling optional for quick experiments
-        return cls(**kwargs)
-
-
-@dataclass
-class LossConfig:
-    """Loss term configuration."""
-
-    enforce_balance: bool = False
-    learn_identity: bool = False
-    identity_weight: float = 1e-4
-    learn_subtotals: bool = False
-    subcategory_weight: float = 1e-5
-
-    def __post_init__(self) -> None:
+        # Loss validation
         if self.identity_weight < 0:
             raise ValueError("identity_weight must be non-negative")
         if self.subcategory_weight < 0:
@@ -155,12 +178,10 @@ class LossConfig:
 
     @classmethod
     def from_args(cls, args):
-        """Create a LossConfig from argparse.Namespace."""
         kwargs = {}
         for f in fields(cls):
             arg_val = getattr(args, f.name, None)
             kwargs[f.name] = f.default if arg_val is None else arg_val
-        # Enables toggling loss penalties via CLI switches
         return cls(**kwargs)
 
 
@@ -184,11 +205,51 @@ class LLMConfig:
 
 
 @dataclass
+class XGBConfig:
+    max_depth: int = 4
+    learning_rate: float = 0.05
+    n_estimators: int = 300
+    subsample: float = 0.8
+    colsample_bytree: float = 0.8
+    reg_alpha: float = 0.1
+    reg_lambda: float = 1.0
+    use_gpu: bool = True
+    random_state: int = 42
+
+    def __post_init__(self) -> None:
+        if self.max_depth <= 0:
+            raise ValueError("max_depth must be positive")
+        if self.learning_rate <= 0:
+            raise ValueError("learning_rate must be positive")
+        if self.n_estimators <= 0:
+            raise ValueError("n_estimators must be positive")
+        if not 0 < self.subsample <= 1:
+            raise ValueError("subsample must be in (0, 1]")
+        if not 0 < self.colsample_bytree <= 1:
+            raise ValueError("colsample_bytree must be in (0, 1]")
+        if self.reg_alpha < 0:
+            raise ValueError("reg_alpha must be non-negative")
+        if self.reg_lambda < 0:
+            raise ValueError("reg_lambda must be non-negative")
+
+    def to_dict(self) -> dict:
+        return asdict(self)
+
+    @classmethod
+    def from_args(cls, args):
+        """Create an XGBConfig from argparse.Namespace."""
+        kwargs = {}
+        for f in fields(cls):
+            arg_val = getattr(args, f.name, None)
+            kwargs[f.name] = f.default if arg_val is None else arg_val
+        return cls(**kwargs)
+
+
+@dataclass
 class Config:
-    """Root configuration grouping data, model, training, and loss settings."""
+    """Root configuration grouping data, LSTM, LLM, and XGBoost settings."""
 
     data: DataConfig = field(default_factory=DataConfig)
-    model: ModelConfig = field(default_factory=ModelConfig)
-    training: TrainingConfig = field(default_factory=TrainingConfig)
-    loss: LossConfig = field(default_factory=LossConfig)
+    lstm: LSTMConfig = field(default_factory=LSTMConfig)
     llm: LLMConfig = field(default_factory=LLMConfig)
+    xgb: XGBConfig = field(default_factory=XGBConfig)

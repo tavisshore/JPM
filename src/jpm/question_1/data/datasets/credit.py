@@ -22,7 +22,7 @@ class CreditDataset:
         random_state: int = 42,
         verbose: bool = False,
     ):
-        self.data_dir = data_dir
+        self.data_dir = data_dir / "ratings"
         self.pattern = pattern
         self.val_size = val_size
         self.test_size = test_size

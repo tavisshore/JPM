@@ -29,7 +29,7 @@ from jpm.question_1.clients.utils import (
     get_fx_rate,
     parse_llm_json_response,
 )
-from jpm.question_1.config import LLMConfig
+from jpm.question_1.config import Config, LLMConfig
 from jpm.question_1.misc import format_money
 
 
@@ -212,9 +212,9 @@ class LLMClient:
         with open(cache_path, "w", encoding="utf-8") as f:
             json.dump(features, f, ensure_ascii=False, indent=4)
 
-    def parse_annual_report(self, report: dict) -> dict[str, float] | None:
-        pdf_path = report["path"]
-        page_range = report["pages"]
+    def parse_annual_report(self, config: Config) -> dict[str, float] | None:
+        pdf_path = config.data.get_report_path()
+        page_range = config.data.get_report_pages()
 
         reader = PdfReader(pdf_path)
         pdf_text = ""

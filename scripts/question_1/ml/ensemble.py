@@ -5,11 +5,9 @@ from jpm.question_1 import (
     EdgarData,
     IncomeStatement,
     LLMConfig,
-    LossConfig,
+    LSTMConfig,
     LSTMForecaster,
-    ModelConfig,
     StatementsDataset,
-    TrainingConfig,
     get_args,
     set_seed,
 )
@@ -18,13 +16,9 @@ set_seed(42)
 args = get_args()
 
 data_cfg = DataConfig.from_args(args)
-model_cfg = ModelConfig.from_args(args)
-train_cfg = TrainingConfig.from_args(args)
-loss_cfg = LossConfig.from_args(args)
+lstm_cfg = LSTMConfig.from_args(args)
 llm_cfg = LLMConfig.from_args(args)
-config = Config(
-    data=data_cfg, model=model_cfg, training=train_cfg, loss=loss_cfg, llm=llm_cfg
-)
+config = Config(data=data_cfg, lstm=lstm_cfg, llm=llm_cfg)
 
 data = EdgarData(config=config)
 dataset = StatementsDataset(edgar_data=data)

@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras.layers import Layer
 
-from jpm.question_1.config import LossConfig
+from jpm.question_1.config import LSTMConfig
 from jpm.question_1.data.structures import get_slack_name
 
 
@@ -9,7 +9,7 @@ def bs_loss(
     feature_means,
     feature_stds,
     feature_mappings,
-    config: LossConfig,
+    config: LSTMConfig,
 ):
     """Build a balance-sheet-aware loss combining MSE with identity penalties."""
     means64 = tf.constant(feature_means, dtype=tf.float64)

@@ -2,6 +2,7 @@ import gc
 import json
 import os
 import sys
+from dataclasses import replace
 
 import numpy as np
 
@@ -12,11 +13,9 @@ from jpm.question_1 import (
     EdgarData,
     IncomeStatement,
     LLMConfig,
-    LossConfig,
+    LSTMConfig,
     LSTMForecaster,
-    ModelConfig,
     StatementsDataset,
-    TrainingConfig,
     get_args,
     set_seed,
 )
@@ -42,9 +41,7 @@ set_seed(42)
 args = get_args()
 
 data_cfg = DataConfig.from_args(args)
-model_cfg = ModelConfig.from_args(args)
-train_cfg = TrainingConfig.from_args(args)
-loss_cfg = LossConfig.from_args(args)
+lstm_cfg = LSTMConfig.from_args(args)
 llm_cfg = LLMConfig.from_args(args)
 
 
@@ -76,18 +73,14 @@ for var_idx, variation in enumerate(CONFIG_VARIATIONS, 1):
     print(f"Config {var_idx}/{len(CONFIG_VARIATIONS)}: {config_name}")
     print(f"{'=' * 65}")
 
-    loss_cfg_var = LossConfig(
+    lstm_cfg_var = replace(
+        lstm_cfg,
         enforce_balance=variation["enforce_balance"],
         learn_identity=variation["learn_identity"],
-        identity_weight=loss_cfg.identity_weight,
-        learn_subtotals=loss_cfg.learn_subtotals,
-        subcategory_weight=loss_cfg.subcategory_weight,
     )
     config = Config(
         data=data_cfg,
-        model=model_cfg,
-        training=train_cfg,
-        loss=loss_cfg_var,
+        lstm=lstm_cfg_var,
         llm=llm_cfg,
     )
 

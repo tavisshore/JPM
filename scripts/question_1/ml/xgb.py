@@ -1,41 +1,20 @@
-from pathlib import Path
-
 from jpm.question_1 import (
     Config,
     CreditDataset,
     CreditRatingModel,
     DataConfig,
     LLMConfig,
-    LossConfig,
-    ModelConfig,
-    TrainingConfig,
+    LSTMConfig,
+    XGBConfig,
     get_args,
     set_seed,
 )
 
 
-def main(cfg: Config):
-    data_dir = Path(cfg.data.cache_dir) / "ratings"
-    save_dir = Path(cfg.data.save_dir)
-    save_dir.mkdir(parents=True, exist_ok=True)
-    plots_dir = save_dir / "plots"
-    plots_dir.mkdir(parents=True, exist_ok=True)
-
-    PARAMS = {
-        "max_depth": 4,
-        "learning_rate": 0.05,
-        "n_estimators": 300,
-        "subsample": 0.8,
-        "colsample_bytree": 0.8,
-        "reg_alpha": 0.1,
-        "reg_lambda": 1.0,
-        "use_gpu": True,  # Set to False if no GPU
-        "random_state": 42,
-    }
-
+def train(cfg: Config):
     print("\n[1/5] Loading dataset...")
     dataset = CreditDataset(
-        data_dir=data_dir,
+        data_dir=cfg.data.cache_dir,
         pattern="*_ratings.parquet",
         val_size=0.15,
         test_size=0.15,
@@ -58,9 +37,8 @@ def main(cfg: Config):
 
     print("\n[4/5] Training XGBoost model...")
     model = CreditRatingModel(
-        n_classes=info["n_classes"], n_features=info["n_features"], **PARAMS
+        n_classes=info["n_classes"], n_features=info["n_features"], **cfg.xgb.to_dict()
     )
-
     model.build()
     model.train(X_train, y_train, X_val, y_val, verbose=False)
 
@@ -73,22 +51,22 @@ def main(cfg: Config):
     feature_imp = model.compute_feature_importance(info["feature_names"])
 
     # Generate plots
-    model.plot_training_history(save_path=plots_dir / "training_history.png")
+    model.plot_training_history(save_path=cfg.data.plots_dir / "training_history.png")
     model.plot_confusion_matrix(
         y_test,
         model.predict(X_test),
         class_names=info["classes"],
-        save_path=plots_dir / "confusion_matrix.png",
+        save_path=cfg.data.plots_dir / "confusion_matrix.png",
     )
     model.plot_confusion_matrix(
         y_test,
         model.predict(X_test),
         class_names=info["classes"],
         normalise=True,
-        save_path=plots_dir / "confusion_matrix_normalised.png",
+        save_path=cfg.data.plots_dir / "confusion_matrix_normalised.png",
     )
     model.plot_feature_importance(
-        top_n=20, save_path=plots_dir / "feature_importance.png"
+        top_n=20, save_path=cfg.data.plots_dir / "feature_importance.png"
     )
 
     # Make predictions on future quarters
@@ -110,9 +88,9 @@ def main(cfg: Config):
         results[f"top_{i + 1}_prob"] = probabilities[range(len(probabilities)), top_idx]
 
     # Save everything
-    model.save(save_dir)
-    results.to_csv(Path(save_dir) / "predictions.csv", index=False)
-    feature_imp.to_csv(Path(save_dir) / "feature_importance.csv", index=False)
+    model.save(cfg.data.save_dir)
+    results.to_csv(cfg.data.save_dir / "predictions.csv", index=False)
+    feature_imp.to_csv(cfg.data.save_dir / "feature_importance.csv", index=False)
 
     # Save test predictions for analysis
     test_meta = dataset.get_metadata("test")
@@ -126,13 +104,13 @@ def main(cfg: Config):
         test_results["target_rating"] == test_results["predicted_rating"]
     )
 
-    test_results.to_csv(Path(save_dir) / "test_predictions.csv", index=False)
+    test_results.to_csv(cfg.data.save_dir / "test_predictions.csv", index=False)
 
     print("\n" + "=" * 70)
     print("TRAINING COMPLETE")
     print("=" * 70)
-    print(f"Model saved to: {save_dir}")
-    print(f"Plots saved to: {plots_dir}")
+    print(f"Model saved to: {cfg.data.save_dir}")
+    print(f"Plots saved to: {cfg.data.plots_dir}")
     print(f"\nTest Accuracy: {test_metrics['accuracy']:.4f}")
     print(f"Test F1 Score: {test_metrics['f1']:.4f}")
     print("=" * 70 + "\n")
@@ -143,16 +121,14 @@ if __name__ == "__main__":
     args = get_args()
 
     data_cfg = DataConfig.from_args(args)
-    model_cfg = ModelConfig.from_args(args)
-    train_cfg = TrainingConfig.from_args(args)
-    loss_cfg = LossConfig.from_args(args)
+    lstm_cfg = LSTMConfig.from_args(args)
     llm_cfg = LLMConfig.from_args(args)
+    xgb_cfg = XGBConfig.from_args(args)
     config = Config(
         data=data_cfg,
-        model=model_cfg,
-        training=train_cfg,
-        loss=loss_cfg,
+        lstm=lstm_cfg,
         llm=llm_cfg,
+        xgb=xgb_cfg,
     )
 
-    main(config)
+    train(config)
