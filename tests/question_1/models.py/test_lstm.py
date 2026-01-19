@@ -1,3 +1,5 @@
+# Import from conftest - pytest will find it automatically
+import sys
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
@@ -9,7 +11,9 @@ import tensorflow as tf
 from jpm.question_1.config import Config, DataConfig, LSTMConfig
 from jpm.question_1.models.lstm import LSTMForecaster
 from jpm.question_1.models.metrics import Metric
-from tests.question_1.conftest import DummyDataLoader, DummyStatementsDataset
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from conftest import DummyDataLoader, DummyStatementsDataset
 
 unit = pytest.mark.unit
 integration = pytest.mark.integration
@@ -18,7 +22,7 @@ integration = pytest.mark.integration
 def _build_config(tmp_path: Path, scheduler: str = "constant"):
     return Config(
         data=DataConfig(lookback=1, horizon=1, batch_size=2, periods=1),
-        model=LSTMConfig(
+        lstm=LSTMConfig(
             lstm_units=4,
             lstm_layers=1,
             dense_units=1,
@@ -47,14 +51,14 @@ def test_build_optimizer_constant_scheduler_returns_scalar_lr(tmp_path):
     optimizer = forecaster._build_optimizer()
     lr = optimizer.learning_rate
     lr_value = float(lr.numpy()) if hasattr(lr, "numpy") else float(lr)
-    assert lr_value == pytest.approx(config.training.lr)
+    assert lr_value == pytest.approx(config.lstm.lr)
 
 
 @unit
 def test_build_model_wraps_with_enforce_balance(tmp_path):
     """_build_model must wrap outputs with EnforceBalance when enabled."""
     config = _build_config(tmp_path)
-    config.loss.enforce_balance = True
+    config.lstm.enforce_balance = True
     data = DummyDataLoader()
     dataset = DummyStatementsDataset()
     with patch("jpm.question_1.models.lstm.EnforceBalance") as eb_mock:
@@ -63,16 +67,16 @@ def test_build_model_wraps_with_enforce_balance(tmp_path):
 
     eb_mock.assert_called_once()
     _, kwargs = eb_mock.call_args
-    assert kwargs["feature_mappings"] == data.feature_mappings
-    assert np.array_equal(kwargs["feature_means"], data.target_mean)
-    assert kwargs["feature_names"] == data.bs_keys
+    assert kwargs["feature_mappings"] == dataset.feature_mappings
+    assert np.array_equal(kwargs["feature_means"], dataset.target_mean)
+    assert kwargs["feature_names"] == dataset.name_to_target_idx
 
 
 @unit
 def test_build_model_without_enforce_balance_skips_wrapper(tmp_path):
     """_build_model should skip EnforceBalance when enforce_balance=False."""
     config = _build_config(tmp_path)
-    config.loss.enforce_balance = False
+    config.lstm.enforce_balance = False
     data = DummyDataLoader()
     dataset = DummyStatementsDataset()
     with patch("jpm.question_1.models.lstm.EnforceBalance") as eb_mock:
@@ -127,13 +131,13 @@ def test_evaluate_returns_ticker_results(tmp_path):
     """evaluate() should return a TickerResults with populated metrics."""
     config = _build_config(tmp_path)
     data = DummyDataLoader()
-    dataset = DummyStatementsDataset()
+    dataset = DummyStatementsDataset(lookback=config.data.lookback)
     forecaster = LSTMForecaster(config=config, data=data, dataset=dataset)
 
     results = forecaster.evaluate(stage="val")
     assert isinstance(results.assets, Metric)
     assert isinstance(results.liabilities, Metric)
-    assert set(results.features.keys()) == set(data.feat_to_idx.keys())
+    assert set(results.features.keys()) == set(dataset.feat_to_idx.keys())
 
 
 @unit
@@ -162,15 +166,15 @@ def test_fit_uses_validation_monitor(tmp_path, monkeypatch):
 
     assert checkpoint_holder["config"]["monitor"] == "val_loss"
     fit_mock.assert_called_once()
-    assert fit_mock.call_args.kwargs["validation_data"] is data.val_dataset
+    assert fit_mock.call_args.kwargs["validation_data"] is dataset.val_dataset
 
 
 @unit
 def test_fit_without_validation_uses_loss_monitor(tmp_path, monkeypatch):
     """fit() should monitor training loss when validation data is absent."""
     config = _build_config(tmp_path)
-    data = DummyDataLoader(with_val=False)
-    dataset = DummyStatementsDataset()
+    data = DummyDataLoader()
+    dataset = DummyStatementsDataset(with_val=False)
     forecaster = LSTMForecaster(config=config, data=data, dataset=dataset)
 
     checkpoint_holder = {}
@@ -196,16 +200,20 @@ def test_fit_without_validation_uses_loss_monitor(tmp_path, monkeypatch):
 
 @unit
 def test_predict_delegates_to_model(tmp_path):
-    """predict() should delegate directly to the underlying Keras model."""
+    """predict() should run and return TickerResults."""
     config = _build_config(tmp_path)
     data = DummyDataLoader()
     dataset = DummyStatementsDataset()
     forecaster = LSTMForecaster(config=config, data=data, dataset=dataset)
-    predict_mock = MagicMock(return_value="preds")
-    forecaster.model.predict = predict_mock
 
-    assert forecaster.predict("input") == "preds"
-    predict_mock.assert_called_once_with("input")
+    # Create a valid input array
+    x = np.zeros((1, 1, 5), dtype=np.float64)
+    results = forecaster.predict(x)
+
+    # Should return TickerResults
+    from jpm.question_1.models.metrics import TickerResults
+
+    assert isinstance(results, TickerResults)
 
 
 @unit
@@ -238,7 +246,7 @@ def test_view_results_prints_tables(monkeypatch, tmp_path):
         assets=metric,
         liabilities=metric,
         equity=metric,
-        features={"feature0": metric, "feature1": metric},
+        features={"feature_0": metric, "feature_1": metric, "feature_2": metric},
         baseline_mae={},
         skill={},
         model_mae=0.0,
@@ -268,12 +276,12 @@ def test_view_results_prints_tables(monkeypatch, tmp_path):
 
     assert make_row_mock.call_count == 3
     build_section_mock.assert_any_call(
-        data.bs_structure["assets"], forecaster.val_results.features
+        dataset.bs_structure["Assets"], forecaster.val_results.features
     )
     build_section_mock.assert_any_call(
-        data.bs_structure["liabilities"], forecaster.val_results.features
+        dataset.bs_structure["Liabilities"], forecaster.val_results.features
     )
     build_equity_mock.assert_called_once_with(
-        data.bs_structure["equity"], forecaster.val_results.features
+        dataset.bs_structure["Equity"], forecaster.val_results.features
     )
     assert print_table_mock.call_count == 4

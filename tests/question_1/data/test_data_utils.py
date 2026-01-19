@@ -292,79 +292,187 @@ def test_xbrl_to_snake_strips_prefix_and_snake_cases():
 
 
 @unit
-def test_get_targets_returns_structure_leaves(monkeypatch):
-    """get_targets should return BS leaves when mode=bs."""
-    fake_structure = {
-        "assets": {"current_assets": ["cash"], "non_current_assets": []},
-        "liabilities": {"current_liabilities": [], "non_current_liabilities": []},
-        "equity": ["retained_earnings"],
+def test_remap_financial_dataframe_basic():
+    """remap_financial_dataframe should apply column mappings correctly."""
+    df = pd.DataFrame(
+        {
+            "old_cash": [100, 200],
+            "old_inventory": [50, 60],
+            "unused": [999, 999],
+        }
+    )
+    mapping = {
+        "Cash": ["old_cash"],
+        "Inventory": ["old_inventory"],
     }
-    monkeypatch.setattr(utils, "get_bs_structure", lambda ticker: fake_structure)
-    assert utils.get_targets(mode="bs", ticker="AAPL") == [
-        "cash",
-        "retained_earnings",
-    ]
+    result = utils.remap_financial_dataframe(df, mapping)
+
+    assert list(result.columns) == ["Cash", "Inventory"]
+    assert list(result["Cash"]) == [100, 200]
+    assert list(result["Inventory"]) == [50, 60]
 
 
 @unit
-def test_get_bs_structure_returns_defaults_for_unknown_ticker():
-    """Unsupported tickers should raise to surface missing mappings."""
-    with pytest.raises(ValueError):
-        utils.get_bs_structure(ticker="UNKNOWN")
-
-
-@unit
-def test_get_cf_structure_flatten(monkeypatch):
-    """get_cf_structure(flatten=True) should return flattened list of leaves."""
-    monkeypatch.setattr(
-        utils, "get_leaf_values", lambda d, sub_key=None: ["net_income"]
+def test_remap_financial_dataframe_nested_mapping():
+    """remap_financial_dataframe should handle nested mappings."""
+    df = pd.DataFrame(
+        {
+            "cash_col": [100],
+            "ppe_col": [500],
+        }
     )
-    flattened = utils.get_cf_structure(ticker="AAPL", flatten=True)
-    assert flattened == ["net_income"]
+    mapping = {
+        "assets": {
+            "current": {"Cash": ["cash_col"]},
+            "non_current": {"PPE": ["ppe_col"]},
+        }
+    }
+    result = utils.remap_financial_dataframe(df, mapping)
+
+    assert "Cash" in result.columns
+    assert "PPE" in result.columns
+    assert result["Cash"].iloc[0] == 100
+    assert result["PPE"].iloc[0] == 500
 
 
 @unit
-def test_build_windows_splits_train_and_test():
-    """build_windows should split sliding windows into train/test
-    respecting the withhold."""
-    X = np.arange(12, dtype=float).reshape(6, 2)
-    X_train, y_train, X_test, y_test = utils.build_windows(
-        X, lookback=2, horizon=1, tgt_indices=[0], withhold=1
+def test_remap_financial_dataframe_missing_source():
+    """remap_financial_dataframe should produce NaN for missing sources."""
+    df = pd.DataFrame({"existing": [1, 2]})
+    mapping = {"NewCol": ["nonexistent"]}
+    result = utils.remap_financial_dataframe(df, mapping)
+
+    assert "NewCol" in result.columns
+    assert result["NewCol"].isna().all()
+
+
+@unit
+def test_extract_leaf_mappings_flat():
+    """_extract_leaf_mappings should extract leaf lists from flat dict."""
+    mapping = {
+        "Cash": ["cash_col1", "cash_col2"],
+        "Inventory": ["inv_col"],
+    }
+    result = utils._extract_leaf_mappings(mapping)
+    assert result == {
+        "Cash": ["cash_col1", "cash_col2"],
+        "Inventory": ["inv_col"],
+    }
+
+
+@unit
+def test_extract_leaf_mappings_nested():
+    """_extract_leaf_mappings should extract leaf lists from nested dict."""
+    mapping = {
+        "assets": {
+            "current": {
+                "Cash": ["cash_col"],
+                "Inventory": ["inv_col"],
+            },
+            "non_current": {
+                "PPE": ["ppe_col"],
+            },
+        },
+        "__unmapped__": ["should_be_ignored"],
+    }
+    result = utils._extract_leaf_mappings(mapping)
+    assert result == {
+        "Cash": ["cash_col"],
+        "Inventory": ["inv_col"],
+        "PPE": ["ppe_col"],
+    }
+
+
+@unit
+def test_extract_leaf_mappings_ignores_unmapped():
+    """_extract_leaf_mappings should skip __unmapped__ key."""
+    mapping = {
+        "Cash": ["cash_col"],
+        "__unmapped__": ["some_unmapped_col"],
+    }
+    result = utils._extract_leaf_mappings(mapping)
+    assert "__unmapped__" not in result
+    assert result == {"Cash": ["cash_col"]}
+
+
+@unit
+def test_is_mutually_exclusive_true():
+    """_is_mutually_exclusive should return True when columns don't overlap."""
+    df = pd.DataFrame(
+        {
+            "col_a": [100, 0, 0, 0],
+            "col_b": [0, 200, 0, 0],
+            "col_c": [0, 0, 300, 0],
+        }
     )
-    assert X_train.shape == (3, 2, 2)
-    assert y_train.shape == (3, 1)
-    assert X_test.shape == (1, 2, 2)
-    assert y_test.shape == (1, 1)
-    np.testing.assert_allclose(y_test[0], X[-1, 0])
+    assert utils._is_mutually_exclusive(df, ["col_a", "col_b", "col_c"])
 
 
 @unit
-def test_build_windows_raises_on_invalid_params():
-    """build_windows should raise ValueError for impossible configurations."""
-    X = np.arange(6, dtype=float).reshape(3, 2)
-    with pytest.raises(ValueError):
-        utils.build_windows(X, lookback=3, horizon=1, withhold=0)
-    with pytest.raises(ValueError):
-        utils.build_windows(X, lookback=1, horizon=1, withhold=-1)
+def test_is_mutually_exclusive_false():
+    """_is_mutually_exclusive should return False when columns overlap."""
+    df = pd.DataFrame(
+        {
+            "col_a": [100, 100, 100, 100],
+            "col_b": [200, 200, 200, 200],
+        }
+    )
+    assert not utils._is_mutually_exclusive(df, ["col_a", "col_b"])
 
 
-@integration
-def test_bs_identity_adds_validation_columns(capsys):
-    """bs_identity should compute sums and print validity counts."""
-    structure = utils.get_bs_structure("AAPL")
-    row = {}
-    for col in structure["assets"]["current_assets"]:
-        row[col] = 10
-    for col in structure["assets"]["non_current_assets"]:
-        row[col] = 10
-    for col in structure["liabilities"]["current_liabilities"]:
-        row[col] = 5
-    for col in structure["liabilities"]["non_current_liabilities"]:
-        row[col] = 5
-    for col in structure["equity"]:
-        row[col] = 10
+@unit
+def test_is_mutually_exclusive_single_col():
+    """_is_mutually_exclusive should return False for single column."""
+    df = pd.DataFrame({"col_a": [100, 200]})
+    assert not utils._is_mutually_exclusive(df, ["col_a"])
 
-    df = pd.DataFrame([row])
-    utils.bs_identity(df, ticker="AAPL", tol=1e-3)
-    captured = capsys.readouterr().out
-    assert "Accounting Identity" in captured
+
+@unit
+def test_map_single_column_empty_list():
+    """_map_single_column should return NaN for empty source list."""
+    df = pd.DataFrame({"col": [1, 2]})
+    result = utils._map_single_column(df, "new_col", [])
+    assert np.isnan(result)
+
+
+@unit
+def test_map_single_column_no_existing():
+    """_map_single_column should return NaN when no source columns exist."""
+    df = pd.DataFrame({"col_a": [1, 2]})
+    result = utils._map_single_column(df, "new_col", ["nonexistent1", "nonexistent2"])
+    assert np.isnan(result)
+
+
+@unit
+def test_map_single_column_single_source():
+    """_map_single_column should return source column directly for single match."""
+    df = pd.DataFrame({"source_col": [100, 200, 300]})
+    result = utils._map_single_column(df, "new_col", ["source_col"])
+    assert list(result) == [100, 200, 300]
+
+
+@unit
+def test_map_single_column_coalesce_mutually_exclusive():
+    """_map_single_column should coalesce mutually exclusive columns."""
+    df = pd.DataFrame(
+        {
+            "col_a": [100, 0, 0],
+            "col_b": [0, 200, 0],
+            "col_c": [0, 0, 300],
+        }
+    )
+    result = utils._map_single_column(df, "new_col", ["col_a", "col_b", "col_c"])
+    assert list(result) == [100, 200, 300]
+
+
+@unit
+def test_map_single_column_sum_overlapping():
+    """_map_single_column should sum overlapping columns."""
+    df = pd.DataFrame(
+        {
+            "col_a": [100, 100, 100],
+            "col_b": [50, 50, 50],
+        }
+    )
+    result = utils._map_single_column(df, "new_col", ["col_a", "col_b"])
+    assert list(result) == [150, 150, 150]

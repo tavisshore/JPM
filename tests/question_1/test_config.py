@@ -97,16 +97,16 @@ def test_loss_config_from_args_overrides_selected_fields():
 def test_config_composes_custom_subconfigs():
     """Config should compose sub-configs created via from_args helpers."""
     data_args = SimpleNamespace(ticker="AAPL", periods=8)
-    model_args = SimpleNamespace(lstm_units=64, dense_units=32)
+    lstm_args = SimpleNamespace(lstm_units=64, dense_units=32)
 
     cfg = Config(
         data=DataConfig.from_args(data_args),
-        model=LSTMConfig.from_args(model_args),
+        lstm=LSTMConfig.from_args(lstm_args),
     )
 
     assert cfg.data.ticker == "AAPL"
-    assert cfg.model.lstm_units == 64
-    assert cfg.training.lr == pytest.approx(1e-4)
-    assert cfg.training.epochs == 50
-    assert cfg.loss.enforce_balance is True
-    assert cfg.loss.identity_weight == pytest.approx(0.5)
+    assert cfg.lstm.lstm_units == 64
+    assert cfg.lstm.lr == pytest.approx(1e-4)
+    assert cfg.lstm.epochs == 500
+    assert cfg.lstm.enforce_balance is False
+    assert cfg.lstm.identity_weight == pytest.approx(1e-4)

@@ -64,8 +64,6 @@ class IncomeStatement:
         return self.revenues.total_gt - self.expenses.total_gt
 
     def view(self) -> None:
-        """Print the income statement and optional baseline comparison tables."""
-
         rows = []
         rows.append(
             [
@@ -122,3 +120,38 @@ class IncomeStatement:
 
     def get_results(self) -> TickerResults:
         return self.results
+
+    def view_predict(self) -> None:
+        """Same as view but no error or uncertainty columns."""
+        rows = []
+        rows.append(
+            [
+                "Total Revenue",
+                format_money(self.revenues.total_gt),
+                format_money(self.revenues.total_pred),
+            ]
+        )
+        rows.append(
+            [
+                "Total Expenses",
+                format_money(self.expenses.total_gt),
+                format_money(self.expenses.total_pred),
+            ]
+        )
+
+        ni_pred = self.net_income_pred
+        ni_gt = self.net_income_gt
+        net_colour = "green" if ni_pred >= 0 else "red"
+        rows.append(
+            [
+                "Net Income (Loss)",
+                format_money(ni_gt),
+                colour(format_money(ni_pred), net_colour),
+            ]
+        )
+
+        print_table(
+            title="Income Statement Predictions",
+            rows=rows,
+            headers=["Category", "Ground Truth", "Predicted"],
+        )

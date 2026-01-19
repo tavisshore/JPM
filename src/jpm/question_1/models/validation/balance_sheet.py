@@ -85,7 +85,7 @@ class BalanceSheet:
     def total_liabilities_and_equity(self) -> float:
         return self.total_liabilities + self.total_equity
 
-    def check_identity(self, atol: float = 1e3) -> float:
+    def check_identity(self, atol: float = 1e3, verbose=True) -> float:
         """Check Assets ≈ Liabilities + Equity."""
         A = self.total_assets
         L_plus_E = self.total_liabilities_and_equity
@@ -93,32 +93,34 @@ class BalanceSheet:
         passed = abs(diff) <= atol
 
         diff_pct = (diff / A) * 100 if A != 0 else 0.0
-        diff_amt = f"${diff:,.2f}"
-        diff_pct_str = f"{diff_pct:.2f}%"
 
-        if passed:
-            diff_col = colour(f"{diff_amt} | {diff_pct_str}", "green")
-        else:
-            if diff_pct < 1:
-                diff_col = colour(f"{diff_amt} | {diff_pct_str}", "orange")
+        if verbose:
+            diff_amt = f"${diff:,.2f}"
+            diff_pct_str = f"{diff_pct:.2f}%"
+
+            if passed:
+                diff_col = colour(f"{diff_amt} | {diff_pct_str}", "green")
             else:
-                diff_col = colour(f"{diff_amt} | {diff_pct_str}", "red")
+                if diff_pct < 1:
+                    diff_col = colour(f"{diff_amt} | {diff_pct_str}", "orange")
+                else:
+                    diff_col = colour(f"{diff_amt} | {diff_pct_str}", "red")
 
-        rows = [
-            [
-                "Accounting Identity (A = L + E)",
-                f"{format_money(A)}",
-                f"{format_money(L_plus_E)}",
-                diff_col,
+            rows = [
+                [
+                    "Accounting Identity (A = L + E)",
+                    f"{format_money(A)}",
+                    f"{format_money(L_plus_E)}",
+                    diff_col,
+                ]
             ]
-        ]
 
-        print_table(
-            title="Balance Sheet Identity Check",
-            rows=rows,
-            headers=["", "Assets", "Liabilities + Equity", "Difference"],
-        )
-        # Single-row table keeps the check consistent with other views
+            print_table(
+                title="Balance Sheet Identity Check",
+                rows=rows,
+                headers=["", "Assets", "Liabilities + Equity", "Difference"],
+            )
+            # Single-row table keeps the check consistent with other views
         return diff_pct
 
     def _get_value(self, name: str) -> float:
@@ -157,3 +159,65 @@ class BalanceSheet:
         equity_names = self.dataset.bs_structure.get("Equity", [])
         items = {name: self._get_value(name) for name in equity_names}
         return Equity(items=items)
+
+    def view(self) -> None:
+        rows = []
+
+        for name, value in self.assets.assets.items():
+            rows.append(
+                [
+                    f"Asset: {name}",
+                    format_money(value),
+                ]
+            )
+        rows.append(
+            [
+                "Total Assets",
+                format_money(self.total_assets),
+            ]
+        )
+        print_table(
+            title="Balance Sheet - Assets",
+            rows=rows,
+            headers=["Item", "Amount"],
+        )
+
+        rows = []
+        for name, value in self.liabilities.liabilities.items():
+            rows.append(
+                [
+                    f"Liability: {name}",
+                    format_money(value),
+                ]
+            )
+        rows.append(
+            [
+                "Total Liabilities",
+                format_money(self.total_liabilities),
+            ]
+        )
+        print_table(
+            title="Balance Sheet - Liabilities",
+            rows=rows,
+            headers=["Item", "Amount"],
+        )
+
+        rows = []
+        for name, value in self.equity.items.items():
+            rows.append(
+                [
+                    f"Equity Item: {name}",
+                    format_money(value),
+                ]
+            )
+        rows.append(
+            [
+                "Total Equity",
+                format_money(self.total_equity),
+            ]
+        )
+        print_table(
+            title="Balance Sheet - Equity",
+            rows=rows,
+            headers=["Item", "Amount"],
+        )

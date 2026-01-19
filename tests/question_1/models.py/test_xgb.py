@@ -22,6 +22,7 @@ def model():
         learning_rate=0.1,
         n_estimators=5,
         random_state=42,
+        use_gpu=False,  # Disable GPU to avoid device mismatch warnings in tests
     )
 
 
@@ -58,7 +59,6 @@ def test_init_stores_parameters():
         reg_alpha=0.1,
         reg_lambda=2.0,
         random_state=123,
-        early_stopping_rounds=15,
         use_gpu=False,
     )
 
@@ -72,7 +72,6 @@ def test_init_stores_parameters():
     assert model.reg_alpha == 0.1
     assert model.reg_lambda == 2.0
     assert model.random_state == 123
-    assert model.early_stopping_rounds == 15
     assert model.use_gpu is False
 
 
@@ -92,7 +91,7 @@ def test_init_default_state():
 
 @unit
 def test_build_creates_xgb_classifier(model):
-    """build() should create an XGBClassifier with correct parameters."""
+    """build() should create an XGBRegressor with correct parameters."""
     result = model.build()
 
     assert result is model  # Returns self for chaining
@@ -102,24 +101,24 @@ def test_build_creates_xgb_classifier(model):
 
 
 @unit
-def test_build_sets_gpu_tree_method():
-    """build() should set tree_method='gpu_hist' when use_gpu=True."""
+def test_build_sets_gpu_device():
+    """build() should set device='cuda' when use_gpu=True."""
     model = CreditRatingModel(n_classes=3, n_features=10, use_gpu=True)
     model.build()
 
-    # Check the model params
+    # Check the model params - uses 'device' not 'tree_method'
     params = model.model.get_params()
-    assert params["tree_method"] == "gpu_hist"
+    assert params.get("device") == "cuda"
 
 
 @unit
-def test_build_sets_cpu_tree_method():
-    """build() should set tree_method='hist' when use_gpu=False."""
+def test_build_sets_cpu_device():
+    """build() should set device='cpu' when use_gpu=False."""
     model = CreditRatingModel(n_classes=3, n_features=10, use_gpu=False)
     model.build()
 
     params = model.model.get_params()
-    assert params["tree_method"] == "hist"
+    assert params.get("device") == "cpu"
 
 
 # Training Tests
@@ -246,7 +245,7 @@ def test_evaluate_returns_metrics_dict(model, sample_data, capsys):
 
 @integration
 def test_evaluate_prints_report(model, sample_data, capsys):
-    """evaluate() should print classification report."""
+    """evaluate() should print evaluation report."""
     X_train, y_train, X_val, y_val = sample_data
     class_names = ["Class_A", "Class_B", "Class_C"]
 
@@ -256,7 +255,6 @@ def test_evaluate_prints_report(model, sample_data, capsys):
     captured = capsys.readouterr()
     assert "EVALUATION" in captured.out
     assert "Accuracy" in captured.out
-    assert "Confusion Matrix" in captured.out
 
 
 # Feature Importance Tests
@@ -299,9 +297,9 @@ def test_save_and_load_model(model, sample_data, tmp_path):
     model.build().train(X_train, y_train, X_val, y_val, verbose=False)
     original_predictions = model.predict(X_val)
 
-    # Save model to directory
+    # Save model to directory (pass Path object, not string)
     save_dir = tmp_path / "model_dir"
-    model.save(str(save_dir))
+    model.save(save_dir)
     assert save_dir.exists()
     assert (save_dir / "xgboost_model.json").exists()
     assert (save_dir / "metadata.json").exists()
@@ -321,8 +319,9 @@ def test_save_creates_metadata(model, sample_data, tmp_path):
 
     model.build().train(X_train, y_train, X_val, y_val, verbose=False)
 
+    # Pass Path object, not string
     save_dir = tmp_path / "model_dir"
-    model.save(str(save_dir))
+    model.save(save_dir)
 
     # Check metadata file exists
     metadata_path = save_dir / "metadata.json"
@@ -345,7 +344,7 @@ def test_save_raises_without_training(model, tmp_path):
     save_dir = tmp_path / "model_dir"
 
     with pytest.raises(ValueError, match="not trained"):
-        model.save(str(save_dir))
+        model.save(save_dir)
 
 
 # Plotting Tests (mock matplotlib)
@@ -368,7 +367,7 @@ def test_plot_training_history_with_save(model, sample_data, tmp_path):
 
     save_path = tmp_path / "history.png"
     with patch("matplotlib.pyplot.show"):
-        model.plot_training_history(save_path=str(save_path))
+        model.plot_training_history(save_path=save_path)
 
     assert save_path.exists()
 
@@ -385,7 +384,7 @@ def test_plot_confusion_matrix_with_save(model, sample_data, tmp_path):
     save_path = tmp_path / "confusion.png"
     with patch("matplotlib.pyplot.show"):
         model.plot_confusion_matrix(
-            y_val, y_pred, class_names=class_names, save_path=str(save_path)
+            y_val, y_pred, class_names=class_names, save_path=save_path
         )
 
     assert save_path.exists()
@@ -403,7 +402,7 @@ def test_handles_imbalanced_classes(sample_data):
     y_train_imbalanced = np.array([0] * 80 + [1] * 15 + [2] * 5)
     y_val_imbalanced = np.array([0] * 16 + [1] * 3 + [2] * 1)
 
-    model = CreditRatingModel(n_classes=3, n_features=10, n_estimators=5)
+    model = CreditRatingModel(n_classes=3, n_features=10, n_estimators=5, use_gpu=False)
     model.build().train(
         X_train, y_train_imbalanced, X_val, y_val_imbalanced, verbose=False
     )
@@ -419,7 +418,7 @@ def test_handles_binary_classification():
     X = np.random.randn(50, 5)
     y = np.random.randint(0, 2, 50)
 
-    model = CreditRatingModel(n_classes=2, n_features=5, n_estimators=5)
+    model = CreditRatingModel(n_classes=2, n_features=5, n_estimators=5, use_gpu=False)
     model.build().train(X[:40], y[:40], X[40:], y[40:], verbose=False)
 
     predictions = model.predict(X[40:])

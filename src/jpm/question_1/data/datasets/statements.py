@@ -98,6 +98,38 @@ class StatementsDataset:
     """Prepares train/val datasets from EdgarData for model training."""
 
     def __init__(self, edgar_data: "EdgarData", verbose: bool = True) -> None:
+        """
+        Initialize dataset from EdgarData.
+
+        Creates train/validation/prediction datasets with feature scaling,
+        seasonal weighting, and structured financial statement organization.
+
+        Parameters
+        ----------
+        edgar_data : EdgarData
+            EdgarData instance containing parsed financial statements
+        verbose : bool, default=True
+            Whether to print progress information
+
+        Attributes
+        ----------
+        X_train : np.ndarray
+            Training features of shape (n_samples, lookback, n_features)
+        y_train : np.ndarray
+            Training targets of shape (n_samples, n_targets)
+        X_test : np.ndarray
+            Validation features of shape (n_samples, lookback, n_features)
+        y_test : np.ndarray
+            Validation targets of shape (n_samples, n_targets)
+        X_predict : np.ndarray
+            Prediction window of shape (1, lookback, n_features)
+        train_dataset : tf.data.Dataset
+            TensorFlow dataset for training
+        val_dataset : tf.data.Dataset
+            TensorFlow dataset for validation
+        predict_dataset : tf.data.Dataset
+            TensorFlow dataset for prediction
+        """
         self.edgar_data = edgar_data
         self.config = edgar_data.config
         self.verbose = verbose
@@ -166,7 +198,35 @@ class StatementsDataset:
             self.config.data.withhold_periods
         )
 
+        # Build predict set: final lookback window with no ground truth
+        self.X_predict = self._build_predict_window(X_scaled)
+        self.predict_dataset = tf.data.Dataset.from_tensor_slices(
+            self.X_predict.astype("float64")
+        ).batch(1)
+
     def _get_structure(self) -> None:
+        """
+        Get financial statement structure.
+
+        Loads balance sheet and income statement structures from configuration,
+        extracts leaf-level line items, and organizes them into hierarchical
+        categories (Assets, Liabilities, Equity for balance sheet; Revenues,
+        Expenses for income statement). Removes summary/derived items to avoid
+        redundancy.
+
+        Sets Attributes
+        ---------------
+        balance_sheet_structure : dict
+            Full balance sheet configuration
+        income_statement_structure : dict
+            Full income statement configuration
+        bs_keys : list
+            All balance sheet line item names
+        bs_structure : dict
+            Balance sheet organized as {Assets: [...], Liabilities: [...], Equity: [...]}
+        is_structure : dict
+            Income statement organized as {Revenues: [...], Expenses: [...]}
+        """
         fs_structure = get_fs_struct("all")
         self.balance_sheet_structure = fs_structure["balance_sheet"]
         self.income_statement_structure = fs_structure["income_statement"]
@@ -229,6 +289,24 @@ class StatementsDataset:
         }
 
     def _prepare_targets(self) -> None:
+        """
+        Prepare target variables.
+
+        Creates index mappings for all target features and organizes them
+        into balance sheet categories (assets, liabilities, equity). These
+        mappings are used for evaluation metrics and accounting identity
+        validation.
+
+        Sets Attributes
+        ---------------
+        targets : list
+            All target feature names
+        name_to_target_idx : dict
+            Mapping from feature name to column index
+        feature_mappings : dict
+            Mappings of {assets: [...], liabilities: [...], equity: [...]}
+            where values are lists of column indices for each category
+        """
         self.targets = list(self.data.columns)
         self.name_to_target_idx = {name: i for i, name in enumerate(self.targets)}
 
@@ -277,6 +355,46 @@ class StatementsDataset:
         self.full_std = np.asarray(scaler.scale_, dtype="float64")
         self.target_mean = self.full_mean[self.tgt_indices]
         self.target_std = self.full_std[self.tgt_indices]
+
+    def _build_predict_window(self, X_scaled: np.ndarray) -> np.ndarray:
+        """
+        Build the final lookback window for prediction (no ground truth).
+
+        Takes the last `lookback` periods from the scaled data to create
+        a single window for predicting the next unseen period.
+
+        Parameters
+        ----------
+        X_scaled : np.ndarray
+            Scaled feature array of shape (time, features)
+
+        Returns
+        -------
+        np.ndarray
+            Prediction window of shape (1, lookback, features)
+        """
+        lookback = self.config.data.lookback
+        X_predict = X_scaled[-lookback:][np.newaxis, ...]  # Shape: (1, lookback, F)
+        return self._apply_seasonal_weight_single(X_predict)
+
+    def _apply_seasonal_weight_single(self, X: np.ndarray) -> np.ndarray:
+        """Apply seasonal weighting to a single window array."""
+        seasonal_step = self.config.data.seasonal_lag
+        if self.config.data.seasonal_weight == 1.0 or seasonal_step <= 0:
+            return X
+
+        seasonal_indices = []
+        idx = self.config.data.lookback - seasonal_step
+        while idx >= 0:
+            seasonal_indices.append(idx)
+            idx -= seasonal_step
+
+        if not seasonal_indices:
+            return X
+
+        X = X.copy()
+        X[:, seasonal_indices, :] *= self.config.data.seasonal_weight
+        return X
 
     def _apply_seasonal_weight(
         self, X_train: np.ndarray, X_test: np.ndarray

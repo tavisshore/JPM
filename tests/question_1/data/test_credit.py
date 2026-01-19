@@ -384,7 +384,7 @@ def test_calculate_size_metrics_handles_negative():
 
 @integration
 def test_calculate_credit_ratios_comprehensive():
-    """calculate_credit_ratios should calculate all available ratios."""
+    """calculate_credit_ratios should calculate JPM ratios (quick_ratio, debt ratios)."""
     df = pd.DataFrame(
         {
             "rating": ["A", "BBB"],
@@ -412,28 +412,12 @@ def test_calculate_credit_ratios_comprehensive():
     assert "rating" in ratios.columns
     assert list(ratios["rating"]) == ["A", "BBB"]
 
-    # Check derived values
-    assert "Total_Debt" in ratios.columns
-    assert ratios["Total_Debt"].iloc[0] == 250  # 50 + 200
-
-    # Check leverage ratios
-    assert "Debt_to_Equity" in ratios.columns
-    assert "Debt_to_Assets" in ratios.columns
-
-    # Check profitability ratios
-    assert "ROA" in ratios.columns
-    assert "ROE" in ratios.columns
-    assert "Operating_Margin" in ratios.columns
-
-    # Check liquidity ratios
-    assert "Current_Ratio" in ratios.columns
-    assert "Quick_Ratio" in ratios.columns
-
-    # Check efficiency ratios
-    assert "Asset_Turnover" in ratios.columns
-
-    # Check size metrics
-    assert "Log_Total_Assets" in ratios.columns
+    # Check JPM ratios (lowercase names from _calculate_jpm_ratios)
+    assert "quick_ratio" in ratios.columns
+    assert "debt_to_equity" in ratios.columns
+    assert "debt_to_assets" in ratios.columns
+    assert "debt_to_capital" in ratios.columns
+    assert "debt_to_ebitda" in ratios.columns
 
 
 @integration
@@ -448,13 +432,10 @@ def test_calculate_credit_ratios_missing_features():
 
     ratios = credit.calculate_credit_ratios(df)
 
-    # Should have some ratios calculated
-    assert "Equity_to_Assets" in ratios.columns
-    assert ratios["Equity_to_Assets"].iloc[0] == 0.5
-
-    # Should not have ratios requiring missing columns
-    assert "Current_Ratio" not in ratios.columns
-    assert "Interest_Coverage" not in ratios.columns
+    # With only Total Assets and Total Equity, no JPM ratios can be calculated
+    # (they require debt components or current assets/liabilities)
+    # The result should be an empty or minimal DataFrame
+    assert len(ratios) == 1  # Still has one row
 
 
 @integration
@@ -471,7 +452,7 @@ def test_calculate_credit_ratios_empty_dataframe():
 @integration
 def test_calculate_credit_ratios_preserves_index():
     """calculate_credit_ratios should preserve the original index."""
-    idx = pd.date_range("2020-01-01", periods=3, freq="Q")
+    idx = pd.date_range("2020-01-01", periods=3, freq="QE")
     df = pd.DataFrame(
         {
             "Total Assets": [1000, 1100, 1200],

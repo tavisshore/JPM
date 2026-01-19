@@ -10,21 +10,28 @@ python -m pip install .
 pytest -v
 ```
 
-## Environment
+
+## Question 1 - Financial Statement Forecasting
+#### Environment Variables
 EDGAR requires an email for downloads:
 ```bash
 export EDGAR_EMAIL="your_email@address.com"
 ```
-The LLM clients requires API keys (currently just ChatGPT):
+The LLM clients requires API keys (currently only OpenAI):
 ```bash
 export OPENAI_API_KEY="your_api_key"
 ```
-We use `https://www.exchangerate-api.com/` to retrieve exchange rates for particular dates - this must be set to sucessfully parse non-USD reports.
+We use `https://www.exchangerate-api.com/` to retrieve exchange rates for particular dates - this must be set to sucessfully parse non-USD reports. Otherwise it falls back to static values.
 ```bash
 export FX_API_KEY='your_fx_api_key'
 ```
+#### Downloading Data
+There is a script that will attempt to download all suitable data - requiring above environments:
+```bash
+python scripts/question_1/download_data.py --cache_dir 'YOUR_DESIRED_LOCATION'
+```
+This will take quite a long time but will show progress.
 
-## Question 1 - Financial Statement Forecasting
 ### Part 1
 - **Vélez-Pareja:**
   - **Plugless:** from the paper *Forecasting Financial Statements with No plugs and No Circularity* [1]
@@ -51,14 +58,14 @@ export FX_API_KEY='your_fx_api_key'
     ```
 
 - **Annual Report Parsing:**
-    This script uses the same LLM client to parse pdf annual reports, extracting key financial information. Available reports are stored within `assets/`:
+    This script uses the same LLM client to parse pdf annual reports, extracting key financial information. Available reports are stored within `assets/`
     (the argument for parsing is `ticker` although it's the name - to be compatible throughout the config)
     ```bash
     python scripts/question_1/ml/parse_reports.py --ticker ['alibaba', 'exxon', 'evergrande' ...]
     ```
 #### Part B: Bonus 1
 - **Credit Rating:**
-    This script trains an XGBoost model on credit ratings data constructed from our SEC data and `ratingshistory.info`:
+    This script trains an XGBoost model on credit ratings data constructed from our SEC data and `ratingshistory.info` before giving a credit prediction to your ticker argument.
     ```bash
     python scripts/question_1/ml/pipeline.py --ticker ['alibaba', 'exxon', 'evergrande' ...]
     ```
