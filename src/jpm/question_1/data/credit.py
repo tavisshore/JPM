@@ -373,35 +373,33 @@ def _calculate_jpm_ratios(df, ratios_df, total_debt, ebitda):
         quick_assets = _safe_get(df, "Total Current Assets") - _safe_get(
             df, "Inventory"
         ).fillna(0)
-        ratios_df["Quick_Ratio"] = _safe_ratio(
+        ratios_df["quick_ratio"] = _safe_ratio(
             quick_assets, _safe_get(df, "Total Current Liabilities")
         )
     # Debt to Equity
     if total_debt is not None and "Total Equity" in df.columns:
-        ratios_df["Debt_to_Equity"] = _safe_ratio(
+        ratios_df["debt_to_equity"] = _safe_ratio(
             total_debt, _safe_get(df, "Total Equity")
         )
     # Debt to Assets
     if total_debt is not None and "Total Assets" in df.columns:
-        ratios_df["Debt_to_Assets"] = _safe_ratio(
+        ratios_df["debt_to_assets"] = _safe_ratio(
             total_debt, _safe_get(df, "Total Assets")
         )
     # Debt to Capital
     if total_debt is not None and "Total Equity" in df.columns:
         total_capital = total_debt + _safe_get(df, "Total Equity")
-        ratios_df["Total_Debt_to_Total_Capital"] = _safe_ratio(
-            total_debt, total_capital
-        )
+        ratios_df["debt_to_capital"] = _safe_ratio(total_debt, total_capital)
     # Debt to EBITDA
     if total_debt is not None and ebitda is not None:
-        ratios_df["Debt_to_EBITDA"] = _safe_ratio(total_debt, ebitda)
+        ratios_df["debt_to_ebitda"] = _safe_ratio(total_debt, ebitda)
     # Interest Coverage
     if "Operating Income" in df.columns and "Interest Paid" in df.columns:
-        ratios_df["EBIT_to_Interest"] = _safe_ratio(
+        ratios_df["ebit_to_interest"] = _safe_ratio(
             _safe_get(df, "Operating Income"), _safe_get(df, "Interest Paid")
         )
     if "Operating Expenses" in df.columns and "Total Revenues" in df.columns:
-        ratios_df["Cost_to_Income"] = _safe_ratio(
+        ratios_df["cost_to_income"] = _safe_ratio(
             _safe_get(df, "Operating Expenses"), _safe_get(df, "Total Revenues")
         )
 
@@ -455,6 +453,13 @@ def calculate_credit_ratios(df):
     # _calculate_quality_metrics(df, ratios_df)
     # _calculate_size_metrics(df, ratios_df)
 
+    if "Total_Debt" in ratios_df.columns:
+        ratios_df = ratios_df.drop(columns=["Total_Debt"])
+    if "EBITDA" in ratios_df.columns:
+        ratios_df = ratios_df.drop(columns=["EBITDA"])
+    if "Free_Cash_Flow" in ratios_df.columns:
+        ratios_df = ratios_df.drop(columns=["Free_Cash_Flow"])
+
     ratios_df = ratios_df.replace([np.inf, -np.inf], np.nan)
-    ratios_df = ratios_df.drop(columns=["Total_Debt", "EBITDA", "Free_Cash_Flow"])
+
     return ratios_df

@@ -226,11 +226,9 @@ class LSTMForecaster:
         )
 
         if llm_config:
-            # Add in LLM client forecast here, and then average the two - comparing
-            # There's no training involved so only for val
             history_df = pd.DataFrame(
                 history_unscaled[0],
-                columns=self.data.targets,
+                columns=self.dataset.targets,
                 index=self._prediction_index(
                     stage, history_unscaled[0].shape[0], for_history=True
                 ),
@@ -239,7 +237,7 @@ class LSTMForecaster:
 
             y_pred_unscaled_df = pd.DataFrame(
                 y_pred_unscaled,
-                columns=self.data.targets,
+                columns=self.dataset.targets,
                 index=self._prediction_index(stage, y_pred_unscaled.shape[0]),
                 copy=False,
             )
@@ -248,11 +246,14 @@ class LSTMForecaster:
 
             if llm_config.adjust:
                 llm_estimation = llm_client.forecast_next_quarter(
-                    history=history_df, prediction=y_pred_unscaled_df, cfg=llm_config
+                    history=history_df,
+                    prediction=y_pred_unscaled_df,
+                    cfg=llm_config,
+                    verbose=True,
                 )
             else:
                 llm_estimation = llm_client.forecast_next_quarter(
-                    history=history_df, cfg=llm_config
+                    history=history_df, cfg=llm_config, verbose=True
                 )
 
             y_pred_unscaled = y_pred_unscaled_df.apply(pd.to_numeric, errors="coerce")
@@ -534,17 +535,17 @@ class LSTMForecaster:
 
         # Detailed per-feature tables
         assets_rows = build_section_rows(
-            self.data.bs_structure["Assets"], results.features
+            self.dataset.bs_structure["Assets"], results.features
         )
         print_table("Assets", assets_rows)
 
         liabilities_rows = build_section_rows(
-            self.data.bs_structure["Liabilities"], results.features
+            self.dataset.bs_structure["Liabilities"], results.features
         )
         print_table("Liabilities", liabilities_rows)
 
         equity_rows = build_equity_rows(
-            self.data.bs_structure["Equity"], results.features
+            self.dataset.bs_structure["Equity"], results.features
         )
         print_table("Equity", equity_rows)
 

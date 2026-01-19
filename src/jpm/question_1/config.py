@@ -37,6 +37,10 @@ REPORTS = {
         "pages": [(124, 134), (186, 186)],
     },
     "vw": {"path": "assets/question_1/vw_report.pdf", "pages": [(472, 478)]},
+    "evergrande": {
+        "path": "assets/question_1/evergrande_report.pdf",
+        "pages": [(46, 53), (92, 98)],
+    },
 }
 
 

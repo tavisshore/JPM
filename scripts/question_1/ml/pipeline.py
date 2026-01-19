@@ -3,6 +3,8 @@
 # 4. Parse Report -> Credit Rating
 # 5. LSTM output -> ratios -> Credit rating
 
+import numpy as np
+
 from jpm.question_1 import (
     Config,
     CreditDataset,
@@ -17,7 +19,7 @@ from jpm.question_1 import (
 from jpm.question_1.clients.llm_client import LLMClient
 
 
-def train_xgb(cfg: Config):
+def train_xgb(cfg: Config, feature_names: list = None):
     print("\n[1/5] Loading dataset...")
     dataset = CreditDataset(
         data_dir=cfg.data.cache_dir,
@@ -27,7 +29,7 @@ def train_xgb(cfg: Config):
         random_state=42,
         verbose=True,
     )
-    dataset.load()
+    dataset.load(feature_names=feature_names)
 
     print("\n[2/5] Dataset summary...")
     info = dataset.get_info()
@@ -90,6 +92,7 @@ def train_xgb(cfg: Config):
     # Add top 3 predictions with probabilities
     for i in range(min(3, probabilities.shape[1])):
         top_idx = probabilities.argsort(axis=1)[:, -(i + 1)]
+        print(top_idx)
         results[f"top_{i + 1}_rating"] = dataset.decode_labels(top_idx)
         results[f"top_{i + 1}_prob"] = probabilities[range(len(probabilities)), top_idx]
 
@@ -143,11 +146,49 @@ if __name__ == "__main__":
         xgb=xgb_cfg,
     )
 
+    # Feature names used across training and inference
+    feature_cols = [
+        "Quick_Ratio",
+        "Debt_to_Equity",
+        "Debt_to_Assets",
+        "Total_Debt_to_Total_Capital",
+        "Debt_to_EBITDA",
+    ]
+
     # Train Ratios -> Credit Rating XGBoost model
-    xgb_model = train_xgb(config)
+    xgb_model = train_xgb(config, feature_names=feature_cols)
 
-    # Parse Report -> Ratios -> Credit Rating LSTM model
+    # Parse Report -> Ratios -> Credit Rating
     client = LLMClient()
-    data = client.parse_annual_report(config)
+    report_path = config.data.get_report_path()
+    report_pages = config.data.get_report_pages()
 
-    # Process Ratios into LSTM input and make predictions
+    if report_path and report_pages:
+        data = client.parse_annual_report(config)
+
+        if data:
+            # Convert to feature array in correct order
+            X_report = np.array([[data.get(col, 0.0) for col in feature_cols]]).astype(
+                np.float32
+            )
+
+            # Predict credit rating from report ratios
+            prediction = xgb_model.predict(X_report)
+            probabilities = xgb_model.predict_proba(X_report)
+
+            # Decode prediction
+            class_names = {0: "Prime", 1: "High", 2: "Medium", 3: "Low"}
+            predicted_rating = class_names.get(prediction[0], "Unknown")
+            confidence = probabilities[0].max()
+
+            print("\n" + "=" * 70)
+            print("REPORT ANALYSIS COMPLETE")
+            print("=" * 70)
+            print(f"Ticker: {config.data.ticker}")
+            print(f"Report Date: {data.get('report_date', 'N/A')}")
+            print("\nExtracted Ratios:")
+            for col in feature_cols:
+                print(f"  {col}: {data.get(col, 'N/A')}")
+            print(f"\nPredicted Credit Rating: {predicted_rating}")
+            print(f"Confidence: {confidence:.2%}")
+            print("=" * 70 + "\n")

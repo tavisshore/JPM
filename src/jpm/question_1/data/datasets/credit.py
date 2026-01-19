@@ -99,8 +99,14 @@ class CreditDataset:
 
         return df
 
-    def load(self) -> "CreditDataset":
-        """Load and process all data files."""
+    def load(self, feature_names: list | None = None) -> "CreditDataset":
+        """Load and process all data files.
+
+        Args:
+            feature_names: Optional list of feature column names to use.
+                          If provided, only these columns will be used as features.
+                          If None, all available feature columns will be used.
+        """
         files = sorted(self.data_dir.glob(self.pattern))
         trainable_dfs = []
         predict_dfs = []
@@ -120,16 +126,28 @@ class CreditDataset:
         df_all = pd.concat(trainable_dfs, ignore_index=True)
         df_predict_all = pd.concat(predict_dfs, ignore_index=True)
 
+        # Select subset of features if specified
+        if feature_names is not None:
+            meta_cols = ["quarter", "rating", "target_rating", "ticker", "index"]
+            keep_cols = [c for c in meta_cols if c in df_all.columns] + feature_names
+            df_all = df_all[[c for c in keep_cols if c in df_all.columns]]
+            df_predict_all = df_predict_all[
+                [c for c in keep_cols if c in df_predict_all.columns]
+            ]
+
         # Process features
         df_all = self._process_features(df_all)
         df_predict_all = self._process_features(df_predict_all)
 
-        # Store feature columns
-        self.feature_cols = [
-            col
-            for col in df_all.columns
-            if col not in ["quarter", "rating", "target_rating", "ticker", "index"]
-        ]
+        # Store feature columns (use provided list or derive from data)
+        if feature_names is not None:
+            self.feature_cols = [c for c in feature_names if c in df_all.columns]
+        else:
+            self.feature_cols = [
+                col
+                for col in df_all.columns
+                if col not in ["quarter", "rating", "target_rating", "ticker", "index"]
+            ]
 
         # Define rating collapse mapping - Simplifies with such small data
         self.rating_map = {
@@ -143,6 +161,8 @@ class CreditDataset:
             "Baa3": 3,
             "Baa2": 3,
             "Baa1": 3,  # Lower Medium (12 samples)
+            "Ba2": 3,  # Non-Investment Grade Speculative (1 sample)
+            # Add more once I download more data
         }
 
         # Decode to rating names
@@ -316,7 +336,7 @@ class CreditDataset:
             "n_test": len(self._X_test),
             "n_predict": len(self._X_predict),
             "n_features": len(self.feature_cols),
-            "n_classes": len(self.rating_map.values()),
+            "n_classes": len(self.class_names),
             "feature_names": self.feature_cols,
             "classes": list(self.class_names.values()),
         }

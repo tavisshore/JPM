@@ -97,35 +97,11 @@ def prune_features_for_lstm(
 class StatementsDataset:
     """Prepares train/val datasets from EdgarData for model training."""
 
-    def __init__(self, edgar_data: "EdgarData", verbose: bool = False) -> None:
-        """
-        Initialize dataset from EdgarData.
-
-        Parameters:
-        -----------
-        edgar_data : EdgarData
-            Instance of EdgarData with loaded and processed financial data
-        target : str
-            Target model type ("lstm" or "xgboost")
-        verbose : bool
-            Whether to print detailed information during processing
-        """
+    def __init__(self, edgar_data: "EdgarData", verbose: bool = True) -> None:
         self.edgar_data = edgar_data
         self.config = edgar_data.config
         self.verbose = verbose
-
-        # Copy necessary attributes from EdgarData
         self.data = edgar_data.data
-
-        # NOTE Starting from now, go back quarterly - remove data after a break
-        # print(f"Searching for break in data for {self.config.data.ticker}...")
-        # self.data = self.data.sort_index(ascending=False)
-        # quarterly_index = self.data.index.asfreq("Q")
-        # expected = pd.period_range(
-        #     end=quarterly_index[0], periods=len(self.data), freq="Q"
-        # )[::-1]
-        # mask = (self.data.index == expected).cumprod().astype(bool)
-        # self.data = self.data[mask]
 
         self._prepare_dataset()
 

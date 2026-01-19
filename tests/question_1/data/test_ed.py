@@ -5,13 +5,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from jpm.question_1.config import (
-    Config,
-    DataConfig,
-    LossConfig,
-    ModelConfig,
-    TrainingConfig,
-)
+from jpm.question_1.config import Config, DataConfig, LLMConfig, LSTMConfig, XGBConfig
 from jpm.question_1.data import ed
 
 unit = pytest.mark.unit
@@ -219,9 +213,9 @@ def make_config(tmp_path):
             batch_size=2,
             target_type="full",
         ),
-        model=ModelConfig(),
-        training=TrainingConfig(),
-        loss=LossConfig(),
+        llm=LLMConfig(),
+        xgb=XGBConfig(),
+        lstm=LSTMConfig(),
     )
 
 

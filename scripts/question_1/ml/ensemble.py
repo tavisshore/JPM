@@ -27,7 +27,6 @@ dataset = StatementsDataset(edgar_data=data)
 model = LSTMForecaster(config=config, data=data, dataset=dataset)
 model.fit()
 
-# model.evaluate(stage="train")
 validation_results = model.evaluate(stage="val", llm_config=llm_cfg)
 model.view_results(stage="val")
 

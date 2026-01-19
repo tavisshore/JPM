@@ -44,10 +44,11 @@ data_cfg = DataConfig.from_args(args)
 lstm_cfg = LSTMConfig.from_args(args)
 llm_cfg = LLMConfig.from_args(args)
 
+view_plot = True
 
 CONFIG_VARIATIONS = [
-    {"learn_identity": False, "enforce_balance": False},
-    {"learn_identity": True, "enforce_balance": False},
+    # {"learn_identity": False, "enforce_balance": False},
+    # {"learn_identity": True, "enforce_balance": False},
     {"learn_identity": True, "enforce_balance": True},
 ]
 
@@ -138,7 +139,7 @@ for var_idx, variation in enumerate(CONFIG_VARIATIONS, 1):
             tf.keras.backend.clear_session()
 
         except Exception as E:
-            print(E)
+            print(f"\n{E}", flush=True)
             failed.append(ticker)
 
     # Store results for this config
