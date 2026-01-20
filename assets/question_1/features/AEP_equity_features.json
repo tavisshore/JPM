@@ -1,0 +1,94 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [
+        "comprehensive income net of tax including portion attributable to noncontrolling interest"
+    ],
+    "Dividends Declared": [
+        "dividends common stock",
+        "dividends preferred stock",
+        "preferred stock dividends"
+    ],
+    "Dividends Paid": [
+        "dividends preferred stock cash",
+        "payments of distributions to affiliates"
+    ],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [
+            "adjustments to additional paid in capital other"
+        ],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [
+            "subtotal common shareholders equity"
+        ],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "net income loss",
+        "net income loss available to common stockholders basic",
+        "profit loss",
+        "revenue from contract with customers net of provisions for refund including assessed tax",
+        "revenues",
+        "revenues from related parties net of provisions for refund"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [
+            "other comprehensive income derivatives qualifying as hedges net of tax period increase decrease"
+        ],
+        "Foreign Currency Translation": [],
+        "Other OCI": [
+            "other comprehensive income amortization of defined benefit plan net prior service cost recognized in net periodic pension cost net of tax",
+            "other comprehensive income defined benefit plans adjustment net of tax period increase decrease",
+            "pension and opeb adjustment related to mitchell plant"
+        ],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax"
+        ],
+        "Unrealized Gains/Losses on Securities": [
+            "other comprehensive income available for sale securities adjustment net of tax period increase decrease"
+        ]
+    },
+    "Other Equity Adjustments": [
+        "capital distribution of radial assets",
+        "deferred state income tax rate adjustment",
+        "distribution of cook coal terminal to parent",
+        "distribution of o p co generation to parent",
+        "preferred stock redemption discount",
+        "preferred stock redemption premium",
+        "return of capital to parent equity statement",
+        "stockholders equity a s u201613 adoption",
+        "stockholders equity a s u201802 adoption",
+        "stockholders equity other"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [],
+        "Other Stock Issuance": [
+            "contributionof mutual energy s w e p co l l cfrom parent",
+            "noncash contributions from parent",
+            "noncash or part noncash acquisition other assets acquired1"
+        ],
+        "Stock-Based Compensation": [],
+        "Total Stock Issuance Value": [
+            "proceeds from contributions from parent",
+            "stock issued during period value new issues"
+        ]
+    },
+    "Stock Repurchases": [],
+    "Tax Effects from Stock Compensation": [],
+    "__unmapped__": [
+        "common stock dividends per share declared",
+        "minority interest decrease from distributions to noncontrolling interest holders",
+        "net income loss attributable to noncontrolling interest",
+        "other amortization of deferred charges",
+        "reverse common stock split",
+        "stock issued during period shares new issues"
+    ]
+}

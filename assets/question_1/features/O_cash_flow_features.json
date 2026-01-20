@@ -1,0 +1,151 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [
+        "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents"
+    ],
+    "Financing Activities": {
+        "Dividends Paid": [
+            "distribution made to limited partner cash distributions paid",
+            "payments of dividends common stock",
+            "payments of dividends preferred stock and preference stock"
+        ],
+        "Net Cash from Financing Activities": [
+            "net cash provided by used in financing activities"
+        ],
+        "Other Financing Activities": [
+            "payments for proceeds from hedge financing activities",
+            "payments for repurchase of redeemable noncontrolling interest",
+            "payments of debt extinguishment costs",
+            "payments of debt issuance costs",
+            "proceeds from payments for other financing activities"
+        ],
+        "Proceeds from Debt": [
+            "proceeds from debt net of issuance costs",
+            "proceeds from issuance of debt",
+            "proceeds from issuance of first mortgage bond",
+            "proceeds from issuance of senior long term debt",
+            "proceeds from long term lines of credit",
+            "proceeds from long term lines of credit and issuance of commercial paper",
+            "proceeds from long term revolving credit facility and issuance of commercial paper",
+            "proceeds from notes payable"
+        ],
+        "Proceeds from Stock Issuance": [
+            "proceeds from at market stock purchase program",
+            "proceeds from dividend reinvestment and stock purchase plan net",
+            "proceeds from issuance of common stock",
+            "proceeds from issuance of preferred stock and preference stock",
+            "proceeds from the at the market stock purchase program"
+        ],
+        "Repayment of Debt": [
+            "repayments of debt",
+            "repayments of first mortgage bond",
+            "repayments of lines of credit",
+            "repayments of long term lines of credit",
+            "repayments of long term lines of credit and commercial paper",
+            "repayments of long term revolving credit facility and commercial paper",
+            "repayments of notes payable",
+            "repayments of secured debt",
+            "repayments of unsecured debt"
+        ],
+        "Stock Repurchases": [
+            "payments for repurchase of preferred stock and preference stock",
+            "payments for repurchase of redeemable preferred stock units"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "cash acquired from merger",
+            "other payments to acquire businesses",
+            "payments for deposits on real estate acquisitions",
+            "payments to acquire and develop real estate",
+            "payments to acquire businesses net of cash acquired",
+            "payments to acquire commercial real estate",
+            "payments to acquire interest in subsidiaries and affiliates"
+        ],
+        "Capital Expenditures": [
+            "payments for capital improvements",
+            "payments to acquire intangible assets"
+        ],
+        "Net Cash from Investing Activities": [
+            "net cash provided by used in investing activities"
+        ],
+        "Other Investing Activities": [
+            "collection of notes receivable by crest",
+            "collection of notes receivable by r e i t taxable subsidiary",
+            "equity method investment dividends or distributions",
+            "net cash received on divestiture",
+            "payments for proceeds from loans receivable",
+            "payments to acquire loans receivable",
+            "payments to acquire mortgage notes receivable",
+            "proceeds from collection of notes receivable",
+            "proceeds from deposits on real estate sales",
+            "proceeds from equity method investment dividends or distributions return of capital",
+            "proceeds from insurance settlement investing activities",
+            "proceeds from sale of equity method investments",
+            "proceeds from sale of other real estate",
+            "proceeds from sale of property held for sale",
+            "proceeds from sale of real estate",
+            "proceeds from sale of real estate heldforinvestment",
+            "real estate acquired for resale"
+        ],
+        "Purchases of Investments": [
+            "payments to acquire short term investments"
+        ],
+        "Sales and Maturities of Investments": []
+    },
+    "Net Change in Cash": [
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "increase decrease in accounts payable and accrued liabilities",
+            "increase decrease in accounts receivable and other operating assets",
+            "increase decrease in restricted cash"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income taxes and tax credits"
+        ],
+        "Depreciation and Amortization": [
+            "amortization of debt discount premium",
+            "amortization of financing costs",
+            "depreciation depletion and amortization"
+        ],
+        "Interest Paid": [],
+        "Net Cash from Operating Activities": [
+            "cash provided by used in operating activities discontinued operations",
+            "net cash provided by used in operating activities"
+        ],
+        "Net Income": [
+            "net income loss"
+        ],
+        "Other Non-Cash Items": [
+            "adjustments noncash items to reconcile net income loss to cash provided by used in operating activities",
+            "foreign currency transaction gain loss unrealized",
+            "gain loss on foreign currency and derivative",
+            "gain loss on foreign currency and derivative net",
+            "gain loss on sale of excess land",
+            "gain loss on sale of properties",
+            "gain on sale of properties continuing operations",
+            "gains losses on extinguishment of debt",
+            "impairment of real estate",
+            "income loss from equity method investments",
+            "other noncash income",
+            "other noncash income expense",
+            "other noncash interest income expense operating",
+            "unrealized gain loss on derivatives"
+        ],
+        "Stock-Based Compensation": [
+            "share based compensation"
+        ]
+    },
+    "__unmapped__": [
+        "continuing operations",
+        "discontinued operations",
+        "income from discontinued operations real estate acquired for resale by crest",
+        "income loss from discontinued operations net of tax attributable to reporting entity",
+        "net cash provided by used in discontinued operations",
+        "profit loss",
+        "real estate held for investment"
+    ]
+}

@@ -1,0 +1,87 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [
+        "comprehensive income net of tax"
+    ],
+    "Dividends Declared": [
+        "dividends"
+    ],
+    "Dividends Paid": [
+        "dividends common stock cash"
+    ],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "net income loss",
+        "profit loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [],
+        "Foreign Currency Translation": [
+            "other comprehensive income foreign currency transaction and translation adjustment net of tax period increase decrease",
+            "other comprehensive income loss foreign currency transaction and translation adjustment net of tax"
+        ],
+        "Other OCI": [
+            "other comprehensive income finalization of pension and non pension postretirement plan valuation net of tax",
+            "other comprehensive income loss pension and other postretirement benefit plans adjustment net of tax"
+        ],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax",
+            "other comprehensive income loss netof tax excludes redeemable interests share"
+        ],
+        "Unrealized Gains/Losses on Securities": []
+    },
+    "Other Equity Adjustments": [
+        "adjustmentsto accumulated other comprehensive income loss decreasefrom purchaseof noncontrolling interest",
+        "adjustmentsto additional paidin capital decreasefrom purchaseof noncontrolling interests",
+        "stockholders equity note spinoff transaction",
+        "stockholders equity other"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [
+            "stock issued during period shares stock options exercised",
+            "stock issued during period value stock options exercised"
+        ],
+        "Other Stock Issuance": [],
+        "Stock-Based Compensation": [
+            "adjustments to additional paid in capital sharebased compensation requisite service period recognition value",
+            "stock issued during period shares share based compensation",
+            "stock issued during period value share based compensation"
+        ],
+        "Total Stock Issuance Value": []
+    },
+    "Stock Repurchases": [
+        "stock repurchased and retired during period value",
+        "treasury stock shares acquired",
+        "treasury stock shares retired",
+        "treasury stock value acquired cost method"
+    ],
+    "Tax Effects from Stock Compensation": [
+        "employee service share based compensation tax benefit from compensation expense"
+    ],
+    "__unmapped__": [
+        "common stock dividends per share declared",
+        "comprehensive income net of tax attributable to noncontrolling interest",
+        "dividends common stock cashand decreasefrom distributionsto noncontrolling interest holders",
+        "minority interest decrease from distributions to noncontrolling interest holders",
+        "minority interest decrease from redemptions",
+        "net income loss attributable to noncontrolling interest",
+        "net income loss including portion attributable to nonredeemable noncontrolling interest",
+        "net income loss including portion attributableto noncontrolling interest excludes redeemable interests share",
+        "other comprehensive income loss netof tax including portion attributableto non controlling interest excludes redeemable interests share",
+        "return on redeemable preferred securities and noncontrolling interests and other"
+    ]
+}

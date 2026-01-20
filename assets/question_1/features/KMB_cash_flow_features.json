@@ -1,0 +1,100 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [
+        "effect of exchange rate on cash and cash equivalents",
+        "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents"
+    ],
+    "Financing Activities": {
+        "Dividends Paid": [
+            "payments of dividends",
+            "payments of dividends common stock",
+            "payments of dividends minority interest"
+        ],
+        "Net Cash from Financing Activities": [
+            "net cash provided by used in financing activities"
+        ],
+        "Other Financing Activities": [
+            "cash paid on redeemable preferred securities of subsidiary",
+            "cash transferred at spinoff",
+            "payments to minority shareholders",
+            "proceeds from payments to minority shareholders"
+        ],
+        "Proceeds from Debt": [
+            "proceeds from issuance of long term debt",
+            "proceeds from repayments of short term debt",
+            "proceeds from repayments of short term debt maturing in three months or less"
+        ],
+        "Proceeds from Stock Issuance": [
+            "proceeds from stock options exercised"
+        ],
+        "Repayment of Debt": [
+            "repayments of long term debt",
+            "repayments of mandatory redeemable capital securities"
+        ],
+        "Stock Repurchases": [
+            "payments for repurchase of common stock"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "payments to acquire businesses net of cash acquired"
+        ],
+        "Capital Expenditures": [
+            "payments to acquire productive assets"
+        ],
+        "Net Cash from Investing Activities": [
+            "net cash provided by used in investing activities"
+        ],
+        "Other Investing Activities": [
+            "proceeds from collection of notes receivable",
+            "proceeds from sale of productive assets",
+            "proceeds from sale of property plant and equipment"
+        ],
+        "Purchases of Investments": [
+            "investments in time deposits",
+            "payments to acquire available for sale securities"
+        ],
+        "Sales and Maturities of Investments": [
+            "maturities of time deposits",
+            "proceeds from sale maturity and collections of investments"
+        ]
+    },
+    "Net Change in Cash": [
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "increase decrease in operating capital"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income tax expense benefit"
+        ],
+        "Depreciation and Amortization": [
+            "depreciation depletion and amortization"
+        ],
+        "Interest Paid": [],
+        "Net Cash from Operating Activities": [
+            "net cash provided by used in operating activities"
+        ],
+        "Net Income": [
+            "profit loss"
+        ],
+        "Other Non-Cash Items": [
+            "asset impairment charges",
+            "business combination step acquisition equity interest in acquiree remeasurement gain",
+            "chargefor venezuelan balance sheet remeasurement",
+            "chargefor venezuelan balance sheet remeasurementand deconsolidation",
+            "deconsolidation gain or loss amount",
+            "gain loss on disposition of assets1",
+            "income loss from equity method investments net of dividends or distributions",
+            "other operating activities cash flow statement",
+            "pension and other postretirement benefit expense"
+        ],
+        "Stock-Based Compensation": [
+            "allocated share based compensation expense",
+            "share based compensation"
+        ]
+    },
+    "__unmapped__": []
+}

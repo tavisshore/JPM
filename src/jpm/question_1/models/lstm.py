@@ -1707,13 +1707,12 @@ class LSTMForecaster:
 
 
 if __name__ == "__main__":
-    from jpm.config.question_1 import Config, DataConfig, LSTMConfig
-    from jpm.question_1.models.balance_sheet import BalanceSheet
-    from jpm.question_1.models.income_statement import IncomeStatement
-    from src.jpm.question_1.misc import set_seed, train_args
+    from jpm.config.question_1 import Config, DataConfig, LSTMConfig, StatementsDataset
+    from jpm.question_1.models import BalanceSheet, IncomeStatement
+    from src.jpm.question_1.misc import get_args, set_seed
 
     set_seed(42)
-    args = train_args()
+    args = get_args()
 
     data_cfg = DataConfig.from_args(args)
     lstm_cfg = LSTMConfig.from_args(args)
@@ -1721,8 +1720,9 @@ if __name__ == "__main__":
     config = Config(data=data_cfg, lstm=lstm_cfg)
 
     data = EdgarData(config=config)
+    dataset = StatementsDataset(config=config, data=data)
 
-    model = LSTMForecaster(config=config, data=data)
+    model = LSTMForecaster(config=config, data=data, dataset=dataset)
     model.fit()
 
     model.evaluate(stage="train")
@@ -1731,9 +1731,13 @@ if __name__ == "__main__":
     model.view_results(stage="val")
 
     # Pass outputs to BS Model
-    bs = BalanceSheet(config=config, results=validation_results)
+    bs = BalanceSheet(
+        config=config, data=data, dataset=dataset, results=validation_results
+    )
     bs.check_identity()
 
     # Income Statement to predict Net Income (Loss)
-    i_s = IncomeStatement(config=config, results=validation_results)
+    i_s = IncomeStatement(
+        config=config, data=data, dataset=dataset, results=validation_results
+    )
     i_s.view()

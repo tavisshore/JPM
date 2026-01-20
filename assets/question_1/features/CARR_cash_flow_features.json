@@ -1,0 +1,102 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [
+        "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents including disposal group and discontinued operations"
+    ],
+    "Financing Activities": {
+        "Dividends Paid": [
+            "payments of dividends common stock",
+            "payments of dividends minority interest"
+        ],
+        "Net Cash from Financing Activities": [
+            "cash provided by used in financing activities discontinued operations",
+            "net cash provided by used in financing activities continuing operations"
+        ],
+        "Other Financing Activities": [
+            "net transfers to parent",
+            "payment to former shareholders",
+            "pension contributions",
+            "proceeds from payments for other financing activities"
+        ],
+        "Proceeds from Debt": [
+            "proceeds from issuance of long term debt",
+            "proceeds from repayments of short term debt"
+        ],
+        "Proceeds from Stock Issuance": [],
+        "Repayment of Debt": [
+            "repayments of long term debt"
+        ],
+        "Stock Repurchases": [
+            "payments for repurchase of common stock"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "payments to acquire businesses net of cash acquired"
+        ],
+        "Capital Expenditures": [
+            "payments to acquire productive assets"
+        ],
+        "Net Cash from Investing Activities": [
+            "cash provided by used in investing activities discontinued operations",
+            "net cash provided by used in investing activities continuing operations"
+        ],
+        "Other Investing Activities": [
+            "cash divested from deconsolidation",
+            "equity method investment dividends or distributions",
+            "payments for proceeds from derivative instrument investing activities",
+            "payments for proceeds from other investing activities",
+            "proceeds from derivative instrument investing activities",
+            "proceeds from divestiture of businesses",
+            "proceeds from sale of equity method investments"
+        ],
+        "Purchases of Investments": [],
+        "Sales and Maturities of Investments": []
+    },
+    "Net Change in Cash": [
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect",
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect continuing operations",
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect disposal group including discontinued operations"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "increase decrease in accounts payable and accrued liabilities",
+            "increase decrease in contract with customer asset",
+            "increase decrease in contract with customer liability",
+            "increase decrease in inventories",
+            "increase decrease in other operating assets",
+            "increase decrease in receivables"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income tax expense benefit"
+        ],
+        "Depreciation and Amortization": [
+            "depreciation amortization and accretion net"
+        ],
+        "Interest Paid": [],
+        "Net Cash from Operating Activities": [
+            "cash provided by used in operating activities discontinued operations",
+            "net cash provided by used in operating activities continuing operations"
+        ],
+        "Net Income": [
+            "income loss from continuing operations including portion attributable to noncontrolling interest",
+            "income loss from discontinued operations net of tax",
+            "profit loss"
+        ],
+        "Other Non-Cash Items": [
+            "equity method investment other than temporary impairment",
+            "equity method investment realized gain loss on disposal",
+            "gains losses on extinguishment of debt",
+            "income loss from equity method investments",
+            "other noncash income expense"
+        ],
+        "Stock-Based Compensation": [
+            "share based compensation",
+            "share based payment arrangement noncash expense continuing operations"
+        ]
+    },
+    "__unmapped__": [
+        "proceeds from divestiture of businesses and interests in affiliates"
+    ]
+}
