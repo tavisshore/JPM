@@ -1,25 +1,31 @@
+# import os
 import os
+import re
 from pathlib import Path
+from urllib.parse import quote, unquote
 
 import edgar
 import numpy as np
 import pandas as pd
-import tensorflow as tf
+import requests
 from edgar import Company
 from edgar.xbrl import XBRLS
-from sklearn.preprocessing import StandardScaler
 
 from jpm.question_1.config import Config
+from jpm.question_1.data.credit import calculate_credit_ratios
 from jpm.question_1.data.utils import (
-    bs_identity,
-    build_windows,
-    get_bs_structure,
-    get_cf_structure,
-    get_is_structure,
-    get_leaf_values,
-    get_targets,
-    xbrl_to_snake,
+    add_derived_columns,
+    bs_identity_checker,
+    drop_constants,
+    drop_non_numeric_columns,
+    remap_financial_dataframe,
+    remove_duplicate_columns,
+    standardise_rating,
+    ticker_to_name,
+    xbrl_to_raw,
+    ytd_to_quarterly,
 )
+from jpm.question_1.data.vis import pretty_print_full_mapping
 
 # SEC requires user identification via email
 email = os.getenv("EDGAR_EMAIL")
@@ -30,72 +36,221 @@ if not email:
     )
 
 edgar.set_identity(email)
+pd.set_option("future.no_silent_downcasting", True)
 
-format_limit = {
-    "AAPL": "2018-12",
+pd.set_option("display.max_rows", None)
+pd.set_option("display.max_columns", None)
+pd.set_option("display.width", None)
+pd.set_option("display.max_colwidth", None)
+
+MONTH_ABBR = {
+    1: "JAN",
+    2: "FEB",
+    3: "MAR",
+    4: "APR",
+    5: "MAY",
+    6: "JUN",
+    7: "JUL",
+    8: "AUG",
+    9: "SEP",
+    10: "OCT",
+    11: "NOV",
+    12: "DEC",
 }
 
 
-class EdgarDataLoader:
-    """Load, scale, and window Edgar filings into train/val datasets."""
+class RatingsHistoryDownloader:
+    """Download and process credit ratings data from ratingshistory.info.
+
+    This class provides functionality to download Moody's Corporate Financial ratings
+    data and process it into quarterly ratings suitable for joining with financial
+    statement data.
+
+    Attributes
+    ----------
+    BASE_URL : str
+        Base URL for the ratings history website
+    API_URL : str
+        API endpoint URL for downloading ratings data
+    config : Config
+        Configuration object containing data paths and settings
+    session : requests.Session
+        HTTP session for making requests
+    """
+
+    BASE_URL = "https://ratingshistory.info"
+    API_URL = f"{BASE_URL}/api/public"
+
+    def __init__(self, config: Config) -> None:
+        """Initialize the RatingsHistoryDownloader.
+
+        Parameters
+        ----------
+        config : Config
+            Configuration object containing data paths and settings
+        """
+        self.config = config
+        self.session = requests.Session()
+
+    def _fetch_available_files(self) -> list[str]:
+        """Scrape the homepage to get list of available CSV files."""
+        resp = self.session.get(self.BASE_URL, timeout=30)
+        resp.raise_for_status()
+        # Extract CSV filenames from href attributes
+        pattern = r'href="[^"]*api/public/([^"]+\.csv)"'
+        matches = re.findall(pattern, resp.text)
+        # URL decode the filenames
+        return [unquote(m) for m in matches]
+
+    def _find_latest_moodys_financial(self, files: list[str]) -> str | None:
+        """Find the most recent Moody's Financial CSV (sorted by date prefix)."""
+        moodys_financial = [
+            f for f in files if "Moody's Investors Service Corporate" in f
+        ]
+        if not moodys_financial:
+            return None
+        # Files are named with YYYYMMDD prefix, so lexicographic sort works
+        return sorted(moodys_financial, reverse=True)[0]
+
+    def download_moodys_financial(self, llm_client, ticker=None) -> pd.DataFrame | None:
+        """Download the latest Moody's Financial ratings CSV.
+        1. Download latest csv from https://ratingshistory.info/
+        2. For each record, add the company's corresponding ticker
+        3. Make the df a quarter update of companies rating
+        """
+        files = self._fetch_available_files()
+        filename = self._find_latest_moodys_financial(files)
+
+        raw_data = Path(self.config.data.cache_dir) / filename
+
+        # Downloads the latest moodys corporate data
+        if not raw_data.exists():
+            url = f"{self.API_URL}/{quote(filename)}"
+            resp = self.session.get(url, timeout=30, stream=True)
+            resp.raise_for_status()
+            total_size = int(resp.headers.get("content-length", 0))
+            with open(raw_data, "wb") as f:
+                if total_size > 0:
+                    from tqdm import tqdm
+
+                    with tqdm(
+                        total=total_size,
+                        unit="B",
+                        unit_scale=True,
+                        desc=f"Downloading {filename}",
+                    ) as pbar:
+                        for chunk in resp.iter_content(chunk_size=8192):
+                            f.write(chunk)
+                            pbar.update(len(chunk))
+                else:
+                    for chunk in resp.iter_content(chunk_size=8192):
+                        f.write(chunk)
+
+        # Processes moodys data for the particular ticker - returning quarterly ratings
+        ratings_df = pd.read_csv(raw_data, dtype=str)
+        ratings_df = ratings_df[
+            ["obligor_name", "rating", "rating_type", "rating_action_date"]
+        ]
+        EXCLUDE_RATINGS = {"WR", "NR", "NP", "P-1", "P-2", "P-3"}
+        df_clean = ratings_df[~ratings_df["rating"].isin(EXCLUDE_RATINGS)].copy()
+        df_clean["rating_action_date"] = pd.to_datetime(df_clean["rating_action_date"])
+        df_clean = df_clean.dropna(subset=["rating"])
+
+        name_variations = ticker_to_name(ticker, llm_client)
+        df_clean = df_clean[df_clean["obligor_name"].isin(name_variations)]
+        df_clean["rating"] = df_clean["rating"].apply(standardise_rating)
+        # Try organisational ratings, otherwise fallback to instrument
+        df_ratings = df_clean[df_clean["rating_type"] == "Organization"]
+        if df_ratings.empty:
+            df_ratings = df_clean[df_clean["rating_type"] == "Instrument"]
+        df_clean = df_ratings.drop(columns=["rating_type"])
+
+        # Now convert into quarterly ratings to join with FS data
+        results = []
+        df_clean = df_clean.sort_values("rating_action_date").reset_index(drop=True)
+        for i in range(len(df_clean)):
+            start_date = df_clean.loc[i, "rating_action_date"]
+            rating = df_clean.loc[i, "rating"]
+
+            # End date is either next rating change or today
+            if i < len(df_clean) - 1:
+                end_date = df_clean.loc[i + 1, "rating_action_date"]
+            else:
+                end_date = pd.Timestamp.now()
+
+            quarters = pd.date_range(start=start_date, end=end_date, freq="QE")
+            for quarter in quarters:
+                results.append(
+                    {
+                        "rating": rating,
+                        "quarter": quarter,
+                    }
+                )
+
+        df = pd.DataFrame(results)
+
+        if "quarter" not in df.columns or df.empty:
+            return None
+
+        df["quarter"] = pd.to_datetime(df["quarter"]).dt.to_period("Q")
+        df = df[["rating", "quarter"]]
+        df = df.set_index("quarter")
+
+        df.index = pd.PeriodIndex(df.index, freq="Q")
+        return df
+
+
+class EdgarData:
+    """Load and process Edgar filings from SEC or cache."""
 
     def __init__(
-        self,
-        config: Config,
+        self, config: Config, overwrite: bool = False, verbose: bool = True
     ) -> None:
+        """Initialize EdgarData with configuration and load/fetch data.
+
+        Sets up cache paths, initializes LLM client, and loads financial data
+        either from cache or by fetching from SEC EDGAR database.
+
+        Parameters
+        ----------
+        config : Config
+            Configuration object containing data paths, ticker, and settings
+        overwrite : bool, optional
+            If True, fetch fresh data even if cache exists, by default False
+        verbose : bool, optional
+            If True, print detailed processing information, by default True
+        """
         self.config = config
+        self.overwrite = overwrite
+        self.verbose = verbose
         self.cache_statement = Path(
-            f"{self.config.data.cache_dir}/{self.config.data.ticker}.parquet"
+            f"{self.config.data.cache_dir}/statements/{self.config.data.ticker}.parquet"
+        )
+        self.ratings_data_path = Path(
+            f"{self.config.data.cache_dir}/ratings/{self.config.data.ticker}_ratings.parquet"
         )
         self.cache_statement.parent.mkdir(parents=True, exist_ok=True)
-        self.bs_structure = get_bs_structure(ticker=self.config.data.ticker)
-        # Prefer cached parquet to avoid repeated SEC fetches
-        self.create_dataset()
+        self.ratings_data_path.parent.mkdir(parents=True, exist_ok=True)
 
-    def create_dataset(self) -> None:
+        # Lazy import to avoid circular dependency
+        from jpm.question_1.clients.llm_client import LLMClient
+
+        self.llm_client = LLMClient()
+        self._load_data()
+
+    def _load_data(self) -> None:
+        """Load data from cache or fetch from SEC"""
         self._validate_target_type()
-        self.bs_keys = get_leaf_values(get_bs_structure(ticker=self.config.data.ticker))
-
         self.data = self._load_or_fetch_data()
-        self._validate_data()
-
-        self._set_feature_index()
-        tar = get_targets(
-            mode=self.config.data.target_type, ticker=self.config.data.ticker
-        )
-        self._prepare_targets(tar)
-
-        X_scaled, scaler = self._scale_features()
-        self._set_scaler_stats(scaler)
-
-        self.map_features()
-        X_train, y_train, X_test, y_test = build_windows(
-            X=X_scaled,
-            lookback=self.config.data.lookback,
-            horizon=self.config.data.horizon,
-            tgt_indices=self.tgt_indices,
-            withhold=self.config.data.withhold_periods,
-        )
-
-        X_train, X_test = self._apply_seasonal_weight(X_train, X_test)
-
-        self.num_features = X_train.shape[-1]  # Input dim
-        self.num_targets = len(self.tgt_indices)  # Output dim
-        # Minimal tf.data pipeline with shuffle/prefetch to smooth training
-        self.train_dataset = (
-            tf.data.Dataset.from_tensor_slices(
-                (X_train.astype("float64"), y_train.astype("float64"))
-            )
-            .shuffle(len(X_train))
-            .batch(self.config.data.batch_size)
-            .prefetch(tf.data.AUTOTUNE)
-        )
-
-        self.val_dataset = tf.data.Dataset.from_tensor_slices((X_test, y_test)).batch(
-            self.config.data.batch_size
-        )
 
     def _validate_target_type(self) -> None:
+        """Validate that the target_type configuration parameter is supported.
+
+        Raises
+        ------
+        ValueError
+            If target_type is not one of 'full', 'bs', or 'net_income'
+        """
         if self.config.data.target_type not in {"full", "bs", "net_income"}:
             raise ValueError(
                 f"Unsupported target_type '{self.config.data.target_type}'. "
@@ -103,136 +258,105 @@ class EdgarDataLoader:
             )
 
     def _load_or_fetch_data(self) -> pd.DataFrame:
-        if self.cache_statement.exists():
+        """Load financial data from cache or fetch fresh data from SEC.
+
+        Attempts to load cached financial statements if available and overwrite
+        is False. Otherwise, fetches fresh data from SEC EDGAR, processes it,
+        and caches the results. Also retrieves and processes credit ratings.
+
+        Returns
+        -------
+        pd.DataFrame
+            Combined financial statement data indexed by quarter
+
+        Raises
+        ------
+        RuntimeError
+            If cached data exists but cannot be loaded
+        ValueError
+            If no data is available after filtering
+        """
+        if self.cache_statement.exists() and not self.overwrite:
             try:
-                return pd.read_parquet(self.cache_statement)
+                self.data = pd.read_parquet(self.cache_statement)
             except (OSError, ValueError) as exc:
                 raise RuntimeError(
                     f"Failed to load cached statement at {self.cache_statement}"
                 ) from exc
-        self.company = Company(self.config.data.ticker)
-        self.create_statements()
+        else:
+            self.company = Company(self.config.data.ticker)
+            self.fy_end_month = int(self.company.fiscal_year_end[:2])
+            self.fy_start_month = self.fy_end_month + 1
+            if self.fy_start_month > 12:
+                self.fy_start_month = 1
+
+            self.create_statements()
+
+        # Get credit ratings, calculate ratios -> separate attr and csv
+        self.get_ratings()
+
+        if len(self.data) == 0:
+            raise ValueError(
+                f"No data available for {self.config.data.ticker}. "
+                "The data may have been filtered out entirely."
+            )
+
         return self.data
 
-    def _validate_data(self) -> None:
-        if self.data.empty:
-            raise ValueError("Loaded financial data is empty; cannot build dataset")
+    def _get_timestamp_index(self) -> pd.DatetimeIndex:
+        """Return a datetime index aligned to the original data index order."""
+        if isinstance(self.data.index, pd.PeriodIndex):
+            return self.data.index.to_timestamp()
+        return pd.DatetimeIndex(self.data.index)
 
-        non_numeric_cols = [
-            col
-            for col, dtype in self.data.dtypes.items()
-            if not np.issubdtype(dtype, np.number)
-        ]
-        if non_numeric_cols:
-            raise TypeError(
-                f"All features must be numeric before scaling; "
-                f"found non-numeric columns: {non_numeric_cols}"
-            )
-        bs_identity(self.data, ticker=self.config.data.ticker)
+    def get_ratings(self):
+        """Training Data for Credit Rating Prediction."""
+        # if not self.ratings_data_path.exists() or self.overwrite:
+        # Download and process credit ratings
+        downloader = RatingsHistoryDownloader(config=self.config)
+        _ratings_df = downloader.download_moodys_financial(
+            self.llm_client, self.config.data.ticker
+        )  # noqa: F841
 
-    def _set_feature_index(self) -> None:
-        self.feat_to_idx = {n: i for i, n in enumerate(self.data.columns.tolist())}
+        if _ratings_df is None or _ratings_df.empty:
+            print(f"No Moody's ratings found for {self.config.data.ticker}.")
+            self.ratings_data = pd.DataFrame()
+            return
+        # Select only the relevant company's data
+        # Calculate ratios from self.data and add to ratings_df
+        df = add_derived_columns(self.data)
 
-    def _prepare_targets(self, tar: list[str]) -> None:
-        if not tar:
-            raise ValueError("No targets resolved for the provided configuration")
+        df.index = df.index.asfreq("Q-DEC")
+        _ratings_df.index = _ratings_df.index.asfreq("Q-DEC")
 
-        if self.config.data.target_type != "full":
-            self.targets = [t for t in tar if t in self.feat_to_idx]
-            self.tgt_indices = [self.feat_to_idx[t] for t in self.targets]
-        else:
-            self.targets = list(self.data.columns)
-            self.tgt_indices = list(range(len(self.targets)))
+        df_combined = pd.merge(
+            df, _ratings_df, left_index=True, right_index=True, how="inner"
+        )
 
-        if not self.targets:
-            raise ValueError(
-                "Resolved target set is empty; check ticker and target_type settings"
-            )
-
-    def _scale_features(self) -> tuple[np.ndarray, StandardScaler]:
-        scaler = StandardScaler()
-        X_scaled = scaler.fit_transform(self.data.values.astype("float64"))
-        return X_scaled, scaler
-
-    def _set_scaler_stats(self, scaler: StandardScaler) -> None:
-        self.full_mean = np.asarray(scaler.mean_, dtype="float64")
-        self.full_std = np.asarray(scaler.scale_, dtype="float64")
-        self.target_mean = self.full_mean[self.tgt_indices]
-        self.target_std = self.full_std[self.tgt_indices]
-
-    def _apply_seasonal_weight(
-        self, X_train: np.ndarray, X_test: np.ndarray
-    ) -> tuple[np.ndarray, np.ndarray]:
-        seasonal_step = self.config.data.seasonal_lag
-        if self.config.data.seasonal_weight == 1.0 or seasonal_step <= 0:
-            return X_train, X_test
-
-        seasonal_indices = []
-        idx = self.config.data.lookback - seasonal_step
-        while idx >= 0:
-            seasonal_indices.append(idx)
-            idx -= seasonal_step
-
-        if not seasonal_indices:
-            return X_train, X_test
-
-        X_train = X_train.copy()
-        X_test = X_test.copy()
-        X_train[:, seasonal_indices, :] *= self.config.data.seasonal_weight
-        X_test[:, seasonal_indices, :] *= self.config.data.seasonal_weight
-        return X_train, X_test
-
-    def map_features(self) -> None:
-        """
-        With the bs, is, and cf structures known, map feature names to indices
-        For loss, calculations etc.
-        """
-
-        # Map feature names to target indices for fast gathers
-        name_to_target_idx = {name: i for i, name in enumerate(self.targets)}
-
-        self.feature_mappings = {
-            "assets": [
-                name_to_target_idx[n]
-                for group in ("current_assets", "non_current_assets")
-                for n in self.bs_structure["assets"][group]
-                if n in name_to_target_idx
-            ],
-            "liabilities": [
-                name_to_target_idx[n]
-                for group in ("current_liabilities", "non_current_liabilities")
-                for n in self.bs_structure["liabilities"][group]
-                if n in name_to_target_idx
-            ],
-            "equity": [
-                name_to_target_idx[n]
-                for n in self.bs_structure["equity"]
-                if n in name_to_target_idx
-            ],
-            "current_assets": [
-                name_to_target_idx[n]
-                for n in self.bs_structure["assets"]["current_assets"]
-                if n in name_to_target_idx
-            ],
-            "non_current_assets": [
-                name_to_target_idx[n]
-                for n in self.bs_structure["assets"]["non_current_assets"]
-                if n in name_to_target_idx
-            ],
-            "current_liabilities": [
-                name_to_target_idx[n]
-                for n in self.bs_structure["liabilities"]["current_liabilities"]
-                if n in name_to_target_idx
-            ],
-            "non_current_liabilities": [
-                name_to_target_idx[n]
-                for n in self.bs_structure["liabilities"]["non_current_liabilities"]
-                if n in name_to_target_idx
-            ],
-        }
+        self.ratings_data = calculate_credit_ratios(df_combined)
+        self.ratings_data.to_parquet(self.ratings_data_path)
+        # else:
+        # self.ratings_data = pd.read_parquet(self.ratings_data_path)
 
     def create_statements(self) -> None:
-        self.filings = self.company.get_filings(form="10-Q")
+        """Create and process financial statements from SEC EDGAR filings.
+
+        Fetches 10-Q and 10-K filings for the company, extracts XBRL data,
+        processes balance sheet, income statement, cash flow statement, and
+        statement of equity. Removes duplicate columns across statements
+        and combines them into a single DataFrame. Saves the result to cache.
+
+        Notes
+        -----
+        Processing includes:
+        - Converting XBRL data to tidy DataFrames
+        - Mapping columns using LLM-based feature extraction
+        - Dropping constant columns
+        - Validating balance sheet identity
+        - Converting year-to-date values to quarterly values
+        - Removing duplicate columns with priority: BS > IS > CF > E
+        """
+        self.filings = self.company.get_filings(form=["10-Q", "10-K"])
         self.xbrls = XBRLS.from_filings(self.filings)
 
         # Process each statement
@@ -240,43 +364,61 @@ class EdgarDataLoader:
             stmt=self.xbrls.statements.balance_sheet(
                 max_periods=self.config.data.periods
             ),
-            kind="balance sheet",
-            needed_cols=self.bs_keys,
+            kind="balance_sheet",
         )
+        self.bs_df = drop_constants(self.bs_df, verbose=self.verbose)
+
         self.is_df = self._process_statement(
             stmt=self.xbrls.statements.income_statement(
                 max_periods=self.config.data.periods
             ),
-            kind="income statement",
-            needed_cols=get_leaf_values(
-                get_is_structure(ticker=self.config.data.ticker)
-            ),
+            kind="income_statement",
         )
+        self.is_df = drop_constants(self.is_df, verbose=self.verbose)
+
         self.cf_df = self._process_statement(
             stmt=self.xbrls.statements.cashflow_statement(
                 max_periods=self.config.data.periods
             ),
-            kind="cash flow statement",
-            needed_cols=get_leaf_values(
-                get_cf_structure(ticker=self.config.data.ticker)
+            kind="cash_flow",
+        )
+        self.cf_df = drop_constants(self.cf_df, verbose=self.verbose)
+
+        self.eq_df = self._process_statement(
+            stmt=self.xbrls.statements.statement_of_equity(
+                max_periods=self.config.data.periods
             ),
+            kind="equity",
         )
+        self.eq_df = drop_constants(self.eq_df, verbose=self.verbose)
 
-        # Align all statements on common dates (monthly periods)
-        for attr in ("bs_df", "is_df", "cf_df"):
-            df = getattr(self, attr)
-            df.index = df.index.to_period("M")
+        # Remove duplicate columns with priority: BS > IS > CF > E
+        bs_cols = set(self.bs_df.columns)
+        is_cols = set(self.is_df.columns)
+        cf_cols = set(self.cf_df.columns)
+        eq_cols = set(self.eq_df.columns)
 
+        # Remove IS columns that are also in BS
+        self.is_df = self.is_df.drop(columns=is_cols.intersection(bs_cols))
+        # Remove CF columns that are also in BS or IS
+        self.cf_df = self.cf_df.drop(
+            columns=cf_cols.intersection(bs_cols.union(is_cols))
+        )
+        # Remove E columns that are also in BS, IS, or CF
+        self.eq_df = self.eq_df.drop(
+            columns=eq_cols.intersection(bs_cols.union(is_cols).union(cf_cols))
+        )
+        # Combine all statements
         self.data = pd.concat(
-            [self.bs_df, self.is_df, self.cf_df], axis=1, join="inner"
+            [self.bs_df, self.is_df, self.cf_df, self.eq_df], axis=1, join="inner"
         )
+
         self.data.to_parquet(self.cache_statement)
 
     def _process_statement(
         self,
         stmt,
         kind: str,
-        needed_cols: list[str],
     ) -> pd.DataFrame:
         """
         Common XBRL → tidy DataFrame pipeline.
@@ -293,29 +435,82 @@ class EdgarDataLoader:
         # concept x dates -> dates x concept
         wide = df.set_index("concept")[date_cols].T
 
-        # Index normalisation
-        wide.index = pd.to_datetime(wide.index)
-        wide = wide.sort_index()
-        wide.index.name = "period_end"
-
-        # Drop records before format change
-        if self.config.data.ticker in format_limit:
-            wide = wide[wide.index >= format_limit[self.config.data.ticker]]
+        freq = f"Q-{MONTH_ABBR[self.fy_end_month]}"  # 'Q-SEP'
+        wide = wide.sort_index(ascending=True)  # oldest first
+        start_period = pd.to_datetime(wide.index[0]).to_period(freq)
+        wide.index = pd.period_range(start=start_period, periods=len(wide), freq=freq)[
+            ::-1
+        ]
+        wide.index.name = "quarter"
 
         # Normalise column names, collapse duplicates, clean NaNs
-        wide.columns = [xbrl_to_snake(col) for col in wide.columns]
+        wide.columns = [xbrl_to_raw(name) for name in wide.columns]
+
         collapsed = wide.T.groupby(level=0).first().T  # collapse duplicate concepts
         collapsed = collapsed.replace(r"^\s*$", np.nan, regex=True)
+
         collapsed = collapsed.dropna(axis=1, how="all")
         collapsed = collapsed.fillna(0)
+        collapsed = drop_non_numeric_columns(collapsed)
 
-        # Keep only required concepts; missing ones raise for visibility
-        missing_cols = [col for col in needed_cols if col not in collapsed.columns]
-        if missing_cols:
-            raise ValueError(f"{kind.title()} missing required columns: {missing_cols}")
-        return collapsed[needed_cols]
+        cleaned_df = remove_duplicate_columns(collapsed, verbose=self.verbose)
+        input_columns = cleaned_df.columns.tolist()
+
+        # Cache LLM mapping results
+        cache_dir = self.config.data.cache_dir
+        ticker = self.config.data.ticker
+        kind_slug = kind.replace(" ", "_")
+        features_cache_path = Path(
+            f"{cache_dir}/features/{ticker}_{kind_slug}_features.json"
+        )
+        features_cache_path.parent.mkdir(parents=True, exist_ok=True)
+
+        if features_cache_path.exists() and not self.overwrite:
+            organised_features = self.llm_client.load_cached_features(
+                features_cache_path
+            )
+        else:
+            organised_features = self.llm_client.parse_financial_features(
+                features=input_columns,
+                statement_type=kind,
+                cfg=self.config.llm,
+            )
+            self.llm_client.save_features_to_cache(
+                organised_features, features_cache_path
+            )
+
+        if self.verbose:
+            pretty_print_full_mapping(
+                organised_features, show_summary=True, statement_type=kind
+            )
+
+        # Create new DataFrame with organised columns
+        mapped_df = remap_financial_dataframe(cleaned_df, organised_features)
+
+        if kind == "balance_sheet":
+            # Drops columns that violate BS identity
+            mapped_df = bs_identity_checker(df=mapped_df, mappings=organised_features)
+        else:
+            # Subtract values to obtain quarterly only (from cumulative)
+            exclude = []
+            if kind == "equity":
+                exclude = [
+                    "Accumulated Other Comprehensive Income",
+                    "Additional Paid-in Capital",
+                    "Common Stock",
+                    "Retained Earnings",
+                    "Total Equity",
+                    "Treasury Stock",
+                ]
+
+            mapped_df = ytd_to_quarterly(mapped_df, exclude_columns=exclude)
+
+        return mapped_df
 
 
 if __name__ == "__main__":
     config = Config()
-    loader = EdgarDataLoader(config=config)
+    data = EdgarData(config=config, overwrite=False, verbose=True)
+    print(data.data.sample(6).T)
+    print()
+    print(data.ratings_data.sample(6).T)

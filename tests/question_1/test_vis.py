@@ -51,18 +51,38 @@ def test_build_baseline_rows_with_ground_truth_uses_error_column():
 
 @unit
 def test_build_section_rows_respects_structure_and_skips_missing():
-    """build_section_rows should respect structure labels and skip missing stats."""
+    """build_section_rows should respect structure labels and skip missing stats.
+
+    The function iterates over keys in sections dict and looks up each key
+    in feature_stats. If not found, it skips that entry.
+    """
+    # sections is a flat dict where keys are feature names
     sections = {
-        "current_assets": ["cash", "inventory"],
-        "non_current_assets": ["ppe"],
+        "cash": [],
+        "inventory": [],
+        "ppe": [],  # This one will be missing from stats
     }
     stats = {
         "cash": Metric(10, 1),
         "inventory": Metric(20, 2),
+        # "ppe" is missing, so it should be skipped
     }
     rows = vis.build_section_rows(sections, stats)
+    # Only cash and inventory should appear (ppe is missing from stats)
     assert len(rows) == 2
-    assert all("Current" in row[0] for row in rows)
+    # Check that the formatted names are present
+    row_names = [row[0] for row in rows]
+    assert "Cash" in row_names
+    assert "Inventory" in row_names
+
+
+@unit
+def test_build_section_rows_empty_stats():
+    """build_section_rows should return empty list when no stats match."""
+    sections = {"cash": [], "inventory": []}
+    stats = {}
+    rows = vis.build_section_rows(sections, stats)
+    assert len(rows) == 0
 
 
 @unit

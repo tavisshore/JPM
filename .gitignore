@@ -64,12 +64,13 @@ Thumbs.db
 # -------------------------
 *.bak
 *.swp
+*.json
 
 # -------------------------
 # Cache and Data
 # -------------------------
 cache/
-
+temp/
 temp.*
 *.xlsx
 ckpts/*

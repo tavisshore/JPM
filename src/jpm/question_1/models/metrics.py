@@ -11,7 +11,7 @@ class Metric:
     """Container for a single metric value, ground truth, and absolute error."""
 
     value: float
-    mae: float
+    mae: float = 0.0
     gt: float = 0.0
     std: float = 0.0
 

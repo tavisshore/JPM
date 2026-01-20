@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import tensorflow as tf
 
-from jpm.question_1.config import LossConfig
+from jpm.question_1.config import LSTMConfig
 from jpm.question_1.models.losses import EnforceBalance, bs_loss
 
 unit = pytest.mark.unit
@@ -19,7 +19,7 @@ def test_bs_loss_returns_mse_when_regularizers_disabled():
         "liabilities": [2],
         "equity": [3],
     }
-    config = LossConfig(
+    config = LSTMConfig(
         learn_identity=False,
         learn_subtotals=False,
     )
@@ -49,7 +49,7 @@ def test_bs_loss_includes_identity_penalty_when_enabled():
         "liabilities": [2],
         "equity": [3],
     }
-    config = LossConfig(
+    config = LSTMConfig(
         learn_identity=True,
         identity_weight=2.0,
         learn_subtotals=False,
@@ -98,7 +98,7 @@ def test_bs_loss_includes_subtotal_penalties_when_enabled():
         "current_liabilities": [3],
         "non_current_liabilities": [],  # omit index 4 to induce violation
     }
-    config = LossConfig(
+    config = LSTMConfig(
         learn_identity=False,
         learn_subtotals=True,
         subcategory_weight=3.5,
@@ -169,7 +169,7 @@ def test_bs_loss_combines_identity_and_subtotals_with_scaling():
         "current_liabilities": [2],
         "non_current_liabilities": [3],
     }
-    config = LossConfig(
+    config = LSTMConfig(
         learn_identity=True,
         identity_weight=0.75,
         learn_subtotals=True,
@@ -247,8 +247,13 @@ def test_enforce_balance_requires_feature_names():
 
 
 @unit
-def test_enforce_balance_raises_if_slack_missing_from_names():
+def test_enforce_balance_raises_if_slack_missing_from_names(monkeypatch):
     """Slack variable must exist in the supplied feature_names."""
+    from jpm.question_1.models import losses
+
+    # Mock get_slack_name to return a name not in feature_names
+    monkeypatch.setattr(losses, "get_slack_name", lambda: "slack_equity")
+
     feature_mappings = {"assets": [0], "liabilities": [1], "equity": [2]}
 
     with pytest.raises(ValueError, match="Slack variable"):
@@ -256,41 +261,48 @@ def test_enforce_balance_raises_if_slack_missing_from_names():
             feature_mappings=feature_mappings,
             feature_means=[0.0, 0.0, 0.0],
             feature_stds=[1.0, 1.0, 1.0],
-            slack_name="slack_equity",
-            feature_names=["asset", "liability", "equity"],
+            feature_names={"asset": 0, "liability": 1, "equity": 2},
         )
 
 
 @unit
-def test_enforce_balance_raises_if_slack_not_in_equity_mapping():
-    """Slack feature must also be included in the equity mapping."""
-    feature_names = ["asset", "liability", "slack_equity"]
+def test_enforce_balance_raises_if_slack_not_in_feature_names(monkeypatch):
+    """Slack variable must exist in feature_names dict."""
+    from jpm.question_1.models import losses
+
+    # Mock get_slack_name to return a specific name
+    monkeypatch.setattr(losses, "get_slack_name", lambda: "missing_slack")
+
     feature_mappings = {
         "assets": [0],
         "liabilities": [1],
-        "equity": [1],  # slack index 2 missing here
+        "equity": [2],
     }
 
-    with pytest.raises(ValueError, match="Include the slack feature"):
+    with pytest.raises(ValueError, match="Slack variable"):
         EnforceBalance(
             feature_mappings=feature_mappings,
             feature_means=[0.0, 0.0, 0.0],
             feature_stds=[1.0, 1.0, 1.0],
-            slack_name="slack_equity",
-            feature_names=feature_names,
+            feature_names={"asset": 0, "liability": 1, "equity": 2},
         )
 
 
 @integration
-def test_enforce_balance_adjusts_only_slack_to_restore_identity():
+def test_enforce_balance_adjusts_only_slack_to_restore_identity(monkeypatch):
     """The layer should adjust the slack equity feature so that A = L + E holds."""
-    feature_names = [
-        "asset_current",
-        "asset_noncurrent",
-        "liability_current",
-        "liability_noncurrent",
-        "slack_equity",
-    ]
+    from jpm.question_1.models import losses
+
+    # Mock get_slack_name where it's used (in losses module)
+    monkeypatch.setattr(losses, "get_slack_name", lambda: "slack_equity")
+
+    feature_names = {
+        "asset_current": 0,
+        "asset_noncurrent": 1,
+        "liability_current": 2,
+        "liability_noncurrent": 3,
+        "slack_equity": 4,
+    }
     feature_mappings = {
         "assets": [0, 1],
         "liabilities": [2, 3],
@@ -301,7 +313,6 @@ def test_enforce_balance_adjusts_only_slack_to_restore_identity():
         feature_mappings=feature_mappings,
         feature_means=[0.0] * 5,
         feature_stds=[1.0] * 5,
-        slack_name="slack_equity",
         feature_names=feature_names,
     )
 
@@ -330,9 +341,14 @@ def test_enforce_balance_adjusts_only_slack_to_restore_identity():
 
 
 @integration
-def test_enforce_balance_handles_non_unit_means_and_stds():
+def test_enforce_balance_handles_non_unit_means_and_stds(monkeypatch):
     """Slack correction should happen in unscaled space and respect arbitrary stats."""
-    feature_names = ["asset_a", "asset_b", "liability", "slack_equity"]
+    from jpm.question_1.models import losses
+
+    # Mock get_slack_name where it's used (in losses module)
+    monkeypatch.setattr(losses, "get_slack_name", lambda: "slack_equity")
+
+    feature_names = {"asset_a": 0, "asset_b": 1, "liability": 2, "slack_equity": 3}
     feature_mappings = {
         "assets": [0, 1],
         "liabilities": [2],
@@ -345,7 +361,6 @@ def test_enforce_balance_handles_non_unit_means_and_stds():
         feature_mappings=feature_mappings,
         feature_means=feature_means,
         feature_stds=feature_stds,
-        slack_name="slack_equity",
         feature_names=feature_names,
     )
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import math
+import os
 import random
 from pathlib import Path
 from typing import Any, Dict, List
@@ -11,6 +12,32 @@ import pandas as pd
 import tensorflow as tf
 
 Nested = Dict[str, Any] | List[str]
+
+# Encode ratings
+RATINGS_MAPPINGS = {
+    "AAA": 1,
+    "AA+": 2,
+    "AA": 3,
+    "AA-": 4,
+    "A+": 5,
+    "A": 6,
+    "A-": 7,
+    "BBB+": 8,
+    "BBB": 9,
+    "BBB-": 10,
+    "BB+": 11,
+    "BB": 12,
+    "BB-": 13,
+    "B+": 14,
+    "B": 15,
+    "B-": 16,
+    "CCC+": 17,
+    "CCC": 18,
+    "CCC-": 19,
+    "CC": 20,
+    "C": 21,
+    "D": 22,
+}
 
 
 def find_subtree(d: Nested, target: str) -> Nested | None:
@@ -52,6 +79,35 @@ def get_leaf_values(d, sub_key: str | None = None) -> List[str]:
 
     # Default: collect every terminal value in the nested structure
     return collect_leaves(d)
+
+
+def get_leaf_keys(d: Nested) -> List[str]:
+    """Return all leaf keys under a nested dict."""
+    if isinstance(d, list):
+        return []
+
+    out = []
+    for k, v in d.items():
+        if isinstance(v, dict):
+            out.extend(get_leaf_keys(v))
+        elif isinstance(v, list):
+            out.append(k)
+    return out
+
+
+def get_leaf_paths(d: Nested, prefix: tuple = ()) -> List[tuple]:
+    """Return all paths from root to leaf values as tuples of keys."""
+    if isinstance(d, list):
+        return []
+
+    out = []
+    for k, v in d.items():
+        current_path = prefix + (k,)
+        if isinstance(v, dict):
+            out.extend(get_leaf_paths(v, current_path))
+        elif isinstance(v, list):
+            out.append(current_path)
+    return out
 
 
 def to_tensor(x) -> tf.Tensor:
@@ -123,13 +179,13 @@ def format_money(n: float) -> str:
     return f"${n / 1_000_000_000_000:.3g}tn"
 
 
-def train_args():
+def get_args():
     """Build CLI args for training entrypoints."""
     p = argparse.ArgumentParser()
 
     # Data
-    p.add_argument("--ticker", type=str, default="AAPL")
-    p.add_argument("--cache_dir", type=str, required=True)
+    p.add_argument("--ticker", type=str, default="MSFT")
+    p.add_argument("--cache_dir", type=str, default=None)  # required=True)
     p.add_argument("--target", type=str, default=None)
     p.add_argument("--batch_size", type=int, default=None)
     p.add_argument("--lookback", type=int, default=None)
@@ -150,4 +206,18 @@ def train_args():
     p.add_argument("--enforce_balance", type=bool, default=None)
     p.add_argument("--learn_subtotals", type=bool, default=None)
 
-    return p.parse_args()
+    # LLM Ensemble
+    p.add_argument("--use_llm", action="store_true")
+    p.add_argument("--llm_provider", type=str, default=None)
+    p.add_argument("--llm_model", type=str, default=None)
+    p.add_argument("--llm_temperature", type=float, default=None)
+    p.add_argument("--llm_max_tokens", type=int, default=None)
+    p.add_argument("--adjust", type=bool, default=None)
+
+    args = p.parse_args()
+
+    # Resolve cache_dir: CLI arg > env var > hardcoded default
+    if args.cache_dir is None:
+        args.cache_dir = os.getenv("JPM_CACHE_DIR", "/scratch/datasets/jpm")
+
+    return args

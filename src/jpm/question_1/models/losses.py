@@ -1,14 +1,15 @@
 import tensorflow as tf
 from tensorflow.keras.layers import Layer
 
-from jpm.question_1.config import LossConfig
+from jpm.question_1.config import LSTMConfig
+from jpm.question_1.data.structures import get_slack_name
 
 
 def bs_loss(
     feature_means,
     feature_stds,
     feature_mappings,
-    config: LossConfig,
+    config: LSTMConfig,
 ):
     """Build a balance-sheet-aware loss combining MSE with identity penalties."""
     means64 = tf.constant(feature_means, dtype=tf.float64)
@@ -105,7 +106,6 @@ class EnforceBalance(Layer):
         feature_mappings,
         feature_means,
         feature_stds,
-        slack_name="accumulated_other_comprehensive_income_loss_net_of_tax",
         feature_names=None,
         **kwargs,
     ):
@@ -128,20 +128,14 @@ class EnforceBalance(Layer):
         if feature_names is None:
             raise ValueError("feature_names required to find slack index")
 
+        slack_name = get_slack_name()
+
         if slack_name not in feature_names:
             raise ValueError(
                 f"Slack variable '{slack_name}' not found in feature names"
             )
 
-        self.slack_idx = feature_names.index(slack_name)
-
-        equity_idx_py = list(feature_mappings["equity"])
-        if self.slack_idx not in equity_idx_py:
-            raise ValueError(
-                f"Slack index {self.slack_idx} ('{slack_name}') "
-                f"is not in equity indices {equity_idx_py}. "
-                f"Include the slack feature in the equity mapping."
-            )
+        self.slack_idx = feature_names[slack_name]
 
         # Use float64 to minimise drift when rescaling and adjusting slack
         self.means = tf.constant(feature_means, dtype=tf.float64)
