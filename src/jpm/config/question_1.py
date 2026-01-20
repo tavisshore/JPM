@@ -53,7 +53,7 @@ class DataConfig:
     ticker : str, optional
         Stock ticker symbol (default: "AAPL").
     cache_dir : Path, optional
-        Directory for caching downloaded data (default: "/scratch/datasets/jpm").
+        Directory for caching downloaded data (default: "data/question_1/").
     save_dir : Path, optional
         Directory for saving outputs (default: "results/question_1/").
     plots_dir : Path, optional
@@ -77,7 +77,7 @@ class DataConfig:
     """
 
     ticker: str = "AAPL"
-    cache_dir: Path = Path("/scratch/datasets/jpm")
+    cache_dir: Path = Path("data/question_1/")
     save_dir: Path = Path("results/question_1/")
     plots_dir: Path = Path("results/question_1/plots")
     periods: int = 60  # quarters -> 15 years, post-2008
