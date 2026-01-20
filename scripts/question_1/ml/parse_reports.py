@@ -1,4 +1,5 @@
-from jpm.question_1 import Config, DataConfig, LLMClient, LLMConfig, get_args, set_seed
+from jpm.config import Config, DataConfig, LLMConfig
+from jpm.question_1 import LLMClient, get_args, set_seed
 
 if __name__ == "__main__":
     set_seed(42)

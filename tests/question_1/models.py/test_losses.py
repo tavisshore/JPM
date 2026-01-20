@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import tensorflow as tf
 
-from jpm.question_1.config import LSTMConfig
+from jpm.config.question_1 import LSTMConfig
 from jpm.question_1.models.losses import EnforceBalance, bs_loss
 
 unit = pytest.mark.unit

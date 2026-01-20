@@ -7,14 +7,11 @@ from dataclasses import replace
 
 import numpy as np
 
+from jpm.config import Config, DataConfig, LLMConfig, LSTMConfig
 from jpm.question_1 import (
     BalanceSheet,
-    Config,
-    DataConfig,
     EdgarData,
     IncomeStatement,
-    LLMConfig,
-    LSTMConfig,
     LSTMForecaster,
     StatementsDataset,
     get_args,

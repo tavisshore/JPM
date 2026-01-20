@@ -1,6 +1,6 @@
 import pytest
 
-from jpm.question_1.config import DataConfig
+from jpm.config.question_1 import DataConfig
 from jpm.question_1.data import utils as data_utils
 
 

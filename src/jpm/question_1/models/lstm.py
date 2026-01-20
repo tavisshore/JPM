@@ -5,8 +5,8 @@ import pandas as pd
 import tensorflow as tf
 import tensorflow_probability as tfp
 
+from jpm.config.question_1 import Config, LLMConfig
 from jpm.question_1.clients.llm_client import LLMClient
-from jpm.question_1.config import Config, LLMConfig
 from jpm.question_1.data import EdgarData, StatementsDataset
 from jpm.question_1.misc import RATINGS_MAPPINGS, set_seed
 from jpm.question_1.models.losses import EnforceBalance, bs_loss
@@ -947,9 +947,9 @@ class LSTMForecaster:
 
 
 if __name__ == "__main__":
+    from jpm.config.question_1 import Config, DataConfig, LSTMConfig
     from jpm.question_1.models.balance_sheet import BalanceSheet
     from jpm.question_1.models.income_statement import IncomeStatement
-    from src.jpm.question_1.config import Config, DataConfig, LSTMConfig
     from src.jpm.question_1.misc import set_seed, train_args
 
     set_seed(42)

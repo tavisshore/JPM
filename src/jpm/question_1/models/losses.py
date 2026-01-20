@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras.layers import Layer
 
-from jpm.question_1.config import LSTMConfig
+from jpm.config.question_1 import LSTMConfig
 from jpm.question_1.data.structures import get_slack_name
 
 

@@ -17,6 +17,7 @@ from pandas import DataFrame
 from pypdf import PdfReader
 from tqdm import tqdm
 
+from jpm.config.question_1 import Config, LLMConfig
 from jpm.question_1.clients.prompts import (
     get_company_name_prompt,
     get_predict_prompt,
@@ -29,7 +30,6 @@ from jpm.question_1.clients.utils import (
     get_fx_rate,
     parse_llm_json_response,
 )
-from jpm.question_1.config import Config, LLMConfig
 from jpm.question_1.misc import format_money
 
 

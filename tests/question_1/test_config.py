@@ -3,7 +3,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from jpm.question_1.config import Config, DataConfig, LSTMConfig
+from jpm.config.question_1 import Config, DataConfig, LSTMConfig
 
 unit = pytest.mark.unit
 integration = pytest.mark.integration
