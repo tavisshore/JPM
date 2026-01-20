@@ -1,0 +1,341 @@
+
+##########################################################################################
+                                 FULL TABLE 1 REPLICATION                                 
+##########################################################################################
+
+Running 4 DGPs × 3 configurations = 12 cells
+This may take several hours...
+
+
+==========================================================================================
+Cell 1/12: DGP1, T=25, J=10
+==========================================================================================
+Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 2.0% Complete (1/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 4.0% Complete (2/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 6.0% Complete (3/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 8.0% Complete (4/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 10.0% Complete (5/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 12.0% Complete (6/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |█████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 14.0% Complete (7/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |██████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 16.0% Complete (8/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |███████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 18.0% Complete (9/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 20.0% Complete (10/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 22.0% Complete (11/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |█████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 24.0% Complete (12/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 26.0% Complete (13/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |███████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 28.0% Complete (14/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 30.0% Complete (15/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 32.0% Complete (16/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |█████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░| 34.0% Complete (17/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |██████████████░░░░░░░░░░░░░░░░░░░░░░░░░░| 36.0% Complete (18/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |███████████████░░░░░░░░░░░░░░░░░░░░░░░░░| 38.0% Complete (19/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |████████████████░░░░░░░░░░░░░░░░░░░░░░░░| 40.0% Complete (20/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |████████████████░░░░░░░░░░░░░░░░░░░░░░░░| 42.0% Complete (21/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |█████████████████░░░░░░░░░░░░░░░░░░░░░░░| 44.0% Complete (22/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |██████████████████░░░░░░░░░░░░░░░░░░░░░░| 46.0% Complete (23/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |███████████████████░░░░░░░░░░░░░░░░░░░░░| 48.0% Complete (24/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |████████████████████░░░░░░░░░░░░░░░░░░░░| 50.0% Complete (25/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |████████████████████░░░░░░░░░░░░░░░░░░░░| 52.0% Complete (26/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |█████████████████████░░░░░░░░░░░░░░░░░░░| 54.0% Complete (27/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |██████████████████████░░░░░░░░░░░░░░░░░░| 56.0% Complete (28/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |███████████████████████░░░░░░░░░░░░░░░░░| 58.0% Complete (29/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |████████████████████████░░░░░░░░░░░░░░░░| 60.0% Complete (30/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |████████████████████████░░░░░░░░░░░░░░░░| 62.0% Complete (31/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |█████████████████████████░░░░░░░░░░░░░░░| 64.0% Complete (32/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |██████████████████████████░░░░░░░░░░░░░░| 66.0% Complete (33/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |███████████████████████████░░░░░░░░░░░░░| 68.0% Complete (34/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |████████████████████████████░░░░░░░░░░░░| 70.0% Complete (35/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |████████████████████████████░░░░░░░░░░░░| 72.0% Complete (36/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |█████████████████████████████░░░░░░░░░░░| 74.0% Complete (37/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |██████████████████████████████░░░░░░░░░░| 76.0% Complete (38/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |███████████████████████████████░░░░░░░░░| 78.0% Complete (39/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |████████████████████████████████░░░░░░░░| 80.0% Complete (40/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |████████████████████████████████░░░░░░░░| 82.0% Complete (41/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |█████████████████████████████████░░░░░░░| 84.0% Complete (42/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |██████████████████████████████████░░░░░░| 86.0% Complete (43/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |███████████████████████████████████░░░░░| 88.0% Complete (44/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |████████████████████████████████████░░░░| 90.0% Complete (45/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |████████████████████████████████████░░░░| 92.0% Complete (46/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |█████████████████████████████████████░░░| 94.0% Complete (47/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |██████████████████████████████████████░░| 96.0% Complete (48/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |███████████████████████████████████████░| 98.0% Complete (49/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (cost)   |████████████████████████████████████████| 100.0% Complete (50/50)
+Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 2.0% Complete (1/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 4.0% Complete (2/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 6.0% Complete (3/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 8.0% Complete (4/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 10.0% Complete (5/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 12.0% Complete (6/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |█████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 14.0% Complete (7/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |██████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 16.0% Complete (8/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |███████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 18.0% Complete (9/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 20.0% Complete (10/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 22.0% Complete (11/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |█████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 24.0% Complete (12/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 26.0% Complete (13/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |███████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 28.0% Complete (14/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 30.0% Complete (15/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 32.0% Complete (16/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |█████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░| 34.0% Complete (17/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |██████████████░░░░░░░░░░░░░░░░░░░░░░░░░░| 36.0% Complete (18/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |███████████████░░░░░░░░░░░░░░░░░░░░░░░░░| 38.0% Complete (19/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |████████████████░░░░░░░░░░░░░░░░░░░░░░░░| 40.0% Complete (20/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |████████████████░░░░░░░░░░░░░░░░░░░░░░░░| 42.0% Complete (21/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |█████████████████░░░░░░░░░░░░░░░░░░░░░░░| 44.0% Complete (22/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |██████████████████░░░░░░░░░░░░░░░░░░░░░░| 46.0% Complete (23/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |███████████████████░░░░░░░░░░░░░░░░░░░░░| 48.0% Complete (24/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |████████████████████░░░░░░░░░░░░░░░░░░░░| 50.0% Complete (25/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |████████████████████░░░░░░░░░░░░░░░░░░░░| 52.0% Complete (26/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |█████████████████████░░░░░░░░░░░░░░░░░░░| 54.0% Complete (27/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |██████████████████████░░░░░░░░░░░░░░░░░░| 56.0% Complete (28/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |███████████████████████░░░░░░░░░░░░░░░░░| 58.0% Complete (29/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |████████████████████████░░░░░░░░░░░░░░░░| 60.0% Complete (30/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |████████████████████████░░░░░░░░░░░░░░░░| 62.0% Complete (31/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |█████████████████████████░░░░░░░░░░░░░░░| 64.0% Complete (32/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |██████████████████████████░░░░░░░░░░░░░░| 66.0% Complete (33/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |███████████████████████████░░░░░░░░░░░░░| 68.0% Complete (34/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |████████████████████████████░░░░░░░░░░░░| 70.0% Complete (35/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |████████████████████████████░░░░░░░░░░░░| 72.0% Complete (36/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |█████████████████████████████░░░░░░░░░░░| 74.0% Complete (37/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |██████████████████████████████░░░░░░░░░░| 76.0% Complete (38/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |███████████████████████████████░░░░░░░░░| 78.0% Complete (39/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |████████████████████████████████░░░░░░░░| 80.0% Complete (40/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |████████████████████████████████░░░░░░░░| 82.0% Complete (41/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |█████████████████████████████████░░░░░░░| 84.0% Complete (42/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |██████████████████████████████████░░░░░░| 86.0% Complete (43/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |███████████████████████████████████░░░░░| 88.0% Complete (44/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |████████████████████████████████████░░░░| 90.0% Complete (45/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |████████████████████████████████████░░░░| 92.0% Complete (46/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |█████████████████████████████████████░░░| 94.0% Complete (47/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |██████████████████████████████████████░░| 96.0% Complete (48/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |███████████████████████████████████████░| 98.0% Complete (49/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  BLP (nocost) |████████████████████████████████████████| 100.0% Complete (50/50)
+Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 2.0% Complete (1/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 4.0% Complete (2/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 6.0% Complete (3/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 8.0% Complete (4/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 10.0% Complete (5/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 12.0% Complete (6/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |█████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 14.0% Complete (7/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |██████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 16.0% Complete (8/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |███████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 18.0% Complete (9/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 20.0% Complete (10/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 22.0% Complete (11/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |█████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 24.0% Complete (12/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 26.0% Complete (13/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |███████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 28.0% Complete (14/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 30.0% Complete (15/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 32.0% Complete (16/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |█████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░| 34.0% Complete (17/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |██████████████░░░░░░░░░░░░░░░░░░░░░░░░░░| 36.0% Complete (18/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |███████████████░░░░░░░░░░░░░░░░░░░░░░░░░| 38.0% Complete (19/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |████████████████░░░░░░░░░░░░░░░░░░░░░░░░| 40.0% Complete (20/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |████████████████░░░░░░░░░░░░░░░░░░░░░░░░| 42.0% Complete (21/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |█████████████████░░░░░░░░░░░░░░░░░░░░░░░| 44.0% Complete (22/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |██████████████████░░░░░░░░░░░░░░░░░░░░░░| 46.0% Complete (23/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |███████████████████░░░░░░░░░░░░░░░░░░░░░| 48.0% Complete (24/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |████████████████████░░░░░░░░░░░░░░░░░░░░| 50.0% Complete (25/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |████████████████████░░░░░░░░░░░░░░░░░░░░| 52.0% Complete (26/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |█████████████████████░░░░░░░░░░░░░░░░░░░| 54.0% Complete (27/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |██████████████████████░░░░░░░░░░░░░░░░░░| 56.0% Complete (28/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |███████████████████████░░░░░░░░░░░░░░░░░| 58.0% Complete (29/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |████████████████████████░░░░░░░░░░░░░░░░| 60.0% Complete (30/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |████████████████████████░░░░░░░░░░░░░░░░| 62.0% Complete (31/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |█████████████████████████░░░░░░░░░░░░░░░| 64.0% Complete (32/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |██████████████████████████░░░░░░░░░░░░░░| 66.0% Complete (33/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |███████████████████████████░░░░░░░░░░░░░| 68.0% Complete (34/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |████████████████████████████░░░░░░░░░░░░| 70.0% Complete (35/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |████████████████████████████░░░░░░░░░░░░| 72.0% Complete (36/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |█████████████████████████████░░░░░░░░░░░| 74.0% Complete (37/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |██████████████████████████████░░░░░░░░░░| 76.0% Complete (38/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |███████████████████████████████░░░░░░░░░| 78.0% Complete (39/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |████████████████████████████████░░░░░░░░| 80.0% Complete (40/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |████████████████████████████████░░░░░░░░| 82.0% Complete (41/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |█████████████████████████████████░░░░░░░| 84.0% Complete (42/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |██████████████████████████████████░░░░░░| 86.0% Complete (43/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |███████████████████████████████████░░░░░| 88.0% Complete (44/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |████████████████████████████████████░░░░| 90.0% Complete (45/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |████████████████████████████████████░░░░| 92.0% Complete (46/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |█████████████████████████████████████░░░| 94.0% Complete (47/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |██████████████████████████████████████░░| 96.0% Complete (48/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |███████████████████████████████████████░| 98.0% Complete (49/50)Simulated dataset with 25 markets of 10 products each under DGP DGP1.
+  Shrinkage    |████████████████████████████████████████| 100.0% Complete (50/50)
+
+==========================================================================================
+Cell 2/12: DGP1, T=25, J=15
+==========================================================================================
+Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 2.0% Complete (1/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 4.0% Complete (2/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 6.0% Complete (3/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 8.0% Complete (4/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 10.0% Complete (5/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 12.0% Complete (6/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |█████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 14.0% Complete (7/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |██████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 16.0% Complete (8/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |███████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 18.0% Complete (9/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 20.0% Complete (10/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 22.0% Complete (11/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |█████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 24.0% Complete (12/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 26.0% Complete (13/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |███████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 28.0% Complete (14/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 30.0% Complete (15/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 32.0% Complete (16/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |█████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░| 34.0% Complete (17/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |██████████████░░░░░░░░░░░░░░░░░░░░░░░░░░| 36.0% Complete (18/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |███████████████░░░░░░░░░░░░░░░░░░░░░░░░░| 38.0% Complete (19/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |████████████████░░░░░░░░░░░░░░░░░░░░░░░░| 40.0% Complete (20/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |████████████████░░░░░░░░░░░░░░░░░░░░░░░░| 42.0% Complete (21/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |█████████████████░░░░░░░░░░░░░░░░░░░░░░░| 44.0% Complete (22/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |██████████████████░░░░░░░░░░░░░░░░░░░░░░| 46.0% Complete (23/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |███████████████████░░░░░░░░░░░░░░░░░░░░░| 48.0% Complete (24/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |████████████████████░░░░░░░░░░░░░░░░░░░░| 50.0% Complete (25/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |████████████████████░░░░░░░░░░░░░░░░░░░░| 52.0% Complete (26/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |█████████████████████░░░░░░░░░░░░░░░░░░░| 54.0% Complete (27/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |██████████████████████░░░░░░░░░░░░░░░░░░| 56.0% Complete (28/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |███████████████████████░░░░░░░░░░░░░░░░░| 58.0% Complete (29/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |████████████████████████░░░░░░░░░░░░░░░░| 60.0% Complete (30/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |████████████████████████░░░░░░░░░░░░░░░░| 62.0% Complete (31/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |█████████████████████████░░░░░░░░░░░░░░░| 64.0% Complete (32/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |██████████████████████████░░░░░░░░░░░░░░| 66.0% Complete (33/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |███████████████████████████░░░░░░░░░░░░░| 68.0% Complete (34/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |████████████████████████████░░░░░░░░░░░░| 70.0% Complete (35/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |████████████████████████████░░░░░░░░░░░░| 72.0% Complete (36/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |█████████████████████████████░░░░░░░░░░░| 74.0% Complete (37/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |██████████████████████████████░░░░░░░░░░| 76.0% Complete (38/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |███████████████████████████████░░░░░░░░░| 78.0% Complete (39/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |████████████████████████████████░░░░░░░░| 80.0% Complete (40/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |████████████████████████████████░░░░░░░░| 82.0% Complete (41/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |█████████████████████████████████░░░░░░░| 84.0% Complete (42/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |██████████████████████████████████░░░░░░| 86.0% Complete (43/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |███████████████████████████████████░░░░░| 88.0% Complete (44/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |████████████████████████████████████░░░░| 90.0% Complete (45/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |████████████████████████████████████░░░░| 92.0% Complete (46/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |█████████████████████████████████████░░░| 94.0% Complete (47/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |██████████████████████████████████████░░| 96.0% Complete (48/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |███████████████████████████████████████░| 98.0% Complete (49/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |████████████████████████████████████████| 100.0% Complete (50/50)
+Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 2.0% Complete (1/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 4.0% Complete (2/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 6.0% Complete (3/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 8.0% Complete (4/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 10.0% Complete (5/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 12.0% Complete (6/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |█████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 14.0% Complete (7/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |██████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 16.0% Complete (8/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |███████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 18.0% Complete (9/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 20.0% Complete (10/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 22.0% Complete (11/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |█████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 24.0% Complete (12/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 26.0% Complete (13/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |███████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 28.0% Complete (14/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 30.0% Complete (15/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 32.0% Complete (16/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |█████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░| 34.0% Complete (17/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |██████████████░░░░░░░░░░░░░░░░░░░░░░░░░░| 36.0% Complete (18/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |███████████████░░░░░░░░░░░░░░░░░░░░░░░░░| 38.0% Complete (19/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |████████████████░░░░░░░░░░░░░░░░░░░░░░░░| 40.0% Complete (20/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |████████████████░░░░░░░░░░░░░░░░░░░░░░░░| 42.0% Complete (21/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |█████████████████░░░░░░░░░░░░░░░░░░░░░░░| 44.0% Complete (22/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |██████████████████░░░░░░░░░░░░░░░░░░░░░░| 46.0% Complete (23/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |███████████████████░░░░░░░░░░░░░░░░░░░░░| 48.0% Complete (24/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |████████████████████░░░░░░░░░░░░░░░░░░░░| 50.0% Complete (25/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |████████████████████░░░░░░░░░░░░░░░░░░░░| 52.0% Complete (26/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |█████████████████████░░░░░░░░░░░░░░░░░░░| 54.0% Complete (27/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |██████████████████████░░░░░░░░░░░░░░░░░░| 56.0% Complete (28/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |███████████████████████░░░░░░░░░░░░░░░░░| 58.0% Complete (29/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |████████████████████████░░░░░░░░░░░░░░░░| 60.0% Complete (30/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |████████████████████████░░░░░░░░░░░░░░░░| 62.0% Complete (31/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |█████████████████████████░░░░░░░░░░░░░░░| 64.0% Complete (32/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |██████████████████████████░░░░░░░░░░░░░░| 66.0% Complete (33/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |███████████████████████████░░░░░░░░░░░░░| 68.0% Complete (34/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |████████████████████████████░░░░░░░░░░░░| 70.0% Complete (35/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |████████████████████████████░░░░░░░░░░░░| 72.0% Complete (36/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |█████████████████████████████░░░░░░░░░░░| 74.0% Complete (37/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |██████████████████████████████░░░░░░░░░░| 76.0% Complete (38/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |███████████████████████████████░░░░░░░░░| 78.0% Complete (39/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |████████████████████████████████░░░░░░░░| 80.0% Complete (40/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |████████████████████████████████░░░░░░░░| 82.0% Complete (41/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |█████████████████████████████████░░░░░░░| 84.0% Complete (42/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |██████████████████████████████████░░░░░░| 86.0% Complete (43/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |███████████████████████████████████░░░░░| 88.0% Complete (44/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |████████████████████████████████████░░░░| 90.0% Complete (45/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |████████████████████████████████████░░░░| 92.0% Complete (46/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |█████████████████████████████████████░░░| 94.0% Complete (47/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |██████████████████████████████████████░░| 96.0% Complete (48/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |███████████████████████████████████████░| 98.0% Complete (49/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  BLP (nocost) |████████████████████████████████████████| 100.0% Complete (50/50)
+Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 2.0% Complete (1/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 4.0% Complete (2/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 6.0% Complete (3/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 8.0% Complete (4/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 10.0% Complete (5/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 12.0% Complete (6/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |█████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 14.0% Complete (7/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |██████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 16.0% Complete (8/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |███████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 18.0% Complete (9/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 20.0% Complete (10/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 22.0% Complete (11/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |█████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 24.0% Complete (12/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 26.0% Complete (13/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |███████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 28.0% Complete (14/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 30.0% Complete (15/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 32.0% Complete (16/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |█████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░| 34.0% Complete (17/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |██████████████░░░░░░░░░░░░░░░░░░░░░░░░░░| 36.0% Complete (18/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |███████████████░░░░░░░░░░░░░░░░░░░░░░░░░| 38.0% Complete (19/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |████████████████░░░░░░░░░░░░░░░░░░░░░░░░| 40.0% Complete (20/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |████████████████░░░░░░░░░░░░░░░░░░░░░░░░| 42.0% Complete (21/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |█████████████████░░░░░░░░░░░░░░░░░░░░░░░| 44.0% Complete (22/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |██████████████████░░░░░░░░░░░░░░░░░░░░░░| 46.0% Complete (23/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |███████████████████░░░░░░░░░░░░░░░░░░░░░| 48.0% Complete (24/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |████████████████████░░░░░░░░░░░░░░░░░░░░| 50.0% Complete (25/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |████████████████████░░░░░░░░░░░░░░░░░░░░| 52.0% Complete (26/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |█████████████████████░░░░░░░░░░░░░░░░░░░| 54.0% Complete (27/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |██████████████████████░░░░░░░░░░░░░░░░░░| 56.0% Complete (28/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |███████████████████████░░░░░░░░░░░░░░░░░| 58.0% Complete (29/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |████████████████████████░░░░░░░░░░░░░░░░| 60.0% Complete (30/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |████████████████████████░░░░░░░░░░░░░░░░| 62.0% Complete (31/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |█████████████████████████░░░░░░░░░░░░░░░| 64.0% Complete (32/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |██████████████████████████░░░░░░░░░░░░░░| 66.0% Complete (33/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |███████████████████████████░░░░░░░░░░░░░| 68.0% Complete (34/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |████████████████████████████░░░░░░░░░░░░| 70.0% Complete (35/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |████████████████████████████░░░░░░░░░░░░| 72.0% Complete (36/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |█████████████████████████████░░░░░░░░░░░| 74.0% Complete (37/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |██████████████████████████████░░░░░░░░░░| 76.0% Complete (38/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |███████████████████████████████░░░░░░░░░| 78.0% Complete (39/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |████████████████████████████████░░░░░░░░| 80.0% Complete (40/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |████████████████████████████████░░░░░░░░| 82.0% Complete (41/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |█████████████████████████████████░░░░░░░| 84.0% Complete (42/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |██████████████████████████████████░░░░░░| 86.0% Complete (43/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |███████████████████████████████████░░░░░| 88.0% Complete (44/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |████████████████████████████████████░░░░| 90.0% Complete (45/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |████████████████████████████████████░░░░| 92.0% Complete (46/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |█████████████████████████████████████░░░| 94.0% Complete (47/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |██████████████████████████████████████░░| 96.0% Complete (48/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |███████████████████████████████████████░| 98.0% Complete (49/50)Simulated dataset with 25 markets of 15 products each under DGP DGP1.
+  Shrinkage    |████████████████████████████████████████| 100.0% Complete (50/50)
+
+==========================================================================================
+Cell 3/12: DGP1, T=50, J=15
+==========================================================================================
+Simulated dataset with 50 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 2.0% Complete (1/50)Simulated dataset with 50 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 4.0% Complete (2/50)Simulated dataset with 50 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 6.0% Complete (3/50)Simulated dataset with 50 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 8.0% Complete (4/50)Simulated dataset with 50 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 10.0% Complete (5/50)Simulated dataset with 50 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 12.0% Complete (6/50)Simulated dataset with 50 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |█████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 14.0% Complete (7/50)Simulated dataset with 50 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |██████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 16.0% Complete (8/50)Simulated dataset with 50 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |███████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 18.0% Complete (9/50)Simulated dataset with 50 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 20.0% Complete (10/50)Simulated dataset with 50 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 22.0% Complete (11/50)Simulated dataset with 50 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |█████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 24.0% Complete (12/50)Simulated dataset with 50 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 26.0% Complete (13/50)Simulated dataset with 50 markets of 15 products each under DGP DGP1.
+  BLP (cost)   |███████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░| 28.0% Complete (14/50)Simulated dataset with 50 markets of 15 products each under DGP DGP1.

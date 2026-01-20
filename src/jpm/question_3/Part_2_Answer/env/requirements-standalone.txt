@@ -1,0 +1,9 @@
+# Standalone environment (TF + TFP, no choice-learn)
+numpy<2
+pandas
+scipy
+tqdm
+matplotlib
+
+tensorflow==2.16.2
+tensorflow-probability==0.22.1
