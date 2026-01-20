@@ -117,7 +117,9 @@ class RatingsHistoryDownloader:
         # Files are named with YYYYMMDD prefix, so lexicographic sort works
         return sorted(moodys_financial, reverse=True)[0]
 
-    def download_moodys_financial(self, llm_client, ticker=None) -> pd.DataFrame | None:
+    def download_moodys_financial(
+        self, llm_client, ticker=None
+    ) -> tuple[pd.DataFrame | None, bool]:
         """Download the latest Moody's Financial ratings CSV.
         1. Download latest csv from https://ratingshistory.info/
         2. For each record, add the company's corresponding ticker
@@ -129,6 +131,7 @@ class RatingsHistoryDownloader:
         raw_data = Path(self.config.data.cache_dir) / filename
 
         # Downloads the latest moodys corporate data
+        updated = False
         if not raw_data.exists():
             url = f"{self.API_URL}/{quote(filename)}"
             resp = self.session.get(url, timeout=30, stream=True)
@@ -150,6 +153,7 @@ class RatingsHistoryDownloader:
                 else:
                     for chunk in resp.iter_content(chunk_size=8192):
                         f.write(chunk)
+            updated = True
 
         # Processes moodys data for the particular ticker - returning quarterly ratings
         ratings_df = pd.read_csv(raw_data, dtype=str)
@@ -202,7 +206,7 @@ class RatingsHistoryDownloader:
         df = df.set_index("quarter")
 
         df.index = pd.PeriodIndex(df.index, freq="Q")
-        return df
+        return df, updated
 
 
 class EdgarData:
@@ -318,10 +322,9 @@ class EdgarData:
 
     def get_ratings(self):
         """Training Data for Credit Rating Prediction."""
-        # if not self.ratings_data_path.exists() or self.overwrite:
         # Download and process credit ratings
         downloader = RatingsHistoryDownloader(config=self.config)
-        _ratings_df = downloader.download_moodys_financial(
+        _ratings_df, ratings_updated = downloader.download_moodys_financial(
             self.llm_client, self.config.data.ticker
         )  # noqa: F841
 
@@ -329,21 +332,23 @@ class EdgarData:
             print(f"No Moody's ratings found for {self.config.data.ticker}.")
             self.ratings_data = pd.DataFrame()
             return
-        # Select only the relevant company's data
-        # Calculate ratios from self.data and add to ratings_df
-        df = add_derived_columns(self.data)
 
-        df.index = df.index.asfreq("Q-DEC")
-        _ratings_df.index = _ratings_df.index.asfreq("Q-DEC")
+        if not self.ratings_data_path.exists() or self.overwrite or ratings_updated:
+            # Select only the relevant company's data
+            # Calculate ratios from self.data and add to ratings_df
+            df = add_derived_columns(self.data)
 
-        df_combined = pd.merge(
-            df, _ratings_df, left_index=True, right_index=True, how="inner"
-        )
+            df.index = df.index.asfreq("Q-DEC")
+            _ratings_df.index = _ratings_df.index.asfreq("Q-DEC")
 
-        self.ratings_data = calculate_credit_ratios(df_combined)
-        self.ratings_data.to_parquet(self.ratings_data_path)
-        # else:
-        # self.ratings_data = pd.read_parquet(self.ratings_data_path)
+            df_combined = pd.merge(
+                df, _ratings_df, left_index=True, right_index=True, how="inner"
+            )
+
+            self.ratings_data = calculate_credit_ratios(df_combined)
+            self.ratings_data.to_parquet(self.ratings_data_path)
+        else:
+            self.ratings_data = pd.read_parquet(self.ratings_data_path)
 
     def create_statements(self) -> None:
         """Create and process financial statements from SEC EDGAR filings.
