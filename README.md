@@ -15,7 +15,8 @@ Create a clean Python 3.10 environment and install the package:
 ```bash
 conda create -n jpm python=3.10
 conda activate jpm
-python -m pip install .
+pip install -e . # .[dev] <- for pytest etc.
+
 # Optional testing
 pytest -v
 ```
