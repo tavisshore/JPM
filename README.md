@@ -84,25 +84,25 @@ This will take quite a long time but will show progress.
 ### Part 1
 The experiments are implemented as Python modules and can be invoked directly.
 - Table 1
-  ```
+```bash
   python scripts/question_3/part_1/reproduce_table1.py
-  ```
+```
 - Decoy effect
-  ```
+```bash
   python scripts/question_3/part_1/decoy_effect.py
-  ```
+```
 - Attraction effect
-  ```
+```bash
   python scripts/question_3/part_1/attraction_effect_tf.py
-  ```
+```
 - Compromise effect
-  ```
+```bash
   python scripts/question_3/part_1/compromise_effect_tf.py
-  ```
+```
 - Attraction effect (PyTorch)
-  ```
+```bash
   python scripts/question_3/part_1/attraction_effect_torch.py
-  ```
+```
 ---
 
 ### Part 2
