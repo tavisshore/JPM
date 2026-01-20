@@ -50,6 +50,7 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 
 import numpy as np
+from tqdm import tqdm
 
 from jpm.config import SimConfig, StudyConfig
 from jpm.question_3.replication_lu25.estimators.blp import estimate_blp_sigma
@@ -61,7 +62,6 @@ from jpm.question_3.replication_lu25.utils import (
     OutputLogger,
     init_storage,
     print_method_table,
-    print_progress_bar,
     save_summary_csv,
     summarize_vec,
 )
@@ -155,7 +155,15 @@ def run_cell(  # noqa: C901
     print(f"Cell: {dgp}, T={T}, J={J}, N_t={getattr(cfg, 'Nt', 'NA')}, R0={cfg.R0}")
     print(f"{'=' * 90}")
 
+    pbar = tqdm(
+        total=study.R_mc,
+        desc=f"  {dgp} T={T:<3d} J={J:<3d}",
+        bar_format="{desc}: {percentage:3.0f}%|{bar}| {n}/{total} [{elapsed}<{remaining}]",
+    )
+
     for r in range(study.R_mc):
+        pbar.set_postfix_str(f"({r + 1}/{study.R_mc})")
+
         rep_seed = study.seed + r
         np.random.seed(rep_seed)
 
@@ -217,13 +225,9 @@ def run_cell(  # noqa: C901
             except Exception:
                 lu25["fail"][r] = 1
 
-        # progress
-        print_progress_bar(
-            r + 1,
-            study.R_mc,
-            prefix=f"  {dgp} T={T:<3d} J={J:<3d}",
-            suffix=f"({r + 1}/{study.R_mc})",
-        )
+        pbar.update(1)
+
+    pbar.close()
 
     # summarize
     summaries: Dict[str, Dict[str, Dict[str, float]]] = {}
