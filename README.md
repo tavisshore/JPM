@@ -104,6 +104,11 @@ scripts/question_3/
 
 Please see `src/jpm/question_3/readme.md` for full instructions.
 
+The hybrid model that combines Zhang et al. (2025) DeepHalo with Lu & Shimizu (2025) sparse market–product shocks is implemented in the following folder:
+```bash
+  src/jpm/question_3/deephalo_extension/zhang_sparse_choice_learn.py
+```
+This is part 2 
 
 ## Citations
 ```
