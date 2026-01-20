@@ -1,9 +1,6 @@
-import types
-from unittest.mock import Mock
-
-import jpm.question_1.models.balance_sheet as bs_mod
 import pytest
-from jpm.question_1.models.balance_sheet import (
+
+from jpm.question_1.models.validation.balance_sheet import (
     Assets,
     BalanceSheet,
     Equity,
@@ -31,34 +28,37 @@ class DummyResults:
         return self._feature_values
 
 
+class DummyDataset:
+    """Mock dataset with bs_structure."""
+
+    def __init__(self, bs_structure: dict) -> None:
+        self.bs_structure = bs_structure
+
+
+class DummyData:
+    """Mock EdgarData."""
+
+    pass
+
+
 @pytest.fixture
 def feature_values():
     return {
-        # Current assets
-        "cash_and_cash_equivalents_at_carrying_value": 100.0,
-        "marketable_securities_current": 200.0,
-        "accounts_receivable_net_current": 300.0,
-        "nontrade_receivables_current": 50.0,
-        "inventory_net": 400.0,
-        "other_assets_current": 25.0,
-        # Non-current assets
-        "marketable_securities_noncurrent": 600.0,
-        "other_assets_noncurrent": 80.0,
-        "property_plant_and_equipment_net": 900.0,
-        # Current liabilities
-        "accounts_payable_current": 150.0,
-        "contract_with_customer_liability_current": 70.0,
-        "other_liabilities_current": 30.0,
-        "commercial_paper": 40.0,
-        "other_short_term_borrowings": 60.0,
-        "long_term_debt_current": 55.0,
-        # Non-current liabilities
-        "other_liabilities_noncurrent": 500.0,
-        "long_term_debt_noncurrent": 700.0,
+        # Assets
+        "Cash and Equivalents": 100.0,
+        "Receivables": 200.0,
+        "Inventory": 300.0,
+        "Property, Plant, and Equipment (net)": 400.0,
+        "Intangible Assets (net)": 150.0,
+        # Liabilities
+        "Accounts Payable and Accrued Expenses": 150.0,
+        "Short-term Debt": 70.0,
+        "Long-term Debt": 500.0,
+        "Other Non-Current Liabilities": 80.0,
         # Equity
-        "retained_earnings_accumulated_deficit": 1200.0,
-        "common_stocks_including_additional_paid_in_capital": 1500.0,
-        "accumulated_other_comprehensive_income_loss_net_of_tax": 100.0,
+        "Common Stock and APIC": 1200.0,
+        "Retained Earnings": 800.0,
+        "Accumulated Other Comprehensive Income": 50.0,
         # Unused field to verify ignored data doesn't break anything
         "unused_metric": 999.0,
     }
@@ -67,39 +67,23 @@ def feature_values():
 @pytest.fixture
 def bs_structure():
     return {
-        "assets": {
-            "current_assets": [
-                "cash_and_cash_equivalents_at_carrying_value",
-                "marketable_securities_current",
-                "accounts_receivable_net_current",
-                "nontrade_receivables_current",
-                "inventory_net",
-                "other_assets_current",
-            ],
-            "non_current_assets": [
-                "marketable_securities_noncurrent",
-                "other_assets_noncurrent",
-                "property_plant_and_equipment_net",
-            ],
-        },
-        "liabilities": {
-            "current_liabilities": [
-                "accounts_payable_current",
-                "contract_with_customer_liability_current",
-                "other_liabilities_current",
-                "commercial_paper",
-                "other_short_term_borrowings",
-                "long_term_debt_current",
-            ],
-            "non_current_liabilities": [
-                "other_liabilities_noncurrent",
-                "long_term_debt_noncurrent",
-            ],
-        },
-        "equity": [
-            "retained_earnings_accumulated_deficit",
-            "common_stocks_including_additional_paid_in_capital",
-            "accumulated_other_comprehensive_income_loss_net_of_tax",
+        "Assets": [
+            "Cash and Equivalents",
+            "Receivables",
+            "Inventory",
+            "Property, Plant, and Equipment (net)",
+            "Intangible Assets (net)",
+        ],
+        "Liabilities": [
+            "Accounts Payable and Accrued Expenses",
+            "Short-term Debt",
+            "Long-term Debt",
+            "Other Non-Current Liabilities",
+        ],
+        "Equity": [
+            "Common Stock and APIC",
+            "Retained Earnings",
+            "Accumulated Other Comprehensive Income",
         ],
     }
 
@@ -110,35 +94,11 @@ def config():
 
 
 @pytest.fixture
-def balance_sheet(config, feature_values, bs_structure, monkeypatch):
-    # Patch get_bs_structure to return our controlled structure
-    monkeypatch.setattr(
-        bs_mod,
-        "get_bs_structure",
-        lambda ticker: bs_structure,
-    )
-
+def balance_sheet(config, feature_values, bs_structure):
     results = DummyResults(feature_values)
-    return BalanceSheet(config=config, results=results)
-
-
-@integration
-def test_balance_sheet_initialization_fetches_structure_and_features(
-    config, feature_values, bs_structure, monkeypatch
-):
-    """Ensure BalanceSheet grabs feature values and ticker structure exactly once."""
-    results = Mock()
-    results.feature_values = Mock(return_value=feature_values)
-
-    get_bs_structure_mock = Mock(return_value=bs_structure)
-    monkeypatch.setattr(bs_mod, "get_bs_structure", get_bs_structure_mock)
-
-    bs = BalanceSheet(config=config, results=results)
-
-    results.feature_values.assert_called_once_with()
-    get_bs_structure_mock.assert_called_once_with(ticker=config.data.ticker)
-    assert bs._feature_values is feature_values
-    assert bs.bs_structure is bs_structure
+    dataset = DummyDataset(bs_structure)
+    data = DummyData()
+    return BalanceSheet(config=config, data=data, dataset=dataset, results=results)
 
 
 # --- Dataclass property tests -------------------------------------------------
@@ -146,20 +106,18 @@ def test_balance_sheet_initialization_fetches_structure_and_features(
 
 @unit
 def test_assets_total():
-    """Assets.total should sum current and non-current buckets."""
+    """Assets.total should sum all asset items."""
     assets = Assets(
-        current_assets={"a": 10.0, "b": 5.0},
-        non_current_assets={"c": 20.0},
+        assets={"a": 10.0, "b": 5.0, "c": 20.0},
     )
     assert assets.total == 35.0
 
 
 @unit
 def test_liabilities_total():
-    """Liabilities.total should sum both current and non-current portions."""
+    """Liabilities.total should sum all liability items."""
     liab = Liabilities(
-        current_liabilities={"a": 7.0},
-        non_current_liabilities={"b": 3.0, "c": 10.0},
+        liabilities={"a": 7.0, "b": 3.0, "c": 10.0},
     )
     assert liab.total == 20.0
 
@@ -181,35 +139,20 @@ def test_build_assets_uses_structure_and_feature_values(balance_sheet):
     """Builder should read the configured metric names and fetch the matching values."""
     assets = balance_sheet.assets
 
-    # Current assets
-    assert assets.current_assets[
-        "cash_and_cash_equivalents_at_carrying_value"
-    ] == pytest.approx(100.0)
-    assert assets.current_assets["inventory_net"] == pytest.approx(400.0)
-
-    # Non-current assets
-    assert assets.non_current_assets[
-        "property_plant_and_equipment_net"
-    ] == pytest.approx(900.0)
-    assert assets.non_current_assets["other_assets_noncurrent"] == pytest.approx(80.0)
+    assert assets.assets["Cash and Equivalents"] == pytest.approx(100.0)
+    assert assets.assets["Inventory"] == pytest.approx(300.0)
+    assert assets.assets["Property, Plant, and Equipment (net)"] == pytest.approx(400.0)
 
 
 @integration
 def test_build_liabilities_uses_structure_and_feature_values(balance_sheet):
-    """Liabilities builder should fetch everything listed for both buckets."""
+    """Liabilities builder should fetch everything listed in the structure."""
     liab = balance_sheet.liabilities
 
-    # Current liabilities
-    assert liab.current_liabilities["accounts_payable_current"] == pytest.approx(150.0)
-    assert liab.current_liabilities["long_term_debt_current"] == pytest.approx(55.0)
-
-    # Non-current liabilities
-    assert liab.non_current_liabilities["long_term_debt_noncurrent"] == pytest.approx(
-        700.0
+    assert liab.liabilities["Accounts Payable and Accrued Expenses"] == pytest.approx(
+        150.0
     )
-    assert liab.non_current_liabilities[
-        "other_liabilities_noncurrent"
-    ] == pytest.approx(500.0)
+    assert liab.liabilities["Long-term Debt"] == pytest.approx(500.0)
 
 
 @integration
@@ -217,83 +160,28 @@ def test_build_equity_uses_structure_and_feature_values(balance_sheet):
     """Equity builder loads all configured equity metrics via feature values."""
     eq = balance_sheet.equity
 
-    assert eq.items[
-        "common_stocks_including_additional_paid_in_capital"
-    ] == pytest.approx(1500.0)
-    assert eq.items["retained_earnings_accumulated_deficit"] == pytest.approx(1200.0)
-    assert eq.items[
-        "accumulated_other_comprehensive_income_loss_net_of_tax"
-    ] == pytest.approx(100.0)
-
-
-@integration
-def test_build_sections_handle_missing_structure_and_default_zero(config, monkeypatch):
-    """Sections missing names should default to empty dicts and zero-filled values."""
-    custom_structure = {
-        "assets": {
-            "current_assets": ["known_current_asset", "missing_current_asset"],
-            # non_current_assets intentionally omitted to ensure default empty dict
-        },
-        "liabilities": {
-            # current_liabilities intentionally omitted to ensure default empty dict
-            "non_current_liabilities": [
-                "known_non_current_liab",
-                "missing_non_current",
-            ],
-        },
-        "equity": ["known_equity", "missing_equity"],
-    }
-    feature_values = {
-        "known_current_asset": 75.5,
-        "known_non_current_liab": 210.0,
-        "known_equity": 333.3,
-    }
-
-    monkeypatch.setattr(bs_mod, "get_bs_structure", lambda ticker: custom_structure)
-    results = DummyResults(feature_values)
-    bs = BalanceSheet(config=config, results=results)
-
-    assert bs.assets.current_assets == {
-        "known_current_asset": pytest.approx(75.5),
-        "missing_current_asset": pytest.approx(0.0),
-    }
-    assert bs.assets.non_current_assets == {}
-
-    assert bs.liabilities.current_liabilities == {}
-    assert bs.liabilities.non_current_liabilities == {
-        "known_non_current_liab": pytest.approx(210.0),
-        "missing_non_current": pytest.approx(0.0),
-    }
-
-    assert bs.equity.items == {
-        "known_equity": pytest.approx(333.3),
-        "missing_equity": pytest.approx(0.0),
-    }
+    assert eq.items["Common Stock and APIC"] == pytest.approx(1200.0)
+    assert eq.items["Retained Earnings"] == pytest.approx(800.0)
+    assert eq.items["Accumulated Other Comprehensive Income"] == pytest.approx(50.0)
 
 
 @integration
 def test_builders_ignore_unreferenced_metrics(balance_sheet):
     """Data outside the structure should never bleed into the balance-sheet sections."""
-    assert "unused_metric" not in balance_sheet.assets.current_assets
-    assert "unused_metric" not in balance_sheet.assets.non_current_assets
-    assert "unused_metric" not in balance_sheet.liabilities.current_liabilities
-    assert "unused_metric" not in balance_sheet.liabilities.non_current_liabilities
+    assert "unused_metric" not in balance_sheet.assets.assets
+    assert "unused_metric" not in balance_sheet.liabilities.liabilities
     assert "unused_metric" not in balance_sheet.equity.items
 
 
 @unit
-def test_get_value_missing_key_returns_zero(config, bs_structure, monkeypatch):
+def test_get_value_missing_key_returns_zero(config, bs_structure):
     """Any missing metric should be interpreted as 0.0 rather than raising errors."""
     feature_values = {"existing": 42.0}
     results = DummyResults(feature_values)
+    dataset = DummyDataset(bs_structure)
+    data = DummyData()
 
-    monkeypatch.setattr(
-        bs_mod,
-        "get_bs_structure",
-        lambda ticker: bs_structure,
-    )
-
-    bs = BalanceSheet(config=config, results=results)
+    bs = BalanceSheet(config=config, data=data, dataset=dataset, results=results)
 
     assert bs._get_value("nonexistent_key") == 0.0
 
@@ -311,90 +199,39 @@ def test_get_value_converts_to_float(balance_sheet):
 @integration
 def test_total_properties_match_component_totals(balance_sheet):
     """Top-level BalanceSheet totals should simply mirror the underlying objects."""
-    assert balance_sheet.total_assets == pytest.approx(2655.0)
-    assert balance_sheet.total_liabilities == pytest.approx(1605.0)
-    assert balance_sheet.total_equity == pytest.approx(2800.0)
-    assert balance_sheet.total_liabilities_and_equity == pytest.approx(4405.0)
+    # Assets: 100 + 200 + 300 + 400 + 150 = 1150
+    assert balance_sheet.total_assets == pytest.approx(1150.0)
+    # Liabilities: 150 + 70 + 500 + 80 = 800
+    assert balance_sheet.total_liabilities == pytest.approx(800.0)
+    # Equity: 1200 + 800 + 50 = 2050
+    assert balance_sheet.total_equity == pytest.approx(2050.0)
+    # L + E = 800 + 2050 = 2850
+    assert balance_sheet.total_liabilities_and_equity == pytest.approx(2850.0)
 
 
 @integration
-def test_total_liabilities_and_equity_uses_component_totals(
-    empty_structure, monkeypatch
-):
-    """Regression test to ensure liabilities plus equity equals
-    the sum of both components."""
-    bs = _make_bs_with_totals(
-        assets_total=0.0,
-        liabilities_total=111.0,
-        equity_total=222.0,
-        empty_structure=empty_structure,
-        monkeypatch=monkeypatch,
-    )
-
-    assert bs.total_liabilities_and_equity == pytest.approx(333.0)
+def test_check_identity_returns_diff_pct(balance_sheet):
+    """check_identity should return difference percentage."""
+    diff_pct = balance_sheet.check_identity(atol=1e6, verbose=False)
+    # A=1150, L+E=2850 -> diff = 1150 - 2850 = -1700
+    # diff_pct = -1700 / 1150 * 100 ≈ -147.83%
+    expected_diff_pct = ((1150 - 2850) / 1150) * 100
+    assert diff_pct == pytest.approx(expected_diff_pct)
 
 
-# --- check_identity behaviour + colour selection ------------------------------
-
-
-@pytest.fixture
-def empty_structure():
-    # For identity tests we override totals directly, so we don't need real names
-    return {
-        "assets": {
-            "current_assets": [],
-            "non_current_assets": [],
-        },
-        "liabilities": {
-            "current_liabilities": [],
-            "non_current_liabilities": [],
-        },
-        "equity": [],
-    }
-
-
-def _make_bs_with_totals(
-    assets_total, liabilities_total, equity_total, empty_structure, monkeypatch
-):
-    config = DummyConfig(ticker="IDENTITY")
-    results = DummyResults(feature_values={})
-
-    monkeypatch.setattr(
-        bs_mod,
-        "get_bs_structure",
-        lambda ticker: empty_structure,
-    )
-
-    # Typing isn't ideal here
-    bs = BalanceSheet(config=config, results=results)
-
-    # Overwrite with simple objects that just expose a 'total' attribute
-    bs.assets = types.SimpleNamespace(total=float(assets_total))
-    bs.liabilities = types.SimpleNamespace(total=float(liabilities_total))
-    bs.equity = types.SimpleNamespace(total=float(equity_total))
-
-    return bs
-
-
-@integration
-def test_check_identity_zero_assets_handles_division_by_zero(
-    empty_structure, monkeypatch
-):
+@unit
+def test_check_identity_zero_assets_handles_division_by_zero(config):
     """Zero assets should not explode diff_pct and still report cleanly."""
-    bs = _make_bs_with_totals(
-        assets_total=0.0,
-        liabilities_total=0.0,
-        equity_total=150.0,
-        empty_structure=empty_structure,
-        monkeypatch=monkeypatch,
-    )
+    results = DummyResults({})
+    bs_structure = {"Assets": [], "Liabilities": [], "Equity": []}
+    dataset = DummyDataset(bs_structure)
+    data = DummyData()
 
-    colour_mock = Mock(side_effect=lambda text, c: f"COLOUR({text},{c})")
-    format_money_mock = Mock(side_effect=lambda x: f"FMT({x})")
-    print_table_mock = Mock()
+    bs = BalanceSheet(config=config, data=data, dataset=dataset, results=results)
 
-    monkeypatch.setattr(bs_mod, "colour", colour_mock)
-    monkeypatch.setattr(bs_mod, "format_money", format_money_mock)
-    monkeypatch.setattr(bs_mod, "print_table", print_table_mock)
+    # Manually add equity to test zero-division handling
+    bs.equity = Equity(items={"equity_item": 150.0})
 
-    bs.check_identity(atol=1.0)  # diff= -150 -> fail, but pct should be 0.0%
+    # Zero assets means diff_pct should be 0.0 (not inf or nan)
+    diff_pct = bs.check_identity(atol=1.0, verbose=False)
+    assert diff_pct == 0.0

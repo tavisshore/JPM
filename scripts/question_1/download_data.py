@@ -5,7 +5,7 @@ from threading import Semaphore
 
 from tqdm import tqdm
 
-from jpm.question_1 import Config, EdgarData
+from jpm.question_1 import Config, EdgarData, get_args
 
 # S&P 500 companies
 sp500 = """
@@ -19,6 +19,8 @@ APH CCI ROP SHW HUM ORLY GM ADSK NXPI F PCAR AIG MET ALL AEP AJG ROST KMB SRE
 EW CTAS CARR MSCI PAYX IDXX AFL DD FCX FTNT A O PRU CTVA ODFL RSG YUM KDP FAST
 CDNS SNPS GWW MNST CHTR VRSK EL MCHP RCL CPRT GD CMG ANSS DAL AME IT BIIB LHX
 """.split()
+
+args = get_args()
 
 rate_limiter = Semaphore(10)
 

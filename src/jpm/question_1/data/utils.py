@@ -10,23 +10,41 @@ import requests
 
 
 class AssetSection(TypedDict):
+    """Balance sheet asset section structure with current and non-current assets."""
+
     current_assets: List[str]
     non_current_assets: List[str]
 
 
 class LiabilitySection(TypedDict):
+    """Balance sheet liability section structure with current and non-current liabilities."""
+
     current_liabilities: List[str]
     non_current_liabilities: List[str]
 
 
 class BalanceSheetStructure(TypedDict):
+    """Complete balance sheet structure with assets, liabilities, and equity sections."""
+
     assets: AssetSection
     liabilities: LiabilitySection
     equity: List[str]
 
 
 def xbrl_to_snake(name: str) -> str:
-    # Drop common XBRL prefixes (e.g., us-gaap_) and normalize to snake_case
+    """
+    Convert XBRL field names to snake_case by removing prefixes and normalizing.
+
+    Parameters
+    ----------
+    name : str
+        XBRL field name with prefix (e.g., 'us-gaap_PropertyPlantAndEquipment')
+
+    Returns
+    -------
+    str
+        Normalized snake_case string (e.g., 'property_plant_and_equipment')
+    """
     if not isinstance(name, str) or not name:
         raise ValueError("xbrl_to_snake expects a non-empty string")
     name = re.sub(r"^[^-]+-[^_]+_", "", name)
@@ -163,6 +181,27 @@ def _validate_window_args(
     X: np.ndarray,
     tgt_indices: Optional[List[int]],
 ) -> None:
+    """
+    Validate arguments for window building operations.
+
+    Parameters
+    ----------
+    config : object
+        Configuration object with data.lookback, data.horizon, and data.withhold_periods
+    X : np.ndarray
+        Input data array of shape (time, features)
+    tgt_indices : Optional[List[int]]
+        Target feature indices to validate
+
+    Raises
+    ------
+    TypeError
+        If X is not a numpy array or withhold_periods is not an integer
+    ValueError
+        If arguments are invalid (non-positive lookback/horizon, sequence too short)
+    IndexError
+        If tgt_indices are out of bounds
+    """
     if not isinstance(X, np.ndarray):
         raise TypeError("X must be a numpy ndarray")
     if X.ndim != 2:
@@ -183,6 +222,28 @@ def _validate_window_args(
 
 
 def _max_start(T: int, lookback: int, horizon: int) -> int:
+    """
+    Calculate maximum starting index for window construction.
+
+    Parameters
+    ----------
+    T : int
+        Total length of the time series
+    lookback : int
+        Number of historical periods in each window
+    horizon : int
+        Number of periods ahead to predict
+
+    Returns
+    -------
+    int
+        Maximum valid starting index for window construction
+
+    Raises
+    ------
+    ValueError
+        If sequence is too short for the given lookback and horizon
+    """
     max_start = T - lookback - horizon + 1
     if max_start <= 0:
         raise ValueError("Sequence too short for given lookback and horizon")
@@ -198,8 +259,39 @@ def _build_window_arrays_with_index(
     index=None,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
-    Build window arrays, only including windows with consecutive quarters.
-    The last `withhold_periods` valid windows are used for testing.
+    Build window arrays with train/test split, filtering for consecutive quarters.
+
+    Only includes windows where all periods are consecutive quarters. The last
+    `withhold_periods` valid windows are used for testing.
+
+    Parameters
+    ----------
+    config : object
+        Configuration object with data.lookback, data.horizon, and data.withhold_periods
+    X : np.ndarray
+        Input data array of shape (time, features)
+    tgt_indices : Optional[List[int]]
+        Indices of target features to predict (None = all features)
+    max_start : int
+        Maximum valid starting index for windows
+    num_features : int
+        Number of features in X
+    index : pd.PeriodIndex, optional
+        Period index for consecutive quarter validation
+
+    Returns
+    -------
+    tuple of np.ndarray
+        (X_train, y_train, X_test, y_test) where:
+        - X_train: (N_train, lookback, F)
+        - y_train: (N_train, target_dim)
+        - X_test: (N_test, lookback, F)
+        - y_test: (N_test, target_dim)
+
+    Raises
+    ------
+    ValueError
+        If withhold_periods exceeds number of valid consecutive windows
     """
     all_windows = []
     window_length = config.data.lookback + config.data.horizon
@@ -260,6 +352,27 @@ def _extract_window(
     horizon: int,
     tgt_indices: Optional[List[int]],
 ) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Extract a single window from the data for training.
+
+    Parameters
+    ----------
+    X : np.ndarray
+        Input data array of shape (time, features)
+    start : int
+        Starting index for the window
+    lookback : int
+        Number of historical periods to include
+    horizon : int
+        Number of periods ahead to predict
+    tgt_indices : Optional[List[int]]
+        Indices of target features (None = all features)
+
+    Returns
+    -------
+    tuple of np.ndarray
+        (x_win, y_target) where x_win is the input window and y_target is the prediction target
+    """
     x_win = X[start : start + lookback]
     y_target = X[start + lookback + horizon - 1]
     if tgt_indices is not None:
@@ -454,17 +567,62 @@ def remove_duplicate_columns(
 
 
 def _bs_has_data(df, col_name):
-    """Check if a field is actually populated (exists and has non-zero values)."""
+    """
+    Check if a balance sheet field is actually populated.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Balance sheet dataframe
+    col_name : str
+        Column name to check
+
+    Returns
+    -------
+    bool
+        True if column exists and has non-zero values
+    """
     return col_name in df.columns and (df[col_name] != 0).any()
 
 
 def _bs_get_field(df, col_name):
-    """Get field value safely, returning 0 if missing or empty."""
+    """
+    Safely retrieve a balance sheet field value.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Balance sheet dataframe
+    col_name : str
+        Column name to retrieve
+
+    Returns
+    -------
+    pd.Series or int
+        Column values if populated, otherwise 0
+    """
     return df[col_name] if _bs_has_data(df, col_name) else 0
 
 
 def _bs_get_deferred_tax_components(df, mappings):
-    """Handle net vs split deferred tax positions. Returns (dta, dtl, has_net_dt)."""
+    """
+    Retrieve deferred tax components, handling net vs split positions.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Balance sheet dataframe
+    mappings : dict
+        Mapping of standardized columns to source columns
+
+    Returns
+    -------
+    tuple
+        (dta, dtl, has_net_dt) where:
+        - dta: Deferred tax assets values
+        - dtl: Deferred tax liabilities values
+        - has_net_dt: True if using net deferred tax position split by sign
+    """
     dta_sources = mappings.get("Deferred Tax Assets", [])
     has_net_dt = any("net" in src.lower() for src in dta_sources)
 
@@ -480,7 +638,21 @@ def _bs_get_deferred_tax_components(df, mappings):
 
 
 def _bs_reconstruct_assets(df, dta_component):
-    """Reconstruct total assets from components."""
+    """
+    Reconstruct total assets from component fields.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Balance sheet dataframe
+    dta_component : pd.Series or int
+        Deferred tax assets component
+
+    Returns
+    -------
+    pd.Series
+        Reconstructed total assets
+    """
     return (
         _bs_get_field(df, "Cash and Equivalents")
         + _bs_get_field(df, "Receivables")
@@ -497,7 +669,21 @@ def _bs_reconstruct_assets(df, dta_component):
 
 
 def _bs_reconstruct_liabilities(df, dtl_component):
-    """Reconstruct total liabilities from components."""
+    """
+    Reconstruct total liabilities from component fields.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Balance sheet dataframe
+    dtl_component : pd.Series or int
+        Deferred tax liabilities component
+
+    Returns
+    -------
+    pd.Series
+        Reconstructed total liabilities
+    """
     return (
         _bs_get_field(df, "Accounts Payable and Accrued Expenses")
         + _bs_get_field(df, "Short-term Debt")
@@ -511,7 +697,23 @@ def _bs_reconstruct_liabilities(df, dtl_component):
 
 
 def _bs_reconstruct_equity(df, mappings):
-    """Reconstruct total equity from components. Returns (equity, has_treasury)."""
+    """
+    Reconstruct total equity from component fields.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Balance sheet dataframe
+    mappings : dict
+        Mapping of standardized columns to source columns
+
+    Returns
+    -------
+    tuple
+        (equity, has_treasury) where:
+        - equity: Reconstructed total equity
+        - has_treasury: True if treasury stock is available and populated
+    """
     treasury_sources = mappings.get("Treasury Stock", [])
     has_treasury = len(treasury_sources) > 0 and _bs_has_data(df, "Treasury Stock")
 
@@ -538,7 +740,30 @@ def _bs_print_diagnostics(
     liabilities_reconstructed,
     equity_reconstructed,
 ):
-    """Print balance sheet validation diagnostics."""
+    """
+    Print diagnostic information for balance sheet validation.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Balance sheet dataframe
+    threshold : float
+        Acceptable discrepancy threshold
+    dta_component : pd.Series or int
+        Deferred tax assets values
+    dtl_component : pd.Series or int
+        Deferred tax liabilities values
+    has_net_dt : bool
+        Whether using net deferred tax position
+    has_treasury : bool
+        Whether treasury stock is available
+    assets_reconstructed : pd.Series
+        Reconstructed total assets
+    liabilities_reconstructed : pd.Series
+        Reconstructed total liabilities
+    equity_reconstructed : pd.Series
+        Reconstructed total equity
+    """
     print("\n" + "=" * 80)
     print(" BALANCE SHEET VALIDATION DIAGNOSTICS")
     print("=" * 80)
@@ -649,6 +874,21 @@ def bs_identity_checker(
 
 
 def drop_constants(df, verbose=False):
+    """
+    Remove constant columns and sparse rows from dataframe.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Input dataframe
+    verbose : bool, optional
+        Whether to print information about dropped columns
+
+    Returns
+    -------
+    pd.DataFrame
+        Cleaned dataframe with constant columns and sparse rows removed
+    """
     # Drop columns that are all NaN first (avoids warnings from nanstd)
     all_nan_cols = df.columns[df.isna().all()].tolist()
     if all_nan_cols:
@@ -721,6 +961,20 @@ def ytd_to_quarterly(df, exclude_columns=None):
 
 
 def lei_to_ticker(lei):
+    """
+    Convert Legal Entity Identifier (LEI) to stock ticker symbol.
+
+    Parameters
+    ----------
+    lei : str
+        Legal Entity Identifier
+
+    Returns
+    -------
+    str or None
+        Stock ticker symbol if found, 'non-english' for non-Latin company names,
+        or None if lookup fails
+    """
     if pd.isna(lei):
         return None
 
@@ -776,6 +1030,23 @@ def lei_to_ticker(lei):
 
 
 def leis_to_ticker(names, ticker_data, llm_client):
+    """
+    Convert multiple LEIs to ticker symbols using LLM-based lookup.
+
+    Parameters
+    ----------
+    names : list
+        List of company names or LEIs
+    ticker_data : str
+        Path to save/load ticker mapping JSON file
+    llm_client : LLMClient
+        LLM client for company name to ticker conversion
+
+    Returns
+    -------
+    dict
+        Mapping of company names to ticker symbols
+    """
     from jpm.question_1.clients.llm_client import LLMConfig
 
     # if os.path.exists(ticker_data):
@@ -802,6 +1073,21 @@ def leis_to_ticker(names, ticker_data, llm_client):
 
 
 def ticker_to_name(names, llm_client):
+    """
+    Convert ticker symbols to company names using LLM-based lookup.
+
+    Parameters
+    ----------
+    names : list
+        List of ticker symbols
+    llm_client : LLMClient
+        LLM client for ticker to company name conversion
+
+    Returns
+    -------
+    dict
+        Mapping of ticker symbols to company names
+    """
     from jpm.question_1.clients.llm_client import LLMConfig
 
     llm_config = LLMConfig(
@@ -819,12 +1105,40 @@ def ticker_to_name(names, llm_client):
 
 
 def _derived_col(d, name):
-    """Safely get column, returning 0 if missing."""
+    """
+    Safely retrieve column for derived calculations.
+
+    Parameters
+    ----------
+    d : pd.DataFrame
+        Dataframe to retrieve column from
+    name : str
+        Column name
+
+    Returns
+    -------
+    pd.Series
+        Column values with NaN filled as 0, or Series of 0 if missing
+    """
     return d[name].fillna(0) if name in d.columns else pd.Series(0, index=d.index)
 
 
 def _should_calculate(d, col_name):
-    """Check if column needs calculation (missing or all zero/NaN)."""
+    """
+    Check if a derived column needs to be calculated.
+
+    Parameters
+    ----------
+    d : pd.DataFrame
+        Dataframe to check
+    col_name : str
+        Column name to check
+
+    Returns
+    -------
+    bool
+        True if column is missing or contains only zero/NaN values
+    """
     if col_name not in d.columns:
         return True
     col_data = d[col_name]
@@ -832,7 +1146,17 @@ def _should_calculate(d, col_name):
 
 
 def _add_derived_assets(d):
-    """Add derived asset columns."""
+    """
+    Add derived asset columns if they don't already exist.
+
+    Calculates Total Current Assets and Total Non-Current Assets from their
+    components, and Total Assets from the sum of current and non-current.
+
+    Parameters
+    ----------
+    d : pd.DataFrame
+        Balance sheet dataframe (modified in-place)
+    """
     if _should_calculate(d, "Total Current Assets"):
         d["Total Current Assets"] = (
             _derived_col(d, "Cash and Equivalents")
@@ -866,7 +1190,17 @@ def _add_derived_assets(d):
 
 
 def _add_derived_liabilities(d):
-    """Add derived liability columns."""
+    """
+    Add derived liability columns if they don't already exist.
+
+    Calculates Total Current Liabilities and Total Non-Current Liabilities from their
+    components, and Total Liabilities from the sum of current and non-current.
+
+    Parameters
+    ----------
+    d : pd.DataFrame
+        Balance sheet dataframe (modified in-place)
+    """
     if _should_calculate(d, "Total Current Liabilities"):
         d["Total Current Liabilities"] = (
             _derived_col(d, "Accounts Payable and Accrued Expenses")
@@ -897,7 +1231,17 @@ def _add_derived_liabilities(d):
 
 
 def _add_derived_equity(d):
-    """Add derived equity columns."""
+    """
+    Add derived equity column if it doesn't already exist.
+
+    Calculates Total Equity from common stock, retained earnings, treasury stock,
+    and accumulated other comprehensive income.
+
+    Parameters
+    ----------
+    d : pd.DataFrame
+        Balance sheet dataframe (modified in-place)
+    """
     if _should_calculate(d, "Total Equity"):
         d["Total Equity"] = (
             _derived_col(d, "Common Stock and APIC")
@@ -908,7 +1252,16 @@ def _add_derived_equity(d):
 
 
 def _add_derived_income(d):
-    """Add derived income statement columns."""
+    """
+    Add derived income statement columns if they don't already exist.
+
+    Calculates Gross Profit, Operating Income, and Total Debt from their components.
+
+    Parameters
+    ----------
+    d : pd.DataFrame
+        Financial statement dataframe (modified in-place)
+    """
     if _should_calculate(d, "Gross Profit"):
         if (
             "Gross Profit" not in d.columns
@@ -957,13 +1310,38 @@ def add_derived_columns(df):
 
 
 def standardise_rating(rating):
+    """
+    Standardize credit rating format by removing provisional markers.
+
+    Parameters
+    ----------
+    rating : str
+        Credit rating string (e.g., 'BBB(P)')
+
+    Returns
+    -------
+    str or None
+        Standardized rating (e.g., 'BBB') or None if input is NaN
+    """
     if pd.isna(rating):
         return None
     return rating.replace("(P)", "").strip()
 
 
 def drop_non_numeric_columns(df):
-    """Drop columns that contain non-numeric, non-NaN values"""
+    """
+    Remove columns that contain non-numeric, non-NaN values.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Input dataframe
+
+    Returns
+    -------
+    pd.DataFrame
+        Dataframe with only numeric columns retained
+    """
     numeric_cols = []
 
     for col in df.columns:
@@ -1007,7 +1385,19 @@ def remap_financial_dataframe(df, column_mapping):
 
 
 def _extract_leaf_mappings(mapping):
-    """Extract only leaf-level column mappings from nested mapping structure."""
+    """
+    Extract leaf-level column mappings from nested mapping structure.
+
+    Parameters
+    ----------
+    mapping : dict
+        Nested dictionary mapping structure
+
+    Returns
+    -------
+    dict
+        Flattened dictionary with only leaf-level mappings
+    """
     leaf_map = {}
 
     for key, value in mapping.items():
@@ -1024,7 +1414,26 @@ def _extract_leaf_mappings(mapping):
 
 
 def _map_single_column(df, new_col, old_cols):
-    """Map a single column based on source columns."""
+    """
+    Map a single column from one or more source columns.
+
+    Handles both mutually exclusive sources (alternate taxonomies) and
+    true aggregations based on data patterns.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Source dataframe
+    new_col : str
+        Name of the new column (unused but kept for API consistency)
+    old_cols : list
+        List of source column names
+
+    Returns
+    -------
+    pd.Series or np.nan
+        Mapped column values (coalesced if mutually exclusive, summed if aggregate)
+    """
     if not old_cols:
         return np.nan
 
@@ -1048,7 +1457,21 @@ def _map_single_column(df, new_col, old_cols):
 def _is_mutually_exclusive(df, cols):
     """
     Check if columns are mutually exclusive (alternate taxonomies).
-    Returns True if columns never have non-zero values simultaneously.
+
+    Columns are considered mutually exclusive if they rarely have non-zero
+    values simultaneously (less than 5% of rows).
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Source dataframe
+    cols : list
+        List of column names to check
+
+    Returns
+    -------
+    bool
+        True if columns never have non-zero values simultaneously
     """
     if len(cols) <= 1:
         return False

@@ -39,6 +39,18 @@ class LSTMForecaster:
     def __init__(
         self, config: Config, data: EdgarData, dataset: StatementsDataset
     ) -> None:
+        """
+        Initialize the LSTM forecaster.
+
+        Parameters
+        ----------
+        config : Config
+            Configuration object containing LSTM and data settings.
+        data : EdgarData
+            Edgar data object containing financial statement data.
+        dataset : StatementsDataset
+            Dataset object with train/val/test splits and feature mappings.
+        """
         self.config = config
         self.data = data
         self.dataset = dataset
@@ -49,6 +61,18 @@ class LSTMForecaster:
             self.config.lstm.checkpoint_path.mkdir(parents=True)
 
     def _build_model(self) -> keras.Model:
+        """
+        Build the LSTM model architecture.
+
+        Constructs a sequential LSTM model with configurable layers, dropout,
+        and output layer type (deterministic, probabilistic, or variational).
+        Optionally includes an EnforceBalance constraint layer.
+
+        Returns
+        -------
+        keras.Model
+            Compiled Keras model ready for training.
+        """
         inputs = keras.layers.Input(
             shape=(self.config.data.lookback, self.dataset.num_features),
             dtype="float32",
@@ -75,7 +99,7 @@ class LSTMForecaster:
             )(x)
 
         if self.config.lstm.probabilistic:
-            n = len(self.data.targets)
+            n = len(self.dataset.targets)
             params_size = tfpl.MultivariateNormalTriL.params_size(n)
 
             params = keras.layers.Dense(
@@ -109,6 +133,13 @@ class LSTMForecaster:
         return model
 
     def _compile_model(self):
+        """
+        Compile the model with loss function and optimizer.
+
+        Configures the model with either negative log likelihood (for
+        probabilistic models) or custom balance sheet loss function
+        (for deterministic models).
+        """
         if self.config.lstm.probabilistic:
 
             def nll(y_true, y_pred_dist):
@@ -137,6 +168,14 @@ class LSTMForecaster:
         # self.model.summary()  # Disabled for batch processing
 
     def _build_optimizer(self):
+        """
+        Create optimizer with optional learning rate schedule.
+
+        Returns
+        -------
+        keras.optimizers.Optimizer
+            Adam optimizer with constant or cosine decay learning rate.
+        """
         lr = self.config.lstm.lr
         if self.config.lstm.scheduler == "cosine":
             lr = keras.optimizers.schedules.CosineDecayRestarts(
@@ -156,6 +195,15 @@ class LSTMForecaster:
         return 1.0 / cardinality
 
     def _build_output_layer(self):
+        """
+        Build the output layer (dense or variational).
+
+        Returns
+        -------
+        keras.layers.Layer
+            Either a standard Dense layer or DenseVariational layer with
+            Bayesian inference capabilities.
+        """
         if not self.config.lstm.variational:
             return keras.layers.Dense(
                 len(self.dataset.tgt_indices), name="next_quarter"
@@ -174,6 +222,23 @@ class LSTMForecaster:
         )
 
     def fit(self, **kwargs):
+        """
+        Train the model on the training dataset.
+
+        Fits the model using the training dataset and validates on the
+        validation dataset if available. Saves the best model weights
+        based on validation loss.
+
+        Parameters
+        ----------
+        **kwargs
+            Additional keyword arguments passed to model.fit().
+
+        Returns
+        -------
+        keras.callbacks.History
+            Training history object containing loss and metrics per epoch.
+        """
         checkpoint_cb = keras.callbacks.ModelCheckpoint(
             filepath=self.config.lstm.checkpoint_path / "best_model_ckpt.weights.h5",
             monitor="val_loss" if self.dataset.val_dataset is not None else "loss",
@@ -195,14 +260,106 @@ class LSTMForecaster:
             self.model.load_weights(weights_path)
         return history
 
-    def predict(self, x):
-        return self.model.predict(x)
+    def predict(self, x: np.ndarray | None = None) -> TickerResults:
+        """
+        Generate predictions for future periods (no ground truth).
+
+        Parameters
+        ----------
+        x : np.ndarray, optional
+            Input window of shape (1, lookback, features). If None, uses
+            the dataset's predict_dataset (final lookback window).
+
+        Returns
+        -------
+        TickerResults
+            Prediction results with forecasted values. MAE and ground truth
+            fields are set to 0 since no actuals are available.
+        """
+        if x is None:
+            x = self.dataset.X_predict
+
+        y_pred, pred_std = self._predict_with_uncertainty(x)
+
+        # Unscale predictions
+        y_pred_unscaled = y_pred * self.dataset.target_std + self.dataset.target_mean
+
+        # Compute per-feature std if available
+        per_feature_std = np.zeros(y_pred_unscaled.shape[-1])
+        if pred_std is not None:
+            per_feature_std = np.mean(pred_std, axis=0)
+
+        # Build feature metrics (no ground truth, so mae=0, gt=0)
+        feature_metrics = {
+            name: Metric(
+                value=float(y_pred_unscaled[:, idx].mean()),
+                mae=0.0,
+                gt=0.0,
+                std=float(per_feature_std[idx]) if pred_std is not None else 0.0,
+            )
+            for name, idx in self.dataset.feat_to_idx.items()
+        }
+
+        # Compute aggregate predictions for assets/liabilities/equity
+        asset_idx = self.dataset.feature_mappings["assets"]
+        liability_idx = self.dataset.feature_mappings["liabilities"]
+        equity_idx = self.dataset.feature_mappings["equity"]
+
+        assets_pred = float(np.sum(y_pred_unscaled[:, asset_idx], axis=-1).mean())
+        liabilities_pred = float(
+            np.sum(y_pred_unscaled[:, liability_idx], axis=-1).mean()
+        )
+        equity_pred = float(np.sum(y_pred_unscaled[:, equity_idx], axis=-1).mean())
+
+        # Net income prediction
+        ni_idx = self.dataset.feat_to_idx.get("Net Income")
+        net_income_pred = (
+            float(y_pred_unscaled[:, ni_idx].mean()) if ni_idx is not None else 0.0
+        )
+
+        ticker_results = TickerResults(
+            assets=Metric(value=assets_pred),
+            liabilities=Metric(value=liabilities_pred),
+            equity=Metric(value=equity_pred),
+            features=feature_metrics,
+            net_income_pred=net_income_pred,
+            pred_std={
+                name: float(per_feature_std[idx])
+                for name, idx in self.dataset.feat_to_idx.items()
+            },
+        )
+
+        self.predict_results = ticker_results
+        return ticker_results
 
     def save(self, path: str):
+        """
+        Save the model to disk.
+
+        Parameters
+        ----------
+        path : str
+            File path where the model will be saved.
+        """
         self.model.save(path)
 
     @classmethod
     def load(cls, path: str, config: Config) -> "LSTMForecaster":
+        """
+        Load a saved model from disk.
+
+        Parameters
+        ----------
+        path : str
+            File path to the saved model.
+        config : Config
+            Configuration object for the loaded model.
+
+        Returns
+        -------
+        LSTMForecaster
+            Loaded LSTMForecaster instance with restored weights.
+        """
         obj = cls.__new__(cls)
         obj.config = config
         obj.model = tf.keras.models.load_model(path)
@@ -211,6 +368,27 @@ class LSTMForecaster:
     def evaluate(
         self, stage: str = "val", llm_config: LLMConfig | None = None
     ) -> TickerResults:
+        """
+        Evaluate the model and compute metrics.
+
+        Evaluates the model on the specified dataset stage (train or val),
+        computes predictions, and calculates various performance metrics
+        including MAE, baseline comparisons, and skill scores.
+
+        Parameters
+        ----------
+        stage : str, default="val"
+            Dataset stage to evaluate on, either "val" or "train".
+        llm_config : LLMConfig, optional
+            Configuration for LLM-based forecast adjustments. If provided,
+            uses LLM to refine or generate predictions.
+
+        Returns
+        -------
+        TickerResults
+            Comprehensive evaluation results including predictions, errors,
+            baseline comparisons, and aggregate metrics.
+        """
         if stage not in {"val", "train"}:
             raise ValueError("stage must be 'val' or 'train'")
 
@@ -288,6 +466,23 @@ class LSTMForecaster:
         return ticker_results
 
     def _collect_batches(self, ds, stage: str) -> tuple[np.ndarray, np.ndarray]:
+        """
+        Collect all batches from a dataset into arrays.
+
+        Parameters
+        ----------
+        ds : tf.data.Dataset
+            Dataset to collect batches from.
+        stage : str
+            Stage name for error messages ("train" or "val").
+
+        Returns
+        -------
+        tuple[np.ndarray, np.ndarray]
+            Tuple of (history, y_gt) where history has shape
+            (n_samples, lookback, features) and y_gt has shape
+            (n_samples, n_targets).
+        """
         x_batches = []
         y_batches = []
         for x_batch, y_batch in ds:
@@ -302,6 +497,24 @@ class LSTMForecaster:
     def _predict_with_uncertainty(
         self, history: np.ndarray
     ) -> tuple[np.ndarray, np.ndarray | None]:
+        """
+        Make predictions with uncertainty estimates.
+
+        Routes to appropriate prediction method based on model configuration
+        (probabilistic, variational, or deterministic).
+
+        Parameters
+        ----------
+        history : np.ndarray
+            Input sequences of shape (n_samples, lookback, features).
+
+        Returns
+        -------
+        tuple[np.ndarray, np.ndarray | None]
+            Tuple of (predictions, std) where predictions has shape
+            (n_samples, n_targets) and std is either None (deterministic)
+            or has the same shape as predictions.
+        """
         pred_std = None
         if self.config.lstm.probabilistic:
             y_pred, pred_std = self._predict_probabilistic(history)
@@ -314,6 +527,24 @@ class LSTMForecaster:
     def _predict_probabilistic(
         self, history: np.ndarray
     ) -> tuple[np.ndarray, np.ndarray]:
+        """
+        Make probabilistic predictions using distribution outputs.
+
+        For probabilistic models, extracts mean and standard deviation from
+        the output distribution. Optionally uses Monte Carlo sampling for
+        additional uncertainty quantification.
+
+        Parameters
+        ----------
+        history : np.ndarray
+            Input sequences of shape (n_samples, lookback, features).
+
+        Returns
+        -------
+        tuple[np.ndarray, np.ndarray]
+            Tuple of (mean_predictions, std_predictions) both with shape
+            (n_samples, n_targets).
+        """
         if self.config.lstm.mc_samples > 1:
             dists = [
                 self.model(history, training=False)
@@ -329,6 +560,23 @@ class LSTMForecaster:
     def _predict_variational(
         self, history: np.ndarray
     ) -> tuple[np.ndarray, np.ndarray]:
+        """
+        Make variational predictions using Monte Carlo dropout.
+
+        Performs multiple forward passes with dropout enabled to estimate
+        prediction uncertainty via Monte Carlo sampling.
+
+        Parameters
+        ----------
+        history : np.ndarray
+            Input sequences of shape (n_samples, lookback, features).
+
+        Returns
+        -------
+        tuple[np.ndarray, np.ndarray]
+            Tuple of (mean_predictions, std_predictions) both with shape
+            (n_samples, n_targets).
+        """
         samples = [
             self.model.predict(history, verbose=0)
             for _ in range(self.config.lstm.mc_samples)
@@ -338,12 +586,52 @@ class LSTMForecaster:
     def _unscale(
         self, y_pred: np.ndarray, y_gt: np.ndarray, history: np.ndarray
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """
+        Unscale normalized predictions back to original scale.
+
+        Reverses standardization by multiplying by standard deviation
+        and adding the mean.
+
+        Parameters
+        ----------
+        y_pred : np.ndarray
+            Normalized predictions of shape (n_samples, n_targets).
+        y_gt : np.ndarray
+            Normalized ground truth of shape (n_samples, n_targets).
+        history : np.ndarray
+            Normalized history of shape (n_samples, lookback, features).
+
+        Returns
+        -------
+        tuple[np.ndarray, np.ndarray, np.ndarray]
+            Tuple of (y_pred_unscaled, y_gt_unscaled, history_unscaled).
+        """
         y_pred_unscaled = y_pred * self.dataset.target_std + self.dataset.target_mean
         y_gt_unscaled = y_gt * self.dataset.target_std + self.dataset.target_mean
         history_unscaled = history * self.dataset.target_std + self.dataset.target_mean
         return y_pred_unscaled, y_gt_unscaled, history_unscaled
 
     def _prediction_index(self, stage: str, count: int, for_history: bool = False):
+        """
+        Create datetime index for predictions.
+
+        Generates a pandas DatetimeIndex aligned with the prediction
+        or history timestamps based on the data's time series index.
+
+        Parameters
+        ----------
+        stage : str
+            Dataset stage ("train" or "val") to determine time window.
+        count : int
+            Number of time steps to include in the index.
+        for_history : bool, default=False
+            If True, creates index for historical data; otherwise for predictions.
+
+        Returns
+        -------
+        pd.DatetimeIndex or None
+            DatetimeIndex for the predictions or None if unavailable.
+        """
         if count <= 0 or not hasattr(self.data, "_get_timestamp_index"):
             return None
 
@@ -381,6 +669,28 @@ class LSTMForecaster:
         y_gt_unscaled: np.ndarray,
         pred_std: np.ndarray | None,
     ) -> tuple[dict[str, Metric], np.ndarray]:
+        """
+        Compute per-feature metrics.
+
+        Calculates mean absolute error, predicted values, ground truth,
+        and standard deviations for each target feature.
+
+        Parameters
+        ----------
+        y_pred_unscaled : np.ndarray
+            Unscaled predictions of shape (n_samples, n_targets).
+        y_gt_unscaled : np.ndarray
+            Unscaled ground truth of shape (n_samples, n_targets).
+        pred_std : np.ndarray or None
+            Prediction standard deviations, shape (n_samples, n_targets).
+
+        Returns
+        -------
+        tuple[dict[str, Metric], np.ndarray]
+            Tuple of (feature_metrics, per_feature_std) where feature_metrics
+            maps feature names to Metric objects and per_feature_std is an
+            array of shape (n_targets,).
+        """
         per_feature_mae, per_feature_std = self._per_feature_errors(
             y_pred_unscaled, y_gt_unscaled, pred_std
         )
@@ -402,6 +712,24 @@ class LSTMForecaster:
         y_gt_unscaled: np.ndarray,
         pred_std: np.ndarray | None,
     ) -> tuple[np.ndarray, np.ndarray]:
+        """
+        Calculate per-feature errors and standard deviations.
+
+        Parameters
+        ----------
+        y_pred_unscaled : np.ndarray
+            Unscaled predictions of shape (n_samples, n_targets).
+        y_gt_unscaled : np.ndarray
+            Unscaled ground truth of shape (n_samples, n_targets).
+        pred_std : np.ndarray or None
+            Prediction standard deviations, shape (n_samples, n_targets).
+
+        Returns
+        -------
+        tuple[np.ndarray, np.ndarray]
+            Tuple of (per_feature_mae, per_feature_std) both with shape
+            (n_targets,).
+        """
         err = y_pred_unscaled - y_gt_unscaled
         abs_err = np.abs(err)
         per_feature_mae = np.mean(abs_err, axis=0)
@@ -418,6 +746,30 @@ class LSTMForecaster:
         per_feature_std: np.ndarray,
         history_unscaled: np.ndarray,
     ) -> TickerResults:
+        """
+        Build TickerResults object from predictions and ground truth.
+
+        Aggregates per-feature predictions into balance sheet categories
+        (assets, liabilities, equity) and computes baseline comparisons.
+
+        Parameters
+        ----------
+        y_pred_unscaled : np.ndarray
+            Unscaled predictions of shape (n_samples, n_targets).
+        y_gt_unscaled : np.ndarray
+            Unscaled ground truth of shape (n_samples, n_targets).
+        feature_metrics : dict[str, Metric]
+            Per-feature metrics mapping feature names to Metric objects.
+        per_feature_std : np.ndarray
+            Per-feature standard deviations, shape (n_targets,).
+        history_unscaled : np.ndarray
+            Unscaled history of shape (n_samples, lookback, features).
+
+        Returns
+        -------
+        TickerResults
+            Complete evaluation results with aggregated metrics.
+        """
         asset_idx = self.dataset.feature_mappings["assets"]
         liability_idx = self.dataset.feature_mappings["liabilities"]
         equity_idx = self.dataset.feature_mappings["equity"]
@@ -483,6 +835,27 @@ class LSTMForecaster:
         y_gt_unscaled: np.ndarray,
         history_unscaled: np.ndarray,
     ) -> dict[str, dict[str, float] | float]:
+        """
+        Compute net income baseline metrics.
+
+        Compares model predictions for Net Income against baseline methods
+        (e.g., persistence, seasonal naive) and computes skill scores.
+
+        Parameters
+        ----------
+        y_pred_unscaled : np.ndarray
+            Unscaled predictions of shape (n_samples, n_targets).
+        y_gt_unscaled : np.ndarray
+            Unscaled ground truth of shape (n_samples, n_targets).
+        history_unscaled : np.ndarray
+            Unscaled history of shape (n_samples, lookback, features).
+
+        Returns
+        -------
+        dict[str, dict[str, float] | float]
+            Dictionary containing baseline_mae, skill, model_mae, pred,
+            gt, and baseline_pred for Net Income.
+        """
         net_income_baseline_mae: dict[str, float] = {}
         net_income_skill: dict[str, float] = {}
         net_income_model_mae = 0.0
@@ -521,6 +894,17 @@ class LSTMForecaster:
         }
 
     def view_results(self, stage: str = "val") -> None:
+        """
+        Display formatted results table.
+
+        Prints comprehensive evaluation results including overall metrics,
+        per-feature breakdowns, and baseline comparisons.
+
+        Parameters
+        ----------
+        stage : str, default="val"
+            Dataset stage to display results for ("val" or "train").
+        """
         results = self.val_results if stage == "val" else self.train_results
 
         print(f"\033[1mResults for {stage} dataset ({self.config.data.ticker}):\033[0m")

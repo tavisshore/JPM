@@ -46,6 +46,36 @@ REPORTS = {
 
 @dataclass
 class DataConfig:
+    """Configuration for data loading and preprocessing.
+
+    Parameters
+    ----------
+    ticker : str, optional
+        Stock ticker symbol (default: "AAPL").
+    cache_dir : Path, optional
+        Directory for caching downloaded data (default: "/scratch/datasets/jpm").
+    save_dir : Path, optional
+        Directory for saving outputs (default: "/scratch/projects/JPM/temp").
+    plots_dir : Path, optional
+        Directory for saving plots (default: "/scratch/projects/JPM/temp/plots").
+    periods : int, optional
+        Number of quarters to include (default: 60, ~15 years post-2008).
+    lookback : int, optional
+        Number of historical quarters for input sequences (default: 4).
+    horizon : int, optional
+        Number of future quarters to predict (default: 1).
+    batch_size : int, optional
+        Batch size for training (default: 32).
+    target_type : str, optional
+        Type of target variable: 'full', 'bs', or 'net_income' (default: "full").
+    withhold_periods : int, optional
+        Number of quarters to withhold for testing (default: 1).
+    seasonal_weight : float, optional
+        Weight applied to seasonal lag timestep, >1.0 increases importance (default: 1.1).
+    seasonal_lag : int, optional
+        Number of quarters for seasonal lag (default: 4, one year).
+    """
+
     ticker: str = "AAPL"
     cache_dir: Path = Path("/scratch/datasets/jpm")
     save_dir: Path = Path("/scratch/projects/JPM/temp")
@@ -61,6 +91,13 @@ class DataConfig:
     seasonal_lag: int = 4
 
     def __post_init__(self) -> None:
+        """Validate configuration parameters after initialization.
+
+        Raises
+        ------
+        ValueError
+            If any validation check fails.
+        """
         self._validate_strings()
         self._validate_positive_ints()
         self._validate_positive_floats()
@@ -68,10 +105,24 @@ class DataConfig:
         self._create_directories()
 
     def _validate_strings(self) -> None:
+        """Validate string parameters.
+
+        Raises
+        ------
+        ValueError
+            If ticker is not a non-empty string.
+        """
         if not isinstance(self.ticker, str) or not self.ticker.strip():
             raise ValueError("ticker must be a non-empty string")
 
     def _validate_positive_ints(self) -> None:
+        """Validate positive integer parameters.
+
+        Raises
+        ------
+        ValueError
+            If any integer parameter is not positive (or non-negative for withhold_periods).
+        """
         for name, val in (
             ("periods", self.periods),
             ("lookback", self.lookback),
@@ -85,14 +136,32 @@ class DataConfig:
             raise ValueError("withhold_periods must be non-negative")
 
     def _validate_positive_floats(self) -> None:
+        """Validate positive float parameters.
+
+        Raises
+        ------
+        ValueError
+            If seasonal_weight is not positive.
+        """
         if self.seasonal_weight <= 0:
             raise ValueError("seasonal_weight must be positive")
 
     def _validate_choices(self) -> None:
+        """Validate choice parameters against allowed values.
+
+        Raises
+        ------
+        ValueError
+            If target_type is not one of the allowed values.
+        """
         if self.target_type not in {"full", "bs", "net_income"}:
             raise ValueError("target_type must be one of {'full', 'bs', 'net_income'}")
 
     def _create_directories(self) -> None:
+        """Create required directories if they do not exist.
+
+        Creates cache_dir, save_dir, and plots_dir with all parent directories.
+        """
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self.save_dir.mkdir(parents=True, exist_ok=True)
         self.plots_dir.mkdir(parents=True, exist_ok=True)
@@ -113,6 +182,23 @@ class DataConfig:
 
     @classmethod
     def from_args(cls, args):
+        """Create a DataConfig from command line arguments.
+
+        Parameters
+        ----------
+        args : argparse.Namespace
+            Parsed command line arguments.
+
+        Returns
+        -------
+        DataConfig
+            New DataConfig instance with values from args, using defaults where not specified.
+
+        Notes
+        -----
+        - Path fields (cache_dir, save_dir, plots_dir) are converted from strings to Path objects.
+        - seasonal_lag is always set to its default value regardless of args.
+        """
         kwargs = {}
         path_fields = {"cache_dir", "save_dir", "plots_dir"}
         for f in fields(cls):
@@ -129,6 +215,48 @@ class DataConfig:
 
 @dataclass
 class LSTMConfig:
+    """Configuration for LSTM model architecture and training.
+
+    Parameters
+    ----------
+    lstm_units : int, optional
+        Number of units in each LSTM layer (default: 256).
+    lstm_layers : int, optional
+        Number of stacked LSTM layers (default: 2).
+    dense_units : int, optional
+        Number of units in dense layers (default: 256).
+    dropout : float, optional
+        Dropout rate for regularization (default: 0.1).
+    variational : bool, optional
+        Whether to use variational dropout (default: False).
+    probabilistic : bool, optional
+        Whether to use probabilistic predictions (default: False).
+    mc_samples : int, optional
+        Number of Monte Carlo samples for uncertainty estimation (default: 1).
+    lr : float, optional
+        Learning rate for optimizer (default: 1e-4).
+    decay_steps : int, optional
+        Number of steps for learning rate decay (default: 100).
+    decay_rate : float, optional
+        Decay rate for learning rate scheduler (default: 0.9).
+    scheduler : str, optional
+        Type of learning rate scheduler: 'exponential', 'cosine', or 'constant' (default: "exponential").
+    epochs : int, optional
+        Number of training epochs (default: 500).
+    checkpoint_path : Path, optional
+        Path to save model checkpoints (default: Path("ckpts")).
+    enforce_balance : bool, optional
+        Whether to enforce balance sheet constraints (default: False).
+    learn_identity : bool, optional
+        Whether to learn identity mappings (default: False).
+    identity_weight : float, optional
+        Weight for identity loss term (default: 1e-4).
+    learn_subtotals : bool, optional
+        Whether to learn subcategory subtotals (default: False).
+    subcategory_weight : float, optional
+        Weight for subcategory loss term (default: 1e-5).
+    """
+
     # Model architecture
     lstm_units: int = 256
     lstm_layers: int = 2
@@ -152,6 +280,13 @@ class LSTMConfig:
     subcategory_weight: float = 1e-5
 
     def __post_init__(self) -> None:  # noqa: C901
+        """Validate LSTM configuration parameters after initialization.
+
+        Raises
+        ------
+        ValueError
+            If any validation check fails.
+        """
         # Model validation
         if self.lstm_units <= 0:
             raise ValueError("lstm_units must be positive")
@@ -182,6 +317,18 @@ class LSTMConfig:
 
     @classmethod
     def from_args(cls, args):
+        """Create an LSTMConfig from command line arguments.
+
+        Parameters
+        ----------
+        args : argparse.Namespace
+            Parsed command line arguments.
+
+        Returns
+        -------
+        LSTMConfig
+            New LSTMConfig instance with values from args, using defaults where not specified.
+        """
         kwargs = {}
         for f in fields(cls):
             arg_val = getattr(args, f.name, None)
@@ -191,6 +338,24 @@ class LSTMConfig:
 
 @dataclass
 class LLMConfig:
+    """Configuration for LLM client and generation parameters.
+
+    Parameters
+    ----------
+    provider : str, optional
+        LLM provider name (default: "openai").
+    model : str, optional
+        Model identifier (default: "gpt-5-mini").
+    temperature : float, optional
+        Sampling temperature for generation (default: 0.0).
+    max_tokens : int, optional
+        Maximum tokens to generate (default: 8192).
+    use_llm : bool, optional
+        Whether to use LLM for processing (default: False).
+    adjust : bool, optional
+        Whether to apply adjustments to LLM outputs (default: True).
+    """
+
     provider: str = "openai"
     model: str = "gpt-5-mini"  # dev nano, eval mini, gpt-4o-2024-08-06
     temperature: float = 0.0  # 0.05
@@ -210,6 +375,30 @@ class LLMConfig:
 
 @dataclass
 class XGBConfig:
+    """Configuration for XGBoost model hyperparameters.
+
+    Parameters
+    ----------
+    max_depth : int, optional
+        Maximum tree depth for base learners (default: 4).
+    learning_rate : float, optional
+        Boosting learning rate (default: 0.05).
+    n_estimators : int, optional
+        Number of boosting rounds (default: 300).
+    subsample : float, optional
+        Subsample ratio of training instances (default: 0.8).
+    colsample_bytree : float, optional
+        Subsample ratio of columns when constructing each tree (default: 0.8).
+    reg_alpha : float, optional
+        L1 regularization term on weights (default: 0.1).
+    reg_lambda : float, optional
+        L2 regularization term on weights (default: 1.0).
+    use_gpu : bool, optional
+        Whether to use GPU for training (default: True).
+    random_state : int, optional
+        Random seed for reproducibility (default: 42).
+    """
+
     max_depth: int = 4
     learning_rate: float = 0.05
     n_estimators: int = 300
@@ -221,6 +410,13 @@ class XGBConfig:
     random_state: int = 42
 
     def __post_init__(self) -> None:
+        """Validate XGBoost configuration parameters after initialization.
+
+        Raises
+        ------
+        ValueError
+            If any validation check fails.
+        """
         if self.max_depth <= 0:
             raise ValueError("max_depth must be positive")
         if self.learning_rate <= 0:
@@ -237,6 +433,13 @@ class XGBConfig:
             raise ValueError("reg_lambda must be non-negative")
 
     def to_dict(self) -> dict:
+        """Convert configuration to dictionary format.
+
+        Returns
+        -------
+        dict
+            Dictionary representation of the XGBoost configuration.
+        """
         return asdict(self)
 
     @classmethod

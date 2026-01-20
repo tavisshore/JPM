@@ -12,24 +12,30 @@ class DummyDataLoader:
     """Dummy EdgarData replacement for testing."""
 
     def __init__(self, with_val: bool = True):
-        self.num_features = 2
-        self.targets = ["feature0", "feature1"]
+        self.num_features = 5
+        self.targets = [f"feature{i}" for i in range(5)]
         self.feature_mappings = {
-            "assets": [0],
-            "liabilities": [1],
-            "equity": [],
+            "assets": [0, 1],
+            "liabilities": [2, 3],
+            "equity": [4],
         }
-        self.bs_keys = ["feature0", "feature1"]
+        self.bs_keys = self.targets
+        # bs_structure should be flat dict without nesting
         self.bs_structure = {
-            "Assets": ["feature0"],
-            "Liabilities": ["feature1"],
-            "Equity": [],
+            "Assets": ["feature0", "feature1"],
+            "Liabilities": ["feature2", "feature3"],
+            "Equity": ["feature4"],
         }
-        self.target_mean = np.array([0.0, 0.0], dtype=np.float64)
-        self.target_std = np.array([1.0, 1.0], dtype=np.float64)
-        self.feat_to_idx = {"feature0": 0, "feature1": 1}
-        x = np.zeros((2, 1, 2), dtype=np.float64)
-        y = np.zeros((2, 2), dtype=np.float64)
+        self.is_structure = {
+            "Revenues": [],
+            "Expenses": [],
+        }
+        self.target_mean = np.zeros(5, dtype=np.float64)
+        self.target_std = np.ones(5, dtype=np.float64)
+        self.feat_to_idx = {f"feature{i}": i for i in range(5)}
+        # Create data with correct lookback and feature dimensions
+        x = np.zeros((2, 1, 5), dtype=np.float64)
+        y = np.zeros((2, 5), dtype=np.float64)
         self.train_dataset = tf.data.Dataset.from_tensor_slices((x, y)).batch(2)
         self.val_dataset = (
             tf.data.Dataset.from_tensor_slices((x, y)).batch(2) if with_val else None
@@ -50,8 +56,14 @@ class DummyStatementsDataset:
         self.num_targets = num_features
         self.tgt_indices = list(range(num_features))
 
-        # Feature names
-        self.targets = [f"feature_{i}" for i in range(num_features)]
+        # Feature names - ensure we have "Net Income" as the last feature
+        if num_features >= 1:
+            self.targets = [f"feature_{i}" for i in range(num_features - 1)] + [
+                "Net Income"
+            ]
+        else:
+            self.targets = [f"feature_{i}" for i in range(num_features)]
+
         self.bs_keys = self.targets[:3]  # First 3 features are balance sheet
 
         # Feature mappings for balance sheet identity
@@ -61,20 +73,17 @@ class DummyStatementsDataset:
             "equity": [2],
         }
 
-        # Balance sheet structure
+        # Balance sheet structure (flat dict format)
         self.bs_structure = {
-            "Assets": {"current_assets": ["feature_0"], "non_current_assets": []},
-            "Liabilities": {
-                "current_liabilities": ["feature_1"],
-                "non_current_liabilities": [],
-            },
+            "Assets": ["feature_0"],
+            "Liabilities": ["feature_1"],
             "Equity": ["feature_2"],
         }
 
         # Income statement structure
         self.is_structure = {
             "Revenues": ["feature_3"] if num_features > 3 else [],
-            "Expenses": ["feature_4"] if num_features > 4 else [],
+            "Expenses": ["Net Income"] if num_features >= 1 else [],
         }
 
         # Scaler stats

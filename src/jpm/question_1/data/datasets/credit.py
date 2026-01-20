@@ -151,16 +151,16 @@ class CreditDataset:
 
         # Define rating collapse mapping - Simplifies with such small data
         self.rating_map = {
-            "Aaa": 0,  # Prime (2 samples)
+            "Aaa": 0,  # Prime
             "Aa3": 1,
             "Aa2": 1,
-            "Aa1": 1,  # High Grade (11 samples)
+            "Aa1": 1,  # High
             "A3": 2,
             "A2": 2,
-            "A1": 2,  # Upper Medium (41 samples)
+            "A1": 2,  # Medium (41 samples)
             "Baa3": 3,
             "Baa2": 3,
-            "Baa1": 3,  # Lower Medium (12 samples)
+            "Baa1": 3,  # Lower
             "Ba2": 3,  # Non-Investment Grade Speculative (1 sample)
             # Add more once I download more data
         }

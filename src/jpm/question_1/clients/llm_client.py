@@ -34,10 +34,32 @@ from jpm.question_1.misc import format_money
 
 
 class LLMClient:
+    """
+    Client for LLM-based financial data analysis and extraction.
+
+    Provides integration with language models for parsing financial statements,
+    forecasting metrics, and converting between company names and ticker symbols.
+    Supports OpenAI models for various financial analysis tasks.
+    """
+
     def __init__(
         self,
         openai_api_key: Optional[str] = None,
     ) -> None:
+        """
+        Initialize the LLM client with API credentials.
+
+        Parameters
+        ----------
+        openai_api_key : Optional[str], optional
+            OpenAI API key for authentication. If not provided, will attempt to
+            read from OPENAI_API_KEY environment variable.
+
+        Raises
+        ------
+        RuntimeError
+            If no API key is provided and OPENAI_API_KEY is not set.
+        """
         openai_api_key = openai_api_key or os.getenv("OPENAI_API_KEY")
 
         if not openai_api_key:
@@ -51,6 +73,28 @@ class LLMClient:
     def chat(
         self, messages: List[Dict[str, Any]], cfg: LLMConfig, verbose: bool = False
     ) -> str:
+        """
+        Send a chat request to the configured LLM provider.
+
+        Parameters
+        ----------
+        messages : List[Dict[str, Any]]
+            List of message dictionaries containing role and content keys.
+        cfg : LLMConfig
+            Configuration specifying the provider and model to use.
+        verbose : bool, default=False
+            If True, display a spinner while waiting for the response.
+
+        Returns
+        -------
+        str
+            The text content of the LLM's response.
+
+        Raises
+        ------
+        ValueError
+            If the provider specified in cfg is not supported.
+        """
         if cfg.provider == "openai":
             return self._chat_openai(messages, cfg, verbose)
         else:
@@ -59,6 +103,28 @@ class LLMClient:
     def _chat_openai(
         self, messages: List[Dict[str, Any]], cfg: LLMConfig, verbose: bool = False
     ) -> str:
+        """
+        Internal method to send chat request to OpenAI API.
+
+        Parameters
+        ----------
+        messages : List[Dict[str, Any]]
+            List of message dictionaries containing role and content keys.
+        cfg : LLMConfig
+            Configuration specifying the model and other parameters.
+        verbose : bool, default=False
+            If True, display a spinner while waiting for the response.
+
+        Returns
+        -------
+        str
+            The text content of the OpenAI response.
+
+        Raises
+        ------
+        RuntimeError
+            If the OpenAI client is not initialized.
+        """
         if self._openai is None:
             raise RuntimeError("OpenAI client not initialised (missing API key).")
         if verbose:
@@ -129,6 +195,41 @@ class LLMClient:
         adjust: bool = False,
         verbose: bool = False,
     ) -> DataFrame:
+        """
+        Forecast next quarter's financial metrics using LLM.
+
+        Uses historical quarterly financial data to predict the next quarter's
+        values for specified financial metrics. Optionally adjusts predictions
+        based on a provided prediction DataFrame.
+
+        Parameters
+        ----------
+        history : DataFrame
+            Historical quarterly financial data with datetime index.
+        cfg : LLMConfig
+            Configuration for the LLM provider and model.
+        prediction : DataFrame or None, default=None
+            Optional prediction DataFrame to adjust against.
+        feature_columns : Optional[List[str]], default=None
+            List of column names to forecast. If None, uses all columns.
+        max_rows : int, default=4
+            Maximum number of recent rows to include in the prompt.
+        adjust : bool, default=False
+            If True, instructs LLM to adjust based on prediction parameter.
+        verbose : bool, default=False
+            If True, display a spinner during API call.
+
+        Returns
+        -------
+        DataFrame
+            Single-row DataFrame containing forecasted values for next quarter.
+
+        Raises
+        ------
+        ValueError
+            If history is None, empty, or missing required columns.
+            If LLM response cannot be parsed as CSV or is missing columns.
+        """
         if history is None or history.empty:
             raise ValueError("DataFrame must contain quarterly financial data.")
 
@@ -214,6 +315,35 @@ class LLMClient:
             json.dump(features, f, ensure_ascii=False, indent=4)
 
     def parse_annual_report(self, config: Config) -> dict[str, float] | None:
+        """
+        Parse annual report PDF to extract financial metrics and ratios.
+
+        Extracts financial data from specified pages of a PDF annual report,
+        converts values to USD if needed, and calculates key financial ratios
+        including leverage, liquidity, and profitability metrics.
+
+        Parameters
+        ----------
+        config : Config
+            Configuration object containing report path and page ranges.
+
+        Returns
+        -------
+        dict[str, float] or None
+            Dictionary containing extracted financial metrics and calculated ratios:
+            - net_income : Net income in USD
+            - Cost_to_Income : Operating expenses / Revenue
+            - Quick_Ratio : (Current Assets - Inventory) / Current Liabilities
+            - Debt_to_Equity : Total Debt / Equity
+            - Debt_to_Assets : Total Debt / Total Assets
+            - Total_Debt_to_Total_Capital : Total Debt / (Total Debt + Equity)
+            - Debt_to_EBITDA : Total Debt / EBITDA
+            - Interest_Coverage : EBIT / Interest Expense
+            - original_currency : Currency from the report
+            - exchange_rate : FX rate used for USD conversion
+            - report_date : Fiscal year end date
+            Returns None if parsing or extraction fails.
+        """
         pdf_path = config.data.get_report_path()
         page_range = config.data.get_report_pages()
 
@@ -362,6 +492,25 @@ class LLMClient:
         company_names: list,
         cfg: LLMConfig,
     ) -> dict:
+        """
+        Convert company names to stock ticker symbols using LLM.
+
+        Processes company names in batches to retrieve corresponding stock ticker
+        symbols. Falls back to individual processing if batch processing fails.
+
+        Parameters
+        ----------
+        company_names : list
+            List of company name strings to convert to tickers.
+        cfg : LLMConfig
+            Configuration for the LLM provider and model.
+
+        Returns
+        -------
+        dict
+            Dictionary mapping company names to ticker symbols.
+            Values may be None if ticker cannot be determined.
+        """
         batch_size = 25
         all_results = {}
         num_batches = (len(company_names) + batch_size - 1) // batch_size
@@ -396,6 +545,24 @@ class LLMClient:
         ticker: str,
         cfg: LLMConfig,
     ) -> dict:
+        """
+        Convert stock ticker symbol to company name variations using LLM.
+
+        Retrieves various name forms and variations for a given ticker symbol,
+        which is useful for matching against different data sources.
+
+        Parameters
+        ----------
+        ticker : str
+            Stock ticker symbol to convert.
+        cfg : LLMConfig
+            Configuration for the LLM provider and model.
+
+        Returns
+        -------
+        dict
+            Dictionary containing ticker and associated company name variations.
+        """
         prompt = get_company_name_prompt([ticker])
         response = self.chat(prompt, cfg)
         result = parse_llm_json_response(response)

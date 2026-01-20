@@ -60,10 +60,35 @@ MONTH_ABBR = {
 
 
 class RatingsHistoryDownloader:
+    """Download and process credit ratings data from ratingshistory.info.
+
+    This class provides functionality to download Moody's Corporate Financial ratings
+    data and process it into quarterly ratings suitable for joining with financial
+    statement data.
+
+    Attributes
+    ----------
+    BASE_URL : str
+        Base URL for the ratings history website
+    API_URL : str
+        API endpoint URL for downloading ratings data
+    config : Config
+        Configuration object containing data paths and settings
+    session : requests.Session
+        HTTP session for making requests
+    """
+
     BASE_URL = "https://ratingshistory.info"
     API_URL = f"{BASE_URL}/api/public"
 
     def __init__(self, config: Config) -> None:
+        """Initialize the RatingsHistoryDownloader.
+
+        Parameters
+        ----------
+        config : Config
+            Configuration object containing data paths and settings
+        """
         self.config = config
         self.session = requests.Session()
 
@@ -181,6 +206,20 @@ class EdgarData:
     def __init__(
         self, config: Config, overwrite: bool = False, verbose: bool = True
     ) -> None:
+        """Initialize EdgarData with configuration and load/fetch data.
+
+        Sets up cache paths, initializes LLM client, and loads financial data
+        either from cache or by fetching from SEC EDGAR database.
+
+        Parameters
+        ----------
+        config : Config
+            Configuration object containing data paths, ticker, and settings
+        overwrite : bool, optional
+            If True, fetch fresh data even if cache exists, by default False
+        verbose : bool, optional
+            If True, print detailed processing information, by default True
+        """
         self.config = config
         self.overwrite = overwrite
         self.verbose = verbose
@@ -205,6 +244,13 @@ class EdgarData:
         self.data = self._load_or_fetch_data()
 
     def _validate_target_type(self) -> None:
+        """Validate that the target_type configuration parameter is supported.
+
+        Raises
+        ------
+        ValueError
+            If target_type is not one of 'full', 'bs', or 'net_income'
+        """
         if self.config.data.target_type not in {"full", "bs", "net_income"}:
             raise ValueError(
                 f"Unsupported target_type '{self.config.data.target_type}'. "
@@ -212,6 +258,24 @@ class EdgarData:
             )
 
     def _load_or_fetch_data(self) -> pd.DataFrame:
+        """Load financial data from cache or fetch fresh data from SEC.
+
+        Attempts to load cached financial statements if available and overwrite
+        is False. Otherwise, fetches fresh data from SEC EDGAR, processes it,
+        and caches the results. Also retrieves and processes credit ratings.
+
+        Returns
+        -------
+        pd.DataFrame
+            Combined financial statement data indexed by quarter
+
+        Raises
+        ------
+        RuntimeError
+            If cached data exists but cannot be loaded
+        ValueError
+            If no data is available after filtering
+        """
         if self.cache_statement.exists() and not self.overwrite:
             try:
                 self.data = pd.read_parquet(self.cache_statement)
@@ -275,6 +339,23 @@ class EdgarData:
         # self.ratings_data = pd.read_parquet(self.ratings_data_path)
 
     def create_statements(self) -> None:
+        """Create and process financial statements from SEC EDGAR filings.
+
+        Fetches 10-Q and 10-K filings for the company, extracts XBRL data,
+        processes balance sheet, income statement, cash flow statement, and
+        statement of equity. Removes duplicate columns across statements
+        and combines them into a single DataFrame. Saves the result to cache.
+
+        Notes
+        -----
+        Processing includes:
+        - Converting XBRL data to tidy DataFrames
+        - Mapping columns using LLM-based feature extraction
+        - Dropping constant columns
+        - Validating balance sheet identity
+        - Converting year-to-date values to quarterly values
+        - Removing duplicate columns with priority: BS > IS > CF > E
+        """
         self.filings = self.company.get_filings(form=["10-Q", "10-K"])
         self.xbrls = XBRLS.from_filings(self.filings)
 
@@ -433,6 +514,3 @@ if __name__ == "__main__":
     print(data.data.sample(6).T)
     print()
     print(data.ratings_data.sample(6).T)
-    # Getting ratings
-    # dataset = EdgarDataset(edgar_data=data, target="lstm", verbose=False)
-    # print(data.data.head(1).T)
