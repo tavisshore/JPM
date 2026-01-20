@@ -48,13 +48,12 @@ import sys
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Tuple
 
 import numpy as np
 
-
-## -----------------------------------------------------------------------------
-# Repo import handling (robust)
+# -----------------------------------------------------------------------------
+# Repo import handling (FIXED)
 # -----------------------------------------------------------------------------
 from pathlib import Path
 import sys
@@ -81,30 +80,28 @@ estimate_lu25_map = None
 Lu25MapConfig = None
 
 try:
-    from simulation.config import SimConfig
-    from simulation.simulate import simulate_dataset
     from estimators.blp import estimate_blp_sigma
     from estimators.shrinkage import estimate_shrinkage_sigma
+    from simulation.config import SimConfig
+    from simulation.simulate import simulate_dataset
 
     try:
-        from estimators.lu25_map import estimate_lu25_map, Lu25MapConfig
+        from estimators.lu25_map import Lu25MapConfig, estimate_lu25_map
+
         HAS_LU25_MAP = True
     except Exception:
         HAS_LU25_MAP = False
 
 except Exception as e:
     raise ImportError(
-        "Could not import repo modules.\n"
-        f"PROJECT_ROOT={PROJECT_ROOT}\n"
-        f"REPL_ROOT={REPL_ROOT}\n"
-        "Make sure you run inside the project with replication_lu25/ present.\n"
-        f"Original error: {e}"
+        "Could not import repo modules. Make sure you run inside the project with "
+        "replication_lu25/ present."
     ) from e
-
 
 # -----------------------------------------------------------------------------
 # Logging + IO
 # -----------------------------------------------------------------------------
+
 
 class OutputLogger:
     """Print to console AND write to a file."""
@@ -134,7 +131,9 @@ def ensure_results_dir() -> Path:
     return results_dir
 
 
-def print_progress_bar(iteration: int, total: int, prefix: str = "", suffix: str = "", length: int = 36):
+def print_progress_bar(
+    iteration: int, total: int, prefix: str = "", suffix: str = "", length: int = 36
+):
     if total <= 0:
         return
     pct = 100.0 * (iteration / float(total))
@@ -148,6 +147,7 @@ def print_progress_bar(iteration: int, total: int, prefix: str = "", suffix: str
 # -----------------------------------------------------------------------------
 # Config
 # -----------------------------------------------------------------------------
+
 
 @dataclass
 class StudyConfig:
@@ -187,6 +187,7 @@ DEFAULT_GRID: List[Tuple[str, int, int]] = [
 # Summaries
 # -----------------------------------------------------------------------------
 
+
 def init_storage(R: int) -> Dict[str, np.ndarray]:
     return {
         "sigma": np.full(R, np.nan),
@@ -207,20 +208,28 @@ def summarize_vec(x: np.ndarray, true_val: float) -> Dict[str, float]:
     return {"mean": mean, "bias": bias, "sd": sd, "rmse": rmse, "n": int(x.size)}
 
 
-def print_method_table(title: str, summary: Dict[str, Dict[str, float]], true_params: Dict[str, float]):
-    print(f"\n{'-'*90}")
+def print_method_table(
+    title: str, summary: Dict[str, Dict[str, float]], true_params: Dict[str, float]
+):
+    print(f"\n{'-' * 90}")
     print(title)
-    print(f"{'-'*90}")
-    print(f"{'Param':<8} {'True':>10} {'Mean':>10} {'Bias':>10} {'SD':>10} {'RMSE':>10} {'n':>6}")
-    print(f"{'-'*90}")
+    print(f"{'-' * 90}")
+    print(
+        f"{'Param':<8} {'True':>10} {'Mean':>10} {'Bias':>10} {'SD':>10} {'RMSE':>10} {'n':>6}"
+    )
+    print(f"{'-' * 90}")
     mapping = [("sigma", "σ"), ("beta_p", "β_p"), ("beta_w", "β_w")]
     for k, sym in mapping:
         s = summary[k]
         tv = true_params[k]
-        print(f"{sym:<8} {tv:>10.4f} {s['mean']:>10.4f} {s['bias']:>10.4f} {s['sd']:>10.4f} {s['rmse']:>10.4f} {s['n']:>6d}")
+        print(
+            f"{sym:<8} {tv:>10.4f} {s['mean']:>10.4f} {s['bias']:>10.4f} {s['sd']:>10.4f} {s['rmse']:>10.4f} {s['n']:>6d}"
+        )
 
 
-def save_summary_csv(path: Path, cell_key: str, summaries: Dict[str, Dict[str, Dict[str, float]]]):
+def save_summary_csv(
+    path: Path, cell_key: str, summaries: Dict[str, Dict[str, Dict[str, float]]]
+):
     # Append mode: one big CSV across the whole grid
     header = "cell,method,parameter,mean,bias,sd,rmse,n\n"
     write_header = not path.exists()
@@ -238,6 +247,7 @@ def save_summary_csv(path: Path, cell_key: str, summaries: Dict[str, Dict[str, D
 # -----------------------------------------------------------------------------
 # Estimator runners (repo-consistent)
 # -----------------------------------------------------------------------------
+
 
 def run_blp_mc(markets, cfg: SimConfig, iv_type: str):
     return estimate_blp_sigma(markets, iv_type=iv_type, R=cfg.R0)
@@ -275,7 +285,10 @@ def run_lu25_map_mc(markets, study: StudyConfig, cfg: SimConfig, rep_seed: int):
 # One cell (DGP,T,J)
 # -----------------------------------------------------------------------------
 
-def run_cell(dgp: str, T: int, J: int, study: StudyConfig, cfg: SimConfig, include_lu25_map: bool) -> Dict[str, Dict[str, Dict[str, float]]]:
+
+def run_cell(  # noqa: C901
+    dgp: str, T: int, J: int, study: StudyConfig, cfg: SimConfig, include_lu25_map: bool
+) -> Dict[str, Dict[str, Dict[str, float]]]:
     """Run one Table-1-style cell and return summaries."""
 
     true_params = {
@@ -295,9 +308,9 @@ def run_cell(dgp: str, T: int, J: int, study: StudyConfig, cfg: SimConfig, inclu
     shrink_gamma_list: List[np.ndarray] = []
     lu25_gamma_list: List[np.ndarray] = []
 
-    print(f"\n{'='*90}")
+    print(f"\n{'=' * 90}")
     print(f"Cell: {dgp}, T={T}, J={J}, N_t={getattr(cfg, 'Nt', 'NA')}, R0={cfg.R0}")
-    print(f"{'='*90}")
+    print(f"{'=' * 90}")
 
     for r in range(study.R_mc):
         rep_seed = study.seed + r
@@ -351,7 +364,12 @@ def run_cell(dgp: str, T: int, J: int, study: StudyConfig, cfg: SimConfig, inclu
                 lu25["fail"][r] = 1
 
         # progress
-        print_progress_bar(r + 1, study.R_mc, prefix=f"  {dgp} T={T:<3d} J={J:<3d}", suffix=f"({r+1}/{study.R_mc})")
+        print_progress_bar(
+            r + 1,
+            study.R_mc,
+            prefix=f"  {dgp} T={T:<3d} J={J:<3d}",
+            suffix=f"({r + 1}/{study.R_mc})",
+        )
 
     # summarize
     summaries: Dict[str, Dict[str, Dict[str, float]]] = {}
@@ -392,26 +410,39 @@ def run_cell(dgp: str, T: int, J: int, study: StudyConfig, cfg: SimConfig, inclu
     if len(shrink_gamma_list) > 0 and dgp in ["DGP1", "DGP2"]:
         # In your repo: first sparse_frac*J are true signals (non-zero)
         cutoff = int(cfg.sparse_frac * J)
-        G = np.stack([g.reshape(T, J) for g in shrink_gamma_list], axis=0)  # [R_eff, T, J]
+        G = np.stack(
+            [g.reshape(T, J) for g in shrink_gamma_list], axis=0
+        )  # [R_eff, T, J]
         gamma_avg = G.mean(axis=(0, 1))  # [J]
         signal = float(gamma_avg[:cutoff].mean()) if cutoff > 0 else np.nan
         noise = float(gamma_avg[cutoff:].mean()) if cutoff < J else np.nan
-        print(f"\nSparsity recovery (Shrinkage; avg gamma over markets+reps):")
+        print("\nSparsity recovery (Shrinkage; avg gamma over markets+reps):")
         print(f"  cutoff (signal products): {cutoff}/{J}")
         print(f"  avg gamma signal: {signal:.4f}")
         print(f"  avg gamma noise:  {noise:.4f}")
 
-    if include_lu25_map and HAS_LU25_MAP and len(lu25_gamma_list) > 0 and dgp in ["DGP1", "DGP2"]:
+    if (
+        include_lu25_map
+        and HAS_LU25_MAP
+        and len(lu25_gamma_list) > 0
+        and dgp in ["DGP1", "DGP2"]
+    ):
         cutoff = int(cfg.sparse_frac * J)
-        H = np.stack([g.reshape(T, J) for g in lu25_gamma_list], axis=0)  # [R_eff, T, J]
+        H = np.stack(
+            [g.reshape(T, J) for g in lu25_gamma_list], axis=0
+        )  # [R_eff, T, J]
         gamma_rate = H.mean(axis=0)  # [T,J]
         signal_rate = float(gamma_rate[:, :cutoff].mean()) if cutoff > 0 else np.nan
         noise_rate = float(gamma_rate[:, cutoff:].mean()) if cutoff < J else np.nan
-        print(f"\nSparsity recovery (Lu25MAP; mean detect rate |d|>tau):")
+        print("\nSparsity recovery (Lu25MAP; mean detect rate |d|>tau):")
         print(f"  tau_detect: {study.lu_tau_detect:.3f}")
         print(f"  detect rate signal: {signal_rate:.4f}")
         print(f"  detect rate noise:  {noise_rate:.4f}")
-        print(f"  specificity (1-noise): {1.0 - noise_rate:.4f}" if not np.isnan(noise_rate) else "")
+        print(
+            f"  specificity (1-noise): {1.0 - noise_rate:.4f}"
+            if not np.isnan(noise_rate)
+            else ""
+        )
 
     # failure counts
     print("\nFailures (count / R):")
@@ -427,6 +458,7 @@ def run_cell(dgp: str, T: int, J: int, study: StudyConfig, cfg: SimConfig, inclu
 # -----------------------------------------------------------------------------
 # Main study runner
 # -----------------------------------------------------------------------------
+
 
 def main():
     results_dir = ensure_results_dir()
@@ -469,9 +501,13 @@ def main():
         print(f"Base seed: {study.seed}")
         print(f"Market size N_t (cfg.Nt): {getattr(cfg, 'Nt', 'NA')}")
         print(f"Consumer draws R0 (cfg.R0): {cfg.R0}")
-        print(f"Shrinkage: n_iter={study.shrink_n_iter}, burn={study.shrink_burn}, v0={study.shrink_v0}, v1={study.shrink_v1}")
+        print(
+            f"Shrinkage: n_iter={study.shrink_n_iter}, burn={study.shrink_burn}, v0={study.shrink_v0}, v1={study.shrink_v1}"
+        )
         if include_lu25_map:
-            print(f"Lu25 MAP: steps={study.lu_steps}, lr={study.lu_lr}, l1_strength={study.lu_l1_strength}, tau={study.lu_tau_detect}")
+            print(
+                f"Lu25 MAP: steps={study.lu_steps}, lr={study.lu_lr}, l1_strength={study.lu_l1_strength}, tau={study.lu_tau_detect}"
+            )
         else:
             print("Lu25 MAP: disabled")
 
@@ -484,7 +520,9 @@ def main():
         # Run grid
         for dgp, T, J in DEFAULT_GRID:
             cell_key = f"{dgp}_T{T}_J{J}"
-            summaries = run_cell(dgp, T, J, study, cfg, include_lu25_map=include_lu25_map)
+            summaries = run_cell(
+                dgp, T, J, study, cfg, include_lu25_map=include_lu25_map
+            )
             save_summary_csv(csv_path, cell_key, summaries)
 
         print("\n" + "=" * 90)

@@ -27,15 +27,20 @@ from jpm.question_1.data.utils import (
 )
 from jpm.question_1.data.vis import pretty_print_full_mapping
 
-# SEC requires user identification via email
-email = os.getenv("EDGAR_EMAIL")
-if not email:
-    raise ValueError(
-        "EDGAR_EMAIL environment variable not set"
-        "set with 'export EDGAR_EMAIL='your_email@jpm.com'"
-    )
 
-edgar.set_identity(email)
+# SEC requires user identification via email
+def _setup_edgar_identity():
+    """Initialize EDGAR with user email. Only called when EDGAR is actually used."""
+    email = os.getenv("EDGAR_EMAIL")
+    if not email:
+        raise ValueError(
+            "EDGAR_EMAIL environment variable not set. "
+            "Set with 'export EDGAR_EMAIL=your_email@jpm.com'"
+        )
+    edgar.set_identity(email)
+    return email
+
+
 pd.set_option("future.no_silent_downcasting", True)
 
 pd.set_option("display.max_rows", None)
@@ -284,6 +289,8 @@ class EdgarData:
                     f"Failed to load cached statement at {self.cache_statement}"
                 ) from exc
         else:
+            # Setup EDGAR identity before making API calls
+            _setup_edgar_identity()
             self.company = Company(self.config.data.ticker)
             self.fy_end_month = int(self.company.fiscal_year_end[:2])
             self.fy_start_month = self.fy_end_month + 1

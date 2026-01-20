@@ -3,8 +3,11 @@ import sys
 
 import numpy as np
 import tensorflow as tf
-from choice_learn_ext.models.deep_context.deep_halo_core import DeepContextChoiceModel
-from choice_learn_ext.models.deep_context.trainer import Trainer
+
+from jpm.question_3.choice_learn_ext.models.deep_context.deep_halo_core import (
+    DeepContextChoiceModel,
+)
+from jpm.question_3.choice_learn_ext.models.deep_context.trainer import Trainer
 
 # ---------------------------------------------------------------------
 # Make sure choice_learn_ext is importable when running this as a script

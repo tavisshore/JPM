@@ -58,9 +58,9 @@ def _simulate_shares_given_delta(
         s_hat: [J] predicted inside shares.
     """
     mu = tf.expand_dims(nu_draws, 1) * tf.expand_dims(p, 0) * sigma  # [R, J]
-    util = tf.expand_dims(delta, 0) + mu                              # [R, J]
+    util = tf.expand_dims(delta, 0) + mu  # [R, J]
     expu = tf.exp(util)
-    denom = 1.0 + tf.reduce_sum(expu, axis=1, keepdims=True)          # include outside option
+    denom = 1.0 + tf.reduce_sum(expu, axis=1, keepdims=True)  # include outside option
     s_r = expu / denom
     return tf.reduce_mean(s_r, axis=0)  # [J]
 
@@ -139,19 +139,21 @@ def estimate_lu25_map(markets: List[Dict], cfg: Lu25MapConfig | None = None) -> 
         nu_draws_list.append(tf.cast(nu, tf.float64))
 
     # Stack lists into tensors for tf.function-safe indexing
-    S_obs = tf.stack(s_obs_list, axis=0)              # [T, J]
-    P = tf.stack(p_list, axis=0)                      # [T, J]
-    W = tf.stack(w_list, axis=0)                      # [T, J]
-    NU = tf.stack(nu_draws_list, axis=0)              # [T, R]
-    N_tf = tf.constant(N_list, dtype=tf.float64)      # [T]
+    S_obs = tf.stack(s_obs_list, axis=0)  # [T, J]
+    P = tf.stack(p_list, axis=0)  # [T, J]
+    W = tf.stack(w_list, axis=0)  # [T, J]
+    NU = tf.stack(nu_draws_list, axis=0)  # [T, R]
+    N_tf = tf.constant(N_list, dtype=tf.float64)  # [T]
 
     # Parameters
     # beta = [intercept, beta_p, beta_w]
     beta = tf.Variable(tf.zeros([3], dtype=tf.float64), name="beta")
-    log_sigma = tf.Variable(tf.math.log(tf.constant(1.0, dtype=tf.float64)), name="log_sigma")
+    log_sigma = tf.Variable(
+        tf.math.log(tf.constant(1.0, dtype=tf.float64)), name="log_sigma"
+    )
 
-    mu = tf.Variable(tf.zeros([T], dtype=tf.float64), name="mu")       # market baselines
-    d = tf.Variable(tf.zeros([T, J], dtype=tf.float64), name="d")      # deviations
+    mu = tf.Variable(tf.zeros([T], dtype=tf.float64), name="mu")  # market baselines
+    d = tf.Variable(tf.zeros([T, J], dtype=tf.float64), name="d")  # deviations
 
     # Initialize beta via crude static logit inversion using average shares
     s_bar = tf.reduce_mean(S_obs, axis=0)  # [J]
@@ -210,7 +212,7 @@ def estimate_lu25_map(markets: List[Dict], cfg: Lu25MapConfig | None = None) -> 
             neg_obj = -ll + mu_pen + d_pen
 
         grads = tape.gradient(neg_obj, [beta, log_sigma, mu, d])
-        opt.apply_gradients(zip(grads, [beta, log_sigma, mu, d]))
+        opt.apply_gradients(zip(grads, [beta, log_sigma, mu, d], strict=True))
         return neg_obj, ll, mu_pen, d_pen, tf.exp(log_sigma)
 
     for it in range(cfg.steps):
@@ -231,9 +233,9 @@ def estimate_lu25_map(markets: List[Dict], cfg: Lu25MapConfig | None = None) -> 
     sigma_hat = float(tf.exp(log_sigma).numpy())
     beta_hat = beta.numpy().astype(float)
 
-    mu_hat = mu.numpy().astype(float)                 # [T]
-    d_hat_mat = d.numpy().astype(float)               # [T, J]
-    d_hat = d_hat_mat.reshape(-1)                     # [T*J]
+    mu_hat = mu.numpy().astype(float)  # [T]
+    d_hat_mat = d.numpy().astype(float)  # [T, J]
+    d_hat = d_hat_mat.reshape(-1)  # [T*J]
     xi_hat = (mu_hat[:, None] + d_hat_mat).reshape(-1)  # [T*J]
 
     # Sparsity diagnostics and detection

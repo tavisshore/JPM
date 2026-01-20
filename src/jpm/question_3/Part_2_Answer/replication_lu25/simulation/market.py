@@ -12,25 +12,35 @@ from .dgp import generate_eta_alpha
 tfd = tfp.distributions
 
 
-def _simulate_shares_rc_logit(p: np.ndarray, w: np.ndarray, xi: np.ndarray, cfg: SimConfig, rng: np.random.Generator) -> np.ndarray:
+def _simulate_shares_rc_logit(
+    p: np.ndarray,
+    w: np.ndarray,
+    xi: np.ndarray,
+    cfg: SimConfig,
+    rng: np.random.Generator,
+) -> np.ndarray:
     """Simulate inside-good shares for one market under RC logit with an outside option."""
-    J = p.shape[0]
+    # J = p.shape[0]
 
-    p_tf = tf.convert_to_tensor(p, dtype=tf.float64)   # (J,)
+    p_tf = tf.convert_to_tensor(p, dtype=tf.float64)  # (J,)
     w_tf = tf.convert_to_tensor(w, dtype=tf.float64)
     xi_tf = tf.convert_to_tensor(xi, dtype=tf.float64)
 
     # Draw individual-specific price coefficients: beta_p_i ~ N(beta_p_star, sigma_star^2)
     beta_p_draws = tf.cast(
-        tfd.Normal(cfg.beta_p_star, cfg.sigma_star).sample(cfg.R0, seed=int(rng.integers(1, 2**31-1))),
-        tf.float64
+        tfd.Normal(cfg.beta_p_star, cfg.sigma_star).sample(
+            cfg.R0, seed=int(rng.integers(1, 2**31 - 1))
+        ),
+        tf.float64,
     )  # (R0,)
 
     # mean utility part: beta_p_star * p + beta_w_star * w + xi
     delta = cfg.beta_p_star * p_tf + cfg.beta_w_star * w_tf + xi_tf  # (J,)
 
     # heterogeneous component: (beta_p_i - beta_p_star) * p
-    mu = tf.expand_dims(beta_p_draws - cfg.beta_p_star, 1) * tf.expand_dims(p_tf, 0)  # (R0, J)
+    mu = tf.expand_dims(beta_p_draws - cfg.beta_p_star, 1) * tf.expand_dims(
+        p_tf, 0
+    )  # (R0, J)
 
     util = tf.expand_dims(delta, 0) + mu  # (R0, J)
     expu = tf.exp(util)

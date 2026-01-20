@@ -1,5 +1,8 @@
 import pandas as pd
-from choice_learn_ext.models.deep_context.deep_halo_core import DeepHaloChoiceModel
+
+from jpm.question_3.choice_learn_ext.models.deep_context.deep_halo_estimator import (
+    DeepHaloChoiceModel,
+)
 
 
 def test_wrapper_fit_predict():

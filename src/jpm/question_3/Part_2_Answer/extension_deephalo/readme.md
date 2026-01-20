@@ -6,10 +6,10 @@ This project studies how to efficiently estimate discrete choice models with ric
 
 The goal is twofold:
 
-1. **Replication**  
+1. **Replication**
    Reproduce and validate the Monte Carlo findings of Lu & Shimizu (2025) under sparse and dense unobserved shocks.
 
-2. **Extension**  
+2. **Extension**
    Demonstrate that a scalable MAP-based approximation can recover the key benefits of Bayesian shrinkage while dramatically reducing computational cost.
 
 The project emphasizes methodological correctness, diagnostics, and interpretability rather than black-box performance.
@@ -18,10 +18,10 @@ The project emphasizes methodological correctness, diagnostics, and interpretabi
 
 ## Key Ideas
 
-- **Context-dependent utilities**  
+- **Context-dependent utilities**
   DeepHalo provides a structured neural representation of choice utilities that captures interactions across products without relying on hand-crafted features.
 
-- **Structured unobserved heterogeneity**  
+- **Structured unobserved heterogeneity**
   Market–product shocks are decomposed into:
   - a market-level component shared across inside goods, and
   - a sparse product-specific deviation.

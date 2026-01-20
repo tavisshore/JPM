@@ -1,4 +1,4 @@
-# Question 3 – Part 1  
+# Question 3 – Part 1
 ## Understanding Context Effects in Discrete Choice Models
 
 ## Repository Structure (Part 1)
@@ -87,4 +87,3 @@ python experiments/decoy_effect.py
 python experiments/attraction_effect_tf.py
 
 python experiments/synthetic_decoy.py
-

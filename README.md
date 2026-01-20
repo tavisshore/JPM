@@ -1,5 +1,15 @@
 # JPM - MLCOE Internship Exercises
 
+<p align="center">
+  <a href="https://www.linkedin.com/in/tavisshore/">
+    <img src="https://img.shields.io/badge/Tavis_Shore-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="Tavis Shore">
+  </a>
+  &nbsp;&nbsp;&nbsp;
+  <a href="https://www.linkedin.com/in/sanaamironov/">
+    <img src="https://img.shields.io/badge/Sanaa_Mironov-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="Sanaa Mironov">
+  </a>
+</p>
+
 ## Setup
 Create a clean Python 3.10 environment and install the package:
 ```bash
@@ -74,23 +84,23 @@ This will take quite a long time but will show progress.
 The experiments are implemented as Python modules and can be invoked directly.
 - Table 1
   ```
-  python -m experiments.reproduce_table1
+  python src/jpm/question_3/experiments/reproduce_table1.py
   ```
 - Decoy effect
   ```
-  python -m experiments.decoy_effect
+  python src/jpm/question_3/experiments/decoy_effect.py
   ```
 - Attraction effect
   ```
-  python -m experiments.attraction_effect_tf
+  python src/jpm/question_3/experiments/attraction_effect_tf
   ```
 - Compromise effect
   ```
-  python -m experiments.compromise_effect_tf
+  python src/jpm/question_3/experiments/compromise_effect_tf
   ```
 - Attraction effect (PyTorch)
   ```
-  python -m experiments.attraction_effect_torch
+  python src/jpm/question_3/experiments/attraction_effect_torch
   ```
 ---
 

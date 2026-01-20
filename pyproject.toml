@@ -47,4 +47,9 @@ ignore = ["E501"]  # Ignore line-too-long errors
 [tool.pytest.ini_options]
 minversion = "8.0"
 testpaths = ["tests"]
-python_files = "question_*.py"
+pythonpath = ["."]
+markers = [
+    "slow: slow integration tests",
+    "unit: fast unit tests",
+    "integration: broader multi-component tests",
+]

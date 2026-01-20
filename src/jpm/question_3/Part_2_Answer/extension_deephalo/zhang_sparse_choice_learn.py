@@ -28,16 +28,16 @@ python choice_learn_extension/zhang_sparse_choice_learn.py
 from __future__ import annotations
 
 import os
+
 os.environ.setdefault("TF_USE_LEGACY_KERAS", "1")
 
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
 
 import numpy as np
 import tensorflow as tf
-
 from choice_learn.data import ChoiceDataset
 
 # -----------------------------------------------------------------------------
@@ -49,8 +49,8 @@ PROJECT_ROOT = HERE.parents[1]
 sys.path.insert(0, str(HERE.parent))
 
 try:
-    from deep_halo_core import DeepHalo
     from config import DeepHaloConfig
+    from deep_halo_core import DeepHalo
 except ImportError:
     print("Warning: DeepHalo not found, using placeholder.")
 
@@ -72,9 +72,11 @@ except ImportError:
             u = tf.squeeze(self.dense(emb), -1)
             return {"utilities": u}
 
+
 # -----------------------------------------------------------------------------
 # Config
 # -----------------------------------------------------------------------------
+
 
 @dataclass
 class ZhangSparseConfig:
@@ -106,6 +108,7 @@ class ZhangSparseConfig:
 # Model
 # -----------------------------------------------------------------------------
 
+
 class ZhangSparseDeepHalo(tf.keras.Model):
     """DeepHalo + 1{j!=0}(mu_t + d_tj)."""
 
@@ -128,16 +131,22 @@ class ZhangSparseDeepHalo(tf.keras.Model):
 
         # shocks: inside goods only
         self.mu = tf.Variable(tf.zeros([self.T], dtype=tf.float32), name="mu")
-        self.d = tf.Variable(tf.zeros([self.T, self.J_inside], dtype=tf.float32), name="d")
+        self.d = tf.Variable(
+            tf.zeros([self.T, self.J_inside], dtype=tf.float32), name="d"
+        )
 
-    def call(self, inputs: Dict[str, tf.Tensor], training: bool = False) -> Dict[str, tf.Tensor]:
+    def call(
+        self, inputs: Dict[str, tf.Tensor], training: bool = False
+    ) -> Dict[str, tf.Tensor]:
         out = self.halo(inputs, training=training)
-        u = out["utilities"] if isinstance(out, dict) and "utilities" in out else out  # (B, n_items)
+        u = (
+            out["utilities"] if isinstance(out, dict) and "utilities" in out else out
+        )  # (B, n_items)
 
         market_id = tf.reshape(tf.cast(inputs["market_id"], tf.int32), [-1])  # (B,)
 
         mu_t = tf.gather(self.mu, market_id)  # (B,)
-        d_t = tf.gather(self.d, market_id)    # (B, J_inside)
+        d_t = tf.gather(self.d, market_id)  # (B, J_inside)
 
         if self.cfg.center_d_within_market:
             d_t = d_t - tf.reduce_mean(d_t, axis=1, keepdims=True)
@@ -168,10 +177,12 @@ class ZhangSparseDeepHalo(tf.keras.Model):
         idx = tf.stack([tf.range(tf.shape(y)[0], dtype=tf.int32), y], axis=1)
         return -tf.reduce_mean(tf.gather_nd(logP, idx))
 
-    def map_objective(self, inputs: Dict[str, tf.Tensor], training: bool = False) -> tf.Tensor:
+    def map_objective(
+        self, inputs: Dict[str, tf.Tensor], training: bool = False
+    ) -> tf.Tensor:
         nll = self.nll(inputs, training=training)
         l1 = self.cfg.l1_strength * tf.reduce_mean(tf.abs(self.d))
-        mu_ridge = 0.5 * tf.reduce_mean(tf.square(self.mu)) / (self.cfg.mu_sd ** 2)
+        mu_ridge = 0.5 * tf.reduce_mean(tf.square(self.mu)) / (self.cfg.mu_sd**2)
         return nll + l1 + mu_ridge
 
 
@@ -179,8 +190,11 @@ class ZhangSparseDeepHalo(tf.keras.Model):
 # Trainer (supports ablations by specifying which variables to train)
 # -----------------------------------------------------------------------------
 
+
 class AblationTrainer:
-    def __init__(self, model: ZhangSparseDeepHalo, lr: float, train_vars: List[tf.Variable]):
+    def __init__(
+        self, model: ZhangSparseDeepHalo, lr: float, train_vars: list[tf.Variable]
+    ):
         self.model = model
         self.opt = tf.keras.optimizers.legacy.Adam(lr)
         self.train_vars = train_vars
@@ -190,10 +204,16 @@ class AblationTrainer:
         with tf.GradientTape() as tape:
             loss = self.model.map_objective(batch, training=True)
         grads = tape.gradient(loss, self.train_vars)
-        self.opt.apply_gradients(zip(grads, self.train_vars))
+        self.opt.apply_gradients(zip(grads, self.train_vars, strict=True))
         return loss
 
-    def fit(self, data: Dict[str, np.ndarray], batch_size: int, epochs: int, verbose: int = 1):
+    def fit(
+        self,
+        data: Dict[str, np.ndarray],
+        batch_size: int,
+        epochs: int,
+        verbose: int = 1,
+    ):
         N = int(len(data["choice"]))
         idx = np.arange(N)
 
@@ -201,7 +221,7 @@ class AblationTrainer:
             np.random.shuffle(idx)
             losses = []
             for s in range(0, N, batch_size):
-                b = idx[s:s + batch_size]
+                b = idx[s : s + batch_size]
                 batch = {k: tf.convert_to_tensor(v[b]) for k, v in data.items()}
                 losses.append(float(self.train_step(batch).numpy()))
             if verbose:
@@ -212,7 +232,10 @@ class AblationTrainer:
 # Data conversion (robust to choice-learn versions)
 # -----------------------------------------------------------------------------
 
-def choice_dataset_to_tensors(dataset: ChoiceDataset, n_items: int) -> Dict[str, np.ndarray]:
+
+def choice_dataset_to_tensors(
+    dataset: ChoiceDataset, n_items: int
+) -> Dict[str, np.ndarray]:
     shared = dataset.shared_features_by_choice
     if isinstance(shared, (tuple, list)):
         shared = shared[0]
@@ -240,6 +263,7 @@ def choice_dataset_to_tensors(dataset: ChoiceDataset, n_items: int) -> Dict[str,
 # -----------------------------------------------------------------------------
 # Simulation (matches the model: mu applies to inside goods only)
 # -----------------------------------------------------------------------------
+
 
 def simulate_context_plus_sparse(
     T: int,
@@ -272,8 +296,13 @@ def simulate_context_plus_sparse(
     )
     halo = DeepHalo(halo_cfg)
 
-    out = halo({"available": tf.constant(available), "item_ids": tf.constant(item_ids)}, training=False)
-    u_halo = (out["utilities"].numpy() if isinstance(out, dict) else out.numpy()).astype(np.float32)
+    out = halo(
+        {"available": tf.constant(available), "item_ids": tf.constant(item_ids)},
+        training=False,
+    )
+    u_halo = (
+        out["utilities"].numpy() if isinstance(out, dict) else out.numpy()
+    ).astype(np.float32)
 
     mu_true = rng.normal(0.0, mu_sd, size=(T,)).astype(np.float32)
     d_true = np.zeros((T, J_inside), dtype=np.float32)
@@ -288,7 +317,10 @@ def simulate_context_plus_sparse(
     d_pad = np.concatenate([np.zeros((T, 1), dtype=np.float32), d_true], axis=1)
 
     inside_mask = np.concatenate(
-        [np.zeros((N, 1), dtype=np.float32), np.ones((N, n_items - 1), dtype=np.float32)],
+        [
+            np.zeros((N, 1), dtype=np.float32),
+            np.ones((N, n_items - 1), dtype=np.float32),
+        ],
         axis=1,
     )
 
@@ -314,8 +346,14 @@ def simulate_context_plus_sparse(
 # Ablation runner
 # -----------------------------------------------------------------------------
 
-def build_and_init_model(cfg: ZhangSparseConfig, n_items: int, T: int, J_inside: int,
-                         init_from_weights: Optional[List[np.ndarray]] = None) -> ZhangSparseDeepHalo:
+
+def build_and_init_model(
+    cfg: ZhangSparseConfig,
+    n_items: int,
+    T: int,
+    J_inside: int,
+    init_from_weights: Optional[list[np.ndarray]] = None,
+) -> ZhangSparseDeepHalo:
     model = ZhangSparseDeepHalo(num_items=n_items, T=T, J_inside=J_inside, cfg=cfg)
 
     # Build variables by running one forward pass
@@ -338,7 +376,9 @@ def build_and_init_model(cfg: ZhangSparseConfig, n_items: int, T: int, J_inside:
     return model
 
 
-def select_train_vars(model: ZhangSparseDeepHalo, learn_mu: bool, learn_d: bool) -> List[tf.Variable]:
+def select_train_vars(
+    model: ZhangSparseDeepHalo, learn_mu: bool, learn_d: bool
+) -> list[tf.Variable]:
     vars_ = []
     # Always train halo
     vars_.extend(model.halo.trainable_variables)
@@ -356,11 +396,15 @@ def evaluate_nll(model: ZhangSparseDeepHalo, data: Dict[str, np.ndarray]) -> flo
     return float(model.nll(tensors, training=False).numpy())
 
 
-def objective_breakdown(model: ZhangSparseDeepHalo, cfg: ZhangSparseConfig, data: Dict[str, np.ndarray]) -> Dict[str, float]:
+def objective_breakdown(
+    model: ZhangSparseDeepHalo, cfg: ZhangSparseConfig, data: Dict[str, np.ndarray]
+) -> Dict[str, float]:
     tensors = {k: tf.convert_to_tensor(v) for k, v in data.items()}
     nll = float(model.nll(tensors, training=False).numpy())
     l1 = float((cfg.l1_strength * tf.reduce_mean(tf.abs(model.d))).numpy())
-    mu_ridge = float((0.5 * tf.reduce_mean(tf.square(model.mu)) / (cfg.mu_sd ** 2)).numpy())
+    mu_ridge = float(
+        (0.5 * tf.reduce_mean(tf.square(model.mu)) / (cfg.mu_sd**2)).numpy()
+    )
     return {
         "nll": nll,
         "l1": l1,
@@ -380,7 +424,7 @@ def run_one_ablation(
     J_inside: int,
     learn_mu: bool,
     learn_d: bool,
-    init_weights: List[np.ndarray],
+    init_weights: list[np.ndarray],
 ):
     print(f"\n=== Ablation: {name} ===")
 
@@ -392,11 +436,18 @@ def run_one_ablation(
     if not learn_mu:
         cfg_local.mu_sd = 1e9  # effectively no ridge (and mu won't be trained anyway)
 
-    model = build_and_init_model(cfg_local, n_items, T, J_inside, init_from_weights=init_weights)
+    model = build_and_init_model(
+        cfg_local, n_items, T, J_inside, init_from_weights=init_weights
+    )
     train_vars = select_train_vars(model, learn_mu=learn_mu, learn_d=learn_d)
 
     trainer = AblationTrainer(model, lr=cfg_local.lr, train_vars=train_vars)
-    trainer.fit(data, batch_size=cfg_local.batch_size, epochs=cfg_local.epochs, verbose=cfg_local.verbose)
+    trainer.fit(
+        data,
+        batch_size=cfg_local.batch_size,
+        epochs=cfg_local.epochs,
+        verbose=cfg_local.verbose,
+    )
 
     nll = evaluate_nll(model, data)
     bd = objective_breakdown(model, cfg_local, data)
@@ -411,6 +462,7 @@ def run_one_ablation(
 # -----------------------------------------------------------------------------
 # Main
 # -----------------------------------------------------------------------------
+
 
 def main():
     cfg = ZhangSparseConfig()
@@ -487,7 +539,9 @@ def main():
     print("-" * 68)
     for k in ["DeepHalo-only", "Halo+mu", "Full"]:
         r = results[k]
-        print(f"{k:<32} {r['nll']:>10.4f} {r['mean_abs_d']:>10.4f} {r['std_mu']:>10.4f}")
+        print(
+            f"{k:<32} {r['nll']:>10.4f} {r['mean_abs_d']:>10.4f} {r['std_mu']:>10.4f}"
+        )
 
     # Optional: support recovery for Full only
     d_hat = full_model.d.numpy()

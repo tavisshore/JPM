@@ -2,9 +2,7 @@ name: CI - Pre-commit Auto-Fix & Lint
 
 on:
   push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
 
 jobs:
   lint:
@@ -14,44 +12,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Setup Miniconda
-      - name: Setup Miniconda
-        uses: conda-incubator/setup-miniconda@v2
+      # 2. Setup Python
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          auto-update-conda: true
+          python-version: '3.11'
+          cache: 'pip'
 
-      # 3. Cache conda packages
-      - name: Cache conda packages
-        uses: actions/cache@v3
-        with:
-          path: ~/miniconda3/pkgs
-          key: conda-pkgs-${{ runner.os }}-${{ hashFiles('environment-lint.yml') }}
-          restore-keys: |
-            conda-pkgs-${{ runner.os }}-
-
-      # 4. Create lint environment & install pre-commit
-      - name: Create & activate lint environment
-        shell: bash -l {0}
+      # 3. Install dependencies
+      - name: Install lint dependencies
         run: |
-          # Remove old env if exists
-          conda remove -n ci --all -y || true
-          # Create env from environment-lint.yml
-          conda env create -f environment-lint.yml -n ci
-          # Source conda.sh and activate
-          source "$(conda info --base)/etc/profile.d/conda.sh"
-          conda activate ci
-          # Upgrade pre-commit
-          pip install --upgrade pre-commit
-          # Verify
-          conda list
+          pip install --upgrade pip
+          pip install black==25.1.0 isort==5.12.0 ruff==0.13.3 pytest==8.4.2 pre-commit
 
-      # 5. Run pre-commit hooks with auto-fix
+      # 4. Run pre-commit hooks with auto-fix
       - name: Run pre-commit hooks (auto-fix)
-        shell: bash -l {0}
         run: |
-          # Ensure conda env is active in this step
-          source "$(conda info --base)/etc/profile.d/conda.sh"
-          conda activate ci
-
-          # Run all pre-commit hooks
           pre-commit run --all-files --show-diff-on-failure --hook-stage manual

@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import platform
+import sys
+
 import tensorflow as tf
 
 
@@ -48,3 +51,8 @@ def masked_log_softmax(logits: tf.Tensor, mask: tf.Tensor, axis: int = -1) -> tf
     very_neg = tf.constant(-1e9, dtype=logits.dtype)
     masked_logits = tf.where(mask, logits, very_neg)
     return tf.nn.log_softmax(masked_logits, axis=axis)
+
+
+def apple_silicon():
+    is_apple_silicon = sys.platform == "darwin" and platform.machine() == "arm64"
+    return is_apple_silicon

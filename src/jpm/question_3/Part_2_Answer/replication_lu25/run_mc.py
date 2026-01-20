@@ -44,17 +44,17 @@ import numpy as np
 
 # Handling both flat and organized structures
 try:
+    from estimators.blp import estimate_blp_sigma
+    from estimators.lu25_map import Lu25MapConfig, estimate_lu25_map
+    from estimators.shrinkage import estimate_shrinkage_sigma
     from simulation.config import SimConfig
     from simulation.simulate import simulate_dataset
-    from estimators.blp import estimate_blp_sigma
-    from estimators.shrinkage import estimate_shrinkage_sigma
-    from estimators.lu25_map import estimate_lu25_map, Lu25MapConfig
 except ImportError:
     # fallback for flat layouts
-    from config import SimConfig
-    from simulate import simulate_dataset
     from blp import estimate_blp_sigma
+    from config import SimConfig
     from shrinkage import estimate_shrinkage_sigma
+    from simulate import simulate_dataset
 
     estimate_lu25_map = None
     Lu25MapConfig = None
@@ -169,11 +169,15 @@ def summarize_mc(arr: np.ndarray, true_val: float) -> Dict[str, float]:
     return {"mean": mean, "bias": bias, "sd": sd, "rmse": rmse}
 
 
-def print_param_table(header: str, summ: Dict[str, Dict[str, float]], true_params: Dict[str, float]):
+def print_param_table(
+    header: str, summ: Dict[str, Dict[str, float]], true_params: Dict[str, float]
+):
     print(f"\n{'-'*90}")
     print(header)
     print(f"{'-'*90}")
-    print(f"{'Param':<12} {'True':>10} {'Mean':>12} {'Bias':>12} {'SD':>12} {'RMSE':>12}")
+    print(
+        f"{'Param':<12} {'True':>10} {'Mean':>12} {'Bias':>12} {'SD':>12} {'RMSE':>12}"
+    )
     print(f"{'-'*90}")
 
     rows = [
@@ -188,7 +192,9 @@ def print_param_table(header: str, summ: Dict[str, Dict[str, float]], true_param
         )
 
 
-def run_blp_cell(mc: MCConfig, cfg: SimConfig, iv_type: str) -> Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
+def run_blp_cell(
+    mc: MCConfig, cfg: SimConfig, iv_type: str
+) -> Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
     res = init_storage(mc.R_mc)
     diag = init_diagnostics(mc.R_mc)
 
@@ -203,7 +209,9 @@ def run_blp_cell(mc: MCConfig, cfg: SimConfig, iv_type: str) -> Tuple[Dict[str, 
 
         # diagnostics from market 0
         diag["outside_share"][r] = float(1.0 - np.sum(markets[0]["s"]))
-        diag["price_xi_corr"][r] = float(np.corrcoef(markets[0]["p"], markets[0]["xi"])[0, 1])
+        diag["price_xi_corr"][r] = float(
+            np.corrcoef(markets[0]["p"], markets[0]["xi"])[0, 1]
+        )
         diag["seed"][r] = rep_seed
 
         try:
@@ -214,7 +222,12 @@ def run_blp_cell(mc: MCConfig, cfg: SimConfig, iv_type: str) -> Tuple[Dict[str, 
         except Exception:
             res["fail"][r] = 1
 
-        print_progress_bar(r + 1, mc.R_mc, prefix=f"  {'BLP('+iv_type+')':12} T={mc.T:<3} J={mc.J:<3}", suffix=f"({r+1}/{mc.R_mc})")
+        print_progress_bar(
+            r + 1,
+            mc.R_mc,
+            prefix=f"  {'BLP('+iv_type+')':12} T={mc.T:<3} J={mc.J:<3}",
+            suffix=f"({r+1}/{mc.R_mc})",
+        )
 
     return res, diag
 
@@ -237,7 +250,9 @@ def run_shrinkage_cell(
         inject_market_size(markets, mc.N_t)
 
         diag["outside_share"][r] = float(1.0 - np.sum(markets[0]["s"]))
-        diag["price_xi_corr"][r] = float(np.corrcoef(markets[0]["p"], markets[0]["xi"])[0, 1])
+        diag["price_xi_corr"][r] = float(
+            np.corrcoef(markets[0]["p"], markets[0]["xi"])[0, 1]
+        )
         diag["seed"][r] = rep_seed
 
         try:
@@ -256,7 +271,12 @@ def run_shrinkage_cell(
         except Exception:
             res["fail"][r] = 1
 
-        print_progress_bar(r + 1, mc.R_mc, prefix=f"  {'Shrinkage':12} T={mc.T:<3} J={mc.J:<3}", suffix=f"({r+1}/{mc.R_mc})")
+        print_progress_bar(
+            r + 1,
+            mc.R_mc,
+            prefix=f"  {'Shrinkage':12} T={mc.T:<3} J={mc.J:<3}",
+            suffix=f"({r+1}/{mc.R_mc})",
+        )
 
     gamma_stack = None
     if len(gamma_list) > 0:
@@ -267,7 +287,9 @@ def run_shrinkage_cell(
 
 def run_lu25_map_cell(
     mc: MCConfig, cfg: SimConfig
-) -> Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray], Optional[Dict[str, np.ndarray]]]:
+) -> Tuple[
+    Dict[str, np.ndarray], Dict[str, np.ndarray], Optional[Dict[str, np.ndarray]]
+]:
     if estimate_lu25_map is None or Lu25MapConfig is None:
         raise ImportError("estimators/lu25_map.py not importable in this environment")
 
@@ -293,7 +315,9 @@ def run_lu25_map_cell(
         inject_market_size(markets, mc.N_t)
 
         diag["outside_share"][r] = float(1.0 - np.sum(markets[0]["s"]))
-        diag["price_xi_corr"][r] = float(np.corrcoef(markets[0]["p"], markets[0]["xi"])[0, 1])
+        diag["price_xi_corr"][r] = float(
+            np.corrcoef(markets[0]["p"], markets[0]["xi"])[0, 1]
+        )
         diag["seed"][r] = rep_seed
 
         try:
@@ -317,9 +341,15 @@ def run_lu25_map_cell(
             res["beta_w"][r] = float(beta_lu[2])
 
             if "gamma_hat" in lu_res and lu_res["gamma_hat"] is not None:
-                gamma_hat = np.asarray(lu_res["gamma_hat"], dtype=int).reshape(mc.T, mc.J)
-                signal_detect = gamma_hat[:, :cutoff] if cutoff > 0 else gamma_hat[:, :0]
-                noise_detect = gamma_hat[:, cutoff:] if cutoff < mc.J else gamma_hat[:, :0]
+                gamma_hat = np.asarray(lu_res["gamma_hat"], dtype=int).reshape(
+                    mc.T, mc.J
+                )
+                signal_detect = (
+                    gamma_hat[:, :cutoff] if cutoff > 0 else gamma_hat[:, :0]
+                )
+                noise_detect = (
+                    gamma_hat[:, cutoff:] if cutoff < mc.J else gamma_hat[:, :0]
+                )
 
                 sens = float(signal_detect.mean()) if signal_detect.size else np.nan
                 noise_rate = float(noise_detect.mean()) if noise_detect.size else np.nan
@@ -334,7 +364,12 @@ def run_lu25_map_cell(
         except Exception:
             res["fail"][r] = 1
 
-        print_progress_bar(r + 1, mc.R_mc, prefix=f"  {'Lu25 MAP':12} T={mc.T:<3} J={mc.J:<3}", suffix=f"({r+1}/{mc.R_mc})")
+        print_progress_bar(
+            r + 1,
+            mc.R_mc,
+            prefix=f"  {'Lu25 MAP':12} T={mc.T:<3} J={mc.J:<3}",
+            suffix=f"({r+1}/{mc.R_mc})",
+        )
 
     return res, diag, sp
 
@@ -345,7 +380,9 @@ def save_results_csv(filename: Path, summaries: Dict[str, Dict[str, Dict[str, fl
         for method_name, sum_method in summaries.items():
             for param in ["sigma", "beta_p", "beta_w"]:
                 s = sum_method[param]
-                f.write(f"{method_name},{param},{s['mean']:.6f},{s['bias']:.6f},{s['sd']:.6f},{s['rmse']:.6f}\n")
+                f.write(
+                    f"{method_name},{param},{s['mean']:.6f},{s['bias']:.6f},{s['sd']:.6f},{s['rmse']:.6f}\n"
+                )
 
 
 def print_comparison(summaries: Dict[str, Dict[str, Dict[str, float]]]):
@@ -373,7 +410,9 @@ def run_table1_cell(mc: MCConfig):
     results_dir = ensure_results_dir()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-    output_file = results_dir / f"mc_{mc.DGP}_T{mc.T}_J{mc.J}_R{mc.R_mc}_{timestamp}.txt"
+    output_file = (
+        results_dir / f"mc_{mc.DGP}_T{mc.T}_J{mc.J}_R{mc.R_mc}_{timestamp}.txt"
+    )
     csv_file = results_dir / f"mc_{mc.DGP}_T{mc.T}_J{mc.J}_R{mc.R_mc}_{timestamp}.csv"
 
     logger = OutputLogger(output_file)
@@ -389,7 +428,9 @@ def run_table1_cell(mc: MCConfig):
         print(f"Base seed: {mc.seed}")
         print(f"Default market size N_t: {mc.N_t}")
         print(f"Consumer draws R0: {mc.R0 if mc.R0 is not None else cfg.R0}")
-        print(f"Shrinkage: n_iter={mc.shrink_n_iter}, burn={mc.shrink_burn}, tau0^2(v0)={mc.tau0_sq}, v1={mc.shrink_v1}")
+        print(
+            f"Shrinkage: n_iter={mc.shrink_n_iter}, burn={mc.shrink_burn}, tau0^2(v0)={mc.tau0_sq}, v1={mc.shrink_v1}"
+        )
 
         true_params = {
             "sigma": float(cfg.sigma_star),
@@ -403,7 +444,9 @@ def run_table1_cell(mc: MCConfig):
         print(f"  β_w* = {true_params['beta_w']:.4f}")
 
         print("\n" + "=" * 90)
-        print(f"Cell: {mc.DGP}, T={mc.T}, J={mc.J}, N_t={mc.N_t}, R0={mc.R0 if mc.R0 is not None else cfg.R0}")
+        print(
+            f"Cell: {mc.DGP}, T={mc.T}, J={mc.J}, N_t={mc.N_t}, R0={mc.R0 if mc.R0 is not None else cfg.R0}"
+        )
         print("=" * 90)
 
         # 1) BLP + cost IV
@@ -492,13 +535,15 @@ def run_full_table1_grid(base: MCConfig, grid_TJ, dgps) -> None:
         print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         print(f"R_mc: {base.R_mc}")
         print(f"Base seed: {base.seed}")
-        print(f"N_t: {base.N_t}, tau0^2(v0): {base.tau0_sq}, R0: {base.R0 if base.R0 is not None else cfg.R0}\n")
+        print(
+            f"N_t: {base.N_t}, tau0^2(v0): {base.tau0_sq}, R0: {base.R0 if base.R0 is not None else cfg.R0}\n"
+        )
 
         cell_idx = 0
         total = len(dgps) * len(grid_TJ)
 
         for dgp in dgps:
-            for (T, J) in grid_TJ:
+            for T, J in grid_TJ:
                 cell_idx += 1
                 print("\n" + "=" * 90)
                 print(f"Cell {cell_idx}/{total}: {dgp}, T={T}, J={J}")
@@ -519,8 +564,8 @@ def run_full_table1_grid(base: MCConfig, grid_TJ, dgps) -> None:
 
 if __name__ == "__main__":
     # ======= EDIT HERE =======
-    R_mc = 50 # can be 10 for a quick reference 
-    run_full_grid = True #set to true if want full grid with all cells 
+    R_mc = 50  # can be 10 for a quick reference
+    run_full_grid = True  # set to true if want full grid with all cells
 
     # Replace these with the (T,J) cells in Table 1.
     grid_TJ = [(25, 15)]
