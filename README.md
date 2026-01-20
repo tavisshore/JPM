@@ -63,8 +63,8 @@ This will take quite a long time but shows progress and a time estimate.
     ```
 
 - **Time-series Forecasting:**
-  - **Deterministic / Variational / Probabilistic LSTM** - predict future financial statement values
-  Script is an evaluation - CONFIG_VARIATIONS can be edited to desired variety.
+  - **Deterministic / Variational / Probabilistic LSTM** - predict future financial statement values.
+  This script is an evaluation - CONFIG_VARIATIONS can be edited to desired variety.
     ```bash
     python scripts/question_1/ml/lstm.py
     ```
