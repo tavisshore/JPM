@@ -1,15 +1,18 @@
 # Lu (2025) – Section 4 Replication
-
 This folder contains a **standalone Monte Carlo replication** of the simulation results in **Lu (2025), Section 4**, focusing on:
+**Important:**
+**This code is fully self-contained and does NOT depend on choice-learn or DeepHalo.**
+** It implements the simulation and estimators directly, following the paper. **
 
-- Standard BLP with valid cost instruments (BLP+IV)
-- BLP without cost instruments (BLP–IV)
-- A shrinkage-based estimator under sparse market–product demand shocks
 
-The goal is to reproduce the *qualitative and quantitative patterns* emphasized in the paper:
-- Endogeneity bias in BLP without valid IVs
-- Improvement from valid cost IVs
-- Further gains from exploiting sparsity in demand shocks
+## What This Replicates
+  The replication focuses on comparing estimators under sparse market–product demand shocks:
+- BLP with valid cost instruments (BLP + IV)
+- BLP without cost instruments (BLP − IV)
+- Shrinkage-based estimator exploiting sparsity
+The goal is to reproduce the qualitative and quantitative patterns emphasized in the paper:
+- Endogeneity bias when valid instruments are removed
+- Bias reduction using cost shifters
 
 This code is intentionally **self-contained and explicit**, prioritizing transparency over abstraction.
 
@@ -54,7 +57,6 @@ replication_lu25/
 │ └── simulate.py # Dataset-level simulation wrapper
 │
 ├── results/ # Generated outputs (not tracked by git)
-
 
 
 ---
@@ -129,7 +131,7 @@ This estimator is designed to exploit information that standard BLP ignores.
 
 ## Main replication script
 
-### `run_mc_copy.py`
+### `run_mc.py`
 
 This is the **official replication driver**.
 
@@ -161,12 +163,16 @@ This code is intended to be run in a TensorFlow-enabled conda environment.
 ```bash
 # Make environment (Required packages are listed in the repository-level environment.yml)
 
-conda env create -f environment.yml
-
 # Run a single simulation
 
-python run_single_replication.py
+ python src/jpm/question_3/Part_2_Answer/replication_lu25/run_single_replication.py
+
 
 # Replicate Table results from section 4:
+#If you want to run all cell change grid = True (this takes a long time)
 
-python run_mc.py
+python src/jpm/question_3/Part_2_Answer/replication_lu25/run_replication_study.py
+```
+**Runtime note:**
+The full Monte Carlo study is computationally expensive.
+Grid size and number of replications can be reduced inside run_replication_study.py if needed.
