@@ -1,38 +1,33 @@
-name: q3p2
-
+name: choice-learn-lu25
 channels:
   - conda-forge
-
 dependencies:
-  # Python
   - python=3.10
+  - pip
 
   # Core scientific stack
-  - numpy>=1.23,<2.0
-  - scipy>=1.9
-  - pandas>=1.5
+  - numpy
+  - scipy
+  - pandas
+  - statsmodels
+  - scikit-learn
+
+  # Convenience
   - tqdm
+  - joblib
+  - matplotlib
 
-  # TensorFlow (Apple Silicon compatible)
-  - tensorflow=2.16.*
-  - tensorflow-probability=0.23.*
-
-  # Choice modeling
-  - pip
+  # Pip-only packages (or if you want tighter pins than conda provides)
   - pip:
-      - choice-learn==1.3.1
-channels:
-  - defaults
-dependencies:
-  tensorflow==2.16.2
-  tf-keras==2.16.0
-  tensorflow-probability==0.22.1
-  choice-learn==1.3.1
+      # TF/Keras/TFP compatibility (avoid Keras 3 breakage)
+      - tensorflow==2.15.*
+      - keras<3
+      - tensorflow-probability==0.23.*
 
-  numpy>=1.23,<2.0
-  scipy
-  pandas
-  tqdm
+      # Add any other pip dependencies your repo needs here
+      # - cvxpy
+      # - autograd
+
 
   - bzip2=1.0.8=h80987f9_6
   - ca-certificates=2025.12.2=hca03da5_0
@@ -96,4 +91,4 @@ dependencies:
       - urllib3==2.6.2
       - werkzeug==3.1.4
       - wrapt==2.0.1
-prefix: /Users/kambam/.conda/envs/q3p2
+prefix: /Users/sanaa/.conda/envs/q3p2
