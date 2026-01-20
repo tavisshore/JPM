@@ -3,7 +3,6 @@
     "Cost of Revenue": {
         "Total Cost of Revenue": [
             "cost of goods and services sold",
-            "cost of goods sold",
             "cost of revenue"
         ]
     },
@@ -59,24 +58,18 @@
         "Diluted EPS": [
             "earnings per share diluted"
         ],
-        "Weighted Average Shares Outstanding (Basic)": [
-            "weighted average number of shares outstanding basic"
-        ],
-        "Weighted Average Shares Outstanding (Diluted)": [
-            "weighted average number of diluted shares outstanding"
-        ]
+        "Weighted Average Shares Outstanding (Basic)": [],
+        "Weighted Average Shares Outstanding (Diluted)": []
     },
     "Revenues": {
         "Total Revenues": [
             "revenue from contract with customer excluding assessed tax",
-            "sales revenue goods net",
-            "sales revenue net abstract",
+            "sales revenue net",
             "sales revenue services and other net"
         ]
     },
     "__unmapped__": [
         "common stock dividends per share declared",
-        "costs and expenses",
-        "income loss from continuing operations before income taxes minority interest and income loss from equity method investments"
+        "product member"
     ]
 }

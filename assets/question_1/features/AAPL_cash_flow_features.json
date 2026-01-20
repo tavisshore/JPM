@@ -4,8 +4,7 @@
     "Effect of Exchange Rate Changes": [],
     "Financing Activities": {
         "Dividends Paid": [
-            "payments of dividends",
-            "payments of dividends and dividend equivalents on common stock and restricted stock units"
+            "payments of dividends"
         ],
         "Net Cash from Financing Activities": [
             "net cash provided by used in financing activities"
@@ -36,11 +35,11 @@
             "payments to acquire businesses net of cash acquired"
         ],
         "Capital Expenditures": [
-            "payments to acquire productive assets",
             "payments to acquire property plant and equipment"
         ],
         "Net Cash from Investing Activities": [
-            "net cash provided by used in investing activities"
+            "net cash provided by used in investing activities",
+            "net cash provided by used in investing activities continuing operations"
         ],
         "Other Investing Activities": [
             "payments to acquire intangible assets"
@@ -51,11 +50,11 @@
         ],
         "Sales and Maturities of Investments": [
             "proceeds from maturities prepayments and calls of available for sale securities",
-            "proceeds from sale and maturity of other investments",
-            "proceeds from sale of available for sale securities"
+            "proceeds from sale and maturity of other investments"
         ]
     },
     "Net Change in Cash": [
+        "cash and cash equivalents period increase decrease",
         "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect"
     ],
     "Operating Activities": {
@@ -72,7 +71,6 @@
             "deferred income tax expense benefit"
         ],
         "Depreciation and Amortization": [
-            "depreciation amortization and accretion net",
             "depreciation depletion and amortization"
         ],
         "Interest Paid": [

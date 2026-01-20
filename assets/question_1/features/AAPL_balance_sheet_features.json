@@ -8,7 +8,7 @@
                 "inventory net"
             ],
             "Marketable Securities (Short-term)": [
-                "available for sale securities current",
+                "available for sale securities debt securities current",
                 "commercial paper",
                 "marketable securities current"
             ],
@@ -34,8 +34,7 @@
                 "intangible assets net excluding goodwill"
             ],
             "Long-term Investments": [
-                "available for sale securities noncurrent",
-                "marketable securities noncurrent"
+                "available for sale securities debt securities noncurrent"
             ],
             "Other Non-Current Assets": [
                 "other assets noncurrent"
@@ -56,6 +55,7 @@
             "accumulated other comprehensive income loss net of tax"
         ],
         "Common Stock and APIC": [
+            "common stock value",
             "common stocks including additional paid in capital"
         ],
         "Retained Earnings": [
@@ -73,8 +73,7 @@
                 "accrued liabilities current"
             ],
             "Deferred Revenue": [
-                "contract with customer liability current",
-                "deferred revenue current"
+                "contract with customer liability current"
             ],
             "Other Current Liabilities": [
                 "other liabilities current"
@@ -91,7 +90,7 @@
             "Deferred Tax Liabilities": [],
             "Lease Liabilities": [],
             "Long-term Debt": [
-                "long term debt noncurrent"
+                "long term debt"
             ],
             "Other Non-Current Liabilities": [
                 "other liabilities noncurrent"
@@ -110,7 +109,6 @@
         ]
     },
     "__unmapped__": [
-        "common stock shares issued",
-        "property plant and equipment and capitalized software net"
+        "common stock shares issued"
     ]
 }

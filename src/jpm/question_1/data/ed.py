@@ -10,6 +10,7 @@ import pandas as pd
 import requests
 from edgar import Company
 from edgar.xbrl import XBRLS
+from tqdm import tqdm
 
 from jpm.config import Config
 from jpm.question_1.data.credit import calculate_credit_ratios
@@ -117,8 +118,8 @@ class RatingsHistoryDownloader:
         # Files are named with YYYYMMDD prefix, so lexicographic sort works
         return sorted(moodys_financial, reverse=True)[0]
 
-    def download_moodys_financial(
-        self, llm_client, ticker=None
+    def download_moodys_financial(  # noqa: C901
+        self, llm_client, ticker=None, ratings_data_path=None, overwrite: bool = False
     ) -> tuple[pd.DataFrame | None, bool]:
         """Download the latest Moody's Financial ratings CSV.
         1. Download latest csv from https://ratingshistory.info/
@@ -132,15 +133,16 @@ class RatingsHistoryDownloader:
 
         # Downloads the latest moodys corporate data
         updated = False
-        if not raw_data.exists():
+        if not raw_data.exists() or overwrite:
+            if filename is None:
+                print("No Moody's Financial CSV file found on ratingshistory.info.")
+                return None, False
             url = f"{self.API_URL}/{quote(filename)}"
             resp = self.session.get(url, timeout=30, stream=True)
             resp.raise_for_status()
             total_size = int(resp.headers.get("content-length", 0))
             with open(raw_data, "wb") as f:
                 if total_size > 0:
-                    from tqdm import tqdm
-
                     with tqdm(
                         total=total_size,
                         unit="B",
@@ -155,57 +157,65 @@ class RatingsHistoryDownloader:
                         f.write(chunk)
             updated = True
 
-        # Processes moodys data for the particular ticker - returning quarterly ratings
-        ratings_df = pd.read_csv(raw_data, dtype=str)
-        ratings_df = ratings_df[
-            ["obligor_name", "rating", "rating_type", "rating_action_date"]
-        ]
-        EXCLUDE_RATINGS = {"WR", "NR", "NP", "P-1", "P-2", "P-3"}
-        df_clean = ratings_df[~ratings_df["rating"].isin(EXCLUDE_RATINGS)].copy()
-        df_clean["rating_action_date"] = pd.to_datetime(df_clean["rating_action_date"])
-        df_clean = df_clean.dropna(subset=["rating"])
+            # Processes moodys data for the particular ticker - returning quarterly ratings
+            ratings_df = pd.read_csv(raw_data, dtype=str)
+            ratings_df = ratings_df[
+                ["obligor_name", "rating", "rating_type", "rating_action_date"]
+            ]
+            EXCLUDE_RATINGS = {"WR", "NR", "NP", "P-1", "P-2", "P-3"}
+            df_clean = ratings_df[~ratings_df["rating"].isin(EXCLUDE_RATINGS)].copy()
+            df_clean["rating_action_date"] = pd.to_datetime(
+                df_clean["rating_action_date"]
+            )
+            df_clean = df_clean.dropna(subset=["rating"])
 
-        name_variations = ticker_to_name(ticker, llm_client)
-        df_clean = df_clean[df_clean["obligor_name"].isin(name_variations)]
-        df_clean["rating"] = df_clean["rating"].apply(standardise_rating)
-        # Try organisational ratings, otherwise fallback to instrument
-        df_ratings = df_clean[df_clean["rating_type"] == "Organization"]
-        if df_ratings.empty:
-            df_ratings = df_clean[df_clean["rating_type"] == "Instrument"]
-        df_clean = df_ratings.drop(columns=["rating_type"])
+            name_variations = ticker_to_name(ticker, llm_client)
+            df_clean = df_clean[df_clean["obligor_name"].isin(name_variations)]
+            df_clean["rating"] = df_clean["rating"].apply(standardise_rating)
+            # Try organisational ratings, otherwise fallback to instrument
+            df_ratings = df_clean[df_clean["rating_type"] == "Organization"]
+            if df_ratings.empty:
+                df_ratings = df_clean[df_clean["rating_type"] == "Instrument"]
+            df_clean = df_ratings.drop(columns=["rating_type"])
 
-        # Now convert into quarterly ratings to join with FS data
-        results = []
-        df_clean = df_clean.sort_values("rating_action_date").reset_index(drop=True)
-        for i in range(len(df_clean)):
-            start_date = df_clean.loc[i, "rating_action_date"]
-            rating = df_clean.loc[i, "rating"]
+            # Now convert into quarterly ratings to join with FS data
+            results = []
+            df_clean = df_clean.sort_values("rating_action_date").reset_index(drop=True)
+            for i in range(len(df_clean)):
+                start_date = df_clean.loc[i, "rating_action_date"]
+                rating = df_clean.loc[i, "rating"]
 
-            # End date is either next rating change or today
-            if i < len(df_clean) - 1:
-                end_date = df_clean.loc[i + 1, "rating_action_date"]
-            else:
-                end_date = pd.Timestamp.now()
+                # End date is either next rating change or today
+                if i < len(df_clean) - 1:
+                    end_date = df_clean.loc[i + 1, "rating_action_date"]
+                else:
+                    end_date = pd.Timestamp.now()
 
-            quarters = pd.date_range(start=start_date, end=end_date, freq="QE")
-            for quarter in quarters:
-                results.append(
-                    {
-                        "rating": rating,
-                        "quarter": quarter,
-                    }
-                )
+                quarters = pd.date_range(start=start_date, end=end_date, freq="QE")
+                for quarter in quarters:
+                    results.append(
+                        {
+                            "rating": rating,
+                            "quarter": quarter,
+                        }
+                    )
 
-        df = pd.DataFrame(results)
+                df = pd.DataFrame(results)
 
-        if "quarter" not in df.columns or df.empty:
-            return None
+            if "quarter" not in df.columns or df.empty:
+                return None
 
-        df["quarter"] = pd.to_datetime(df["quarter"]).dt.to_period("Q")
-        df = df[["rating", "quarter"]]
-        df = df.set_index("quarter")
+            df["quarter"] = pd.to_datetime(df["quarter"]).dt.to_period("Q")
+            df = df[["rating", "quarter"]]
+            df = df.set_index("quarter")
 
-        df.index = pd.PeriodIndex(df.index, freq="Q")
+            df.index = pd.PeriodIndex(df.index, freq="Q")
+
+            df.to_parquet(ratings_data_path)
+        else:
+            df = pd.read_parquet(ratings_data_path)
+            updated = False
+
         return df, updated
 
 
@@ -237,6 +247,9 @@ class EdgarData:
         )
         self.ratings_data_path = Path(
             f"{self.config.data.cache_dir}/ratings/{self.config.data.ticker}_ratings.parquet"
+        )
+        self.ratings_partial_data_path = Path(
+            f"{self.config.data.cache_dir}/ratings/{self.config.data.ticker}_partial_ratings.parquet"
         )
         self.cache_statement.parent.mkdir(parents=True, exist_ok=True)
         self.ratings_data_path.parent.mkdir(parents=True, exist_ok=True)
@@ -325,7 +338,7 @@ class EdgarData:
         # Download and process credit ratings
         downloader = RatingsHistoryDownloader(config=self.config)
         _ratings_df, ratings_updated = downloader.download_moodys_financial(
-            self.llm_client, self.config.data.ticker
+            self.llm_client, self.config.data.ticker, self.ratings_partial_data_path
         )  # noqa: F841
 
         if _ratings_df is None or _ratings_df.empty:

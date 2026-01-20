@@ -13,14 +13,13 @@ The ensemble approach leverages both neural network pattern recognition
 and LLM reasoning capabilities for improved forecast accuracy.
 """
 
-from jpm.config import Config, DataConfig, LLMConfig, LSTMConfig
+from jpm.config import Config, DataConfig, LLMConfig, LSTMConfig, get_args
 from jpm.question_1 import (
     BalanceSheet,
     EdgarData,
     IncomeStatement,
     LSTMForecaster,
     StatementsDataset,
-    get_args,
     set_seed,
 )
 

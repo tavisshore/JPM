@@ -21,8 +21,8 @@ The model maps financial health indicators to credit rating categories
 (Prime, High, Medium, Low) for risk assessment. # Expanding later
 """
 
-from jpm.config import Config, DataConfig, LLMConfig, LSTMConfig, XGBConfig
-from jpm.question_1 import CreditDataset, CreditRatingModel, get_args, set_seed
+from jpm.config import Config, DataConfig, LLMConfig, LSTMConfig, XGBConfig, get_args
+from jpm.question_1 import CreditDataset, CreditRatingModel, set_seed
 
 
 def train(cfg: Config):

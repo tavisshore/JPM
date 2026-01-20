@@ -59,12 +59,10 @@
     },
     "Revenues": {
         "Total Revenues": [
-            "revenue from contract with customer excluding assessed tax",
-            "revenues"
+            "revenue from contract with customer excluding assessed tax"
         ]
     },
     "__unmapped__": [
-        "common stock dividends per share declared",
-        "income loss from continuing operations before income taxes minority interest and income loss from equity method investments"
+        "common stock dividends per share declared"
     ]
 }

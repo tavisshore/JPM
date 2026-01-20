@@ -30,7 +30,9 @@
         "General and Administrative": [
             "general and administrative expense"
         ],
-        "Other Operating Expenses": [],
+        "Other Operating Expenses": [
+            "loss contingency loss in period"
+        ],
         "Research and Development": [
             "research and development expense"
         ],
@@ -56,15 +58,12 @@
     },
     "Revenues": {
         "Total Revenues": [
-            "revenue from contract with customer excluding assessed tax",
             "revenues"
         ]
     },
     "__unmapped__": [
         "costs and expenses",
         "income loss from discontinued operations net of tax",
-        "loss contingency loss in period",
-        "preferred stock dividends and other adjustments",
-        "income loss from continuing operations before income taxes minority interest and income loss from equity method investments"
+        "preferred stock dividends and other adjustments"
     ]
 }

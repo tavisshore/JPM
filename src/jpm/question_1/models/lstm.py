@@ -8,7 +8,7 @@ import tensorflow_probability as tfp
 from jpm.config.question_1 import Config, LLMConfig
 from jpm.question_1.clients.llm_client import LLMClient
 from jpm.question_1.data import EdgarData, StatementsDataset
-from jpm.question_1.misc import RATINGS_MAPPINGS, format_money, set_seed
+from jpm.question_1.misc import format_money, set_seed
 from jpm.question_1.models.losses import EnforceBalance, bs_loss
 from jpm.question_1.models.metrics import (
     Metric,
@@ -26,8 +26,6 @@ from jpm.question_1.vis import (
     make_row,
     print_table,
 )
-
-RATINGS_MAPPINGS = RATINGS_MAPPINGS
 
 # keras has to stick to tf.keras so pytests can patch tf.keras.* as expected
 keras = tf.keras

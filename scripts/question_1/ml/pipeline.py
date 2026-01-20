@@ -21,8 +21,8 @@ for credit risk assessment.
 
 import numpy as np
 
-from jpm.config import Config, DataConfig, LLMConfig, LSTMConfig, XGBConfig
-from jpm.question_1 import CreditDataset, CreditRatingModel, get_args, set_seed
+from jpm.config import Config, DataConfig, LLMConfig, LSTMConfig, XGBConfig, get_args
+from jpm.question_1 import CreditDataset, CreditRatingModel, set_seed
 from jpm.question_1.clients.llm_client import LLMClient
 
 

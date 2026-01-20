@@ -2,7 +2,6 @@
     "Cash at Beginning of Period": [],
     "Cash at End of Period": [],
     "Effect of Exchange Rate Changes": [
-        "effect of exchange rate on cash and cash equivalents",
         "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents including disposal group and discontinued operations"
     ],
     "Financing Activities": {
@@ -10,7 +9,8 @@
             "payments of dividends common stock"
         ],
         "Net Cash from Financing Activities": [
-            "net cash provided by used in financing activities"
+            "net cash provided by used in financing activities",
+            "net cash provided by used in financing activities continuing operations"
         ],
         "Other Financing Activities": [
             "payments of debt restructuring costs",
@@ -18,13 +18,16 @@
         ],
         "Proceeds from Debt": [
             "proceeds from debt maturing in more than three months",
+            "proceeds from short and long term borrowings",
+            "proceeds from short term debt maturing in three months or less",
             "proceeds from repayments of short term debt maturing in three months or less"
         ],
         "Proceeds from Stock Issuance": [
             "proceeds from issuance of common stock"
         ],
         "Repayment of Debt": [
-            "repayments of debt maturing in more than three months"
+            "repayments of debt maturing in more than three months",
+            "repayments of short term and long term borrowings"
         ],
         "Stock Repurchases": [
             "payments for repurchase of common stock"
@@ -32,8 +35,9 @@
     },
     "Investing Activities": {
         "Acquisitions (net of cash acquired)": [
-            "payments to acquire businesses net of cash acquired",
-            "acquisitions net of cash acquired and purchases of intangible and other assets"
+            "acquisitions net of cash acquired and purchases of intangible and other assets",
+            "acquisitions netof cash acquired and purchases of intangibleand other assets",
+            "payments to acquire businesses net of cash acquired"
         ],
         "Capital Expenditures": [
             "payments to acquire property plant and equipment"
@@ -60,12 +64,12 @@
             "increase decrease in accrued income taxes payable",
             "increase decrease in collateral held under securities lending",
             "increase decrease in contract with customer liability",
-            "increase decrease in deferred revenue",
             "increase decrease in inventories",
             "increase decrease in other current assets",
             "increase decrease in other current liabilities",
             "increase decrease in other noncurrent assets",
             "increase decrease in other noncurrent liabilities",
+            "increase decrease in unearned revenue",
             "recognition of deferred revenue"
         ],
         "Deferred Income Taxes": [

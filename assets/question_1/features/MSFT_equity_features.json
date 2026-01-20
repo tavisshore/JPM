@@ -27,7 +27,6 @@
     ],
     "Other Comprehensive Income": {
         "Derivatives and Hedging": [
-            "other comprehensive income derivatives qualifying as hedges net of tax period increase decrease",
             "other comprehensive income loss derivatives qualifying as hedges net of tax"
         ],
         "Foreign Currency Translation": [
@@ -35,6 +34,7 @@
         ],
         "Other OCI": [],
         "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax",
             "other comprehensive income loss net of tax portion attributable to parent"
         ],
         "Unrealized Gains/Losses on Securities": [
@@ -60,7 +60,9 @@
         "stock repurchased and retired during period value"
     ],
     "Tax Effects from Stock Compensation": [
-        "adjustment to additional paid in capital income tax effect from share based compensation net"
+        "adjustment to additional paid in capital income tax effect from share based compensation net",
+        "adjustments to additional paid in capital income tax effect from share based compensation net",
+        "adjustments to additional paid in capital tax effect from share based compensation"
     ],
     "__unmapped__": [
         "common stock dividends per share declared"

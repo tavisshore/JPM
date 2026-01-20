@@ -1,4 +1,4 @@
-# Sparse Discrete Choice Modeling with DeepHalo 
+# Sparse Discrete Choice Modeling with DeepHalo
 # Zhang-Sparse (Lu25-aligned) estimator implemented using DeepHalo (Zhang 2025)
 
 
@@ -67,4 +67,3 @@ The main experiment can be executed from the project root:
 ```bash
 python extension_deephalo/zhang_sparse_choice_learn.py
 ```
-

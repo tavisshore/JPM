@@ -8,12 +8,10 @@
                 "inventory net"
             ],
             "Marketable Securities (Short-term)": [
-                "available for sale securities current",
                 "marketable securities current"
             ],
             "Prepaid and Other Current Assets": [
-                "other assets current",
-                "prepaid revenue share expenses and other assets current"
+                "other assets current"
             ],
             "Receivables": [
                 "accounts receivable net current",
@@ -27,7 +25,6 @@
         "Non-Current": {
             "Deferred Tax Assets": [
                 "deferred income tax assets net",
-                "deferred income tax liabilities net",
                 "deferred tax assets net current"
             ],
             "Goodwill": [
@@ -41,8 +38,7 @@
             ],
             "Other Non-Current Assets": [
                 "operating lease right of use asset",
-                "other assets noncurrent",
-                "prepaid revenue share expenses and other assets noncurrent"
+                "other assets noncurrent"
             ],
             "Property, Plant, and Equipment (net)": [
                 "property plant and equipment and finance lease right of use asset after accumulated depreciation and amortization"
@@ -72,17 +68,16 @@
         "Current": {
             "Accounts Payable and Accrued Expenses": [
                 "accounts payable current",
-                "accrued income taxes current",
-                "accrued liabilities current",
-                "accrued revenue share",
-                "employee related liabilities current"
+                "accrued liabilities current"
             ],
             "Deferred Revenue": [
-                "contract with customer liability current",
-                "deferred revenue current"
+                "contract with customer liability current"
             ],
             "Other Current Liabilities": [
-                "deposits received for securities loaned at carrying value"
+                "accrued income taxes current",
+                "accrued revenue share",
+                "deposits received for securities loaned at carrying value",
+                "employee related liabilities current"
             ],
             "Short-term Debt": [
                 "debt current"
@@ -92,9 +87,7 @@
             ]
         },
         "Non-Current": {
-            "Deferred Tax Liabilities": [
-                "deferred tax liabilities noncurrent"
-            ],
+            "Deferred Tax Liabilities": [],
             "Lease Liabilities": [
                 "operating lease liability noncurrent"
             ],
@@ -118,11 +111,14 @@
         ]
     },
     "__unmapped__": [
+        "cash cash equivalents and short term investments",
         "common stock par or stated value per share",
         "common stock shares authorized",
         "common stock shares issued",
         "preferred stock par or stated value per share",
         "preferred stock shares authorized",
-        "preferred stock shares issued"
+        "preferred stock shares issued",
+        "prepaid revenue share expenses and other assets current",
+        "prepaid revenue share expenses and other assets noncurrent"
     ]
 }

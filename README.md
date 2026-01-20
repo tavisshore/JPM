@@ -40,7 +40,19 @@ export FX_API_KEY='your_fx_api_key'
 ```
 
 #### Configuration
-All configuration defaults can be edited in `src/jpm/config/question_1.py`, and most are available as terminal arguments.
+**View Available Arguments:**
+Accessible for any Question 1 scripts, using parse_reports.py here as an example. (lstm.py is an evaluation - alter it's config in file)
+```bash
+python scripts/question_1/ml/parse_reports.py --help       # Show all arguments
+python scripts/question_1/ml/parse_reports.py --help data  # Show only DataConfig arguments
+python scripts/question_1/ml/parse_reports.py --help lstm  # Show only LSTMConfig arguments
+python scripts/question_1/ml/parse_reports.py --help llm   # Show only LLMConfig arguments
+```
+
+The category-specific help commands display organised, focused documentation for each configuration section:
+- **DataConfig** (11 args): Data loading, preprocessing, and dataset configuration
+- **LSTMConfig** (15 args): Model architecture, uncertainty quantification, training hyperparameters, and BS constraints
+- **LLMConfig** (6 args): Large language model integration for report parsing and ensemble predictions
 
 #### Downloading Data
 This script downloads data from all `data_tickers` - if available from EDGAR, can be edited.
@@ -108,7 +120,7 @@ The hybrid model that combines Zhang et al. (2025) DeepHalo with Lu & Shimizu (2
 ```bash
   src/jpm/question_3/deephalo_extension/zhang_sparse_choice_learn.py
 ```
-This is part 2 
+This is part 2
 
 ## Citations
 ```

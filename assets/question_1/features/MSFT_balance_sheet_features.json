@@ -8,7 +8,6 @@
                 "inventory net"
             ],
             "Marketable Securities (Short-term)": [
-                "available for sale securities current",
                 "commercial paper",
                 "short term investments"
             ],
@@ -67,21 +66,19 @@
     "Liabilities": {
         "Current": {
             "Accounts Payable and Accrued Expenses": [
-                "accounts payable current",
-                "accrued income taxes current",
-                "employee related liabilities current"
+                "accounts payable current"
             ],
             "Deferred Revenue": [
-                "contract with customer liability current",
-                "deferred revenue current"
+                "contract with customer liability current"
             ],
             "Other Current Liabilities": [
+                "accrued income taxes current",
                 "deposits received for securities loaned at carrying value",
+                "employee related liabilities current",
                 "other liabilities current"
             ],
             "Short-term Debt": [
-                "long term debt current",
-                "short term borrowings"
+                "long term debt current"
             ],
             "Total Current Liabilities": [
                 "liabilities current"
@@ -96,9 +93,9 @@
                 "long term debt noncurrent"
             ],
             "Other Non-Current Liabilities": [
+                "accrued income taxes noncurrent",
                 "contract with customer liability noncurrent",
-                "other liabilities noncurrent",
-                "accrued income taxes noncurrent"
+                "other liabilities noncurrent"
             ],
             "Total Non-Current Liabilities": []
         },
