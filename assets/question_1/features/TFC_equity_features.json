@@ -1,0 +1,83 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [
+        "comprehensive income net of tax including portion attributable to noncontrolling interest"
+    ],
+    "Dividends Declared": [],
+    "Dividends Paid": [
+        "dividends common stock cash",
+        "dividends preferred stock",
+        "dividends share based compensation",
+        "other preferred stock dividends and adjustments"
+    ],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "profit loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [],
+        "Foreign Currency Translation": [],
+        "Other OCI": [],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax",
+            "other comprehensive income loss net of tax period increase decrease"
+        ],
+        "Unrealized Gains/Losses on Securities": []
+    },
+    "Other Equity Adjustments": [
+        "cumulative effect of new accounting pronouncement",
+        "purchase of additional ownership of amrisc l p",
+        "stockholders equity other",
+        "tax cutsand jobs actof2017 reclassificationfrom a o c ito retained earnings"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [],
+        "Other Stock Issuance": [
+            "proceeds from issuance of preferred stock and preference stock",
+            "stock issued during period shares acquisitions",
+            "stock issued during period shares dividend reinvestment plan",
+            "stock issued during period shares employee benefit plan",
+            "stock issued during period shares401k contribution"
+        ],
+        "Stock-Based Compensation": [
+            "adjustments to additional paid in capital sharebased compensation requisite service period recognition value",
+            "stock issued during period shares share based compensation"
+        ],
+        "Total Stock Issuance Value": [
+            "stock issued during period value acquisitions",
+            "stock issued during period value dividend reinvestment plan",
+            "stock issued during period value employee benefit plan",
+            "stock issued during period value new issues",
+            "stock issued during period value share based compensation",
+            "stock issued during period value401k contribution"
+        ]
+    },
+    "Stock Repurchases": [
+        "stock redeemed or called during period value",
+        "stock repurchased during period value",
+        "treasury stock value acquired par value method"
+    ],
+    "Tax Effects from Stock Compensation": [
+        "adjustment to additional paid in capital income tax effect from share based compensation net"
+    ],
+    "__unmapped__": [
+        "disposal group including discontinued operation noncontrolling interest",
+        "noncontrolling interest increase from subsidiary equity issuance",
+        "stock repurchased during period shares",
+        "treasury stock shares acquired"
+    ]
+}

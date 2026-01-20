@@ -1,0 +1,132 @@
+{
+    "Assets": {
+        "Current": {
+            "Cash and Equivalents": [
+                "cash and cash equivalents at carrying value"
+            ],
+            "Inventory": [
+                "inventory net"
+            ],
+            "Marketable Securities (Short-term)": [
+                "short term investments"
+            ],
+            "Prepaid and Other Current Assets": [
+                "other assets current"
+            ],
+            "Receivables": [
+                "receivables net current"
+            ],
+            "Total Current Assets": [
+                "assets current"
+            ]
+        },
+        "Non-Current": {
+            "Deferred Tax Assets": [
+                "deferred income tax assets net"
+            ],
+            "Goodwill": [
+                "goodwill"
+            ],
+            "Intangible Assets (net)": [
+                "intangible assets net excluding goodwill"
+            ],
+            "Long-term Investments": [
+                "long term investments",
+                "marketable securities noncurrent"
+            ],
+            "Other Non-Current Assets": [
+                "operating lease right of use asset",
+                "other assets noncurrent"
+            ],
+            "Property, Plant, and Equipment (net)": [
+                "property plant and equipment net"
+            ],
+            "Total Non-Current Assets": []
+        },
+        "Total Assets": [
+            "assets"
+        ]
+    },
+    "Equity": {
+        "Accumulated Other Comprehensive Income": [
+            "accumulated other comprehensive income loss net of tax"
+        ],
+        "Common Stock and APIC": [
+            "additional paid in capital common stock",
+            "common stock value outstanding",
+            "preferred stock value outstanding"
+        ],
+        "Retained Earnings": [
+            "retained earnings accumulated deficit"
+        ],
+        "Total Equity": [
+            "stockholders equity"
+        ],
+        "Treasury Stock": []
+    },
+    "Liabilities": {
+        "Current": {
+            "Accounts Payable and Accrued Expenses": [
+                "accounts payable current",
+                "accrued income taxes current",
+                "employee related liabilities current"
+            ],
+            "Deferred Revenue": [
+                "contract with customer liability current",
+                "deferred revenue current"
+            ],
+            "Other Current Liabilities": [
+                "operating lease liability current",
+                "other liabilities current"
+            ],
+            "Short-term Debt": [
+                "long term debt and capital lease obligations current",
+                "short term borrowings"
+            ],
+            "Total Current Liabilities": [
+                "liabilities current"
+            ]
+        },
+        "Non-Current": {
+            "Deferred Tax Liabilities": [],
+            "Lease Liabilities": [
+                "operating lease liability noncurrent"
+            ],
+            "Long-term Debt": [
+                "long term debt and capital lease obligations"
+            ],
+            "Other Non-Current Liabilities": [
+                "contract with customer liability noncurrent",
+                "other liabilities noncurrent"
+            ],
+            "Total Non-Current Liabilities": []
+        },
+        "Total Liabilities": [
+            "liabilities"
+        ]
+    },
+    "Totals": {
+        "Total Liabilities and Equity": [
+            "liabilities and stockholders equity"
+        ]
+    },
+    "__unmapped__": [
+        "accounts payable current percent",
+        "accumulated other comprehensive income loss net of tax percent",
+        "assets current percent",
+        "assets percent",
+        "common stock shares issued",
+        "common stock value outstanding percent",
+        "employee related liabilities current percent",
+        "liabilities current percent",
+        "liabilities percent",
+        "minority interest",
+        "other assets current percent",
+        "other assets noncurrent percent",
+        "other liabilities current percent",
+        "other liabilities noncurrent percent",
+        "property plant and equipment and finance lease right of use asset after accumulated depreciation and amortization",
+        "retained earnings accumulated deficit percent",
+        "stockholders equity including portion attributable to noncontrolling interest percent"
+    ]
+}

@@ -1,0 +1,105 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [
+        "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents"
+    ],
+    "Financing Activities": {
+        "Dividends Paid": [],
+        "Net Cash from Financing Activities": [
+            "net cash provided by used in financing activities"
+        ],
+        "Other Financing Activities": [
+            "proceeds from minority shareholders"
+        ],
+        "Proceeds from Debt": [
+            "proceeds from debt net of issuance costs"
+        ],
+        "Proceeds from Stock Issuance": [
+            "net proceeds payments related to stock based award activities",
+            "stock issued1"
+        ],
+        "Repayment of Debt": [
+            "repayments of debt and capital lease obligations"
+        ],
+        "Stock Repurchases": [
+            "payments for repurchase of common stock"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "acquisitions net of cash acquired and purchases of intangible and other assets"
+        ],
+        "Capital Expenditures": [
+            "payments to acquire property plant and equipment"
+        ],
+        "Net Cash from Investing Activities": [
+            "net cash provided by used in investing activities"
+        ],
+        "Other Investing Activities": [
+            "payments for proceeds from other investing activities",
+            "proceeds from collection of notes receivable",
+            "proceeds from divestiture of businesses",
+            "proceeds from payments for securities purchased under agreements to resell",
+            "proceeds from sale of property plant and equipment"
+        ],
+        "Purchases of Investments": [
+            "payments to acquire marketable securities",
+            "payments to acquire other investments"
+        ],
+        "Sales and Maturities of Investments": [
+            "proceeds from sale and maturity of marketable securities",
+            "proceeds from sale and maturity of other investments"
+        ]
+    },
+    "Net Change in Cash": [
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "increase decrease in accounts payable",
+            "increase decrease in accounts receivable",
+            "increase decrease in accrued liabilities",
+            "increase decrease in accrued revenue share",
+            "increase decrease in collateral held under securities lending",
+            "increase decrease in contract with customer liability",
+            "increase decrease in income taxes",
+            "increase decrease in other operating assets",
+            "increase decrease in prepaid revenue share expenses and other assets"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income taxes and tax credits"
+        ],
+        "Depreciation and Amortization": [
+            "amortization and impairment of intangible assets",
+            "depreciation",
+            "depreciation and impairment on disposition of property and equipment",
+            "depreciationand impairmenton dispositionof propertyand equipment"
+        ],
+        "Interest Paid": [
+            "interest paid",
+            "interest paid net"
+        ],
+        "Net Cash from Operating Activities": [
+            "net cash provided by used in operating activities"
+        ],
+        "Net Income": [
+            "net income loss"
+        ],
+        "Other Non-Cash Items": [
+            "debt and equity securities gain loss",
+            "gain loss on marketable and non marketable investments net",
+            "gain losson marketableand nonmarketable investments net",
+            "income taxes paid",
+            "income taxes paid net",
+            "other noncash income expense"
+        ],
+        "Stock-Based Compensation": [
+            "excess tax benefit from share based compensation operating activities",
+            "share based compensation"
+        ]
+    },
+    "__unmapped__": [
+        "paymentsfor parent company transaction"
+    ]
+}

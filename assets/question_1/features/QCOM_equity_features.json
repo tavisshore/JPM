@@ -1,0 +1,66 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [
+        "comprehensive income net of tax including portion attributable to noncontrolling interest"
+    ],
+    "Dividends Declared": [
+        "dividends"
+    ],
+    "Dividends Paid": [],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "net income loss",
+        "profit loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [],
+        "Foreign Currency Translation": [],
+        "Other OCI": [],
+        "Total Other Comprehensive Income": [],
+        "Unrealized Gains/Losses on Securities": []
+    },
+    "Other Equity Adjustments": [
+        "new accounting pronouncement or change in accounting principle effect of adoption quantification",
+        "stockholders equity other"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [],
+        "Other Stock Issuance": [
+            "business combination consideration transferred equity interests issued and issuable"
+        ],
+        "Stock-Based Compensation": [
+            "adjustments related to tax withholding for share based compensation",
+            "adjustments to additional paid in capital sharebased compensation requisite service period recognition value"
+        ],
+        "Total Stock Issuance Value": [
+            "stock issued during period value acquisitions",
+            "stock issued during period value new issues"
+        ]
+    },
+    "Stock Repurchases": [
+        "stock repurchased and retired during period value"
+    ],
+    "Tax Effects from Stock Compensation": [],
+    "__unmapped__": [
+        "common stock dividends per share declared",
+        "minority interest increase from stock issuance",
+        "net income loss attributable to noncontrolling interest",
+        "shares paid for tax withholding for share based compensation",
+        "stock issued during period shares new issues",
+        "stock repurchased and retired during period shares"
+    ]
+}

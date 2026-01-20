@@ -1,0 +1,85 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "cost of goods and services sold"
+        ]
+    },
+    "Gross Profit": [
+        "gross profit"
+    ],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "net income loss",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [],
+        "Interest Income": [],
+        "Other Income (Expense)": [
+            "gains losses on extinguishment of debt",
+            "interest income expense nonoperating net",
+            "interest revenue expense net"
+        ],
+        "Total Non-Operating Items": []
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "depreciation and amortization"
+        ],
+        "General and Administrative": [
+            "selling general and administrative expense"
+        ],
+        "Other Operating Expenses": [],
+        "Research and Development": [],
+        "Sales and Marketing": [],
+        "Total Operating Expenses": [
+            "operating expenses"
+        ]
+    },
+    "Operating Income": [
+        "operating income loss"
+    ],
+    "Other Comprehensive Income": [],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [
+            "weighted average number of shares outstanding basic"
+        ],
+        "Weighted Average Shares Outstanding (Diluted)": [
+            "weighted average number of diluted shares outstanding"
+        ]
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "revenue from contract with customer excluding assessed tax",
+            "sales revenue net"
+        ]
+    },
+    "__unmapped__": [
+        "adjustments to retained earnings share repurchase",
+        "common stock dividends per share declared",
+        "cost of goods and services sold percent",
+        "depreciation and amortization percent",
+        "depreciation nonproduction percent",
+        "dividends common stock cash",
+        "gross profit percent",
+        "income tax expense benefit percent",
+        "net income loss attributable to parent percent",
+        "operating expenses percent",
+        "operating income loss percent",
+        "revenue from contract with customer excluding assessed tax percentage",
+        "selling general and administrative expense percent",
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest percent"
+    ]
+}

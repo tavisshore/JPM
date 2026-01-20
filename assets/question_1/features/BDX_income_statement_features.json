@@ -1,0 +1,83 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "cost of goods and services sold"
+        ]
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "income loss from continuing operations",
+        "net income loss",
+        "net income loss available to common stockholders basic",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [
+            "interest expense",
+            "interest expense nonoperating"
+        ],
+        "Interest Income": [
+            "investment income interest"
+        ],
+        "Other Income (Expense)": [
+            "other nonoperating income expense"
+        ],
+        "Total Non-Operating Items": []
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [],
+        "General and Administrative": [
+            "selling general and administrative expense"
+        ],
+        "Other Operating Expenses": [
+            "acquisition related costs and restructuring charges",
+            "business combination transaction and integration related costs",
+            "integration restructuring and transaction expense",
+            "other operating income expense net"
+        ],
+        "Research and Development": [
+            "research and development expense",
+            "research and development expense operating"
+        ],
+        "Sales and Marketing": [],
+        "Total Operating Expenses": []
+    },
+    "Operating Income": [
+        "operating income loss"
+    ],
+    "Other Comprehensive Income": [],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic",
+            "income loss from continuing operations per basic share"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted",
+            "income loss from continuing operations per diluted share"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [],
+        "Weighted Average Shares Outstanding (Diluted)": []
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "revenues"
+        ]
+    },
+    "__unmapped__": [
+        "common stock dividends per share declared",
+        "costs and expenses",
+        "income loss from discontinued operations net of tax",
+        "income loss from discontinued operations net of tax attributable to reporting entity",
+        "income loss from discontinued operations net of tax per basic share",
+        "income loss from discontinued operations net of tax per diluted share",
+        "preferred stock dividends income statement impact",
+        "income loss from continuing operations before income taxes minority interest and income loss from equity method investments"
+    ]
+}

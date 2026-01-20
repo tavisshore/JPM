@@ -1,0 +1,107 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "direct costs of leased and rented property or equipment",
+            "other cost of operating revenue"
+        ]
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "foreign currency transaction gain loss before tax"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "net income loss",
+        "net income loss available to common stockholders basic",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [
+            "interest expense"
+        ],
+        "Interest Income": [],
+        "Other Income (Expense)": [
+            "equity method investment realized gain loss on disposal",
+            "foreign exchange fluctuation",
+            "gain on sale of disposition of real estate investments",
+            "gain or loss on sale of previously unissued stock by equity investee",
+            "gains losses on extinguishment of debt",
+            "gains losses on sales of investment real estate",
+            "income loss from equity method investments",
+            "loss from catastrophes"
+        ],
+        "Total Non-Operating Items": []
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "depreciation and amortization",
+            "depreciation depletion and amortization"
+        ],
+        "General and Administrative": [
+            "general and administrative expense"
+        ],
+        "Other Operating Expenses": [
+            "allocation of net income to restricted share units",
+            "allocation of net income to restricted share units and unvested l t i p units",
+            "asset impairment charges",
+            "real estate acquisition and development expense",
+            "restricted share units"
+        ],
+        "Research and Development": [],
+        "Sales and Marketing": [],
+        "Total Operating Expenses": []
+    },
+    "Operating Income": [
+        "operating income loss"
+    ],
+    "Other Comprehensive Income": [],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic",
+            "income loss from continuing operations per basic share"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [
+            "weighted average number of shares outstanding basic"
+        ],
+        "Weighted Average Shares Outstanding (Diluted)": [
+            "weighted average number of diluted shares outstanding"
+        ]
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "revenues"
+        ]
+    },
+    "__unmapped__": [
+        "ancillary operations member",
+        "based upon redemptions of preferred partnership units",
+        "common shareholders",
+        "common stock dividends per share declared",
+        "costs and expenses",
+        "equity shares series",
+        "equity shares series based on redemptions",
+        "gain loss on real estate sale and debt retirement",
+        "income loss attributable to noncontrolling interest",
+        "income loss from continuing operations including portion attributable to noncontrolling interest",
+        "income loss from discontinued operations net of tax attributable to reporting entity",
+        "interest and other income",
+        "net income allocated to controlling equity based upon income of consolidated entities",
+        "net income allocated to noncontrolling interests in subsidiaries",
+        "net income loss attributable to noncontrolling interest",
+        "preferred shareholders based on distributions paid",
+        "preferred shareholders based on redemptions",
+        "preferred shareholders based on repurchases",
+        "preferred stock dividends income statement impact",
+        "preferred stock redemption premium",
+        "self storage operations member",
+        "total expenses",
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest",
+        "income loss from continuing operations before income taxes minority interest and income loss from equity method investments"
+    ]
+}

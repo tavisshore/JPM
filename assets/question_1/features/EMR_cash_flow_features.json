@@ -1,0 +1,104 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [
+        "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents"
+    ],
+    "Financing Activities": {
+        "Dividends Paid": [
+            "payments of dividends",
+            "payments of dividends common stock"
+        ],
+        "Net Cash from Financing Activities": [
+            "net cash provided by used in financing activities"
+        ],
+        "Other Financing Activities": [
+            "payments to minority shareholders",
+            "payments to settle awards"
+        ],
+        "Proceeds from Debt": [
+            "proceeds from issuance of long term debt",
+            "proceeds from repayments of short term debt maturing in three months or less",
+            "proceeds from short term debt maturing in more than three months",
+            "proceeds from subordinated interest"
+        ],
+        "Proceeds from Stock Issuance": [],
+        "Repayment of Debt": [
+            "repayments of debt maturing in more than three months",
+            "repayments of long term debt",
+            "repayments of notes payable",
+            "repayments of short term debt maturing in more than three months"
+        ],
+        "Stock Repurchases": [
+            "payment for repurchase of awards",
+            "payments for repurchase of common stock",
+            "payments for repurchase of common stock by subsidiary"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "payments to acquire businesses net of cash acquired"
+        ],
+        "Capital Expenditures": [
+            "payments to acquire property plant and equipment"
+        ],
+        "Net Cash from Investing Activities": [
+            "cash provided by used in investing activities discontinued operations",
+            "net cash provided by used in investing activities continuing operations"
+        ],
+        "Other Investing Activities": [
+            "proceeds from divestiture of businesses"
+        ],
+        "Purchases of Investments": [],
+        "Sales and Maturities of Investments": []
+    },
+    "Net Change in Cash": [
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "increase decrease in accounts payable",
+            "increase decrease in accrued income taxes payable",
+            "increase decrease in accrued liabilities",
+            "increase decrease in inventories",
+            "increase decrease in operating capital",
+            "increase decrease in other current assets",
+            "increase decrease in receivables"
+        ],
+        "Deferred Income Taxes": [],
+        "Depreciation and Amortization": [
+            "amortization of acquisition costs",
+            "depreciation depletion and amortization"
+        ],
+        "Interest Paid": [],
+        "Net Cash from Operating Activities": [
+            "cash provided by used in operating activities discontinued operations",
+            "net cash provided by used in operating activities continuing operations"
+        ],
+        "Net Income": [],
+        "Other Non-Cash Items": [
+            "defined benefit plan net periodic benefit cost",
+            "gain from periodic distribution from retained subordinated interest",
+            "gain from periodic distribution from retained subordinated interest in vertiv v r t",
+            "gain lossonsalesofbusinessnetoftax",
+            "gain on sale of business t o d",
+            "goodwill impairment loss net of tax",
+            "income loss on equity method investment note receivable",
+            "other operating activities cash flow statement",
+            "pension contributions",
+            "pension expense reversal of expense noncash",
+            "periodic distribution from retained subordinated interest in vertiv v r t",
+            "taxes paidon gainon saleof business"
+        ],
+        "Stock-Based Compensation": [
+            "share based compensation"
+        ]
+    },
+    "__unmapped__": [
+        "discontinued operation income loss from discontinued operation during phase out period net of tax",
+        "income loss from discontinued operations net of tax",
+        "income loss from discontinued operations net of tax attributable to reporting entity",
+        "netincometaxexpensebenefittaxreform",
+        "profit loss"
+    ]
+}

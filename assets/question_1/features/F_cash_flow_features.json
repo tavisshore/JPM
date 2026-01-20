@@ -1,0 +1,131 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [
+        "effect of exchange rate on cash and cash equivalents",
+        "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents"
+    ],
+    "Financing Activities": {
+        "Dividends Paid": [
+            "payments of dividends common stock"
+        ],
+        "Net Cash from Financing Activities": [
+            "net cash provided by used in financing activities"
+        ],
+        "Other Financing Activities": [],
+        "Proceeds from Debt": [
+            "proceeds from issuance of long term debt",
+            "proceeds from other debt",
+            "proceeds from repayments of short term debt"
+        ],
+        "Proceeds from Stock Issuance": [
+            "proceeds from issuance of common stock"
+        ],
+        "Repayment of Debt": [
+            "repayments of long term debt",
+            "repayments of other debt"
+        ],
+        "Stock Repurchases": [
+            "payments for repurchase of common stock"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "cash acquired from acquisition"
+        ],
+        "Capital Expenditures": [
+            "payments to acquire productive assets"
+        ],
+        "Net Cash from Investing Activities": [
+            "net cash provided by used in investing activities"
+        ],
+        "Other Investing Activities": [
+            "cash divested from deconsolidation",
+            "collections of retail and other finance receivables and operating leases",
+            "payments for proceeds from derivative instrument investing activities",
+            "proceeds from collection of finance receivables",
+            "proceeds from divestiture of businesses",
+            "proceeds from divestiture of interest in consolidated subsidiaries",
+            "proceeds from equity method investment dividends or distributions return of capital",
+            "proceeds from sale of finance receivables"
+        ],
+        "Purchases of Investments": [
+            "payments to acquire equity method investments",
+            "payments to acquire loans and leases held for investment",
+            "payments to acquire marketable securities",
+            "payments to acquire marketable securitiesand cost method investments"
+        ],
+        "Sales and Maturities of Investments": [
+            "proceeds from sale and maturity of marketable securities",
+            "proceeds from sale and maturityof marketable securitiesand cost method investments"
+        ]
+    },
+    "Net Change in Cash": [
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "increase decrease in accounts and other receivables",
+            "increase decrease in accounts payable and other operating liabilities",
+            "increase decrease in accounts receivable and other operating assets",
+            "increase decrease in finance receivables",
+            "increase decrease in inventories",
+            "increase decrease in operating liabilities",
+            "net change in intersector receivables payables and other liabilities",
+            "net increase decrease in wholesale receivables"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income tax expense benefit",
+            "deferred income tax expense benefit sector",
+            "deferred income taxes and tax credits"
+        ],
+        "Depreciation and Amortization": [
+            "adjustment for amortization",
+            "depreciation",
+            "depreciation depletion and amortization",
+            "depreciationand amortization including depreciationon operating leases",
+            "other depreciation and amortization"
+        ],
+        "Interest Paid": [],
+        "Net Cash from Operating Activities": [
+            "net cash provided by used in continuing operations",
+            "net cash provided by used in operating activities"
+        ],
+        "Net Income": [],
+        "Other Non-Cash Items": [
+            "business combination step acquisition equity interest in acquiree remeasurement gain or loss",
+            "disposal group not discontinued operation loss gain on write down",
+            "gain loss on disposition of assets1",
+            "gain loss on investments",
+            "gainandlossoninvestment",
+            "gains losses on changes in investments in affiliates",
+            "gains losses on extinguishment of debt",
+            "income loss from equity method investments net of dividends or distributions",
+            "investment income net amortization of discount and premium",
+            "other noncash income expense",
+            "other operating activities cash flow statement",
+            "pension and other postretirement benefit expense",
+            "pension and other postretirement benefits expense reversal of expense noncash",
+            "provision for loan lease and other losses",
+            "restructuring charges",
+            "unrealized gain loss on investments"
+        ],
+        "Stock-Based Compensation": [
+            "share based compensation"
+        ]
+    },
+    "__unmapped__": [
+        "cumulative correction of prior period error",
+        "financing activity to from sectors",
+        "foreign currency transaction gain loss before tax",
+        "foreign currency transaction gain loss unrealized",
+        "increase decrease in inventories and other operating assets",
+        "increase decreasein cashdueto changefrom consolidatedto cost method",
+        "interest supplements and residual value support from automotive",
+        "interest supplements and residual value support to financial services",
+        "investing activity to from sectors inflow",
+        "investing activity to from sectors outflow",
+        "profit loss",
+        "voluntary employee benefit association trust payment"
+    ]
+}

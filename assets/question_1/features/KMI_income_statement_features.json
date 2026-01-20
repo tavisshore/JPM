@@ -1,0 +1,120 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "cost of goods and service excluding depreciation depletion and amortization",
+            "cost of goods and services sold",
+            "cost of goods sold",
+            "gas purchases and other costs of sales"
+        ]
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "income loss from continuing operations including portion attributable to noncontrolling interest",
+        "net income loss",
+        "net income loss available to common stockholders basic",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [
+            "interest expense"
+        ],
+        "Interest Income": [
+            "investment income interest"
+        ],
+        "Other Income (Expense)": [
+            "business combination step acquisition equity interest in acquiree remeasurement gain",
+            "business combination step acquisition equity interest in acquiree remeasurement gain or loss",
+            "business combination step acquisition equity interest in acquiree remeasurement loss",
+            "equity method investment other than temporary impairment",
+            "equity method investment realized gain loss on disposal",
+            "gain loss on sale of interest in projects",
+            "gain lossonimpairmentsanddisposalsoflonglivedassetsnet",
+            "gain on sale of investments",
+            "income loss from equity method investments",
+            "interest income expense nonoperating net",
+            "loss gainonimpairmentsanddisposalsoflonglivedassetsnet",
+            "loss on remeasurement of assets of disposal group to fair value net of tax",
+            "loss on remeasurement of previously held equity interest",
+            "loss on remeasurement of previously held equity interest in kinderhawk",
+            "loss on sale and remeasurement of kmps ftc natural gas pipelines disposal group to to fair value net of tax",
+            "lossonimpairmentsanddisposalsoflonglivedassetsnet",
+            "lossonsaleandremeasurementofdisposalgrouptofairvaluenetoftax",
+            "other nonoperating income expense"
+        ],
+        "Total Non-Operating Items": [
+            "nonoperating income expense"
+        ]
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "amortizationofexcesscostofequityinvestments",
+            "depreciation depletion and amortization"
+        ],
+        "General and Administrative": [
+            "general and administrative expense"
+        ],
+        "Other Operating Expenses": [
+            "asset impairment charges",
+            "goodwill impairment loss",
+            "impairment of long lived assets held for use",
+            "other cost and expense operating",
+            "other operating income expense net",
+            "utilities operating expense maintenance and operations"
+        ],
+        "Research and Development": [],
+        "Sales and Marketing": [],
+        "Total Operating Expenses": []
+    },
+    "Operating Income": [
+        "operating income loss",
+        "other operating income"
+    ],
+    "Other Comprehensive Income": [],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic",
+            "income loss from continuing operations per basic share"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted",
+            "income loss from continuing operations per diluted share"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [
+            "weighted average number of shares outstanding basic"
+        ],
+        "Weighted Average Shares Outstanding (Diluted)": [
+            "weighted average number of diluted shares outstanding"
+        ]
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "natural gas revenue",
+            "other sales revenue net",
+            "revenues"
+        ]
+    },
+    "__unmapped__": [
+        "common stock dividends per share declared",
+        "costs and expenses",
+        "discontinued operation income loss from discontinued operation during phase out period before income tax",
+        "earnings per share basic and diluted",
+        "gain loss on sales of assets and asset impairment charges",
+        "income loss from continuing operations per basic and diluted share",
+        "income loss from discontinued operations net of tax",
+        "income loss from discontinued operations net of tax per basic share",
+        "income loss from discontinued operations net of tax per diluted share",
+        "net income loss attributable to noncontrolling interest",
+        "oil and gas service member",
+        "operating costs and expenses",
+        "preferred stock dividends income statement impact",
+        "taxes excluding income and excise taxes",
+        "weighted average number of share outstanding basic and diluted"
+    ]
+}

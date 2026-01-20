@@ -1,0 +1,136 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "cost of real estate revenue",
+            "direct costs of leased and rented property or equipment",
+            "service management costs"
+        ]
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "earnings loss before income taxes"
+    ],
+    "Income Tax Expense": [
+        "current income tax expense benefit",
+        "deferred income tax expense benefit",
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "income loss from continuing operations after preferred unit distributions",
+        "income loss from continuing operations after preferred unit distributions diluted",
+        "net income loss",
+        "net income loss attributable to common unitholders",
+        "net income loss available to common stockholders basic",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [
+            "interest expense",
+            "interest expense nonoperating"
+        ],
+        "Interest Income": [],
+        "Other Income (Expense)": [
+            "disposal group not discontinued operation gain loss on disposal",
+            "gain loss on disposition of assets1",
+            "gain loss on foreign currency and derivative",
+            "gain loss on sale of property",
+            "gains losses on extinguishment of debt",
+            "gains on dispositions of development properties and land net",
+            "gains on other dispositions of investments in real estate net",
+            "income loss from equity method investments",
+            "net gain loss on dispositions net of related impairment charges and taxes",
+            "net gain loss on dispositions net of taxes",
+            "net gains on dispositions net of related impairment charges and taxes",
+            "other nonoperating income expense"
+        ],
+        "Total Non-Operating Items": [
+            "nonoperating income expense",
+            "total other income and expenses net"
+        ]
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "depreciation and amortization"
+        ],
+        "General and Administrative": [
+            "general and administrative expense"
+        ],
+        "Other Operating Expenses": [
+            "business combination acquisition related costs",
+            "fund costs",
+            "goodwill and intangible asset impairment",
+            "impairment of real estate",
+            "merger transaction costs",
+            "other asset impairment charges",
+            "other cost and expense operating",
+            "restructuring charges"
+        ],
+        "Research and Development": [],
+        "Sales and Marketing": [],
+        "Total Operating Expenses": [
+            "operating expenses",
+            "operating expenses before gains on real estate transactions net"
+        ]
+    },
+    "Operating Income": [
+        "operating income loss",
+        "operating income loss before gains loss on real estate transactions net"
+    ],
+    "Other Comprehensive Income": [],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic",
+            "income loss from continuing operations per basic share"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted",
+            "income loss from continuing operations per diluted share"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [
+            "weighted average common units outstanding basic",
+            "weighted average number of shares outstanding basic"
+        ],
+        "Weighted Average Shares Outstanding (Diluted)": [
+            "weighted average number of diluted shares outstanding"
+        ]
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "management fees revenue",
+            "minimum rents",
+            "operating leases income statement lease revenue",
+            "other real estate revenue",
+            "real estate revenue net",
+            "rental revenue",
+            "revenues",
+            "tenant reimbursements1"
+        ]
+    },
+    "__unmapped__": [
+        "allocation to participating securities",
+        "common stock dividends per share cash paid",
+        "development profits net of taxes",
+        "discontinued operation income loss from discontinued operation during phase out period net of tax",
+        "dividends preferred stock",
+        "gain loss on foreign currency and derivative and interest and other income expense net",
+        "gain loss on foreign currency and derivative and other income expense net",
+        "gain loss on foreign currency and derivative contracts and related amortization",
+        "gain loss on foreign currency derivative and other gains losses and other income expense net",
+        "income loss from continuing operations including portion attributable to noncontrolling interest",
+        "income loss from discontinued operations net of tax",
+        "income loss from discontinued operations net of tax per basic share",
+        "income loss from discontinued operations net of tax per diluted share",
+        "joint venture partners and class b limited partnership unit holders share of development profits",
+        "joint venture partners and limited partnership unitholders share of development profits",
+        "minority interest in net income loss joint venture partners",
+        "minority interest in net income loss limited partnerships",
+        "net income loss allocated to general partners",
+        "net income loss allocated to limited partners",
+        "net income loss attributable to noncontrolling interest",
+        "preferred stock dividends income statement impact",
+        "preferred stock redemption premium",
+        "foreign currency transaction gain loss before tax",
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ]
+}

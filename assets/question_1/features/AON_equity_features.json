@@ -1,0 +1,91 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [
+        "comprehensive income member",
+        "comprehensive income net of tax including portion attributable to noncontrolling interest"
+    ],
+    "Dividends Declared": [],
+    "Dividends Paid": [
+        "dividends common stock cash"
+    ],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "net income loss including portion attributable to nonredeemable noncontrolling interest",
+        "profit loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [
+            "other comprehensive income derivatives qualifying as hedges net of tax portion attributable to parent",
+            "other comprehensive income loss derivatives qualifying as hedges net of tax",
+            "other comprehensive income unrealized gain loss on derivatives arising during period net of tax"
+        ],
+        "Foreign Currency Translation": [
+            "other comprehensive income foreign currency transaction and translation adjustment net of tax period increase decrease",
+            "other comprehensive income loss foreign currency transaction and translation adjustment net of tax"
+        ],
+        "Other OCI": [
+            "other comprehensive income defined benefit plans adjustment net of tax period increase decrease",
+            "other comprehensive income defined benefit plans adjustment net of tax portion attributable to parent",
+            "other comprehensive income loss pension and other postretirement benefit plans adjustment net of tax"
+        ],
+        "Total Other Comprehensive Income": [],
+        "Unrealized Gains/Losses on Securities": [
+            "other comprehensive income loss available for sale securities adjustment net of tax",
+            "other comprehensive income unrealized holding gain loss on securities arising during period net of tax"
+        ]
+    },
+    "Other Equity Adjustments": [],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [],
+        "Other Stock Issuance": [
+            "stock issued during period shares acquisitions",
+            "stock issued during period shares employee benefit plan"
+        ],
+        "Stock-Based Compensation": [
+            "adjustments to additional paid in capital sharebased compensation requisite service period recognition value",
+            "stock issued during period shares employee compensation net of forfeitures",
+            "stock issued during period shares share based compensation"
+        ],
+        "Total Stock Issuance Value": [
+            "stock issued during period value acquisitions",
+            "stock issued during period value employee benefit plan",
+            "stock issued during period value employee compensation net of forfeitures",
+            "stock issued during period value share based compensation",
+            "stock issued during period value treasury stock reissued share based compensation"
+        ]
+    },
+    "Stock Repurchases": [
+        "stock repurchased and retired during period shares",
+        "stock repurchased and retired during period value",
+        "stock repurchased during period shares",
+        "stock repurchased during period value",
+        "treasury stock retired cost method amount",
+        "treasury stock shares retired"
+    ],
+    "Tax Effects from Stock Compensation": [
+        "adjustment to additional paid in capital income tax effect from share based compensation net",
+        "adjustments to additional paid in capital tax effect from share based compensation"
+    ],
+    "__unmapped__": [
+        "minority interest change in redemption value",
+        "minority interest decrease from distributions to noncontrolling interest holders",
+        "minority interest decrease from redemptions",
+        "minority interest increase from stock issuance",
+        "noncontrolling interest increase from sale of parent equity interest",
+        "sales purchasesofsharesto from noncontrolling interest"
+    ]
+}

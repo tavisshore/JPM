@@ -1,0 +1,121 @@
+{
+    "Assets": {
+        "Current": {
+            "Cash and Equivalents": [
+                "cash and cash equivalents",
+                "cash and cash equivalents at carrying value",
+                "cash and securities segregated for regulatory and other purposes",
+                "cash and securities segregated under federal and other regulations"
+            ],
+            "Inventory": [],
+            "Marketable Securities (Short-term)": [
+                "federal funds sold and securities purchased under agreements to resell",
+                "financial instruments owned at fair value",
+                "securities purchased under agreements to resell and federal funds sold",
+                "trading assets including pledge",
+                "trading securities"
+            ],
+            "Prepaid and Other Current Assets": [
+                "securities borrowed",
+                "securities loaned",
+                "securities loaned b s"
+            ],
+            "Receivables": [
+                "customer and other receivables",
+                "loans and leases receivable net reported amount",
+                "notes receivable net",
+                "other receivables",
+                "receivables from brokers dealers and clearing organizations",
+                "receivables from customers"
+            ],
+            "Total Current Assets": []
+        },
+        "Non-Current": {
+            "Deferred Tax Assets": [],
+            "Goodwill": [],
+            "Intangible Assets (net)": [],
+            "Long-term Investments": [
+                "available for sale securities debt securities",
+                "debt securities held to maturity amortized cost after allowance for credit loss",
+                "investment including pledge",
+                "other investments"
+            ],
+            "Other Non-Current Assets": [
+                "other assets",
+                "other assets b s"
+            ],
+            "Property, Plant, and Equipment (net)": [],
+            "Total Non-Current Assets": []
+        },
+        "Total Assets": [
+            "assets"
+        ]
+    },
+    "Equity": {
+        "Accumulated Other Comprehensive Income": [
+            "accumulated other comprehensive income loss net of tax"
+        ],
+        "Common Stock and APIC": [
+            "additional paid in capital",
+            "common stock value",
+            "nonvoting common stock",
+            "preferred stock value",
+            "restricted stock units and employee stock options",
+            "share based awards"
+        ],
+        "Retained Earnings": [
+            "retained earnings accumulated deficit"
+        ],
+        "Total Equity": [
+            "stockholders equity"
+        ],
+        "Treasury Stock": [
+            "treasury stock value"
+        ]
+    },
+    "Liabilities": {
+        "Current": {
+            "Accounts Payable and Accrued Expenses": [
+                "customer and other payables",
+                "payables to broker dealers and clearing organizations",
+                "payables to customers"
+            ],
+            "Deferred Revenue": [],
+            "Other Current Liabilities": [
+                "deposits",
+                "financial instruments sold not yet purchased at fair value",
+                "trading liabilities",
+                "trading liabilities at fair value"
+            ],
+            "Short-term Debt": [
+                "securities sold under agreements to repurchase",
+                "unsecured short term borrowings including current portion of unsecured long term borrowings"
+            ],
+            "Total Current Liabilities": []
+        },
+        "Non-Current": {
+            "Deferred Tax Liabilities": [],
+            "Lease Liabilities": [],
+            "Long-term Debt": [
+                "unsecured long term debt"
+            ],
+            "Other Non-Current Liabilities": [
+                "other liabilities",
+                "other secured financings"
+            ],
+            "Total Non-Current Liabilities": []
+        },
+        "Total Liabilities": [
+            "liabilities"
+        ]
+    },
+    "Totals": {
+        "Total Liabilities and Equity": [
+            "liabilities and stockholders equity"
+        ]
+    },
+    "__unmapped__": [
+        "other liabilities and accrued expenses",
+        "receivables from customers and counterparties"
+    ]
+}

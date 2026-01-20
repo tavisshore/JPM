@@ -1,0 +1,59 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [],
+    "Dividends Declared": [],
+    "Dividends Paid": [
+        "dividends cash"
+    ],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "profit loss excluding redeemable noncontrolling interests"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [],
+        "Foreign Currency Translation": [],
+        "Other OCI": [],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax"
+        ],
+        "Unrealized Gains/Losses on Securities": []
+    },
+    "Other Equity Adjustments": [
+        "stockholders equity other"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [],
+        "Other Stock Issuance": [
+            "stock issued during period value acquisitions",
+            "stock issued during period value employee stock purchase plan"
+        ],
+        "Stock-Based Compensation": [
+            "adjustments to additional paid in capital sharebased compensation requisite service period recognition value"
+        ],
+        "Total Stock Issuance Value": []
+    },
+    "Stock Repurchases": [
+        "treasury stock value acquired cost method"
+    ],
+    "Tax Effects from Stock Compensation": [
+        "adjustments related to tax withholding for share based compensation"
+    ],
+    "__unmapped__": [
+        "noncontrolling interest consolidation deconsolidation of investment",
+        "subscriptions from redemptions and distributions to noncontrolling interest holders"
+    ]
+}

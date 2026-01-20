@@ -1,0 +1,122 @@
+{
+    "Assets": {
+        "Current": {
+            "Cash and Equivalents": [
+                "cash and due from banks",
+                "federal funds sold and securities purchased under agreements to resell",
+                "interest bearing deposits in banks",
+                "restricted cash and cash equivalents"
+            ],
+            "Inventory": [],
+            "Marketable Securities (Short-term)": [
+                "available for sale securities",
+                "available for sale securities debt securities",
+                "debt securities available for sale excluding accrued interest",
+                "marketable securities"
+            ],
+            "Prepaid and Other Current Assets": [],
+            "Receivables": [
+                "financing receivable allowance for credit loss excluding accrued interest",
+                "financing receivable excluding accrued interest before allowance for credit loss",
+                "interest receivable",
+                "loans and leases receivable allowance",
+                "loans and leases receivable net of deferred income",
+                "loans receivable held for sale net",
+                "loans receivable held for sale net not part of disposal group",
+                "notes receivable gross",
+                "notes receivable net"
+            ],
+            "Total Current Assets": []
+        },
+        "Non-Current": {
+            "Deferred Tax Assets": [],
+            "Goodwill": [
+                "goodwill"
+            ],
+            "Intangible Assets (net)": [
+                "intangible assets net excluding goodwill"
+            ],
+            "Long-term Investments": [
+                "held to maturity securities",
+                "unsecured loans held for investment at amortized cost"
+            ],
+            "Other Non-Current Assets": [
+                "interests continued to be held by transferor fair value",
+                "other assets"
+            ],
+            "Property, Plant, and Equipment (net)": [
+                "property plant and equipment net"
+            ],
+            "Total Non-Current Assets": []
+        },
+        "Total Assets": [
+            "assets"
+        ]
+    },
+    "Equity": {
+        "Accumulated Other Comprehensive Income": [
+            "accumulated other comprehensive income loss net of tax"
+        ],
+        "Common Stock and APIC": [
+            "additional paid in capital",
+            "additional paid in capital common stock",
+            "common stock value",
+            "preferred stock value"
+        ],
+        "Retained Earnings": [
+            "retained earnings accumulated deficit"
+        ],
+        "Total Equity": [
+            "stockholders equity"
+        ],
+        "Treasury Stock": [
+            "treasury stock common value"
+        ]
+    },
+    "Liabilities": {
+        "Current": {
+            "Accounts Payable and Accrued Expenses": [],
+            "Deferred Revenue": [],
+            "Other Current Liabilities": [
+                "deposits",
+                "interest bearing deposit liabilities",
+                "interest payable current and noncurrent",
+                "noninterest bearing deposit liabilities"
+            ],
+            "Short-term Debt": [
+                "federal funds purchased and securities sold under agreements to repurchase"
+            ],
+            "Total Current Liabilities": []
+        },
+        "Non-Current": {
+            "Deferred Tax Liabilities": [],
+            "Lease Liabilities": [],
+            "Long-term Debt": [
+                "debt excluding secured debt",
+                "other borrowings",
+                "secured debt",
+                "unsecured debt"
+            ],
+            "Other Non-Current Liabilities": [
+                "other liabilities"
+            ],
+            "Total Non-Current Liabilities": []
+        },
+        "Total Liabilities": [
+            "liabilities"
+        ]
+    },
+    "Totals": {
+        "Total Liabilities and Equity": [
+            "liabilities and stockholders equity"
+        ]
+    },
+    "__unmapped__": [
+        "assets of disposal group including discontinued operation",
+        "cash cash equivalents and federal funds sold",
+        "debt securities available for sale and held to maturity",
+        "liabilities of disposal group including discontinued operation",
+        "parent company member",
+        "variable interest entity primary beneficiary member"
+    ]
+}

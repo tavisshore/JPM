@@ -1,0 +1,77 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [
+        "comprehensive income net of tax"
+    ],
+    "Dividends Declared": [
+        "dividends"
+    ],
+    "Dividends Paid": [],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "net income loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [
+            "other comprehensive income loss derivatives qualifying as hedges net of tax"
+        ],
+        "Foreign Currency Translation": [
+            "other comprehensive income loss foreign currency transaction and translation adjustment net of tax"
+        ],
+        "Other OCI": [],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax portion attributable to parent"
+        ],
+        "Unrealized Gains/Losses on Securities": [
+            "other comprehensive income loss available for sale securities adjustment net of tax"
+        ]
+    },
+    "Other Equity Adjustments": [
+        "cumulative effect period of adoption adjustment member"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [
+            "share based compensation arrangement by share based payment award options exercises in period total intrinsic value"
+        ],
+        "Other Stock Issuance": [],
+        "Stock-Based Compensation": [
+            "adjustments to additional paid in capital sharebased compensation requisite service period recognition value",
+            "share based compensation arrangement by share based payment award equity instruments other than options vested in period total fair value",
+            "stock issued during period value share based compensation net of shares withheld for taxes"
+        ],
+        "Total Stock Issuance Value": [
+            "stock issued during period value new issues"
+        ]
+    },
+    "Stock Repurchases": [
+        "amount utilized under accelerated share repurchase program",
+        "stock repurchased and retired during period value"
+    ],
+    "Tax Effects from Stock Compensation": [
+        "adjustments related to tax withholding for share based compensation",
+        "adjustments to additional paid in capital tax effect from share based compensation including transfer pricing",
+        "income tax reconciliation nondeductible expense share based compensation cost"
+    ],
+    "__unmapped__": [
+        "common stock dividends per share declared",
+        "dividends and dividend equivalents declared on common stock and restricted stock units",
+        "employee service share based compensation unrecognized compensation costs on nonvested awards weighted average period of recognition",
+        "shares of stock issued during period share based compensation net of shares withheld for taxes",
+        "stock repurchased and retired during period shares",
+        "stock repurchased and retired during period weighted average price"
+    ]
+}

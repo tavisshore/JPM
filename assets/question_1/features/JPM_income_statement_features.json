@@ -1,0 +1,98 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": []
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "net income loss",
+        "net income loss available to common stockholders basic",
+        "net income loss available to common stockholders diluted"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [
+            "interest expense operating"
+        ],
+        "Interest Income": [
+            "interest income operating"
+        ],
+        "Other Income (Expense)": [
+            "available for sale securities gross realized gain loss net",
+            "debt securities available for sale realized gain loss",
+            "gain on expected recovery of subordinated loan pre tax",
+            "impairment of investments",
+            "interest income expense net",
+            "other than temporary impairment losses investments portion recognized in earnings net",
+            "other than temporary impairment losses investments portion recognized in earnings net availableforsale securities"
+        ],
+        "Total Non-Operating Items": []
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "amortization of intangible assets"
+        ],
+        "General and Administrative": [
+            "communications and information technology",
+            "labor and related expense",
+            "occupancy net",
+            "professional and contract services expense"
+        ],
+        "Other Operating Expenses": [
+            "merger and acquisition cost",
+            "other noninterest expense",
+            "provision for loan lease and other losses"
+        ],
+        "Research and Development": [],
+        "Sales and Marketing": [
+            "marketing and advertising expense"
+        ],
+        "Total Operating Expenses": []
+    },
+    "Operating Income": [],
+    "Other Comprehensive Income": [
+        "other than temporary impairment losses investments portion in other comprehensive income loss before tax including portion attributable to noncontrolling interest"
+    ],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [
+            "weighted average number of shares outstanding basic"
+        ],
+        "Weighted Average Shares Outstanding (Diluted)": [
+            "weighted average number of diluted shares outstanding"
+        ]
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "asset management administration and commissions",
+            "asset management fees",
+            "fees and commissions credit and debit cards",
+            "fees and commissions credit and debit cards1",
+            "fees and commissions1",
+            "investment banking revenue",
+            "lending and deposit related fees",
+            "mortgage fees and related income",
+            "noninterest income other",
+            "principal transactions revenue"
+        ]
+    },
+    "__unmapped__": [
+        "common stock dividends per share cash paid",
+        "common stock dividends per share declared",
+        "income loss before extraordinary items and cumulative effect of change in accounting principle",
+        "noninterest expense",
+        "noninterest income",
+        "revenues net of interest expense",
+        "income loss from continuing operations before income taxes minority interest and income loss from equity method investments"
+    ]
+}

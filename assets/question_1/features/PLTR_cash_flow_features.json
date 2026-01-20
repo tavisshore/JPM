@@ -1,0 +1,110 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [
+        "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents"
+    ],
+    "Financing Activities": {
+        "Dividends Paid": [],
+        "Net Cash from Financing Activities": [
+            "net cash provided by used in financing activities"
+        ],
+        "Other Financing Activities": [
+            "proceeds from payments for other financing activities",
+            "payments related to tax withholding for share based compensation",
+            "accrued taxes related to net share settlement of equity awards",
+            "receivable from the exercise of stock option",
+            "conversion of stock amount converted1"
+        ],
+        "Proceeds from Debt": [
+            "proceeds from debt net of issuance costs"
+        ],
+        "Proceeds from Stock Issuance": [
+            "proceeds from issuance of common stock",
+            "proceeds from stock options exercised"
+        ],
+        "Repayment of Debt": [
+            "repayments of debt"
+        ],
+        "Stock Repurchases": [
+            "payments for repurchase of common stock"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "payments to acquire businesses net of cash acquired"
+        ],
+        "Capital Expenditures": [
+            "payments to acquire property plant and equipment"
+        ],
+        "Net Cash from Investing Activities": [
+            "net cash provided by used in investing activities"
+        ],
+        "Other Investing Activities": [
+            "payments for proceeds from other investing activities",
+            "proceeds from sale of other assets investing activities"
+        ],
+        "Purchases of Investments": [
+            "payments to acquire marketable securities",
+            "payments to acquire equity method investments",
+            "payments to acquire other investments",
+            "purchases of alternative investments"
+        ],
+        "Sales and Maturities of Investments": [
+            "proceeds from sale and maturity of marketable securities",
+            "proceeds from sales of alternative investments",
+            "proceeds from sale of equity securities fv ni"
+        ]
+    },
+    "Net Change in Cash": [
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "increase decrease in accounts payable",
+            "increase decrease in accounts receivable",
+            "increase decrease in accrued liabilities",
+            "increase decrease in contract with customer liability",
+            "increase decrease in deferred revenue",
+            "increase decrease in operating lease liability current and noncurrent",
+            "increase decrease in other noncurrent assets",
+            "increase decrease in other noncurrent liabilities",
+            "increase decrease in other operating liabilities",
+            "increase decrease in prepaid deferred expense and other assets"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income tax expense benefit"
+        ],
+        "Depreciation and Amortization": [
+            "depreciation depletion and amortization"
+        ],
+        "Interest Paid": [
+            "interest paid net"
+        ],
+        "Net Cash from Operating Activities": [
+            "net cash provided by used in operating activities"
+        ],
+        "Net Income": [
+            "net income loss",
+            "profit loss"
+        ],
+        "Other Non-Cash Items": [
+            "asset impairment charges",
+            "business combination step acquisition equity interest in acquiree remeasurement gain",
+            "debt and equity securities unrealized gain loss",
+            "fair value adjustment of warrants",
+            "income taxes paid net",
+            "marketable securities unrealized gain loss",
+            "noncash consideration",
+            "noncash operating lease cost",
+            "other operating activities cash flow statement",
+            "unrealized and realized loss gain from marketable securities net"
+        ],
+        "Stock-Based Compensation": [
+            "share based compensation"
+        ]
+    },
+    "__unmapped__": [
+        "increase decrease in accounts payable and accrued liabilities"
+    ]
+}

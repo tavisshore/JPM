@@ -1,0 +1,94 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "access and communication fees"
+        ]
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "net income loss",
+        "net income loss available to common stockholders basic",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [
+            "interest and debt expense"
+        ],
+        "Interest Income": [],
+        "Other Income (Expense)": [
+            "gain loss on derivative instruments net pretax",
+            "impairment of investments",
+            "income loss from equity method investments",
+            "increase decrease in fair value of unhedged derivative instruments",
+            "investment income nonoperating",
+            "other nonoperating income expense"
+        ],
+        "Total Non-Operating Items": [
+            "nonoperating income expense"
+        ]
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "amortization of intangible assets"
+        ],
+        "General and Administrative": [
+            "information technology and data processing",
+            "labor and related expense",
+            "occupancy net",
+            "professional fees"
+        ],
+        "Other Operating Expenses": [
+            "other cost and expense operating",
+            "restructuring charges"
+        ],
+        "Research and Development": [],
+        "Sales and Marketing": [
+            "communication"
+        ],
+        "Total Operating Expenses": []
+    },
+    "Operating Income": [
+        "operating income loss"
+    ],
+    "Other Comprehensive Income": [],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [
+            "weighted average number of shares outstanding basic"
+        ],
+        "Weighted Average Shares Outstanding (Diluted)": [
+            "weighted average number of diluted shares outstanding"
+        ]
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "licensing fees",
+            "market data revenue",
+            "revenue from contract with customer excluding assessed tax",
+            "revenues"
+        ]
+    },
+    "__unmapped__": [
+        "antidilutive securities excluded from computation of earnings per share amount",
+        "clearing service member",
+        "costs and expenses",
+        "income loss from continuing operations including portion attributable to noncontrolling interest",
+        "income loss including portion attributable to noncontrolling interest",
+        "net income attributable to redeemable non controlling interest and non controlling interest",
+        "net income loss attributable to noncontrolling interest",
+        "net income loss including portion attributable to nonredeemable noncontrolling interest",
+        "noncontrolling interest in net income loss other noncontrolling interests nonredeemable"
+    ]
+}

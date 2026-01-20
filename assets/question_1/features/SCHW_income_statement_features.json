@@ -1,0 +1,91 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": []
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit",
+        "tax cuts and jobs act of2017 incomplete accounting change in tax rate deferred tax asset provisional income tax expense"
+    ],
+    "Net Income": [
+        "income loss from continuing operations",
+        "net income loss",
+        "net income loss available to common stockholders basic"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [
+            "interest expense operating"
+        ],
+        "Interest Income": [
+            "interest income operating"
+        ],
+        "Other Income (Expense)": [
+            "gain loss related to litigation settlement",
+            "interest income expense net",
+            "money market mutual fund charges",
+            "other income",
+            "other than temporary impairment losses investments portion recognized in earnings net"
+        ],
+        "Total Non-Operating Items": []
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "amortization of intangible assets",
+            "depreciation and amortization excluding amortization of intangible assets"
+        ],
+        "General and Administrative": [
+            "communication",
+            "labor and related expense",
+            "occupancy net",
+            "professional fees",
+            "regulatory fees and assessments"
+        ],
+        "Other Operating Expenses": [
+            "noninterest expense",
+            "provision for loan losses expensed"
+        ],
+        "Research and Development": [],
+        "Sales and Marketing": [
+            "marketing and advertising expense"
+        ],
+        "Total Operating Expenses": []
+    },
+    "Operating Income": [],
+    "Other Comprehensive Income": [],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic",
+            "income loss from continuing operations per basic share"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [
+            "weighted average number of shares outstanding basic"
+        ],
+        "Weighted Average Shares Outstanding (Diluted)": [
+            "weighted average number of diluted shares outstanding"
+        ]
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "fees and commissions",
+            "fees and commissions waivers",
+            "product and service other member",
+            "revenue from contract with customer excluding assessed tax",
+            "revenues",
+            "trading revenue"
+        ]
+    },
+    "__unmapped__": [
+        "antidilutive securities excluded from computation of earnings per share amount",
+        "common stock dividends per share declared",
+        "preferred stock dividends and other adjustments",
+        "preferred stock dividends income statement impact",
+        "income loss from continuing operations before income taxes minority interest and income loss from equity method investments"
+    ]
+}

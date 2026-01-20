@@ -1,0 +1,82 @@
+{
+    "Comprehensive Income": [
+        "comprehensive income net of tax"
+    ],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "cost of goods and services sold"
+        ]
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before investment income and income taxes"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "net income loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [
+            "interest and other borrowing expense",
+            "interest expense"
+        ],
+        "Interest Income": [
+            "interest and fee income loans and leases",
+            "investment income net"
+        ],
+        "Other Income (Expense)": [],
+        "Total Non-Operating Items": [
+            "other nonoperating income expense"
+        ]
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "depreciation on equipment on operating lease and other vehicle related expense and other expense"
+        ],
+        "General and Administrative": [
+            "selling general and administrative expense"
+        ],
+        "Other Operating Expenses": [
+            "provision for loan lease and other losses"
+        ],
+        "Research and Development": [
+            "research and development expense"
+        ],
+        "Sales and Marketing": [],
+        "Total Operating Expenses": []
+    },
+    "Operating Income": [],
+    "Other Comprehensive Income": [],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [
+            "weighted average number of shares outstanding basic"
+        ],
+        "Weighted Average Shares Outstanding (Diluted)": [
+            "weighted average number of diluted shares outstanding"
+        ]
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "financial services revenue",
+            "operating lease rental and other revenues",
+            "operating leases income statement lease revenue",
+            "revenue from contract with customer excluding assessed tax",
+            "revenues"
+        ]
+    },
+    "__unmapped__": [
+        "common stock dividends per share declared",
+        "costs and expenses",
+        "other nonrecurring expense accrual adjustment",
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest",
+        "income loss from continuing operations before income taxes minority interest and income loss from equity method investments"
+    ]
+}

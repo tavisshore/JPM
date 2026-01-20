@@ -1,0 +1,70 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "cost of revenue"
+        ]
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "income loss from continuing operations",
+        "net income loss",
+        "net income loss available to common stockholders basic"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [],
+        "Interest Income": [],
+        "Other Income (Expense)": [],
+        "Total Non-Operating Items": [
+            "nonoperating income expense"
+        ]
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [],
+        "General and Administrative": [
+            "general and administrative expense"
+        ],
+        "Other Operating Expenses": [],
+        "Research and Development": [
+            "research and development expense"
+        ],
+        "Sales and Marketing": [
+            "selling and marketing expense"
+        ],
+        "Total Operating Expenses": []
+    },
+    "Operating Income": [
+        "operating income loss"
+    ],
+    "Other Comprehensive Income": [],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic",
+            "income loss from continuing operations per basic share"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [],
+        "Weighted Average Shares Outstanding (Diluted)": []
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "revenue from contract with customer excluding assessed tax",
+            "revenues"
+        ]
+    },
+    "__unmapped__": [
+        "costs and expenses",
+        "income loss from discontinued operations net of tax",
+        "loss contingency loss in period",
+        "preferred stock dividends and other adjustments",
+        "income loss from continuing operations before income taxes minority interest and income loss from equity method investments"
+    ]
+}

@@ -1,0 +1,113 @@
+{
+    "Assets": {
+        "Current": {
+            "Cash and Equivalents": [
+                "cash and cash equivalents at carrying value"
+            ],
+            "Inventory": [
+                "inventory net"
+            ],
+            "Marketable Securities (Short-term)": [
+                "marketable securities"
+            ],
+            "Prepaid and Other Current Assets": [],
+            "Receivables": [
+                "accounts receivable net",
+                "due from related parties",
+                "other receivables"
+            ],
+            "Total Current Assets": []
+        },
+        "Non-Current": {
+            "Deferred Tax Assets": [
+                "deferred income tax assets net"
+            ],
+            "Goodwill": [
+                "goodwill"
+            ],
+            "Intangible Assets (net)": [
+                "finite lived intangible assets net"
+            ],
+            "Long-term Investments": [
+                "investments in affiliates subsidiaries associates and joint ventures"
+            ],
+            "Other Non-Current Assets": [
+                "defined benefit plan assets for plan benefits noncurrent",
+                "loans pledged as collateral",
+                "notes receivable and net investment in lease net",
+                "other assets",
+                "property subject to or available for operating lease net"
+            ],
+            "Property, Plant, and Equipment (net)": [
+                "property plant and equipment and finance lease right of use asset excluding lessor asset under operating lease after accumulated depreciation and amortization"
+            ],
+            "Total Non-Current Assets": []
+        },
+        "Total Assets": [
+            "assets"
+        ]
+    },
+    "Equity": {
+        "Accumulated Other Comprehensive Income": [
+            "accumulated other comprehensive income loss available for sale securities adjustment net of tax",
+            "accumulated other comprehensive income loss cumulative changes in net gain loss from cash flow hedges effect net of tax",
+            "accumulated other comprehensive income loss defined benefit pension and other postretirement plans net of tax",
+            "accumulated other comprehensive income loss foreign currency translation adjustment net of tax",
+            "accumulated other comprehensive income loss net of tax"
+        ],
+        "Common Stock and APIC": [
+            "common stock value"
+        ],
+        "Retained Earnings": [
+            "retained earnings accumulated deficit"
+        ],
+        "Total Equity": [
+            "stockholders equity"
+        ],
+        "Treasury Stock": [
+            "treasury stock common value"
+        ]
+    },
+    "Liabilities": {
+        "Current": {
+            "Accounts Payable and Accrued Expenses": [
+                "accounts payable and accrued liabilities current and noncurrent"
+            ],
+            "Deferred Revenue": [],
+            "Other Current Liabilities": [
+                "due to related parties current and noncurrent"
+            ],
+            "Short-term Debt": [
+                "debt current"
+            ],
+            "Total Current Liabilities": []
+        },
+        "Non-Current": {
+            "Deferred Tax Liabilities": [
+                "deferred income tax liabilities net"
+            ],
+            "Lease Liabilities": [],
+            "Long-term Debt": [
+                "long term debt and finance leases noncurrent",
+                "secured debt"
+            ],
+            "Other Non-Current Liabilities": [],
+            "Total Non-Current Liabilities": []
+        },
+        "Total Liabilities": [
+            "liabilities"
+        ]
+    },
+    "Totals": {
+        "Total Liabilities and Equity": [
+            "liabilities and stockholders equity"
+        ]
+    },
+    "__unmapped__": [
+        "assets of disposal group including discontinued operation",
+        "liabilities of disposal group including discontinued operation",
+        "minority interest",
+        "pension and other postretirement defined benefit plans and other liabilities current and noncurrent",
+        "redeemable noncontrolling interest equity carrying amount"
+    ]
+}

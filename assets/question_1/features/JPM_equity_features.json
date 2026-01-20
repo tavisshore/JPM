@@ -1,0 +1,72 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [
+            "adjustments to additional paid in capital other"
+        ],
+        "Common Stock": [
+            "common stock held in trust liquidation",
+            "common stock member"
+        ],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": [
+            "treasury stock value acquired cost method"
+        ]
+    },
+    "Comprehensive Income": [
+        "comprehensive income net of tax"
+    ],
+    "Dividends Declared": [],
+    "Dividends Paid": [
+        "dividends common stock cash",
+        "dividends preferred stock cash"
+    ],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": [
+            "treasury stock value reissued"
+        ]
+    },
+    "Net Income": [
+        "net income loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [],
+        "Foreign Currency Translation": [],
+        "Other OCI": [],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax",
+            "other comprehensive income loss net of tax portion attributable to parent"
+        ],
+        "Unrealized Gains/Losses on Securities": []
+    },
+    "Other Equity Adjustments": [
+        "cumulative effect of new accounting principle in period of adoption",
+        "stock redeemed or called during period value"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [],
+        "Other Stock Issuance": [
+            "reissuance from trust",
+            "stock issued during period value new issues",
+            "stock issued during period value treasury stock reissued"
+        ],
+        "Stock-Based Compensation": [],
+        "Total Stock Issuance Value": []
+    },
+    "Stock Repurchases": [
+        "share repurchases related to employee stock based compensation awards"
+    ],
+    "Tax Effects from Stock Compensation": [],
+    "__unmapped__": [
+        "adjustments to additional paid in capital from share based compensation and related tax effects",
+        "adjustments to additional paid in capital sharebased compensation and exercise of stock options",
+        "preferred stock including additional paid in capital member",
+        "preferred stock redemption premium"
+    ]
+}

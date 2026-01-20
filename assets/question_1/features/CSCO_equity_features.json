@@ -1,0 +1,90 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [
+        "comprehensive income net of tax",
+        "comprehensive income net of tax including portion attributable to noncontrolling interest"
+    ],
+    "Dividends Declared": [],
+    "Dividends Paid": [
+        "dividends common stock cash"
+    ],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "net income loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [
+            "other comprehensive income derivatives qualifying as hedges net of tax period increase decrease",
+            "other comprehensive income derivatives qualifying as hedges net of tax portion attributable to parent"
+        ],
+        "Foreign Currency Translation": [
+            "cumulative translation adjustment net of tax period increase decrease",
+            "other comprehensive income foreign currency transaction and translation adjustment net of tax period increase decrease",
+            "other comprehensive income foreign currency transaction and translation adjustment net of tax portion attributable to parent"
+        ],
+        "Other OCI": [],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax",
+            "other comprehensive income loss net of tax portion attributable to parent"
+        ],
+        "Unrealized Gains/Losses on Securities": [
+            "other comprehensive income available for sale securities adjustment net of tax period increase decrease",
+            "other comprehensive income availableforsale securities adjustment net of tax portion attributable to parent",
+            "other comprehensive income unrealized holding gain loss on securities arising during period net of tax"
+        ]
+    },
+    "Other Equity Adjustments": [
+        "cumulative effect of new accounting principle in period of adoption",
+        "stockholders equity other"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [],
+        "Other Stock Issuance": [
+            "stock issued during period value acquisitions",
+            "stock issued during period value new issues"
+        ],
+        "Stock-Based Compensation": [
+            "adjustments to additional paid in capital sharebased compensation requisite service period recognition value"
+        ],
+        "Total Stock Issuance Value": []
+    },
+    "Stock Repurchases": [
+        "repurchase of common stock value",
+        "stock repurchased and retired during period value",
+        "stock repurchased during period value",
+        "stock repurchased in settlement of employee tax withholding obligations"
+    ],
+    "Tax Effects from Stock Compensation": [
+        "adjustment to additional paid in capital income tax effect from share based compensation net",
+        "adjustments to additional paid in capital tax effect from share based compensation"
+    ],
+    "__unmapped__": [
+        "adjustments related to tax withholding for share based compensation",
+        "comprehensive income net of tax attributable to noncontrolling interest",
+        "net of tax attributable to noncontrolling interest comprehensive income",
+        "other comprehensive income availableforsale securities adjustment net of tax portion attributable to noncontrolling interest",
+        "other comprehensive income loss available for sale securities adjustment net of tax portion attributable to noncontrolling interest",
+        "other comprehensive income loss net of tax portion attributable to noncontrolling interest",
+        "payments related to tax withholding for share based compensation",
+        "repurchased shares and retired during period shares",
+        "shares paid for tax withholding for share based compensation",
+        "shares repurchased in settlement of employee tax withholding obligations shares",
+        "stock issued during period shares new issues",
+        "stock repurchased and retired during period shares",
+        "stockholders equity other shares"
+    ]
+}

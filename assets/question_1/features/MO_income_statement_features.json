@@ -1,0 +1,91 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "cost of goods and services sold",
+            "cost of goods sold",
+            "other cost of operating revenue"
+        ]
+    },
+    "Gross Profit": [
+        "gross profit"
+    ],
+    "Income Before Taxes": [
+        "gain loss on derivative instruments net pretax"
+    ],
+    "Income Tax Expense": [
+        "changes to tax related receivables",
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "net income loss",
+        "net income loss available to common stockholders basic",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [],
+        "Interest Income": [],
+        "Other Income (Expense)": [
+            "derivative gain loss on derivative net",
+            "equity securities without readily determinable fair value impairment loss annual amount",
+            "gain loss from equity securities",
+            "gain on sale of i q o s system commercialization rights",
+            "gains losses on extinguishment of debt",
+            "income loss from equity investments",
+            "income loss from equity method investments",
+            "interest income expense nonoperating net",
+            "other nonoperating income expense"
+        ],
+        "Total Non-Operating Items": []
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "amortization of intangible assets"
+        ],
+        "General and Administrative": [
+            "marketing administrationand research costs"
+        ],
+        "Other Operating Expenses": [
+            "asset impairment charges",
+            "goodwill impairment loss",
+            "net periodic defined benefits expense reversal of expense excluding service cost component",
+            "other operating expense income tax sharing agreement",
+            "other operating expenses income tax sharing agreement"
+        ],
+        "Research and Development": [],
+        "Sales and Marketing": [],
+        "Total Operating Expenses": []
+    },
+    "Operating Income": [
+        "operating income loss"
+    ],
+    "Other Comprehensive Income": [],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic",
+            "income loss from continuing operations per basic share"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [],
+        "Weighted Average Shares Outstanding (Diluted)": []
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "revenue from contract with customer excluding assessed tax",
+            "sales revenue net"
+        ]
+    },
+    "__unmapped__": [
+        "asset impairmentand business exit costs",
+        "asset impairmentand business exit costs excluding net pension cost credit",
+        "common stock dividends per share declared",
+        "earnings per share basic and diluted",
+        "income loss from continuing operations including portion attributable to noncontrolling interest",
+        "net income loss attributable to noncontrolling interest",
+        "nonmonetary transaction gain losson transfer derivative instrumentsand divestitures",
+        "income loss from continuing operations before income taxes",
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ]
+}

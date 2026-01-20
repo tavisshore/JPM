@@ -1,0 +1,84 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "programming and production costs"
+        ]
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "net income loss",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [
+            "interest expense",
+            "interest expense nonoperating"
+        ],
+        "Interest Income": [
+            "investment income nonoperating"
+        ],
+        "Other Income (Expense)": [
+            "gain loss on disposition of assets1",
+            "income loss from equity method investments",
+            "other nonoperating income expense"
+        ],
+        "Total Non-Operating Items": [
+            "nonoperating income expense"
+        ]
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "depreciation"
+        ],
+        "General and Administrative": [
+            "other operating and administrative",
+            "selling general and administrative expense"
+        ],
+        "Other Operating Expenses": [
+            "goodwill and intangible asset impairment"
+        ],
+        "Research and Development": [],
+        "Sales and Marketing": [
+            "marketing and advertising expense"
+        ],
+        "Total Operating Expenses": [
+            "operating expenses excluding depreciation and amortization"
+        ]
+    },
+    "Operating Income": [
+        "operating income loss"
+    ],
+    "Other Comprehensive Income": [],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [],
+        "Weighted Average Shares Outstanding (Diluted)": []
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "revenue from contract with customer excluding assessed tax",
+            "revenues"
+        ]
+    },
+    "__unmapped__": [
+        "common stock dividends per share declared",
+        "costs and expenses",
+        "diluted earnings per share pro forma",
+        "net income loss attributable to noncontrolling interest",
+        "net income loss attributable to noncontrolling interests and redeemable subsidiary preferred stock",
+        "operating costs and expenses excluding depreciation and amortization",
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ]
+}

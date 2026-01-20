@@ -1,0 +1,81 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [
+            "stockholder s equity beginning balance restated value"
+        ],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [
+        "comprehensive income net of tax including portion attributable to noncontrolling interest"
+    ],
+    "Dividends Declared": [],
+    "Dividends Paid": [
+        "dividends common stock cash",
+        "dividends preferred stock cash"
+    ],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "profit loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [
+            "other comprehensive income unrealized gain loss on derivatives arising during period net of tax"
+        ],
+        "Foreign Currency Translation": [],
+        "Other OCI": [
+            "other comprehensive income defined benefit plans adjustment net of tax period increase decrease"
+        ],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax"
+        ],
+        "Unrealized Gains/Losses on Securities": [
+            "other comprehensive income unrealized holding gain loss on securities arising during period net of tax",
+            "other than temporary impairment gains on debt securities",
+            "other than temporary impairment losses investments portion in other comprehensive income loss net of tax including portion attributable to noncontrolling interest",
+            "other than temporary impairment losses on debt securities"
+        ]
+    },
+    "Other Equity Adjustments": [
+        "cumulative effect adjustment from adoption of fspfas1152 and fas1242",
+        "cumulative effect of initial adoption of new accounting principle",
+        "preferred stock accretion of redemption discount",
+        "stockholders equity other"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [],
+        "Other Stock Issuance": [
+            "common stock activity net",
+            "proceeds from issuance of preferred stock and preference stock",
+            "stock issued during period shares new issues",
+            "stock issued during period shares treasury stock reissued and share based payment arrangement after forfeiture"
+        ],
+        "Stock-Based Compensation": [],
+        "Total Stock Issuance Value": [
+            "stock issued during period value new issues",
+            "stock issued during period value treasury stock reissued and share based payment arrangement after forfeiture"
+        ]
+    },
+    "Stock Repurchases": [
+        "redemption of series n tarp preferred stock other",
+        "redemption of series ntarp preferred stock",
+        "stock repurchased during period value"
+    ],
+    "Tax Effects from Stock Compensation": [],
+    "__unmapped__": [
+        "common and net treasury stock activity shares",
+        "common stock dividends per share declared",
+        "noncontrolling interest decrease from deconsolidation",
+        "treasury stock shares net acquired reissued"
+    ]
+}

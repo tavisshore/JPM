@@ -1,0 +1,77 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "cost of goods and services sold"
+        ]
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "net income loss",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [],
+        "Interest Income": [],
+        "Other Income (Expense)": [
+            "interest income expense nonoperating net",
+            "other income",
+            "income loss from equity method investments"
+        ],
+        "Total Non-Operating Items": [
+            "nonoperating income expense"
+        ]
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "depreciation depletion and amortization"
+        ],
+        "General and Administrative": [
+            "selling general and administrative expense"
+        ],
+        "Other Operating Expenses": [
+            "restructuring settlement and impairment provisions"
+        ],
+        "Research and Development": [],
+        "Sales and Marketing": [],
+        "Total Operating Expenses": []
+    },
+    "Operating Income": [],
+    "Other Comprehensive Income": [],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic",
+            "income loss from continuing operations per basic share"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted",
+            "income loss from continuing operations per diluted share"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [
+            "weighted average number of shares outstanding basic"
+        ],
+        "Weighted Average Shares Outstanding (Diluted)": [
+            "weighted average number of diluted shares outstanding"
+        ]
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "revenues"
+        ]
+    },
+    "__unmapped__": [
+        "costs and expenses",
+        "discontinued operation income loss from discontinued operation net of tax per basic share",
+        "income loss from continuing operations attributable to noncontrolling entity",
+        "income loss from continuing operations including portion attributable to noncontrolling interest",
+        "income loss from discontinued operations net of tax",
+        "income loss from discontinued operations net of tax attributable to noncontrolling interest",
+        "net income loss attributable to noncontrolling interest"
+    ]
+}

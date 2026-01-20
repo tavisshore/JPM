@@ -1,0 +1,76 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [
+        "comprehensive income net of tax",
+        "comprehensive income net of tax including portion attributable to noncontrolling interest"
+    ],
+    "Dividends Declared": [
+        "dividends common stock cash"
+    ],
+    "Dividends Paid": [],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": [
+            "treasury stock value acquired cost method"
+        ]
+    },
+    "Net Income": [
+        "net income loss",
+        "profit loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [
+            "other comprehensive income derivatives qualifying as hedges net of tax period increase decrease"
+        ],
+        "Foreign Currency Translation": [
+            "other comprehensive income foreign currency transaction and translation adjustment net of tax period increase decrease"
+        ],
+        "Other OCI": [
+            "other comprehensive income amortization of defined benefit plan net prior service cost recognized in net periodic pension cost net of tax",
+            "other comprehensive income defined benefit plan net prior service costs credit arising during period net of tax",
+            "other comprehensive income defined benefit plans net unamortized gain loss arising during period net of tax",
+            "other comprehensive income finalization of pension and non pension postretirement plan valuation net of tax",
+            "other comprehensive income reclassification of defined benefit plans net gain loss recognized in net periodic benefit cost net of tax"
+        ],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax period increase decrease",
+            "other comprehensive income loss net of tax portion attributable to parent"
+        ],
+        "Unrealized Gains/Losses on Securities": [
+            "other comprehensive income available for sale securities adjustment net of tax period increase decrease"
+        ]
+    },
+    "Other Equity Adjustments": [
+        "cumulative effect of new accounting principle in period of adoption",
+        "stockholders equity note spinoff transaction",
+        "stockholders equity other"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [
+            "common stock issued under employee plan value"
+        ],
+        "Other Stock Issuance": [],
+        "Stock-Based Compensation": [
+            "stock issued during period value share based compensation"
+        ],
+        "Total Stock Issuance Value": []
+    },
+    "Stock Repurchases": [
+        "purchases sales treasury stock under employee plans net"
+    ],
+    "Tax Effects from Stock Compensation": [],
+    "__unmapped__": [
+        "minority interest period increase decrease"
+    ]
+}

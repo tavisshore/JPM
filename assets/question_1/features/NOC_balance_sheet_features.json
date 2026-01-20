@@ -1,0 +1,130 @@
+{
+    "Assets": {
+        "Current": {
+            "Cash and Equivalents": [
+                "cash and cash equivalents at carrying value"
+            ],
+            "Inventory": [
+                "inventory for long term contracts or programs"
+            ],
+            "Marketable Securities (Short-term)": [],
+            "Prepaid and Other Current Assets": [
+                "contract with customer asset net current",
+                "other assets current"
+            ],
+            "Receivables": [
+                "accounts receivable net current"
+            ],
+            "Total Current Assets": [
+                "assets current"
+            ]
+        },
+        "Non-Current": {
+            "Deferred Tax Assets": [
+                "deferred income tax assets net",
+                "deferred tax assets liabilities net noncurrent",
+                "deferred tax assets net current",
+                "deferred tax assets net noncurrent"
+            ],
+            "Goodwill": [
+                "goodwill"
+            ],
+            "Intangible Assets (net)": [
+                "intangible assets net excluding goodwill",
+                "capitalized computer software gross"
+            ],
+            "Long-term Investments": [],
+            "Other Non-Current Assets": [
+                "defined benefit plan assets for plan benefits noncurrent",
+                "operating lease right of use asset",
+                "other assets miscellaneous noncurrent",
+                "other assets noncurrent",
+                "receivables long term contracts or programs"
+            ],
+            "Property, Plant, and Equipment (net)": [
+                "accumulated depreciation depletion and amortization property plant and equipment",
+                "buildings and improvements gross",
+                "land",
+                "leasehold improvements gross",
+                "machinery and equipment gross",
+                "property plant and equipment gross",
+                "property plant and equipment net"
+            ],
+            "Total Non-Current Assets": [
+                "assets noncurrent"
+            ]
+        },
+        "Total Assets": [
+            "assets"
+        ]
+    },
+    "Equity": {
+        "Accumulated Other Comprehensive Income": [
+            "accumulated other comprehensive income loss net of tax"
+        ],
+        "Common Stock and APIC": [
+            "additional paid in capital common stock",
+            "common stock value",
+            "preferred stock value"
+        ],
+        "Retained Earnings": [
+            "retained earnings accumulated deficit"
+        ],
+        "Total Equity": [
+            "stockholders equity"
+        ],
+        "Treasury Stock": []
+    },
+    "Liabilities": {
+        "Current": {
+            "Accounts Payable and Accrued Expenses": [
+                "accounts payable current",
+                "employee related liabilities current"
+            ],
+            "Deferred Revenue": [
+                "contract with customer liability current",
+                "customer advances current"
+            ],
+            "Other Current Liabilities": [
+                "other liabilities current"
+            ],
+            "Short-term Debt": [
+                "long term debt and capital lease obligations current",
+                "notes payable current"
+            ],
+            "Total Current Liabilities": [
+                "liabilities current"
+            ]
+        },
+        "Non-Current": {
+            "Deferred Tax Liabilities": [],
+            "Lease Liabilities": [
+                "operating lease liability noncurrent"
+            ],
+            "Long-term Debt": [
+                "long term debt noncurrent"
+            ],
+            "Other Non-Current Liabilities": [
+                "other liabilities noncurrent",
+                "pension and other postretirement defined benefit plans liabilities noncurrent"
+            ],
+            "Total Non-Current Liabilities": []
+        },
+        "Total Liabilities": [
+            "liabilities"
+        ]
+    },
+    "Totals": {
+        "Total Liabilities and Equity": [
+            "liabilities and stockholders equity"
+        ]
+    },
+    "__unmapped__": [
+        "assets of disposal group including discontinued operation current",
+        "cash cash equivalents restricted cash and restricted cash equivalents",
+        "deferred tax and other liabilities noncurrent",
+        "inventory net of allowances customer advances and progress billings",
+        "liabilities of disposal group including discontinued operation current",
+        "long term debt and capital lease obligations"
+    ]
+}

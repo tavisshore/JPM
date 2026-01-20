@@ -1,0 +1,66 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [
+        "comprehensive income net of tax including portion attributable to noncontrolling interest"
+    ],
+    "Dividends Declared": [],
+    "Dividends Paid": [
+        "dividends common stock cash"
+    ],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": [
+            "treasury stock value acquired cost method"
+        ]
+    },
+    "Net Income": [
+        "net income loss including portion attributable to nonredeemable noncontrolling interest"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [],
+        "Foreign Currency Translation": [
+            "other comprehensive income foreign currency transaction and translation adjustment net of tax period increase decrease"
+        ],
+        "Other OCI": [
+            "other comprehensive income defined benefit plans adjustment net of tax period increase decrease",
+            "other comprehensive income other net of tax"
+        ],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax",
+            "other comprehensive income loss net of tax period increase decrease"
+        ],
+        "Unrealized Gains/Losses on Securities": []
+    },
+    "Other Equity Adjustments": [
+        "stockholders equity other"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [
+            "stock issued during period value stock options exercised"
+        ],
+        "Other Stock Issuance": [],
+        "Stock-Based Compensation": [
+            "adjustment to additional paid in capital share based compensation restrictred and deferred stock awards"
+        ],
+        "Total Stock Issuance Value": []
+    },
+    "Stock Repurchases": [],
+    "Tax Effects from Stock Compensation": [
+        "adjustmentsto additional paidin capital sharebased compensation requisite service period recognitionand income tax effect net"
+    ],
+    "__unmapped__": [
+        "equity profit loss",
+        "noncontrolling interest increase from business combination"
+    ]
+}

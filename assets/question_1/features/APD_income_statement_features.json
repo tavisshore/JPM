@@ -1,0 +1,101 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "cost of goods and services sold"
+        ]
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before taxes"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "net income loss",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [
+            "interest expense",
+            "interest expense nonoperating"
+        ],
+        "Interest Income": [],
+        "Other Income (Expense)": [
+            "business combination step acquisition equity interest in acquiree remeasurement gain",
+            "defined benefit plan recognized net gain loss due to settlements1",
+            "gain loss on disposition of assets",
+            "gain loss on sale of business",
+            "gains losses on extinguishment of debt",
+            "income loss from equity method investments",
+            "net gain loss on exchange of equity affiliate investments",
+            "net loss on unsolicited tender offer of company",
+            "other income expense net"
+        ],
+        "Total Non-Operating Items": [
+            "other nonoperating income expense"
+        ]
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [],
+        "General and Administrative": [
+            "selling general and administrative expense"
+        ],
+        "Other Operating Expenses": [
+            "advisory costs",
+            "business combination acquisition related costs",
+            "business separation costs",
+            "business separation costs legal and advisory fees before tax",
+            "customer bankruptcy",
+            "goodwill and intangible asset impairment",
+            "project suspension costs",
+            "restructuring and related cost incurred cost",
+            "restructuring charges",
+            "shareholder activism costs"
+        ],
+        "Research and Development": [
+            "research and development expense"
+        ],
+        "Sales and Marketing": [],
+        "Total Operating Expenses": []
+    },
+    "Operating Income": [
+        "operating income loss"
+    ],
+    "Other Comprehensive Income": [],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic",
+            "income loss from continuing operations per basic share"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted",
+            "income loss from continuing operations per diluted share"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [
+            "weighted average number of shares outstanding basic"
+        ],
+        "Weighted Average Shares Outstanding (Diluted)": [
+            "weighted average number of diluted shares outstanding"
+        ]
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "revenues"
+        ]
+    },
+    "__unmapped__": [
+        "common stock dividends per share declared",
+        "gain loss on sales of assets and asset impairment charges",
+        "income loss from continuing operations attributable to noncontrolling entity",
+        "income loss from continuing operations including portion attributable to noncontrolling interest",
+        "income loss from discontinued operations net of tax",
+        "income loss from discontinued operations net of tax attributable to noncontrolling interest",
+        "income loss from discontinued operations net of tax attributable to reporting entity",
+        "income loss from discontinued operations net of tax per basic share",
+        "income loss from discontinued operations net of tax per diluted share",
+        "net income loss attributable to noncontrolling interest",
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ]
+}

@@ -1,0 +1,157 @@
+{
+    "Assets": {
+        "Current": {
+            "Cash and Equivalents": [
+                "cash and cash equivalents at carrying value",
+                "cash and equivalents excluding assets held for sale"
+            ],
+            "Inventory": [
+                "inventory net"
+            ],
+            "Marketable Securities (Short-term)": [
+                "equity securities fv ni"
+            ],
+            "Prepaid and Other Current Assets": [
+                "assets held for sale at carrying value",
+                "assets of disposal group including discontinued operation current",
+                "contract with customer asset net current",
+                "other assets current"
+            ],
+            "Receivables": [
+                "accounts receivable net current",
+                "notes and loans receivable net current",
+                "premiums and other receivables net current",
+                "receivables held for sale amount",
+                "receivables net current",
+                "sales discounts and allowances current"
+            ],
+            "Total Current Assets": [
+                "assets current"
+            ]
+        },
+        "Non-Current": {
+            "Deferred Tax Assets": [
+                "deferred income tax assets net",
+                "deferred income tax liabilities net",
+                "deferred tax assets net noncurrent"
+            ],
+            "Goodwill": [
+                "goodwill"
+            ],
+            "Intangible Assets (net)": [
+                "intangible assets net excluding goodwill"
+            ],
+            "Long-term Investments": [
+                "long term investments"
+            ],
+            "Other Non-Current Assets": [
+                "commodity contract asset noncurrent",
+                "contract and other deferred assets noncurrent",
+                "disposal group including discontinued operation assets noncurrent",
+                "notes receivable net",
+                "operating lease right of use asset",
+                "other assets noncurrent",
+                "restricted cash and cash equivalents noncurrent"
+            ],
+            "Property, Plant, and Equipment (net)": [
+                "property plant and equipment net"
+            ],
+            "Total Non-Current Assets": []
+        },
+        "Total Assets": [
+            "assets"
+        ]
+    },
+    "Equity": {
+        "Accumulated Other Comprehensive Income": [
+            "accumulated other comprehensive income loss available for sale securities adjustment net of tax",
+            "accumulated other comprehensive income loss cumulative changes in net gain loss from cash flow hedges effect net of tax",
+            "accumulated other comprehensive income loss defined benefit pension and other postretirement plans net of tax",
+            "accumulated other comprehensive income loss foreign currency translation adjustment net of tax",
+            "accumulated other comprehensive income loss net of tax"
+        ],
+        "Common Stock and APIC": [
+            "additional paid in capital",
+            "common stock value",
+            "geccpreferredstockvalue",
+            "preferred stock value"
+        ],
+        "Retained Earnings": [
+            "retained earnings accumulated deficit"
+        ],
+        "Total Equity": [
+            "stockholders equity"
+        ],
+        "Treasury Stock": [
+            "treasury stock common value"
+        ]
+    },
+    "Liabilities": {
+        "Current": {
+            "Accounts Payable and Accrued Expenses": [
+                "accounts payable current",
+                "accrued liabilities current"
+            ],
+            "Deferred Revenue": [
+                "contract with customer liability current",
+                "contract with customer liability progress billings"
+            ],
+            "Other Current Liabilities": [
+                "dividends payable current",
+                "liabilities of assets held for sale",
+                "liabilities of disposal group including discontinued operation current",
+                "other liabilities current"
+            ],
+            "Short-term Debt": [
+                "debt current",
+                "short term borrowings"
+            ],
+            "Total Current Liabilities": [
+                "liabilities current"
+            ]
+        },
+        "Non-Current": {
+            "Deferred Tax Liabilities": [
+                "deferred tax liabilities"
+            ],
+            "Lease Liabilities": [
+                "operating lease liability"
+            ],
+            "Long-term Debt": [
+                "long term debt and capital lease obligations",
+                "non recourse borrowings of consolidated securitization entities"
+            ],
+            "Other Non-Current Liabilities": [
+                "contract with customer liability noncurrent",
+                "deferred compensation liability classified noncurrent",
+                "investment contracts insurance liabilities annuity benefits",
+                "liabilities of disposal group including discontinued operation noncurrent",
+                "other liabilities noncurrent"
+            ],
+            "Total Non-Current Liabilities": []
+        },
+        "Total Liabilities": [
+            "liabilities"
+        ]
+    },
+    "Totals": {
+        "Total Liabilities and Equity": [
+            "liabilities and stockholders equity"
+        ]
+    },
+    "__unmapped__": [
+        "accounts payable and other accrued liabilities current",
+        "accrued progress collections price adjustments",
+        "assets of disposal group including discontinued operation",
+        "cash cash equivalents restricted cash and restricted cash equivalents",
+        "deposits",
+        "liabilities of disposal group including discontinued operation",
+        "minority interest",
+        "other assets",
+        "other liabilities",
+        "preferred stock shares outstanding",
+        "premiums and other receivables net",
+        "property plant and equipment and operating lease right of use asset after accumulated depreciation and amortization",
+        "redeemable noncontrolling interest equity carrying amount"
+    ]
+}

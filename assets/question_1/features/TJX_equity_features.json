@@ -1,0 +1,70 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [
+        "comprehensive income net of tax",
+        "comprehensive income net of tax including portion attributable to noncontrolling interest"
+    ],
+    "Dividends Declared": [],
+    "Dividends Paid": [
+        "dividends common stock cash"
+    ],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "net income loss",
+        "profit loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [],
+        "Foreign Currency Translation": [
+            "other comprehensive income foreign currency transaction and translation adjustment net of tax period increase decrease",
+            "other comprehensive income loss foreign currency transaction and translation adjustment net of tax"
+        ],
+        "Other OCI": [
+            "other comprehensive income defined benefit plan net prior service costs credit arising during period net of tax",
+            "other comprehensive income loss finalization of pension and non pension postretirement plan valuation net of tax"
+        ],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax"
+        ],
+        "Unrealized Gains/Losses on Securities": []
+    },
+    "Other Equity Adjustments": [
+        "cumulative effect on retained earnings net of tax1",
+        "cumulative effect period of adoption adjustment member"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [],
+        "Other Stock Issuance": [],
+        "Stock-Based Compensation": [
+            "adjustments to additional paid in capital sharebased compensation requisite service period recognition value",
+            "stock issued during period value share based compensation"
+        ],
+        "Total Stock Issuance Value": []
+    },
+    "Stock Repurchases": [
+        "stock repurchased and retired during period value"
+    ],
+    "Tax Effects from Stock Compensation": [],
+    "__unmapped__": [
+        "adjustment to actual shares issued to effect two for one stock split",
+        "stock issued during period shares share based compensation",
+        "stock issued during period shares stock splits",
+        "stock issued during period value stock splits",
+        "stock repurchased and retired during period shares",
+        "stock repurchased during period shares"
+    ]
+}

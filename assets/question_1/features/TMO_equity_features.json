@@ -1,0 +1,78 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [],
+    "Dividends Declared": [],
+    "Dividends Paid": [
+        "dividends common stock cash"
+    ],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "net income loss",
+        "net income loss available to common stockholders basic"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [],
+        "Foreign Currency Translation": [],
+        "Other OCI": [],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax including redeemable and non redeemable n c i"
+        ],
+        "Unrealized Gains/Losses on Securities": []
+    },
+    "Other Equity Adjustments": [
+        "adjustments to additional paid in capital other",
+        "new accounting pronouncement or change in accounting principle effect of adoption quantification",
+        "reclassification from temporary equity"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [
+            "stock issued during period value exercise of warrants"
+        ],
+        "Other Stock Issuance": [
+            "settlement of convertible debt value",
+            "stock issued during period value new issues",
+            "stock received during period value employee stock plans"
+        ],
+        "Stock-Based Compensation": [
+            "adjustments to additional paid in capital sharebased compensation requisite service period recognition value",
+            "stock issued during period value share based compensation"
+        ],
+        "Total Stock Issuance Value": []
+    },
+    "Stock Repurchases": [
+        "share repurchase program excise tax",
+        "treasury stock retired cost method amount",
+        "treasury stock shares acquired",
+        "treasury stock shares retired",
+        "treasury stock value acquired cost method"
+    ],
+    "Tax Effects from Stock Compensation": [
+        "adjustment to additional paid in capital income tax effect from share based compensation net"
+    ],
+    "__unmapped__": [
+        "minority interest decrease from distributions to noncontrolling interest holders",
+        "net income loss attributable to redeemable noncontrolling interest",
+        "noncontrolling interest contribution from distributions to noncontrolling interests",
+        "noncontrolling interest decrease from deconsolidation",
+        "noncontrolling interest increase from business combination",
+        "stock issued during period shares new issues",
+        "stock issued during period shares share based compensation",
+        "temporary equity decrease from distributions to noncontrolling interest holders",
+        "temporary equity foreign currency translation adjustments",
+        "temporary equity other changes"
+    ]
+}

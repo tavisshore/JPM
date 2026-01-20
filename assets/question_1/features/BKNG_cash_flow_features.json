@@ -1,0 +1,145 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [
+        "effect of exchange rate on cash and cash equivalents",
+        "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents"
+    ],
+    "Financing Activities": {
+        "Dividends Paid": [
+            "payments of dividends"
+        ],
+        "Net Cash from Financing Activities": [
+            "net cash provided by used in financing activities"
+        ],
+        "Other Financing Activities": [
+            "debt instrument convertible conversion charges",
+            "debt instrument convertible conversion gains losses",
+            "excess tax benefit from share based compensation financing activities",
+            "minority interest change in redemption value",
+            "paymentof debt issuance costs lineof credit",
+            "payments for repurchase of redeemable noncontrolling interest",
+            "payments of debt issuance costs",
+            "payments of financing costs",
+            "payments of stock issuance costs",
+            "payments related to conversion of senior notes",
+            "proceeds from conversion spread hedge financing activities",
+            "proceeds from minority shareholders",
+            "proceeds from payments for other financing activities",
+            "proceeds from sale and leaseback transaction",
+            "redeemable noncontrolling interests fair value adjustment",
+            "redeemable noncontrolling interests fair value adjustment net of tax"
+        ],
+        "Proceeds from Debt": [
+            "proceeds from issuance of long term debt",
+            "proceeds from lines of credit",
+            "proceeds from short term debt"
+        ],
+        "Proceeds from Stock Issuance": [
+            "proceeds from stock options exercised"
+        ],
+        "Repayment of Debt": [
+            "repayments of assumed debt",
+            "repayments of convertible debt",
+            "repayments of lines of credit",
+            "repayments of long term debt",
+            "repayments of senior debt",
+            "repayments of short term debt"
+        ],
+        "Stock Repurchases": [
+            "payments for repurchase of common stock"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "payments to acquire businesses and interest in affiliates"
+        ],
+        "Capital Expenditures": [
+            "acquisitionoflanduserights",
+            "payments to acquire property plant and equipment"
+        ],
+        "Net Cash from Investing Activities": [
+            "net cash provided by used in investing activities"
+        ],
+        "Other Investing Activities": [
+            "business combination contingent consideration arrangements change in amount of contingent consideration liability1",
+            "costmethod investments other than temporary impairment",
+            "noncashinvestingandfinancingactivityforanacquisition",
+            "other significant noncash transaction investingactivities contingent consideration",
+            "other significant noncash transaction value of consideration given1",
+            "payments for hedge investing activities",
+            "payments for proceeds from other investing activities",
+            "proceeds from hedge investing activities"
+        ],
+        "Purchases of Investments": [
+            "payments to acquire investments"
+        ],
+        "Sales and Maturities of Investments": [
+            "proceeds from sale and maturity of available for sale securities",
+            "proceeds from sale maturity and collections of investments"
+        ]
+    },
+    "Net Change in Cash": [
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect",
+        "cash cash equivalentsand restricted cash period increase decrease"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "increase decrease in accounts receivable",
+            "increase decrease in operating liabilities",
+            "increase decrease in other operating capital net",
+            "increase decrease in prepaid deferred expense and other assets",
+            "increase decrease in restricted cash",
+            "increase decreasein longterm u. s.transitiontaxliability"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income tax expense benefit",
+            "other deferred income taxes"
+        ],
+        "Depreciation and Amortization": [
+            "amortization of intangible assets",
+            "depreciation depletion and amortization",
+            "depreciation nonproduction",
+            "finite lived intangible assets amortization expense",
+            "operating lease right of use asset amortization expense"
+        ],
+        "Interest Paid": [
+            "interest paid net"
+        ],
+        "Net Cash from Operating Activities": [
+            "net cash provided by used in operating activities"
+        ],
+        "Net Income": [
+            "net income loss available to common stockholders basic",
+            "profit loss"
+        ],
+        "Other Non-Cash Items": [
+            "amortization of debt discount premium",
+            "amortization of financing costs and discounts",
+            "amortization of financing costs and write off of unamortized discount due to early debt conversions",
+            "asset impairment charges",
+            "embedded derivative gain loss on embedded derivative net",
+            "equity securities fv ni gain loss",
+            "equity securities fv ni unrealized gain loss",
+            "equity securities without readily determinable fair value impairment loss annual amount",
+            "foreign currency transaction gain lossbeforetaxassociatedwiththeremeasurementofnonfunctionalcurrencydebt",
+            "gains losses on extinguishment of debt",
+            "goodwill and intangible asset impairment",
+            "goodwill impairment loss",
+            "income loss from equity method investments",
+            "income taxes paid net",
+            "noncashoperatingandfinancingactivityforanacquisition",
+            "other noncash income expense",
+            "sale and leaseback transaction gain loss net",
+            "provision for doubtful accounts",
+            "provision for expected credit losses and chargebacks",
+            "provisionforuncollectibleaccountsandchargebacks"
+        ],
+        "Stock-Based Compensation": [
+            "excess tax benefitfrom sharebased compensation operating activities reclassificationfrom financing",
+            "share based compensation",
+            "share based compensation and other stock based expense"
+        ]
+    },
+    "__unmapped__": []
+}

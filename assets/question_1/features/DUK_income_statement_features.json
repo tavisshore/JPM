@@ -1,0 +1,127 @@
+{
+    "Comprehensive Income": [
+        "comprehensive income net of tax",
+        "comprehensive income net of tax including portion attributable to noncontrolling interest"
+    ],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "cost depreciation amortization and depletion",
+            "cost of domestic regulated electric",
+            "cost of goods and service excluding depreciation depletion and amortization",
+            "cost of goods and services sold",
+            "cost of natural gas and coal sold",
+            "cost of worldwide unregulated electric",
+            "utilities operating expense gas and petroleum purchased"
+        ]
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "income loss before extraordinary items and cumulative effect of change in accounting principle",
+        "income loss from continuing operations including portion attributable to noncontrolling interest",
+        "income loss including portion attributable to noncontrolling interest",
+        "net income loss",
+        "net income loss available to common stockholders basic",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [
+            "interest expense",
+            "interest expense nonoperating"
+        ],
+        "Interest Income": [],
+        "Other Income (Expense)": [
+            "assets disposed of by method other than sale in period of disposition gain loss on disposition",
+            "disposal group not discontinued operation gain loss on disposal",
+            "equity method investment realized gain loss on disposal",
+            "gain loss on disposition of assets1",
+            "gain loss on sale of stock in subsidiary or equity method investee",
+            "gains losses on sales of assets",
+            "income loss from equity method investments",
+            "other nonoperating income expense"
+        ],
+        "Total Non-Operating Items": [
+            "nonoperating income expense"
+        ]
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "depreciation and amortization"
+        ],
+        "General and Administrative": [],
+        "Other Operating Expenses": [
+            "asset impairment charges",
+            "impairment of assets and other charges",
+            "impairment of assets and other charges reversals"
+        ],
+        "Research and Development": [],
+        "Sales and Marketing": [],
+        "Total Operating Expenses": []
+    },
+    "Operating Income": [
+        "operating income loss"
+    ],
+    "Other Comprehensive Income": [
+        "other comprehensive income defined benefit plans adjustment net of tax period increase decrease",
+        "other comprehensive income loss cash flow hedge gain loss before reclassification after tax",
+        "other comprehensive income loss cash flow hedge gain loss reclassification after tax",
+        "other comprehensive income loss foreign currency transaction and translation adjustment net of tax",
+        "other comprehensive income loss net of tax",
+        "other comprehensive income loss net of tax period increase decrease abstract",
+        "other comprehensive income loss pension and other postretirement benefit plans adjustment net of tax",
+        "other comprehensive income loss reclassification adjustment from a o c i pension and other postretirement benefit plans net of tax",
+        "other comprehensive income reclassification of cash flow hedges to regulatory assets",
+        "other comprehensive income unrealized gain loss on derivatives arising during period net of tax",
+        "other comprehensive income unrealized holding gain loss on auction rate securities arising during period net of tax",
+        "other comprehensive income unrealized holding gain loss on securities arising during period net of tax"
+    ],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic",
+            "income loss from continuing operations per basic share"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted",
+            "income loss from continuing operations per diluted share"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [
+            "weighted average number of shares outstanding basic"
+        ],
+        "Weighted Average Shares Outstanding (Diluted)": [
+            "weighted average number of diluted shares outstanding"
+        ]
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "regulated operating revenue electric non nuclear",
+            "regulated operating revenue gas",
+            "sales revenue net",
+            "unregulated operating revenue"
+        ]
+    },
+    "__unmapped__": [
+        "common stock dividends per share declared",
+        "comprehensive income net of tax attributable to noncontrolling interest",
+        "costs and expenses",
+        "earnings per share basic and diluted",
+        "electricity member",
+        "impairments and gains on sales of unconsolidated affiliates",
+        "income loss from continuing operations per basic and diluted share",
+        "income loss from discontinued operations net of tax",
+        "income loss from discontinued operations net of tax per basic share",
+        "natural gas reserves member",
+        "net income loss attributable to noncontrolling interest",
+        "preferred stock dividends income statement impact",
+        "preferred stock redemption premium",
+        "regulated and unregulated operating revenue",
+        "taxes excluding income and excise taxes",
+        "utilities operating expense maintenance operations and other costs and expenses",
+        "weighted average number of share outstanding basic and diluted",
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ]
+}

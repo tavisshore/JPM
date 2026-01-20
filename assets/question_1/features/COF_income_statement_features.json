@@ -1,0 +1,113 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": []
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "income loss from continuing operations",
+        "net income loss",
+        "net income loss available to common stockholders basic"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [
+            "interest expense deposits",
+            "interest expense operating",
+            "interest expense other borrowings",
+            "interest expense secured debt",
+            "interest expense unsecured debt"
+        ],
+        "Interest Income": [
+            "interest and dividend income operating",
+            "interest and dividend income securities",
+            "interest and fee income loans and leases",
+            "interest and fee income loans and leases held in portfolio",
+            "other interest and dividend income"
+        ],
+        "Other Income (Expense)": [
+            "business combination bargain purchase gain recognized amount",
+            "debt and equity securities gain loss",
+            "gain loss on sale of securities net",
+            "interest income expense after provision for loan loss",
+            "interest income expense net",
+            "net other than temporary impairment losses recognized in earnings",
+            "other than temporary impairment losses investments portion recognized in earnings net availableforsale securities"
+        ],
+        "Total Non-Operating Items": []
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "amortization and impairment of intangibles",
+            "amortization of intangible assets"
+        ],
+        "General and Administrative": [
+            "communications and information technology",
+            "labor and related expense",
+            "occupancy net",
+            "professional and contract services expense",
+            "supplies and equipment expense"
+        ],
+        "Other Operating Expenses": [
+            "business combination acquisition related costs",
+            "merger related cost",
+            "provision for loan and lease losses",
+            "provision for loan lease and other losses",
+            "provision for loan losses expensed",
+            "restructuring charges"
+        ],
+        "Research and Development": [],
+        "Sales and Marketing": [
+            "marketing expense"
+        ],
+        "Total Operating Expenses": [
+            "noninterest expense"
+        ]
+    },
+    "Operating Income": [],
+    "Other Comprehensive Income": [
+        "other than temporary impairment losses investments portion in other comprehensive income loss before tax portion attributable to parent availableforsale securities",
+        "other than temporary impairment not recognized in earnings on securities net of income taxes"
+    ],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic",
+            "income loss from continuing operations per basic share",
+            "participating securities distributedand undistributed earnings lossexcluding preferred stock dividends basic"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [],
+        "Weighted Average Shares Outstanding (Diluted)": []
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "interchange fees net",
+            "non interest income interchange",
+            "noninterest income",
+            "revenue from contract with customer excluding assessed tax",
+            "service chargesand other customer related fees",
+            "servicing and securitizations income"
+        ]
+    },
+    "__unmapped__": [
+        "available for sale securities other than temporary impairment losses",
+        "common stock dividends per share declared",
+        "discount for preferred stock redeemed",
+        "income loss from discontinued operations net of tax",
+        "income loss from discontinued operations net of tax attributable to reporting entity",
+        "income loss from discontinued operations net of tax per basic share",
+        "income loss from discontinued operations net of tax per diluted share",
+        "issuance cost for preferred stock redeemed",
+        "other than temporary impairment losses investments availableforsale securities",
+        "preferred stock dividends and other adjustments",
+        "preferred stock dividends income statement impact",
+        "income loss from continuing operations before income taxes minority interest and income loss from equity method investments"
+    ]
+}

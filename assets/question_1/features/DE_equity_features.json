@@ -1,0 +1,75 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [
+        "comprehensive income net of tax including portion attributable to noncontrolling interest"
+    ],
+    "Dividends Declared": [],
+    "Dividends Paid": [
+        "dividends common stock cash"
+    ],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "net income loss including portion attributable to nonredeemable noncontrolling interest",
+        "profit loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [
+            "other comprehensive income derivatives qualifying as hedges net of tax period increase decrease",
+            "other comprehensive income loss derivatives qualifying as hedges net of tax"
+        ],
+        "Foreign Currency Translation": [
+            "other comprehensive income loss foreign currency transaction and translation adjustment net of tax"
+        ],
+        "Other OCI": [
+            "other comprehensive income loss excluding portion attributable to temporary equity net of tax",
+            "other comprehensive income loss pension and other postretirement benefit plans adjustment net of tax"
+        ],
+        "Total Other Comprehensive Income": [],
+        "Unrealized Gains/Losses on Securities": [
+            "other comprehensive income loss available for sale securities adjustment net of tax"
+        ]
+    },
+    "Other Equity Adjustments": [
+        "tax cuts and jobs act of2017 reclassification from aoci to retained earnings tax effect"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [
+            "stock issued during period value stock options exercised and other"
+        ],
+        "Other Stock Issuance": [
+            "stock issued during period value treasury stock reissued all"
+        ],
+        "Stock-Based Compensation": [
+            "stock issued during period value share based compensation"
+        ],
+        "Total Stock Issuance Value": []
+    },
+    "Stock Repurchases": [
+        "treasury stock value acquired cost method"
+    ],
+    "Tax Effects from Stock Compensation": [],
+    "__unmapped__": [
+        "noncontrolling interest decrease from deconsolidation",
+        "noncontrolling interest increase from business combination",
+        "purchase of redeemable noncontrolling interest",
+        "stock issued during period value share based compensation and other",
+        "temporary equity foreign currency translation adjustments",
+        "temporary equity net income",
+        "temporary equity other changes",
+        "temporary equity redemption"
+    ]
+}

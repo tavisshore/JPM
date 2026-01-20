@@ -1,0 +1,139 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [
+        "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents"
+    ],
+    "Financing Activities": {
+        "Dividends Paid": [
+            "payments of dividends"
+        ],
+        "Net Cash from Financing Activities": [
+            "cash provided by used in financing activities discontinued operations",
+            "net cash provided by used in financing activities"
+        ],
+        "Other Financing Activities": [
+            "payments of debt extinguishment costs",
+            "payments to minority shareholders",
+            "proceeds from contributions from affiliates",
+            "proceeds from payments for other financing activities"
+        ],
+        "Proceeds from Debt": [
+            "proceeds from debt maturing in more than three months",
+            "proceeds from issuance of long term debt",
+            "proceeds from repayments of debt maturing in more than three months",
+            "proceeds from repayments of short term debt maturing in three months or less"
+        ],
+        "Proceeds from Stock Issuance": [
+            "payments for proceeds from issuance of shares under incentive and share based compensation plans including stock options",
+            "proceeds from issuance of common stock",
+            "proceeds from issuance of preferred stock and preference stock",
+            "proceeds from issuance of shares under incentive and share based compensation plans including stock options",
+            "proceeds from the sale of envista holdings corporation common stock net of issuance costs"
+        ],
+        "Repayment of Debt": [
+            "repayments of debt maturing in more than three months",
+            "repayments of long term debt"
+        ],
+        "Stock Repurchases": [
+            "payments for repurchase of common stock",
+            "stock redeemed through distribution of a business during period shares",
+            "stock redeemed through distribution of a business during period value",
+            "treasury stock value acquired cost method"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "payments to acquire businesses net of cash acquired"
+        ],
+        "Capital Expenditures": [
+            "payments to acquire property plant and equipment"
+        ],
+        "Net Cash from Investing Activities": [
+            "cash provided by used in investing activities discontinued operations",
+            "net cash provided by used in investing activities"
+        ],
+        "Other Investing Activities": [
+            "equity method investment dividends or distributions",
+            "gain loss on sale of stock in subsidiary or equity method investee",
+            "payments for proceeds from other investing activities",
+            "proceeds from distribution from discontinued operations separation",
+            "proceeds from divestiture of businesses net of cash divested",
+            "proceeds from sale of product line",
+            "proceeds from sale of product lines net of cash transfered and transaction costs",
+            "proceeds from sale of property plant and equipment"
+        ],
+        "Purchases of Investments": [
+            "payments to acquire investments"
+        ],
+        "Sales and Maturities of Investments": [
+            "gain loss on sale of investments",
+            "marketable securities realized gain loss",
+            "proceeds from sale and maturity of marketable securities",
+            "proceeds from sale and maturity of other investments",
+            "proceeds from sale maturity and collections of investments",
+            "proceeds from sale of equity method investments"
+        ]
+    },
+    "Net Change in Cash": [
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "increase decrease in accounts payable",
+            "increase decrease in accounts receivable",
+            "increase decrease in inventories",
+            "increase decrease in other accounts payable and accrued liabilities",
+            "increase decrease in prepaid deferred expense and other assets"
+        ],
+        "Deferred Income Taxes": [
+            "increase decrease in deferred income taxes"
+        ],
+        "Depreciation and Amortization": [
+            "adjustment for amortization",
+            "amortization of inventory step up",
+            "depreciation"
+        ],
+        "Interest Paid": [
+            "interest paid net"
+        ],
+        "Net Cash from Operating Activities": [
+            "cash provided by used in operating activities discontinued operations",
+            "net cash provided by used in operating activities"
+        ],
+        "Net Income": [
+            "income loss from continuing operations",
+            "income loss from discontinued operations net of tax",
+            "income loss from discontinued operations net of tax attributable to reporting entity",
+            "income loss from equity method investments",
+            "income loss from equity method investments net of dividends or distributions",
+            "net income loss",
+            "profit loss"
+        ],
+        "Other Non-Cash Items": [
+            "asset impairment charges",
+            "contract settlement expense",
+            "disposal group not discontinued operation gain loss on disposal",
+            "distributionof noncash net assetsin connectionwiththe spin offof fortive corporation",
+            "gain loss on investments",
+            "gain on contribution of businesses to joint venture",
+            "gains losses on extinguishment of debt",
+            "income taxes paid",
+            "income taxes paid net",
+            "noncash separation of subsidiary distribution of assets liabilities net"
+        ],
+        "Stock-Based Compensation": [
+            "share based compensation"
+        ]
+    },
+    "__unmapped__": [
+        "gainon saleof investmentsand product lines",
+        "investment gains losses and pretax gain on sale of product line",
+        "pretax gain on sale of product lines and investment gains losses",
+        "pretax gain on sale of product lines and unrealized investment gains losses",
+        "pretax gain on sales of investments and product line",
+        "proceeds from salse of investments and product line",
+        "proceedsfrom salesof investmentsand product line",
+        "restructuring costs and asset impairment charges"
+    ]
+}

@@ -1,0 +1,147 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [],
+    "Financing Activities": {
+        "Dividends Paid": [
+            "payments of dividends"
+        ],
+        "Net Cash from Financing Activities": [
+            "net cash provided by used in financing activities"
+        ],
+        "Other Financing Activities": [
+            "debt conversion converted instrument amount1",
+            "finance lease extinguishment",
+            "noncash transaction common stock repurchased",
+            "noncash transaction preferred stock called",
+            "proceeds from payments for other financing activities",
+            "right of use asset obtained in exchange for finance lease liability",
+            "right of use asset obtained in exchange for operating lease liability"
+        ],
+        "Proceeds from Debt": [
+            "proceeds from federal home loan bank borrowings",
+            "proceeds from issuance of commercial paper",
+            "proceeds from issuance of long term debt",
+            "proceeds from issuance of other long term debt",
+            "proceeds from lines of credit",
+            "proceeds from lines of credit and issuance of commercial paper",
+            "proceeds from other short term debt",
+            "proceeds from short term debt",
+            "proceeds from short term debt",
+            "proceeds from sale of available for sale securities debt"
+        ],
+        "Proceeds from Stock Issuance": [
+            "proceeds from issuance of common stock",
+            "proceeds from issuance of preferred stock and preference stock",
+            "proceeds from stock options exercised"
+        ],
+        "Repayment of Debt": [
+            "repayment of long term debt and finance leases",
+            "repayments of commercial paper",
+            "repayments of federal home loan bank borrowings",
+            "repayments of lines of credit",
+            "repayments of lines of credit and commercial paper",
+            "repayments of long term debt",
+            "repayments of other short term debt",
+            "repayments of short term debt"
+        ],
+        "Stock Repurchases": [
+            "payments for repurchase of common stock",
+            "payments for repurchase of common stock and nonvoting common stock",
+            "payments for repurchase of preferred stock and preference stock"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "cash acquired from acquisition",
+            "fair value of assets acquired",
+            "payments to acquire businesses net of cash acquired"
+        ],
+        "Capital Expenditures": [
+            "capital expenditures incurred but not yet paid",
+            "payments to acquire property plant and equipment"
+        ],
+        "Net Cash from Investing Activities": [
+            "net cash provided by used in investing activities"
+        ],
+        "Other Investing Activities": [
+            "common stock issued to acquire businesses",
+            "noncash changes in capital expenditures incurred by not yet paid",
+            "noncash or part noncash acquisition common stock issued and equity awards assumed",
+            "payments for proceeds from loans and leases",
+            "payments for proceeds from loans receivable",
+            "payments for proceeds from other investing activities",
+            "transfer of investments",
+            "transfer to investments"
+        ],
+        "Purchases of Investments": [
+            "payments for origination and purchases of loans held for sale",
+            "payments to acquire available for sale securities",
+            "payments to acquire available for sale securities debt",
+            "payments to acquire federal home loan bank stock",
+            "payments to acquire federal reserve stock",
+            "payments to acquire held to maturity securities"
+        ],
+        "Sales and Maturities of Investments": [
+            "proceeds from maturities prepayments and calls of available for sale securities",
+            "proceeds from maturities prepayments and calls of held to maturity securities",
+            "proceeds from sale of available for sale securities",
+            "proceeds from sale of federal home loan bank stock",
+            "proceeds from sale of federal reserve stock",
+            "proceeds from sale of loans held for sale",
+            "securities matured but not yet settled"
+        ]
+    },
+    "Net Change in Cash": [
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease excluding exchange rate effect",
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "increase decrease in accrued liabilities",
+            "increase decrease in brokerage receivables",
+            "increase decrease in deposits",
+            "increase decrease in financial instruments used in operating activities",
+            "increase decrease in other operating assets",
+            "increase decrease in payables to broker dealers",
+            "increase decrease in payables to customers",
+            "increase decrease in receivables from brokerage clients",
+            "increase decrease in restricted cash and investments for operating activities",
+            "increase decrease of restricted investments"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income tax expense benefit"
+        ],
+        "Depreciation and Amortization": [
+            "accretion amortization of discounts and premiums investments",
+            "amortization of intangible assets",
+            "depreciation and amortization excluding amortization of intangible assets"
+        ],
+        "Interest Paid": [
+            "interest paid net"
+        ],
+        "Net Cash from Operating Activities": [
+            "net cash provided by used in operating activities"
+        ],
+        "Net Income": [
+            "net income loss"
+        ],
+        "Other Non-Cash Items": [
+            "income taxes paid",
+            "income taxes paid net",
+            "operating lease payments",
+            "other noncash income expense",
+            "other than temporary impairment losses investments portion recognized in earnings net",
+            "provision for loan losses expensed"
+        ],
+        "Stock-Based Compensation": [
+            "share based compensation",
+            "excess tax benefit from share based compensation operating activities"
+        ]
+    },
+    "__unmapped__": [
+        "deposit transfers",
+        "securities transferred from available for sale to held to maturity fair value",
+        "securities transferred from held to maturity to available for sale fair value"
+    ]
+}

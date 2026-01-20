@@ -1,0 +1,55 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [],
+    "Dividends Declared": [],
+    "Dividends Paid": [],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "profit loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [],
+        "Foreign Currency Translation": [],
+        "Other OCI": [],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax"
+        ],
+        "Unrealized Gains/Losses on Securities": []
+    },
+    "Other Equity Adjustments": [
+        "new accounting pronouncement or change in accounting principle effect of adoption quantification"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [],
+        "Other Stock Issuance": [
+            "stock issued during period value new issues"
+        ],
+        "Stock-Based Compensation": [],
+        "Total Stock Issuance Value": []
+    },
+    "Stock Repurchases": [
+        "treasury stock value acquired cost method"
+    ],
+    "Tax Effects from Stock Compensation": [],
+    "__unmapped__": [
+        "increase decrease through transactions with noncontrolling interests",
+        "increase decrease through transactions with noncontrolling interests and other",
+        "interests acquired and other transactions",
+        "shares issued and repurchased",
+        "stock issued during period value new issues and other"
+    ]
+}

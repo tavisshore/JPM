@@ -1,0 +1,89 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [
+        "comprehensive income net of tax including portion attributable to noncontrolling interest"
+    ],
+    "Dividends Declared": [
+        "dividends preferred stock"
+    ],
+    "Dividends Paid": [
+        "dividends common stock cash",
+        "dividends preferred stock cash"
+    ],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "income loss from continuing operations",
+        "income loss from continuing operations available to common stockholders basic",
+        "income loss from discontinued operations net of tax",
+        "net income loss available to common stockholders basic",
+        "net income loss available to common stockholders diluted",
+        "profit loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [],
+        "Foreign Currency Translation": [],
+        "Other OCI": [],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax",
+            "other comprehensive income loss net of tax period increase decrease"
+        ],
+        "Unrealized Gains/Losses on Securities": []
+    },
+    "Other Equity Adjustments": [
+        "equityimpactfromsaleofnoncontrollinginterestinsubsidiary",
+        "stockholders equity note spinoff transaction",
+        "stockholders equity other",
+        "stockholders equity other shares"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [
+            "stock issued during period shares stock options exercised",
+            "stock issued during period value stock options exercised"
+        ],
+        "Other Stock Issuance": [
+            "preferred stock conversions and redemptions shares",
+            "stock issued and redeemed during period shares conversion and redemptionof stock",
+            "stock issued during period shares employee benefit trust net",
+            "stock issued during period value employee benefit trust net"
+        ],
+        "Stock-Based Compensation": [
+            "stock issued during period shares share based compensation"
+        ],
+        "Total Stock Issuance Value": [
+            "preferred stock conversions and redemptions value",
+            "stock issued and redeemed during period value conversion and redemptionof stock"
+        ]
+    },
+    "Stock Repurchases": [
+        "acquisitionof common stockinan exchange offer value",
+        "acquisitionof common stockinan exchange offershares",
+        "treasury stock shares acquired",
+        "treasury stock value acquired cost method"
+    ],
+    "Tax Effects from Stock Compensation": [],
+    "__unmapped__": [
+        "antidilutive securities excluded from computation of earnings per share amount",
+        "common stock dividends per share declared",
+        "minority interest decrease from distributions to noncontrolling interest holders",
+        "net income loss attributable to noncontrolling interest",
+        "noncontrolling interest decrease from deconsolidation",
+        "stock issued during period value share based compensation and treasury stock value acquired cost method",
+        "weighted average number diluted shares outstanding adjustment",
+        "weighted average number of diluted shares outstanding",
+        "weighted average number of shares outstanding basic"
+    ]
+}

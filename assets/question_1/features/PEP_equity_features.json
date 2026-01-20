@@ -1,0 +1,105 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [],
+    "Dividends Declared": [],
+    "Dividends Paid": [
+        "dividends common stock cash",
+        "dividends preferred stock cash",
+        "dividends share based compensation cash"
+    ],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": [
+            "treasury stock shares acquired",
+            "treasury stock value acquired cost method"
+        ]
+    },
+    "Net Income": [
+        "net income loss",
+        "profit loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [
+            "other comprehensive income loss reclassification adjustment from a o c i on derivatives net of tax",
+            "other comprehensive income reclassification adjustment on derivatives included in net income net of tax",
+            "other comprehensive income unrealized gain loss on derivatives arising during period net of tax"
+        ],
+        "Foreign Currency Translation": [
+            "other comprehensive income loss foreign currency transaction and translation adjustment net of tax"
+        ],
+        "Other OCI": [
+            "defined benefit plan remeasurement of net liabilities",
+            "other comprehensive income defined benefit plans net unamortized gain loss arising during period net of tax",
+            "other comprehensive income loss pension and other postretirement benefit plans adjustment before reclassification adjustments net of tax",
+            "other comprehensive income loss pension and other postretirement benefit plans remeasurement of net liabilities and translation net of tax",
+            "other comprehensive income loss reclassification adjustment from a o c i pension and other postretirement benefit plans net of tax",
+            "other comprehensive income reclassification of defined benefit plans net gain loss recognized in net periodic benefit cost net of tax"
+        ],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax portion attributable to parent"
+        ],
+        "Unrealized Gains/Losses on Securities": [
+            "other comprehensive income unrealized holding gain loss on securities arising during period net of tax"
+        ]
+    },
+    "Other Equity Adjustments": [
+        "adjustments to additional paid in capital other",
+        "other changes during period shares",
+        "retirementofpreferredstock",
+        "retirementofpreferredstockvalue",
+        "stockholders equity other",
+        "stockholders equity other shares"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [
+            "stock issued during period shares stock options exercised",
+            "stock options excercises r s us converted",
+            "stock options exercises r s us p s u s pepunits converted"
+        ],
+        "Other Stock Issuance": [
+            "conversion of stock shares converted1",
+            "convertible preferred stock converted to other securities",
+            "stock issued during period shares acquisitions",
+            "stock issued during period shares conversion of convertible securities"
+        ],
+        "Stock-Based Compensation": [
+            "adjustments to additional paid in capital sharebased compensation requisite service period recognition value",
+            "stock issued during period value share based compensation"
+        ],
+        "Total Stock Issuance Value": [
+            "stock issued during period value stock options exercised"
+        ]
+    },
+    "Stock Repurchases": [
+        "stock redeemed or called during period shares",
+        "stock redeemed or called during period value",
+        "stock repurchased during period shares",
+        "stock repurchased during period value"
+    ],
+    "Tax Effects from Stock Compensation": [
+        "adjustments related to tax withholding for share based compensation",
+        "adjustments to additional paid in capital tax effect from share based compensation",
+        "payments related to tax withholding for share based compensation",
+        "restricted stock withholding taxes recorded as net settlement"
+    ],
+    "__unmapped__": [
+        "acquisitions and divestitures to noncontrolling interest",
+        "common stock dividends per share declared",
+        "minority interest decrease from distributions to noncontrolling interest holders",
+        "minority interest increase decrease from contributions from or distributions to noncontrolling interest members",
+        "net income loss attributable to noncontrolling interest",
+        "reclassificationassociatedwith venezuelaimpairmentcharges",
+        "reclassificationassociatedwithvenezuelaimpairmentchargesnetoftaxpension"
+    ]
+}

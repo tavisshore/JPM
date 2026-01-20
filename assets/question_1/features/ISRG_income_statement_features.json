@@ -1,0 +1,86 @@
+{
+    "Comprehensive Income": [
+        "comprehensive income net of tax",
+        "comprehensive income net of tax including portion attributable to noncontrolling interest"
+    ],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "cost of goods and services sold",
+            "cost of goods sold",
+            "cost of revenue"
+        ]
+    },
+    "Gross Profit": [
+        "gross profit"
+    ],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "net income loss",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [],
+        "Interest Income": [],
+        "Other Income (Expense)": [],
+        "Total Non-Operating Items": [
+            "nonoperating income expense"
+        ]
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [],
+        "General and Administrative": [
+            "selling general and administrative expense"
+        ],
+        "Other Operating Expenses": [],
+        "Research and Development": [
+            "research and development expense"
+        ],
+        "Sales and Marketing": [],
+        "Total Operating Expenses": [
+            "operating expenses"
+        ]
+    },
+    "Operating Income": [
+        "operating income loss"
+    ],
+    "Other Comprehensive Income": [
+        "other comprehensive income loss available for sale securities adjustment net of tax",
+        "other comprehensive income loss cash flow hedge gain loss after reclassification and tax",
+        "other comprehensive income loss foreign currency transaction and translation adjustment net of tax",
+        "other comprehensive income loss net of tax",
+        "other comprehensive income loss pension and other postretirement benefit plans adjustment net of tax"
+    ],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [
+            "weighted average number of shares outstanding basic"
+        ],
+        "Weighted Average Shares Outstanding (Diluted)": [
+            "weighted average number of diluted shares outstanding"
+        ]
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "revenue from contract with customer excluding assessed tax",
+            "sales revenue goods net",
+            "sales revenue net"
+        ]
+    },
+    "__unmapped__": [
+        "comprehensive income net of tax attributable to noncontrolling interest",
+        "net income loss attributable to noncontrolling interest",
+        "other comprehensive income loss net of tax portion attributable to noncontrolling interest",
+        "service member",
+        "income loss from continuing operations before income taxes minority interest and income loss from equity method investments"
+    ]
+}

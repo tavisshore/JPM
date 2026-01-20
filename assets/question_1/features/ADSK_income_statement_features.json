@@ -1,0 +1,89 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "cost of goods and services sold",
+            "cost of goods and services sold amortization",
+            "cost of revenue",
+            "license costs",
+            "maintenance costs"
+        ]
+    },
+    "Gross Profit": [
+        "gross profit"
+    ],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "net income loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [],
+        "Interest Income": [],
+        "Other Income (Expense)": [
+            "interest income expense net",
+            "interest income expense nonoperating net"
+        ],
+        "Total Non-Operating Items": []
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "amortization of intangible assets"
+        ],
+        "General and Administrative": [
+            "general and administrative expense"
+        ],
+        "Other Operating Expenses": [
+            "goodwill and intangible asset impairment",
+            "restructuring charges",
+            "restructuring charges credits",
+            "restructuring charges netof adjustments",
+            "restructuring costs"
+        ],
+        "Research and Development": [
+            "research and development expense"
+        ],
+        "Sales and Marketing": [
+            "selling and marketing expense"
+        ],
+        "Total Operating Expenses": [
+            "operating expenses"
+        ]
+    },
+    "Operating Income": [
+        "operating income loss"
+    ],
+    "Other Comprehensive Income": [],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [
+            "weighted average number of shares outstanding basic"
+        ],
+        "Weighted Average Shares Outstanding (Diluted)": [
+            "weighted average number of diluted shares outstanding"
+        ]
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "license and services revenue",
+            "revenue from contract with customer excluding assessed tax",
+            "subscription revenue",
+            "total maintenanceand subscription revenue"
+        ]
+    },
+    "__unmapped__": [
+        "maintenance member",
+        "subscription and circulation member",
+        "subscriptionand maintenance member",
+        "income loss from continuing operations before income taxes minority interest and income loss from equity method investments"
+    ]
+}

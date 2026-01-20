@@ -1,0 +1,99 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "amortization of acquisition related intangibles c o g s",
+            "cost depreciation amortization and depletion",
+            "cost of goods and service excluding depreciation depletion and amortization",
+            "cost of goods and services sold",
+            "cost of goods sold"
+        ]
+    },
+    "Gross Profit": [
+        "gross profit"
+    ],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes minority interest and income loss from equity method investments"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "income loss from continuing operations",
+        "net income loss",
+        "net income loss available to common stockholders basic",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [
+            "interest expense"
+        ],
+        "Interest Income": [
+            "investment income interest"
+        ],
+        "Other Income (Expense)": [
+            "gain loss on licensing agreement",
+            "income loss from equity method investments"
+        ],
+        "Total Non-Operating Items": [
+            "other nonoperating income expense"
+        ]
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "amortization of acquired intangible assets",
+            "amortization of acquisition related intangibles opex",
+            "amortization of acquisition related intangibles_ opex",
+            "amortization of intangible assets"
+        ],
+        "General and Administrative": [
+            "selling general and administrative expense"
+        ],
+        "Other Operating Expenses": [
+            "goodwill impairment loss",
+            "litigation settlement amount",
+            "litigation settlement gross",
+            "restructuring and other special charges net",
+            "restructuring charges"
+        ],
+        "Research and Development": [
+            "research and development expense"
+        ],
+        "Sales and Marketing": [],
+        "Total Operating Expenses": [
+            "operating expenses"
+        ]
+    },
+    "Operating Income": [
+        "operating income loss"
+    ],
+    "Other Comprehensive Income": [],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic",
+            "income loss from continuing operations per basic share"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted",
+            "income loss from continuing operations per diluted share"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [
+            "weighted average number of shares outstanding basic"
+        ],
+        "Weighted Average Shares Outstanding (Diluted)": [
+            "weighted average number of diluted shares outstanding"
+        ]
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "revenue from contract with customer excluding assessed tax",
+            "sales revenue goods net",
+            "sales revenue net"
+        ]
+    },
+    "__unmapped__": [
+        "income loss from discontinued operations net of tax attributable to reporting entity",
+        "income loss from discontinued operations net of tax per basic share",
+        "income loss from discontinued operations net of tax per diluted share"
+    ]
+}

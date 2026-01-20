@@ -1,0 +1,134 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [],
+    "Financing Activities": {
+        "Dividends Paid": [
+            "payments of dividends common stock",
+            "payments of dividends preferred stock and preference stock"
+        ],
+        "Net Cash from Financing Activities": [
+            "net cash provided by used in financing activities"
+        ],
+        "Other Financing Activities": [
+            "excess tax benefit from share based compensation financing activities",
+            "exchange of junior subordinated debentures for senior note",
+            "increase decrease in federal funds purchased and securities sold under agreements to repurchase net",
+            "minority interest decrease from redemptions",
+            "net change in commercial paper",
+            "net change interest bearing deposits domestic",
+            "net change noninterest bearing deposits domestic",
+            "payments for redemption of tarp preferred stock",
+            "payments for repurchase of redeemable noncontrolling interest",
+            "right of use asset obtained in exchange for finance lease liability"
+        ],
+        "Proceeds from Debt": [
+            "proceeds from issuance of commercial paper",
+            "proceeds from issuance of federal home loan borrowings",
+            "proceeds from issuance of other long term debt",
+            "proceeds from sales issuances of bank notes and senior debt",
+            "proceeds from repayments of short term debt",
+            "proceeds from repayments of short term debt maturing in three months or less",
+            "proceeds from sale of available for sale securities debt",
+            "proceeds from sale of debt securities available for sale net of failed sales"
+        ],
+        "Proceeds from Stock Issuance": [
+            "black rock stock via secondary common stock offering",
+            "proceeds from issuance of common and treasury stock",
+            "proceeds from issuance of preferred stock and preference stock"
+        ],
+        "Repayment of Debt": [
+            "maturities of subordinated debt",
+            "proceeds from repayments of commercial paper",
+            "repayments of federal home loan bank borrowings"
+        ],
+        "Stock Repurchases": [
+            "payments for repurchase of common stock"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "payments for proceeds from businesses and interest in affiliates",
+            "payments to acquire businesses net of cash acquired"
+        ],
+        "Capital Expenditures": [],
+        "Net Cash from Investing Activities": [
+            "net cash provided by used in investing activities"
+        ],
+        "Other Investing Activities": [
+            "increase decrease in trading securities",
+            "payments for proceeds from other investing activities",
+            "payments to acquire life insurance policies",
+            "proceeds from divestiture of businesses",
+            "proceeds from payments for federal funds sold and securities purchased under agreements to resell net",
+            "proceeds from payments for in interest bearing deposits in banks",
+            "transfer from loans to foreclosed assets",
+            "transfer of investments",
+            "transfer of loans held for sale to portfolio loans1",
+            "transfer of portfolio loans and leases to held for sale1",
+            "transfer to investments",
+            "transferof trading securitiesto investment securities"
+        ],
+        "Purchases of Investments": [
+            "payments for proceeds from federal home loan bank stock"
+        ],
+        "Sales and Maturities of Investments": [
+            "proceeds from maturities prepayments and calls of available for sale securities",
+            "proceeds from maturities prepayments and calls of held to maturity securities",
+            "proceeds from sale of loans held for investment"
+        ]
+    },
+    "Net Change in Cash": [
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "adjustment to assets and liabilities related to partially financed investment exits",
+            "increase decrease in accrued liabilities and other operating liabilities",
+            "increase decrease in loans held for sale",
+            "increase decrease in other operating assets",
+            "increase decrease in other operating capital net"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income tax expense benefit"
+        ],
+        "Depreciation and Amortization": [
+            "depreciation and amortization"
+        ],
+        "Interest Paid": [
+            "interest paid net"
+        ],
+        "Net Cash from Operating Activities": [
+            "net cash provided by used in operating activities"
+        ],
+        "Net Income": [
+            "profit loss"
+        ],
+        "Other Non-Cash Items": [
+            "debt securities available for sale gain loss",
+            "discontinued operation gain loss from disposal of discontinued operation before income tax",
+            "financing receivable credit loss and off balance sheet credit loss liability expense recovery",
+            "gain loss on sale of business",
+            "gain loss on sale of equity investments",
+            "gain loss on shares exchange program",
+            "gain on sale of visa class b common shares",
+            "goodwill impairment loss",
+            "income taxes paid",
+            "mortgage servicing rights m s r impairment recovery",
+            "mortgage servicing rights valuation adjustment",
+            "noncash charge on trust preferred securities redemption",
+            "other than temporary impairment losses investments portion recognized in earnings net",
+            "proceeds from income tax refunds",
+            "provision for loan lease and other losses",
+            "right of use asset obtained in exchange for operating lease liability",
+            "undistributed discontinued operation earnings loss basic and diluted"
+        ],
+        "Stock-Based Compensation": [
+            "excess tax benefit from share based compensation operating activities"
+        ]
+    },
+    "__unmapped__": [
+        "net cash provided by used in continuing operations",
+        "net cash provided by used in discontinued operations"
+    ]
+}

@@ -1,0 +1,124 @@
+{
+    "Assets": {
+        "Current": {
+            "Cash and Equivalents": [
+                "cash and cash equivalents at carrying value",
+                "restricted cash and cash equivalents at carrying value"
+            ],
+            "Inventory": [],
+            "Marketable Securities (Short-term)": [
+                "available for sale securities current",
+                "held to maturity securities current"
+            ],
+            "Prepaid and Other Current Assets": [
+                "deposits assets current",
+                "other assets current",
+                "prepaid expense current"
+            ],
+            "Receivables": [
+                "accounts receivable net current",
+                "settlement due from customers"
+            ],
+            "Total Current Assets": [
+                "assets current"
+            ]
+        },
+        "Non-Current": {
+            "Deferred Tax Assets": [
+                "deferred income tax assets net",
+                "deferred income tax liabilities net"
+            ],
+            "Goodwill": [
+                "goodwill"
+            ],
+            "Intangible Assets (net)": [
+                "intangible assets net excluding goodwill"
+            ],
+            "Long-term Investments": [
+                "available for sale securities noncurrent",
+                "investments"
+            ],
+            "Other Non-Current Assets": [
+                "other assets noncurrent",
+                "prepaid expense noncurrent"
+            ],
+            "Property, Plant, and Equipment (net)": [
+                "property plant and equipment net"
+            ],
+            "Total Non-Current Assets": []
+        },
+        "Total Assets": [
+            "assets"
+        ]
+    },
+    "Equity": {
+        "Accumulated Other Comprehensive Income": [
+            "accumulated other comprehensive income loss available for sale securities adjustment net of tax",
+            "accumulated other comprehensive income loss defined benefit pension and other postretirement plans net of tax",
+            "accumulated other comprehensive income loss net of tax",
+            "cumulative foreign currency translation adjustments"
+        ],
+        "Common Stock and APIC": [
+            "additional paid in capital",
+            "common stock value"
+        ],
+        "Retained Earnings": [
+            "retained earnings accumulated deficit"
+        ],
+        "Total Equity": [
+            "stockholders equity"
+        ],
+        "Treasury Stock": [
+            "treasury stock value"
+        ]
+    },
+    "Liabilities": {
+        "Current": {
+            "Accounts Payable and Accrued Expenses": [
+                "accounts payable current",
+                "accrued liabilities current"
+            ],
+            "Deferred Revenue": [],
+            "Other Current Liabilities": [
+                "litigation reserve current",
+                "other liabilities current",
+                "settlement due to customers"
+            ],
+            "Short-term Debt": [
+                "long term debt current"
+            ],
+            "Total Current Liabilities": [
+                "liabilities current"
+            ]
+        },
+        "Non-Current": {
+            "Deferred Tax Liabilities": [],
+            "Lease Liabilities": [],
+            "Long-term Debt": [
+                "long term debt noncurrent"
+            ],
+            "Other Non-Current Liabilities": [
+                "other liabilities noncurrent",
+                "present value of litigation settlement obligation"
+            ],
+            "Total Non-Current Liabilities": []
+        },
+        "Total Liabilities": [
+            "liabilities"
+        ]
+    },
+    "Totals": {
+        "Total Liabilities and Equity": [
+            "liabilities and stockholders equity"
+        ]
+    },
+    "__unmapped__": [
+        "common stock shares authorized",
+        "common stock shares issued",
+        "common stock shares outstanding",
+        "prepaid expense and other assets current",
+        "property plant and equipment and finance lease right of use asset after accumulated depreciation and amortization",
+        "redeemable noncontrolling interest equity fair value",
+        "minority interest"
+    ]
+}

@@ -1,0 +1,79 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "cost of services depreciation",
+            "fuel costs",
+            "labor and related expense",
+            "materials and other expense income"
+        ]
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income before income taxes"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "net income loss",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [
+            "interest expense",
+            "interest expense debt",
+            "interest expense nonoperating"
+        ],
+        "Interest Income": [],
+        "Other Income (Expense)": [
+            "disposal group not discontinued operation gain loss on disposal",
+            "unusual or infrequent item gain gross"
+        ],
+        "Total Non-Operating Items": [
+            "other nonoperating income expense"
+        ]
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "depreciation"
+        ],
+        "General and Administrative": [
+            "purchased services and rents"
+        ],
+        "Other Operating Expenses": [
+            "business combination acquisition related costs",
+            "restructuring and other charges"
+        ],
+        "Research and Development": [],
+        "Sales and Marketing": [],
+        "Total Operating Expenses": [
+            "operating expenses"
+        ]
+    },
+    "Operating Income": [
+        "operating income loss"
+    ],
+    "Other Comprehensive Income": [],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [],
+        "Weighted Average Shares Outstanding (Diluted)": []
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "revenue from contract with customer excluding assessed tax",
+            "revenues"
+        ]
+    },
+    "__unmapped__": [
+        "common stock dividends per share cash paid",
+        "costs and expenses",
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ]
+}

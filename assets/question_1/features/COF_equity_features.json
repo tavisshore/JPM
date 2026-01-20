@@ -1,0 +1,91 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [
+        "comprehensive income net of tax"
+    ],
+    "Dividends Declared": [
+        "dividends common stock",
+        "dividends preferred stock",
+        "dividends preferred stock stock",
+        "dividends sharebased compensation stock"
+    ],
+    "Dividends Paid": [
+        "dividends common stock cash",
+        "dividends preferred stock cash"
+    ],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "net income loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [
+            "other comprehensive income unrealized gain loss on derivatives arising during period net of tax"
+        ],
+        "Foreign Currency Translation": [
+            "other comprehensive income foreign currency transaction and translation adjustment net of tax period increase decrease"
+        ],
+        "Other OCI": [
+            "other comprehensive income defined benefit plans adjustment net of tax period increase decrease"
+        ],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax period increase decrease"
+        ],
+        "Unrealized Gains/Losses on Securities": [
+            "other comprehensive income available for sale securities adjustment net of tax period increase decrease",
+            "other than temporary impairment not recognized in earnings on securities net of taxes"
+        ]
+    },
+    "Other Equity Adjustments": [
+        "cumulative effect of initial adoption of asc82510",
+        "cumulative effect of initial adoption of new accounting principles",
+        "cumulative effect period of adoption adjustment member",
+        "new accounting pronouncement or change in accounting principle effect of adoption quantification",
+        "stockholders equity other"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [
+            "stock issued during period value stock options and warrants exercised and restricted stock vesting",
+            "stock issued during period value stock optionsand warrants exercisedand restricted stock vesting",
+            "stock options exercised including income tax benefits vesting of restricted stock units and other"
+        ],
+        "Other Stock Issuance": [
+            "stock issued during period value acquisitions",
+            "stock issued during period value new issues",
+            "stock issued during period value new issuesand restricted stock netof forfeitures"
+        ],
+        "Stock-Based Compensation": [
+            "adjustments to additional paid in capital sharebased compensation requisite service period recognition value"
+        ],
+        "Total Stock Issuance Value": []
+    },
+    "Stock Repurchases": [
+        "stock redeemed or called during period value",
+        "treasury stock value acquired cost method"
+    ],
+    "Tax Effects from Stock Compensation": [],
+    "__unmapped__": [
+        "common stock dividends per share declared",
+        "common stock dividends shares",
+        "exercise of stock options and tax benefits of exercises and restricted stock vesting in shares",
+        "stock issued during period shares acquisitions",
+        "stock issued during period shares new issues",
+        "stock issued during period shares new issuesand restricted stock netof forfeituresinshares",
+        "stock issued during period shares preferred stock",
+        "stock issued during period shares stock optionsand warrants exercisedand restricted stock vesting",
+        "stock redeemed or called during period shares"
+    ]
+}

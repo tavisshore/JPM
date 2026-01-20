@@ -1,0 +1,132 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [
+        "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents"
+    ],
+    "Financing Activities": {
+        "Dividends Paid": [
+            "payments of dividends",
+            "payments of dividends common stock",
+            "payments of dividends minority interest"
+        ],
+        "Net Cash from Financing Activities": [
+            "net cash provided by used in financing activities"
+        ],
+        "Other Financing Activities": [
+            "cash paid resulting in reduction of noncontrolling interest ownership",
+            "excess tax benefit from share based compensation financing activities",
+            "payments of debt issuance and debt extinguishment or debt prepayment costs",
+            "payments of debt issuance costs",
+            "payments of merger related costs financing activities",
+            "payments related to tax withholding for share based compensation",
+            "payments to minority shareholders",
+            "settlement of treasury rate lock"
+        ],
+        "Proceeds from Debt": [
+            "proceeds from issuance of commercial paper",
+            "proceeds from lines of credit",
+            "proceeds from notes payable"
+        ],
+        "Proceeds from Stock Issuance": [
+            "proceeds from stock plans"
+        ],
+        "Repayment of Debt": [
+            "repayments of commercial paper",
+            "repayments of long term capital lease obligations",
+            "repayments of notes payable"
+        ],
+        "Stock Repurchases": [
+            "accelerated share repurchase program remaining not yet settled",
+            "payments for repurchase of common stock",
+            "payments for repurchase of redeemable noncontrolling interest"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "other payments to acquire businesses",
+            "payments to acquire businesses and interest in affiliates",
+            "payments to acquire businesses gross",
+            "payments to acquire businesses net of cash acquired",
+            "payments to acquire interest in subsidiaries and affiliates"
+        ],
+        "Capital Expenditures": [
+            "payments to acquire property plant and equipment"
+        ],
+        "Net Cash from Investing Activities": [
+            "net cash provided by used in investing activities"
+        ],
+        "Other Investing Activities": [
+            "disposal group including discontinued operation cash reclassification",
+            "payments for hedge investing activities",
+            "proceeds from derivative instrument investing activities",
+            "proceeds from divestiture of businesses",
+            "proceeds from divestiture of businesses net of cash divested",
+            "proceeds from hedge investing activities",
+            "proceeds from realized cash inflow on foreign currency purchase price hedge derivatives",
+            "proceeds from sales of business affiliate and productive assets"
+        ],
+        "Purchases of Investments": [
+            "payments to acquire investments",
+            "payments to acquire short term investments"
+        ],
+        "Sales and Maturities of Investments": [
+            "proceeds from sale maturity and collection of shortterm investments",
+            "proceeds from sale maturity and collections of investments"
+        ]
+    },
+    "Net Change in Cash": [
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "increase decrease in accounts payable and accrued liabilities",
+            "increase decrease in accounts receivable",
+            "increase decrease in operating lease liability",
+            "increase decrease in other deferred liability",
+            "increase decrease in other operating assets",
+            "increase decrease in other operating liabilities",
+            "increase decrease in prepaid deferred expense and other assets",
+            "increase decrease in restructuring reserve",
+            "increase decreasein contractwith customer liability excluding effectof exchange rate",
+            "unrecognized tax benefits and other non current tax liabilities period increase decrease",
+            "unrecognized tax benefits period increase decrease"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income tax expense benefit"
+        ],
+        "Depreciation and Amortization": [
+            "depreciation and amortization"
+        ],
+        "Interest Paid": [],
+        "Net Cash from Operating Activities": [
+            "net cash provided by used in operating activities"
+        ],
+        "Net Income": [
+            "profit loss"
+        ],
+        "Other Non-Cash Items": [
+            "business combination step acquisition equity interest in acquiree remeasurement gain",
+            "disposal group including discontinued operation foreign currency translation gains losses",
+            "equity method investment realized gain loss on disposal",
+            "gain loss on sale of business",
+            "gain loss on sale of stock in subsidiary or equity method investee",
+            "gain on extinguishment of debt",
+            "gains losses on extinguishment of debt",
+            "goodwill impairment loss",
+            "impairment of long lived assets held for use",
+            "impairment of long lived assets to be disposed of",
+            "operating lease impairment loss and non cash restructuring charge",
+            "provision for doubtful accounts",
+            "realized gain on foreign currency purchase price hedge derivatives",
+            "restructuring costs and asset impairment charges"
+        ],
+        "Stock-Based Compensation": [
+            "excess tax benefit from share based compensation operating activities",
+            "share based compensation"
+        ]
+    },
+    "__unmapped__": [
+        "legacy tax liabilities"
+    ]
+}

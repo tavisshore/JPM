@@ -1,0 +1,67 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [
+        "comprehensive income net of tax"
+    ],
+    "Dividends Declared": [],
+    "Dividends Paid": [
+        "dividends common stock cash"
+    ],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "net income loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [
+            "other comprehensive income unrealized gain loss on derivatives arising during period net of tax"
+        ],
+        "Foreign Currency Translation": [
+            "other comprehensive income foreign currency transaction and translation adjustment net of tax period increase decrease"
+        ],
+        "Other OCI": [
+            "other comprehensive income loss net of tax period increase decrease",
+            "other comprehensive income loss net of tax portion attributable to parent",
+            "other comprehensive income minimum pension liability net adjustment net of tax"
+        ],
+        "Total Other Comprehensive Income": [],
+        "Unrealized Gains/Losses on Securities": [
+            "other comprehensive income unrealized holding gain loss on securities arising during period net of tax"
+        ]
+    },
+    "Other Equity Adjustments": [],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [],
+        "Other Stock Issuance": [
+            "stock assumed during period value acquisition",
+            "stock issued during period shares employee stock purchase plans",
+            "stock issued during period value employee stock purchase plan"
+        ],
+        "Stock-Based Compensation": [
+            "adjustments to additional paid in capital sharebased compensation requisite service period recognition value",
+            "stock issued during period shares share based compensation",
+            "stock issued during period value share based compensation",
+            "stock issued during period value share based compensation net of tax"
+        ],
+        "Total Stock Issuance Value": []
+    },
+    "Stock Repurchases": [
+        "treasury stock shares acquired",
+        "treasury stock value acquired par value method"
+    ],
+    "Tax Effects from Stock Compensation": [],
+    "__unmapped__": []
+}

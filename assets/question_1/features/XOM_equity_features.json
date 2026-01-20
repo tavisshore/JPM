@@ -1,0 +1,78 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [],
+    "Dividends Declared": [
+        "dividends common stock",
+        "dividends common stock inc noncontrolling int"
+    ],
+    "Dividends Paid": [],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": [
+            "treasury stock including non controlling interests"
+        ]
+    },
+    "Net Income": [
+        "profit loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [
+            "other comprehensive income reclassification adjustment on derivatives included in net income net of tax",
+            "other comprehensive income unrealized gain loss on derivatives arising during period net of tax"
+        ],
+        "Foreign Currency Translation": [
+            "other comprehensive income foreign currency transaction and translation adjustment net of tax period increase decrease",
+            "other comprehensive income foreign currency transaction and translation reclassification adjustment realized upon sale or liquidation net of tax"
+        ],
+        "Other OCI": [
+            "other comprehensive income defined benefit plans adjustment net of tax period increase decrease",
+            "other comprehensive income postretirement benefits recognized in net periodic pension cost net of tax"
+        ],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax"
+        ],
+        "Unrealized Gains/Losses on Securities": []
+    },
+    "Other Equity Adjustments": [
+        "cumulative effect of accounting change",
+        "stockholders equity other"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [],
+        "Other Stock Issuance": [
+            "issued for company merger",
+            "stock issued during period value acquisitions",
+            "stock issued during period value treasury stock reissued"
+        ],
+        "Stock-Based Compensation": [
+            "amortization of stock based awards"
+        ],
+        "Total Stock Issuance Value": []
+    },
+    "Stock Repurchases": [
+        "treasury stock value acquired cost method"
+    ],
+    "Tax Effects from Stock Compensation": [
+        "adjustments to additional paid in capital tax effect from share based compensation"
+    ],
+    "__unmapped__": [
+        "issued for company merger shares",
+        "minority interest decrease from distributions to noncontrolling interest holders",
+        "minority interest decrease from redemptions",
+        "minority interest stock issued during period value treasury stock reissued",
+        "stock issued during period shares acquisitions",
+        "stock issued during period shares treasury stock reissued",
+        "treasury stock shares acquired"
+    ]
+}

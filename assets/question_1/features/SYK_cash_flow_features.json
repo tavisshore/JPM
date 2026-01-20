@@ -1,0 +1,118 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [
+        "effect of exchange rate on cash and cash equivalents",
+        "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents"
+    ],
+    "Financing Activities": {
+        "Dividends Paid": [
+            "payments of dividends"
+        ],
+        "Net Cash from Financing Activities": [
+            "net cash provided by used in financing activities"
+        ],
+        "Other Financing Activities": [
+            "excess tax benefit from share based compensation financing activities",
+            "payments related to tax withholding for share based compensation",
+            "payments to minority shareholders",
+            "payments of debt issuance costs",
+            "proceeds from payments for other financing activities",
+            "proceeds from repayments of short term debt",
+            "proceeds from repayments of short term debt maturing in three months or less",
+            "tax benefit from stock options exercised"
+        ],
+        "Proceeds from Debt": [
+            "proceeds from issuance of long term debt"
+        ],
+        "Proceeds from Stock Issuance": [
+            "proceeds from stock options exercised"
+        ],
+        "Repayment of Debt": [
+            "repayments of long term debt",
+            "repayments of short term debt"
+        ],
+        "Stock Repurchases": [
+            "payments for repurchase of common stock"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "payments to acquire businesses net of cash acquired"
+        ],
+        "Capital Expenditures": [
+            "payments to acquire property plant and equipment"
+        ],
+        "Net Cash from Investing Activities": [
+            "net cash provided by used in investing activities"
+        ],
+        "Other Investing Activities": [
+            "inventory stepped up to fair value at acquisition",
+            "payments for proceeds from other investing activities",
+            "proceeds from hedge investing activities",
+            "proceeds from sale of property plant and equipment",
+            "proceeds from sales of business affiliate and productive assets",
+            "sale of inventory stepped up to fair value at acquisition"
+        ],
+        "Purchases of Investments": [
+            "payments to acquire marketable securities",
+            "payments to acquire short term investments",
+            "payments for proceeds from short term investments"
+        ],
+        "Sales and Maturities of Investments": [
+            "proceeds from maturities prepayments and calls of shortterm investments",
+            "proceeds from sale and maturity of marketable securities"
+        ]
+    },
+    "Net Change in Cash": [
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "changeinaccrualforrecallexpenses",
+            "increase decrease in accounts payable trade",
+            "increase decrease in accounts receivable",
+            "increase decrease in accrued income taxes payable",
+            "increase decrease in accrued liabilities",
+            "increase decrease in inventories",
+            "increase decrease in loaner instrumentation",
+            "increase decrease in other operating capital net"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income tax expense benefit",
+            "deferred income taxes and tax credits"
+        ],
+        "Depreciation and Amortization": [
+            "adjustment for amortization",
+            "depreciation"
+        ],
+        "Interest Paid": [
+            "interest paid net"
+        ],
+        "Net Cash from Operating Activities": [
+            "net cash provided by used in operating activities"
+        ],
+        "Net Income": [
+            "net income loss"
+        ],
+        "Other Non-Cash Items": [
+            "asset impairment charges",
+            "foreign currency transaction gain loss before tax",
+            "gain loss on sale of property plant equipment",
+            "goodwill impairment loss",
+            "grossrecallcharges",
+            "impairment of long lived assets held for use",
+            "income taxes paid net",
+            "product liability accrual period expense",
+            "provision for doubtful accounts",
+            "rejuvenate a b g i i hip recall charges gross",
+            "restructuring charges",
+            "payments for restructuring"
+        ],
+        "Stock-Based Compensation": [
+            "share based compensation",
+            "excess tax benefit from share based compensation operating activities"
+        ]
+    },
+    "__unmapped__": []
+}

@@ -1,0 +1,89 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [],
+    "Dividends Declared": [
+        "dividends and dividend equivalents declared on common stock and restricted stock units",
+        "dividends common stock",
+        "dividends preferred stock"
+    ],
+    "Dividends Paid": [],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "net income loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [],
+        "Foreign Currency Translation": [
+            "other comprehensive income foreign currency transaction and translation adjustment net of tax period increase decrease"
+        ],
+        "Other OCI": [
+            "other comprehensive income defined benefit plans adjustment net of tax period increase decrease",
+            "reclassification of cumulative debt valuation adjustment net of tax from retained earnings to accumulated other comprehensive loss"
+        ],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax"
+        ],
+        "Unrealized Gains/Losses on Securities": [
+            "other comprehensive income unrealized holding gain loss on securities arising during period net of tax"
+        ]
+    },
+    "Other Equity Adjustments": [
+        "adjustment to retained earnings accretion of redeemable noncontrolling interests",
+        "adjustments to additional paid in capital stock issued issuance costs",
+        "cumulative effect of change in accounting principle related to current expected credit losses net of tax",
+        "cumulative effect of change in accounting principle related to leases net of tax",
+        "cumulative effect of the change in accounting principle related to forfeiture of share based awards",
+        "cumulative effect of the change in accounting principle related to forfeiture of share based awards net of tax",
+        "cumulative effect of the change in accounting principle related to revenue recognition from contracts with clients net of tax",
+        "preferred stock redemption discount",
+        "preferred stock redemption premium",
+        "stockholders equity other"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [
+            "stock issued during period value stock options exercised"
+        ],
+        "Other Stock Issuance": [
+            "cancellation of restricted stock units and employee stock options in satisfaction of withholding tax requirements",
+            "cancellation of share based awards in satisfaction of withholding tax requirements",
+            "stock issued during period value acquisitions",
+            "stock issued during period value new issues",
+            "stock issued during period value restricted stock award forfeitures",
+            "stock issued during period value treasury stock reissued"
+        ],
+        "Stock-Based Compensation": [
+            "cash settlement of share based awards",
+            "cash settlement of share based compensation",
+            "delivery of common stock underlying restricted stock units",
+            "forfeiture of restricted stock units and employee stock options",
+            "issuance and amortization of restricted stock units and employee stock options",
+            "issuance and amortization of share based awards",
+            "stock issued during period value share based compensation"
+        ],
+        "Total Stock Issuance Value": []
+    },
+    "Stock Repurchases": [
+        "stock redeemed or called during period value",
+        "treasury stock value acquired cost method"
+    ],
+    "Tax Effects from Stock Compensation": [
+        "adjustments to additional paid in capital tax effect from share based compensation"
+    ],
+    "__unmapped__": [
+        "stock subject to possible redemption value"
+    ]
+}

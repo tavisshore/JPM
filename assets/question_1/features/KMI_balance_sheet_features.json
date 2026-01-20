@@ -1,0 +1,156 @@
+{
+    "Assets": {
+        "Current": {
+            "Cash and Equivalents": [
+                "bank overdrafts",
+                "cash and cash equivalents at carrying value",
+                "cash and cash equivalents at carrying value kmp",
+                "cash and cash equivalents kinder morgan kansas inc",
+                "restricted cash and investments current"
+            ],
+            "Inventory": [
+                "energy related inventory natural gas in storage",
+                "inventory net"
+            ],
+            "Marketable Securities (Short-term)": [
+                "marketable securities current"
+            ],
+            "Prepaid and Other Current Assets": [
+                "assets held for sale current",
+                "derivative assets current",
+                "other assets current"
+            ],
+            "Receivables": [
+                "accounts notes and loans receivable net current",
+                "accounts receivable gross current",
+                "accounts receivable net current",
+                "income tax receivable",
+                "income taxes receivable",
+                "naturalgasimbalancereceivable"
+            ],
+            "Total Current Assets": [
+                "assets current"
+            ]
+        },
+        "Non-Current": {
+            "Deferred Tax Assets": [
+                "deferred income tax assets net",
+                "deferred tax assets liabilities net noncurrent",
+                "deferred income taxes"
+            ],
+            "Goodwill": [
+                "goodwill"
+            ],
+            "Intangible Assets (net)": [
+                "intangible assets net excluding goodwill"
+            ],
+            "Long-term Investments": [
+                "long term investments"
+            ],
+            "Other Non-Current Assets": [
+                "deferred charges and other assets",
+                "notes and loans receivable gross noncurrent",
+                "other assets noncurrent",
+                "regulatory assets"
+            ],
+            "Property, Plant, and Equipment (net)": [
+                "accumulated depreciation depletion and amortization property plant and equipment",
+                "construction in progress gross",
+                "land",
+                "net depreciable property plant and equipment",
+                "property plant and equipment net"
+            ],
+            "Total Non-Current Assets": []
+        },
+        "Total Assets": [
+            "assets"
+        ]
+    },
+    "Equity": {
+        "Accumulated Other Comprehensive Income": [
+            "accumulated other comprehensive income loss net of tax"
+        ],
+        "Common Stock and APIC": [
+            "additional paid in capital",
+            "common stock value",
+            "preferred stock value"
+        ],
+        "Retained Earnings": [
+            "retained earnings accumulated deficit"
+        ],
+        "Total Equity": [
+            "stockholders equity"
+        ],
+        "Treasury Stock": []
+    },
+    "Liabilities": {
+        "Current": {
+            "Accounts Payable and Accrued Expenses": [
+                "accounts payable current",
+                "accrued liabilities current",
+                "interest payable current"
+            ],
+            "Deferred Revenue": [
+                "deferred revenue current"
+            ],
+            "Other Current Liabilities": [
+                "accrued income taxes current",
+                "other accrued liabilities current",
+                "taxes payable current",
+                "loss contingency accrual carrying value current"
+            ],
+            "Short-term Debt": [
+                "debt current",
+                "long term debt current",
+                "long term debt current kinder morgan kansas",
+                "long term debt current kmp"
+            ],
+            "Total Current Liabilities": [
+                "liabilities current"
+            ]
+        },
+        "Non-Current": {
+            "Deferred Tax Liabilities": [
+                "deferred income tax liabilities net",
+                "deferred tax liabilities noncurrent"
+            ],
+            "Lease Liabilities": [],
+            "Long-term Debt": [
+                "long term debt",
+                "long term debt and capital lease obligations",
+                "long term debt excluding preferred interest",
+                "long term debt noncurrent",
+                "unsecured long term debt",
+                "unsecured long term debt kinder morgan kansas inc",
+                "unsecured long term debt kmp",
+                "debt instrument carrying amount of long term portion"
+            ],
+            "Other Non-Current Liabilities": [
+                "deferred credits and other liabilities noncurrent",
+                "derivative instruments and hedges liabilities",
+                "derivative instruments and hedges liabilities noncurrent",
+                "other liabilities noncurrent"
+            ],
+            "Total Non-Current Liabilities": [
+                "liabilities noncurrent"
+            ]
+        },
+        "Total Liabilities": [
+            "liabilities"
+        ]
+    },
+    "Totals": {
+        "Total Liabilities and Equity": [
+            "liabilities and stockholders equity"
+        ]
+    },
+    "__unmapped__": [
+        "accounts payable and accrued liabilities current",
+        "debt fair value adjustments",
+        "derivative instruments and hedges",
+        "minority interest",
+        "preferredinterestingeneralpartnerof k m p",
+        "redeemable noncontrolling interest equity carrying amount",
+        "total other long term liabilities and deferred credits"
+    ]
+}

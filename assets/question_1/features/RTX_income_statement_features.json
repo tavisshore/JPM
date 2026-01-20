@@ -1,0 +1,105 @@
+{
+    "Comprehensive Income": [
+        "comprehensive income net of tax",
+        "comprehensive income net of tax including portion attributable to noncontrolling interest"
+    ],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "cost of goods and services sold",
+            "cost of goods sold",
+            "cost of services"
+        ]
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "net income loss",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [
+            "interest expense"
+        ],
+        "Interest Income": [],
+        "Other Income (Expense)": [
+            "gains losses on extinguishment of debt",
+            "interest income expense nonoperating net",
+            "other expenses",
+            "other income"
+        ],
+        "Total Non-Operating Items": [
+            "nonoperating income expense"
+        ]
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [],
+        "General and Administrative": [
+            "selling general and administrative expense"
+        ],
+        "Other Operating Expenses": [
+            "goodwill impairment loss",
+            "other operating income expense net"
+        ],
+        "Research and Development": [
+            "research and development expense"
+        ],
+        "Sales and Marketing": [],
+        "Total Operating Expenses": []
+    },
+    "Operating Income": [
+        "operating income loss",
+        "other operating income"
+    ],
+    "Other Comprehensive Income": [],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic",
+            "income loss from continuing operations per basic share"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [
+            "weighted average number of shares outstanding basic"
+        ],
+        "Weighted Average Shares Outstanding (Diluted)": [
+            "weighted average number of diluted shares outstanding"
+        ]
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "revenue from contract with customer excluding assessed tax",
+            "revenues",
+            "sales revenue goods net",
+            "sales revenue net",
+            "sales revenue services net"
+        ]
+    },
+    "__unmapped__": [
+        "common stock dividends per share declared",
+        "comprehensive income net of tax attributable to noncontrolling interest",
+        "costs and expenses",
+        "discontinued operation gain loss from disposal of discontinued operation before income tax",
+        "discontinued operation income loss from discontinued operation before income tax",
+        "discontinued operation income loss from discontinued operation during phase out period before income tax",
+        "discontinued operation income loss from discontinued operation during phase out period net of tax",
+        "discontinued operation tax effect of discontinued operation",
+        "disposal group including discontinued operation operating income loss",
+        "disposal group including discontinued operation revenue",
+        "extinguishment of debt amount",
+        "income loss from continuing operations attributable to noncontrolling entity",
+        "income loss from continuing operations including portion attributable to noncontrolling interest",
+        "income loss from discontinued operations net of tax",
+        "income loss from discontinued operations net of tax attributable to noncontrolling interest",
+        "income loss from discontinued operations net of tax attributable to reporting entity",
+        "income loss from discontinued operations net of tax per basic share",
+        "net income loss attributable to noncontrolling interest",
+        "net periodic defined benefits expense reversal of expense excluding service cost component",
+        "income loss from continuing operations before income taxes minority interest and income loss from equity method investments"
+    ]
+}

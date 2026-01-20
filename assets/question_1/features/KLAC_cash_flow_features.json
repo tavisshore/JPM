@@ -1,0 +1,135 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [
+        "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents"
+    ],
+    "Financing Activities": {
+        "Dividends Paid": [
+            "payments of dividends",
+            "payments of dividends common stock",
+            "payments of dividends minority interest"
+        ],
+        "Net Cash from Financing Activities": [
+            "net cash provided by used in financing activities"
+        ],
+        "Other Financing Activities": [
+            "payment for contingent consideration liability financing activities",
+            "payments of debt issuance costs",
+            "payments related to tax withholding for share based compensation",
+            "payments to minority shareholders",
+            "proceeds from disposal of noncontrolling interest",
+            "tax withholding payments related to vested and released restricted stock units"
+        ],
+        "Proceeds from Debt": [
+            "proceeds from debt net of issuance costs",
+            "proceeds from long term lines of credit",
+            "proceeds from sale of available for sale securities debt"
+        ],
+        "Proceeds from Stock Issuance": [
+            "proceeds from issuance of common stock",
+            "stock issued1"
+        ],
+        "Repayment of Debt": [
+            "repayments of long term debt"
+        ],
+        "Stock Repurchases": [
+            "payments for forward contract for accelerated share repurchases",
+            "payments for repurchase of common stock",
+            "stock repurchase program unsettled common stock repurchase"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "noncash or part noncash acquisition contingent consideration payable receivable",
+            "noncash or part noncash acquisition fixed assets acquired1",
+            "noncash or part noncash acquisition holdback consideration payable",
+            "payments to acquire businesses net of cash acquired"
+        ],
+        "Capital Expenditures": [
+            "payments to acquire property plant and equipment"
+        ],
+        "Net Cash from Investing Activities": [
+            "net cash provided by used in investing activities"
+        ],
+        "Other Investing Activities": [
+            "payments to acquire intangible assets",
+            "proceeds from capital related government assistance",
+            "proceeds from divestiture of businesses",
+            "proceeds from sale of productive assets"
+        ],
+        "Purchases of Investments": [
+            "acquisition of non marketable securities",
+            "payments to acquire available for sale securities",
+            "payments to acquire available for sale securities debt",
+            "payments to acquire investments",
+            "payments to acquire other investments",
+            "payments to acquire trading securities heldforinvestment"
+        ],
+        "Sales and Maturities of Investments": [
+            "proceeds from maturities prepayments and calls of available for sale securities",
+            "proceeds from sale and maturity of available for sale securities",
+            "proceeds from sale and maturity of other investments",
+            "proceeds from sale of available for sale securities",
+            "proceeds from sale of other investments",
+            "proceeds from sale of trading securities"
+        ]
+    },
+    "Net Change in Cash": [
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "increase decrease in accounts payable",
+            "increase decrease in accounts receivable",
+            "increase decrease in accounts receivable excluding acquisition related",
+            "increase decrease in contract with customer liability service revenue",
+            "increase decrease in contract with customer liability system revenue",
+            "increase decrease in deferred system profit",
+            "increase decrease in derivative assets and liabilities",
+            "increase decrease in inventories",
+            "increase decrease in other operating assets",
+            "increase decrease in other operating liabilities"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income tax expense benefit"
+        ],
+        "Depreciation and Amortization": [
+            "depreciation depletion and amortization"
+        ],
+        "Interest Paid": [
+            "interest paid net"
+        ],
+        "Net Cash from Operating Activities": [
+            "net cash provided by used in operating activities"
+        ],
+        "Net Income": [
+            "net income loss"
+        ],
+        "Other Non-Cash Items": [
+            "equity securities fv ni unrealized gain loss",
+            "foreign currency transaction gain loss unrealized",
+            "gain loss on sale of business",
+            "gain loss on sale of property plant equipment",
+            "gains losses on extinguishment of debt",
+            "gains losses on sales of other real estate",
+            "goodwill impairment loss",
+            "income taxes paid",
+            "income taxes paid net",
+            "marketable securities gain loss",
+            "other asset impairment charges",
+            "profit loss",
+            "provision for doubtful accounts"
+        ],
+        "Stock-Based Compensation": [
+            "excess tax benefit from share based compensation operating activities",
+            "share based compensation"
+        ]
+    },
+    "__unmapped__": [
+        "contingent consideration payable and other net",
+        "dividends payable current",
+        "gains losseson extinguishmentof debtand other net",
+        "goodwill and intangible asset impairment"
+    ]
+}

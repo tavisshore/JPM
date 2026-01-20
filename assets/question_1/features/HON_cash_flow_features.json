@@ -1,0 +1,120 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [
+        "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents including disposal group and discontinued operations"
+    ],
+    "Financing Activities": {
+        "Dividends Paid": [
+            "payments of dividends common stock"
+        ],
+        "Net Cash from Financing Activities": [
+            "net cash provided by used in financing activities"
+        ],
+        "Other Financing Activities": [
+            "payments for repurchase of redeemable noncontrolling interest",
+            "proceeds from indemnification and reimbursement agreement termination"
+        ],
+        "Proceeds from Debt": [
+            "advansix preseparation funding",
+            "preseparation funding",
+            "prespin borrowing",
+            "proceeds from issuance of long term debt and capital securities net",
+            "proceeds from short term debt",
+            "net decrease increase in commercial paper",
+            "net decrease increase in commercial paper and other shortterm borrowings",
+            "net decrease increase in short term borrowings"
+        ],
+        "Proceeds from Stock Issuance": [
+            "proceeds from issuance or sale of equity"
+        ],
+        "Repayment of Debt": [
+            "repayments of assumed debt",
+            "repayments of long term debt and capital securities",
+            "repayments of short term debt"
+        ],
+        "Stock Repurchases": [
+            "payments for repurchase of common stock"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "payments to acquire businesses net of cash acquired"
+        ],
+        "Capital Expenditures": [
+            "payments to acquire property plant and equipment",
+            "payments to acquire property plant and equipment including discontinued operations"
+        ],
+        "Net Cash from Investing Activities": [
+            "net cash provided by used in investing activities"
+        ],
+        "Other Investing Activities": [
+            "payments for proceeds from derivative instrument investing activities",
+            "proceeds from divestiture of businesses",
+            "proceeds from sale of property plant and equipment"
+        ],
+        "Purchases of Investments": [
+            "payments to acquire investments"
+        ],
+        "Sales and Maturities of Investments": [
+            "proceeds from sale maturity and collections of investments"
+        ]
+    },
+    "Net Change in Cash": [
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "increase decrease in accounts and notes receivable",
+            "increase decrease in accounts payable",
+            "increase decrease in accounts receivable",
+            "increase decrease in accrued liabilities",
+            "increase decrease in income taxes",
+            "increase decrease in inventories",
+            "increase decrease in other current assets",
+            "increase decrease in other noncurrent assets"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income taxes and tax credits"
+        ],
+        "Depreciation and Amortization": [
+            "adjustment for amortization",
+            "depreciation",
+            "depreciation depletion and amortization including discontinued operations"
+        ],
+        "Interest Paid": [],
+        "Net Cash from Operating Activities": [
+            "net cash provided by used in operating activities"
+        ],
+        "Net Income": [
+            "net income loss"
+        ],
+        "Other Non-Cash Items": [
+            "gain loss on sale of nonstrategic businesses and assets",
+            "gain loss on sale of nonstrategic businesses and assets including discontinued operations",
+            "impairment of long lived assets to be disposed of",
+            "loss contingency accrual buyout",
+            "marketable securities realized gain loss",
+            "other noncash income expense",
+            "pension and other postretirement benefit contributions",
+            "pension and other postretirement benefit expense",
+            "pension and other postretirement benefits expense reversal of expense noncash",
+            "restructuring costs"
+        ],
+        "Stock-Based Compensation": [
+            "excess tax benefit from share based compensation operating activities",
+            "share based compensation"
+        ]
+    },
+    "__unmapped__": [
+        "advansix cash at spinoff",
+        "cash received by honeywell",
+        "gain loss on sale of nonstrategic businesses and assets and other",
+        "net income loss attributable to noncontrolling interest",
+        "net payments for repositioning and other charges",
+        "proceeds from repayments of commercial paper",
+        "proceeds from repayments of short term debt",
+        "profit loss",
+        "spinoff cash"
+    ]
+}

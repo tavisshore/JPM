@@ -1,0 +1,220 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [],
+    "Financing Activities": {
+        "Dividends Paid": [
+            "payments of dividends common stock",
+            "payments of dividends minority interest",
+            "payments of dividends preferred stock and preference stock"
+        ],
+        "Net Cash from Financing Activities": [
+            "net cash provided by used in financing activities"
+        ],
+        "Other Financing Activities": [
+            "capital lease obligations incurred",
+            "federal financing bank loan issuance costs",
+            "gains losses on extinguishment of debt before write off of deferred debt issuance cost",
+            "interest bearing refundable deposit related to asset sale",
+            "payments of capital distribution",
+            "payments to minority shareholders",
+            "pension and other postretirement benefit contributions",
+            "premium for early debt extinguishment",
+            "proceeds from contributions from parent",
+            "proceeds from minority shareholders",
+            "proceeds from payments for other financing activities",
+            "purchase of membership interests from noncontrolling interests",
+            "purchaseof membership interestsfrom noncontrolling interests",
+            "return of capital",
+            "right of use asset obtained in exchange for finance lease liability",
+            "right of use asset obtained in exchange for operating and finance lease liability",
+            "right of use asset obtained in exchange for operating lease liability",
+            "right of use asset obtained in exchange for operating lease liability reassessment",
+            "gains losses on extinguishment of debt before write off of deferred debt issuance cost"
+        ],
+        "Proceeds from Debt": [
+            "federal financing bank loan",
+            "longterm debt issuance to parent company",
+            "proceeds from bonds other",
+            "proceeds from federal financing bank loan",
+            "proceeds from guarantee obligation",
+            "proceeds from issuance of first mortgage bond",
+            "proceeds from issuance of long term debt",
+            "proceeds from issuance of long term debt and capital securities net",
+            "proceeds from issuance of other long term debt",
+            "proceeds from issuance of senior long term debt",
+            "proceeds from notes payable",
+            "proceeds from other short term debt",
+            "proceeds from pollution control bond"
+        ],
+        "Proceeds from Stock Issuance": [
+            "proceeds from issuance of common stock",
+            "proceeds from issuance of preferred stock and preference stock",
+            "stock issued1"
+        ],
+        "Repayment of Debt": [
+            "longterm debt redemption to parent company",
+            "repayment long term debt to affiliate trust",
+            "repayment of interestbearing refundable deposit related to asset sale",
+            "repayments of debt and capital lease obligations",
+            "repayments of gas facility revenue bonds",
+            "repayments of long term capital lease obligations",
+            "repayments of long term debt",
+            "repayments of medium term notes",
+            "repayments of notes payable",
+            "repayments of other long term debt",
+            "repayments of other revenue bonds",
+            "repayments of other short term debt",
+            "repayments of senior debt"
+        ],
+        "Stock Repurchases": [
+            "payments for repurchase of common stock",
+            "payments for repurchase of preferred stock and preference stock"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "noncash or part noncash acquisition debt assumed1",
+            "noncash or part noncash acquisition value of assets acquired1",
+            "payments to acquire businesses gross",
+            "payments to acquire businesses net of cash acquired"
+        ],
+        "Capital Expenditures": [
+            "capital expenditures incurred but not yet paid",
+            "payments to acquire other property plant and equipment",
+            "payments to acquire property plant and equipment"
+        ],
+        "Net Cash from Investing Activities": [
+            "net cash provided by used in investing activities"
+        ],
+        "Other Investing Activities": [
+            "asset retirement obligation cash paid to settle",
+            "government grant proceeds",
+            "payments for investment in restricted cash",
+            "payments for investment in restricted cash from revenue bond",
+            "payments for proceeds from other investing activities",
+            "payments for removal costs",
+            "payments pursuant to long term service agreements",
+            "payments pursuantto long term service agreementsandfor equipment not yet received",
+            "payments to invest in decommissioning fund",
+            "proceeds from capital grant",
+            "proceeds from contribution in aid of construction",
+            "proceeds from decommissioning fund",
+            "proceeds from distribution of restricted cash",
+            "proceeds from distribution of restricted cash from pollution control bond",
+            "proceeds from distribution of restricted cash from revenue bond",
+            "proceeds from divestiture of businesses net of cash divested",
+            "proceeds from equity method investment dividends or distributions return of capital",
+            "proceeds from sale of productive assets",
+            "proceeds from sale of property plant and equipment",
+            "payments for removal costs"
+        ],
+        "Purchases of Investments": [
+            "payments to acquire equity method investments"
+        ],
+        "Sales and Maturities of Investments": []
+    },
+    "Net Change in Cash": [
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease excluding exchange rate effect",
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "change in construction payables",
+            "change in construction payables net of joint owner portion",
+            "customer liability associated with kemper refunds",
+            "increase decrease in accounts payable",
+            "increase decrease in accrued salaries",
+            "increase decrease in accrued taxes",
+            "increase decrease in accrued taxes payable",
+            "increase decrease in contract with customer asset",
+            "increase decrease in customer refunds",
+            "increase decrease in deferred charges",
+            "increase decrease in deposits",
+            "increase decrease in fossil fuel inventories",
+            "increase decrease in income taxes receivable",
+            "increase decrease in interest payable net",
+            "increase decrease in materials and supplies",
+            "increase decrease in natural gas cost under recovery current portion",
+            "increase decrease in other operating assets",
+            "increase decrease in other operating liabilities",
+            "increase decrease in over energy recovery",
+            "increase decrease in prepaid expense",
+            "increase decrease in prepaid taxes",
+            "increase decrease in receivables",
+            "increase decrease in recoverable property damage costs",
+            "increase decrease in regulatory clause revenue",
+            "increase decrease retail fuel cost over recovery short term",
+            "increase decrease retail fuel cost under recovery short term",
+            "increase decreasein energy related inventory natural gasin storage",
+            "liability for unpaid claims and claims adjustment expense period increase decrease natural disasters"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income tax expense benefit"
+        ],
+        "Depreciation and Amortization": [
+            "amortization of deferred investment tax credits",
+            "depreciation amortization and accretion net"
+        ],
+        "Interest Paid": [
+            "interest paid capitalized",
+            "interest paid net"
+        ],
+        "Net Cash from Operating Activities": [
+            "net cash provided by used in operating activities"
+        ],
+        "Net Income": [
+            "leveraged leases income statement net income from leveraged leases",
+            "profit loss"
+        ],
+        "Other Non-Cash Items": [
+            "asset impairment charges",
+            "contribution of property",
+            "derivative gain loss on derivative net",
+            "disposal group not discontinued operation gain loss on disposal",
+            "estimated loss on integrated coal gasification combined cycle project non cash",
+            "estimated loss on plant vogtle units3 and4 non cash adjusted",
+            "estimated loss on plants under construction non cash adjusted",
+            "gain loss on disposition of assets1",
+            "gain loss on sale of property",
+            "goodwill impairment loss",
+            "hedge settlements",
+            "income tax credits and adjustments",
+            "income tax reconciliation tax credits investment",
+            "income taxes paid net",
+            "investment tax credit",
+            "lease and asset impairment charges",
+            "losson power plant unit",
+            "noncash or part noncash transaction contributions from noncontrolling interests",
+            "noncash transaction long term service agreement credits utilized",
+            "other non cash activities relatedto energy services",
+            "other noncash income expense",
+            "pension and other postretirement benefit expense"
+        ],
+        "Stock-Based Compensation": [
+            "stock option plan expense"
+        ]
+    },
+    "__unmapped__": [
+        "certain regulatory assets",
+        "contract amendment",
+        "integrated coal gasification combined cycle regulatory deferral",
+        "mirror construction work in progress",
+        "natural disaster reserve",
+        "natural gas cost under recovery long term",
+        "prepaid long term service agreement",
+        "promissory note",
+        "public utilities allowance for funds used during construction capitalized cost of equity",
+        "receivables relatedto energy services",
+        "recognition of deferred expenses",
+        "recognition of deferred revenue",
+        "regulatory assets associated with integrated coal gasification combined cycle project",
+        "regulatory deferrals",
+        "retail fuel cost over recovery long term",
+        "retail fuel cost under recovery long term",
+        "storm damage cost recovery noncurrent",
+        "storm damage provision",
+        "storm damage provision and reliability reserve provision",
+        "under recovered regulatory clause"
+    ]
+}

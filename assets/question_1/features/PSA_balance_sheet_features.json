@@ -1,0 +1,103 @@
+{
+    "Assets": {
+        "Current": {
+            "Cash and Equivalents": [
+                "cash and cash equivalents at carrying value"
+            ],
+            "Inventory": [],
+            "Marketable Securities (Short-term)": [],
+            "Prepaid and Other Current Assets": [
+                "prepaid expense and other assets"
+            ],
+            "Receivables": [
+                "due from related parties"
+            ],
+            "Total Current Assets": []
+        },
+        "Non-Current": {
+            "Deferred Tax Assets": [],
+            "Goodwill": [
+                "goodwill"
+            ],
+            "Intangible Assets (net)": [
+                "development in process",
+                "intangible assets net excluding goodwill"
+            ],
+            "Long-term Investments": [
+                "held to maturity securities",
+                "investments in affiliates subsidiaries associates and joint ventures"
+            ],
+            "Other Non-Current Assets": [
+                "other assets"
+            ],
+            "Property, Plant, and Equipment (net)": [
+                "investment building and building improvements",
+                "land",
+                "real estate facilities net",
+                "real estate investment property accumulated depreciation",
+                "real estate investment property at cost",
+                "real estate investment property net"
+            ],
+            "Total Non-Current Assets": []
+        },
+        "Total Assets": [
+            "assets"
+        ]
+    },
+    "Equity": {
+        "Accumulated Other Comprehensive Income": [
+            "accumulated other comprehensive income loss net of tax"
+        ],
+        "Common Stock and APIC": [
+            "additional paid in capital",
+            "common stock value",
+            "preferred stock value"
+        ],
+        "Retained Earnings": [
+            "retained earnings accumulated deficit"
+        ],
+        "Total Equity": [
+            "stockholders equity"
+        ],
+        "Treasury Stock": []
+    },
+    "Liabilities": {
+        "Current": {
+            "Accounts Payable and Accrued Expenses": [],
+            "Deferred Revenue": [],
+            "Other Current Liabilities": [],
+            "Short-term Debt": [
+                "notes payable",
+                "short term borrowings"
+            ],
+            "Total Current Liabilities": []
+        },
+        "Non-Current": {
+            "Deferred Tax Liabilities": [],
+            "Lease Liabilities": [],
+            "Long-term Debt": [
+                "loans payable to bank",
+                "long term debt",
+                "unsecured debt"
+            ],
+            "Other Non-Current Liabilities": [],
+            "Total Non-Current Liabilities": []
+        },
+        "Total Liabilities": [
+            "liabilities"
+        ]
+    },
+    "Totals": {
+        "Total Liabilities and Equity": [
+            "liabilities and stockholders equity"
+        ]
+    },
+    "__unmapped__": [
+        "accrued liabilities current and noncurrent",
+        "intangible assets net including goodwill",
+        "minority interest",
+        "redeemable noncontrolling interest equity carrying amount",
+        "redeemable noncontrolling interest equity preferred redemption value",
+        "temporary equity carrying amount"
+    ]
+}

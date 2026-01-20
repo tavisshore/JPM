@@ -1,0 +1,93 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [],
+    "Dividends Declared": [
+        "dividends common stock",
+        "dividends preferred stock"
+    ],
+    "Dividends Paid": [
+        "dividends cash"
+    ],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "net income loss",
+        "profit loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [
+            "other comprehensive income loss derivatives qualifying as hedges net of tax"
+        ],
+        "Foreign Currency Translation": [
+            "other comprehensive income foreign currency transaction and translation adjustment net of tax portion attributable to parent"
+        ],
+        "Other OCI": [
+            "cumulative debt valuation adjustment net of tax attributable to parent",
+            "other comprehensive income minimum pension liability net adjustment net of tax"
+        ],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax",
+            "other comprehensive income loss net of tax excluding portion attributable to redeemable noncontrolling interest"
+        ],
+        "Unrealized Gains/Losses on Securities": [
+            "available for sale securities change in net unrealized holding gain loss net of tax"
+        ]
+    },
+    "Other Equity Adjustments": [
+        "adjustments to additional paid in capital reallocation of minority interest",
+        "cumulative effect of new accounting principle in periods of adoption",
+        "gain loss on subsidiary transaction",
+        "stockholders equity other"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [],
+        "Other Stock Issuance": [
+            "preferred stock issued",
+            "stock issued during period value acquisitions",
+            "stock issued during period value new issues"
+        ],
+        "Stock-Based Compensation": [
+            "stock issued during period value share based compensation"
+        ],
+        "Total Stock Issuance Value": []
+    },
+    "Stock Repurchases": [
+        "stock redeemed or called during period value"
+    ],
+    "Tax Effects from Stock Compensation": [
+        "stock issued during period value share based compensation net of tax"
+    ],
+    "__unmapped__": [
+        "increase decrease in non controlling interest from consolidation",
+        "minority interest change in redemption value",
+        "minority interest decrease from distributions to noncontrolling interest holders",
+        "minority interest decrease from redemptions",
+        "minority interest increase from stock issuance",
+        "minority interest period increase decrease",
+        "net income loss attributable to nonredeemable noncontrolling interest",
+        "noncontrolling interest decrease from deconsolidation",
+        "noncontrolling interest reclassification to redeemable noncontrolling interest",
+        "nonredeemable noncontrolling interest attributable from net income loss",
+        "nonredeemable noncontrolling interest period increase decrease",
+        "other comprehensive income foreign currency transaction and translation adjustment net of tax portion attributable to noncontrolling interest",
+        "stock conversion related to subsidiary",
+        "payments related to common stock repurchase and tax withholding for share based compensation",
+        "treasury stock value acquired cost method and employee tax withholdings"
+    ],
+    "Treasury Stock": [
+        "treasury stock value acquired cost method"
+    ]
+}

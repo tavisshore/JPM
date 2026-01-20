@@ -1,0 +1,115 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [
+        "effect of exchange rate on cash and cash equivalents",
+        "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents"
+    ],
+    "Financing Activities": {
+        "Dividends Paid": [
+            "payments of dividends"
+        ],
+        "Net Cash from Financing Activities": [
+            "net cash provided by used in financing activities"
+        ],
+        "Other Financing Activities": [
+            "collateral for derivatives received returned financing activities",
+            "payments to acquire additional interest in subsidiaries financing activities",
+            "payments to minority shareholders",
+            "proceeds from minority shareholders",
+            "proceeds from payments for other financing activities",
+            "proceeds from payments to minority shareholders"
+        ],
+        "Proceeds from Debt": [
+            "proceeds from issuance of long term debt",
+            "proceeds from issuance of other long term debt",
+            "proceeds from lines of credit",
+            "proceeds from repayments of short term debt",
+            "proceeds from repayments of short term debt maturing in three months or less",
+            "proceeds from short term debt maturing in more than three months"
+        ],
+        "Proceeds from Stock Issuance": [
+            "proceeds from issuance of common stock"
+        ],
+        "Repayment of Debt": [
+            "repayments of lines of credit",
+            "repayments of long term debt",
+            "repayments of short term debt maturing in more than three months"
+        ],
+        "Stock Repurchases": [
+            "payments for repurchase of common stock"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "cash acquired from acquisition",
+            "payments to acquire businesses and assets net of cash acquired",
+            "payments to acquire businesses net of cash acquired",
+            "payments to acquire interest in subsidiaries and affiliates"
+        ],
+        "Capital Expenditures": [
+            "payments to acquire property plant and equipment"
+        ],
+        "Net Cash from Investing Activities": [
+            "net cash provided by used in investing activities"
+        ],
+        "Other Investing Activities": [
+            "cash divested from deconsolidation",
+            "collateral for derivatives paidreturned investing activities",
+            "payments for proceeds from hedge investing activities",
+            "payments to acquire intangible assets",
+            "payments to acquire projects",
+            "proceeds from divestiture of businesses"
+        ],
+        "Purchases of Investments": [
+            "payments to acquire equity method investments"
+        ],
+        "Sales and Maturities of Investments": []
+    },
+    "Net Change in Cash": [
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "increase decrease in accounts payable",
+            "increase decrease in accrued income taxes payable",
+            "increase decrease in accrued liabilities and other current assets",
+            "increase decrease in inventories",
+            "increase decrease in other operating capital net",
+            "increase decrease in receivables"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income tax expense benefit"
+        ],
+        "Depreciation and Amortization": [
+            "depreciation and amortization"
+        ],
+        "Interest Paid": [
+            "interest paid",
+            "interest paid net"
+        ],
+        "Net Cash from Operating Activities": [
+            "net cash provided by used in operating activities"
+        ],
+        "Net Income": [
+            "profit loss"
+        ],
+        "Other Non-Cash Items": [
+            "asset impairment and exit costs net of cash paid",
+            "defined benefit plan plan assets pension plan contributions net of refunds",
+            "disposal group not discontinued operation gain loss on disposal",
+            "disposal group not discontinued operation gain loss on disposal including tax",
+            "disposal group not discontinued operation loss gain on write down",
+            "equity securities without readily determinable fair value impairment loss annual amount",
+            "goodwill and intangible asset impairment",
+            "impairment of intangible assets excluding goodwill",
+            "income taxes paid net",
+            "pension contributions"
+        ],
+        "Stock-Based Compensation": []
+    },
+    "__unmapped__": [
+        "depreciation amortization and impairment",
+        "restructuring costs and asset impairment charges"
+    ]
+}

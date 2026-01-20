@@ -1,0 +1,127 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "direct costs of leased and rented property or equipment"
+        ]
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "income loss from continuing operations including portion attributable to noncontrolling interest",
+        "net income loss",
+        "net income loss available to common stockholders basic"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [
+            "interest expense deposits",
+            "interest expense long term debt",
+            "interest expense operating",
+            "interest expense other",
+            "interest expense short term borrowings"
+        ],
+        "Interest Income": [
+            "dividend income equity securities operating",
+            "interest and dividend income operating",
+            "interest and dividend income securities",
+            "interest and dividend income securities available for sale",
+            "interest and dividend income securities trading or measured at fair value",
+            "interest and fee income loans and leases held for sale",
+            "interest and fee income loans and leases held in portfolio",
+            "interest and fee income loans held for sale mortgages",
+            "interest and fee income nonmortgage loans and leases held for sale",
+            "interest income debt securities operating",
+            "interest income other",
+            "other interest and dividend income"
+        ],
+        "Other Income (Expense)": [
+            "debt and equity securities realized gain loss",
+            "debt securities credit loss expense reversal",
+            "debt securities gain loss1",
+            "fees and commissions lending activities1",
+            "fees and commissions mortgage banking and servicing",
+            "fees and commissions on deposit accounts and lending activities",
+            "fiduciary and trust member",
+            "financial service other member",
+            "gain loss on sale of debt investments",
+            "gains losses from equity investments",
+            "interest income expense after provision for loan loss",
+            "interest income expense net",
+            "net gains losses from equity investments",
+            "noninterest income",
+            "noninterest income other operating income",
+            "trading gains losses"
+        ],
+        "Total Non-Operating Items": []
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "amortization of intangible assets"
+        ],
+        "General and Administrative": [
+            "information technology communications and equipment expense",
+            "labor and related expense",
+            "occupancy net",
+            "other labor related expenses",
+            "professional and contract services expense",
+            "salaries wages and officers compensation"
+        ],
+        "Other Operating Expenses": [
+            "equipment expense",
+            "federal deposit insurance corporation premium expense",
+            "other noninterest expense",
+            "provision for loan and lease losses",
+            "provision for loan lease and other losses",
+            "restructuring charges"
+        ],
+        "Research and Development": [],
+        "Sales and Marketing": [
+            "commission and incentive compensation",
+            "marketing and advertising expense"
+        ],
+        "Total Operating Expenses": [
+            "noninterest expense"
+        ]
+    },
+    "Operating Income": [
+        "operating losses"
+    ],
+    "Other Comprehensive Income": [],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [
+            "weighted average number of shares outstanding basic"
+        ],
+        "Weighted Average Shares Outstanding (Diluted)": [
+            "weighted average number of diluted shares outstanding"
+        ]
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "insurance services revenue",
+            "lease income lessor",
+            "operating leases income statement lease revenue",
+            "revenue from contract with customer excluding assessed tax",
+            "revenues net of interest expense",
+            "total credit and debit card fees"
+        ]
+    },
+    "__unmapped__": [
+        "common stock dividends per share declared",
+        "deposit account member",
+        "net income loss attributable to noncontrolling interest",
+        "preferred stock dividend accretion and other",
+        "preferred stock dividends and other adjustments",
+        "income loss from continuing operations before income taxes minority interest and income loss from equity method investments"
+    ]
+}

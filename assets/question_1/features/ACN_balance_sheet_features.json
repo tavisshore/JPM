@@ -1,0 +1,126 @@
+{
+    "Assets": {
+        "Current": {
+            "Cash and Equivalents": [
+                "cash and cash equivalents at carrying value"
+            ],
+            "Inventory": [],
+            "Marketable Securities (Short-term)": [
+                "short term investments"
+            ],
+            "Prepaid and Other Current Assets": [
+                "deferred costs",
+                "other assets current"
+            ],
+            "Receivables": [
+                "accounts receivable net current",
+                "unbilled services net current"
+            ],
+            "Total Current Assets": [
+                "assets current"
+            ]
+        },
+        "Non-Current": {
+            "Deferred Tax Assets": [
+                "deferred income tax assets net",
+                "deferred tax assets net noncurrent"
+            ],
+            "Goodwill": [
+                "goodwill"
+            ],
+            "Intangible Assets (net)": [
+                "finite lived intangible assets net"
+            ],
+            "Long-term Investments": [
+                "long term investments"
+            ],
+            "Other Non-Current Assets": [
+                "contract with customer asset net noncurrent",
+                "operating lease right of use asset",
+                "other assets noncurrent"
+            ],
+            "Property, Plant, and Equipment (net)": [
+                "property plant and equipment net"
+            ],
+            "Total Non-Current Assets": [
+                "assets noncurrent"
+            ]
+        },
+        "Total Assets": [
+            "assets"
+        ]
+    },
+    "Equity": {
+        "Accumulated Other Comprehensive Income": [
+            "accumulated other comprehensive income loss net of tax"
+        ],
+        "Common Stock and APIC": [
+            "additional paid in capital",
+            "common stock value",
+            "other additional capital"
+        ],
+        "Retained Earnings": [
+            "retained earnings accumulated deficit"
+        ],
+        "Total Equity": [
+            "stockholders equity"
+        ],
+        "Treasury Stock": [
+            "treasury stock shares",
+            "treasury stock value"
+        ]
+    },
+    "Liabilities": {
+        "Current": {
+            "Accounts Payable and Accrued Expenses": [
+                "accounts payable current",
+                "employee related liabilities current"
+            ],
+            "Deferred Revenue": [
+                "deferred revenue current"
+            ],
+            "Other Current Liabilities": [
+                "accrued income taxes current",
+                "sales and excise tax payable current",
+                "other liabilities current",
+                "operating lease liability current"
+            ],
+            "Short-term Debt": [
+                "debt current"
+            ],
+            "Total Current Liabilities": [
+                "liabilities current"
+            ]
+        },
+        "Non-Current": {
+            "Deferred Tax Liabilities": [
+                "deferred income tax liabilities net"
+            ],
+            "Lease Liabilities": [],
+            "Long-term Debt": [
+                "long term debt and capital lease obligations"
+            ],
+            "Other Non-Current Liabilities": [
+                "other liabilities noncurrent",
+                "pension and other postretirement defined benefit plans liabilities noncurrent"
+            ],
+            "Total Non-Current Liabilities": [
+                "liabilities noncurrent"
+            ]
+        },
+        "Total Liabilities": []
+    },
+    "Totals": {
+        "Total Liabilities and Equity": [
+            "liabilities and stockholders equity"
+        ]
+    },
+    "__unmapped__": [
+        "common stock par or stated value per share",
+        "common stock shares authorized",
+        "common stock shares issued",
+        "common stock shares outstanding",
+        "minority interest",
+        "receivables and contract assets"
+    ]
+}

@@ -1,0 +1,117 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": []
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes and noncontrolling interest"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "income loss from continuing operations including portion attributable to noncontrolling interest",
+        "net income loss",
+        "net income loss available to common stockholders",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [
+            "interest expense abstract",
+            "interest expense borrowings",
+            "interest expense deposits",
+            "interest expense operating"
+        ],
+        "Interest Income": [
+            "interest and dividend income operating",
+            "interest and dividend income securities",
+            "interest and fee income loans and leases",
+            "other interest and dividend income"
+        ],
+        "Other Income (Expense)": [
+            "consumer services noninterest income",
+            "debt and equity securities gain loss",
+            "gain loss on sale of securities net",
+            "gain loss on sale of stock in subsidiary or equity method investee",
+            "gain loss on shares exchange program",
+            "interest revenue expense net",
+            "other than temporary impairment losses investments portion recognized in earnings net",
+            "noninterest income",
+            "noninterest income other",
+            "residential mortgage noninterest income"
+        ],
+        "Total Non-Operating Items": []
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [],
+        "General and Administrative": [
+            "labor and related expense",
+            "occupancy net"
+        ],
+        "Other Operating Expenses": [
+            "equipment expense",
+            "financing receivable credit loss and off balance sheet credit loss liability expense recovery",
+            "impairment of investments",
+            "other noninterest expense",
+            "provision for loan lease and other losses"
+        ],
+        "Research and Development": [],
+        "Sales and Marketing": [
+            "marketing and advertising expense"
+        ],
+        "Total Operating Expenses": []
+    },
+    "Operating Income": [],
+    "Other Comprehensive Income": [
+        "other than temporary impairment losses investments portion in other comprehensive income loss before tax including portion attributable to noncontrolling interest"
+    ],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic",
+            "income loss from continuing operations per basic share"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted",
+            "income loss from continuing operations per diluted share"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [
+            "weighted average number of shares outstanding basic"
+        ],
+        "Weighted Average Shares Outstanding (Diluted)": [
+            "weighted average number of diluted shares outstanding"
+        ]
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "brokerage commissions revenue",
+            "card and cash management revenue",
+            "corporate banking revenue",
+            "investment advisory management and administrative service member",
+            "investment banking revenue",
+            "lending and deposit services revenue",
+            "residential and commercial mortgage revenue",
+            "revenue from contract with customer excluding assessed tax",
+            "revenues"
+        ]
+    },
+    "__unmapped__": [
+        "comprehensive income net of tax attributable to noncontrolling interest",
+        "deposit account member",
+        "discontinued operation income loss from discontinued operation before income tax",
+        "discontinued operation tax effect of discontinued operation",
+        "income loss from continuing operations attributable to noncontrolling entity",
+        "income loss from discontinued operations net of tax",
+        "income loss from discontinued operations net of tax attributable to reporting entity",
+        "income loss from discontinued operations net of tax per basic share",
+        "income loss from discontinued operations net of tax per diluted share",
+        "net income loss attributable to noncontrolling interest",
+        "noninterest expense",
+        "preferred stock discount accretion and redemptions",
+        "preferred stock discount accretion and redemptions eps",
+        "preferred stock dividends and other adjustments",
+        "preferred stock dividends income statement impact",
+        "income loss from continuing operations before income taxes and noncontrolling interests",
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ]
+}

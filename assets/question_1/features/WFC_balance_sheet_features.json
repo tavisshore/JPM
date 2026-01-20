@@ -1,0 +1,125 @@
+{
+    "Assets": {
+        "Current": {
+            "Cash and Equivalents": [
+                "cash and due from banks",
+                "interest bearing deposits in banks"
+            ],
+            "Inventory": [],
+            "Marketable Securities (Short-term)": [
+                "available for sale securities",
+                "available for sale securities debt securities",
+                "debt securities available for sale excluding accrued interest",
+                "equity securities f v n iandwithout readily determinable fair value",
+                "equity securities fv ni and without readily determinable fair value",
+                "federal funds sold securities purchased under resale agreements other short term investments",
+                "trading assets",
+                "trading securities debt"
+            ],
+            "Prepaid and Other Current Assets": [
+                "derivative assets"
+            ],
+            "Receivables": [
+                "financing receivable and net investment in lease excluding accrued interest after allowance for credit loss",
+                "financing receivable and net investment in lease excluding accrued interest before allowance for credit loss",
+                "loans and leases receivable allowance",
+                "loans and leases receivable net of deferred income",
+                "loans held for sale mortgages",
+                "loans held for sale net",
+                "loans held for sale other",
+                "loans receivable held for sale net not part of disposal group",
+                "loans receivable held for sale net not part of disposal group mortgage",
+                "loans receivable held for sale net not part of disposal group other",
+                "notes receivable gross"
+            ],
+            "Total Current Assets": []
+        },
+        "Non-Current": {
+            "Deferred Tax Assets": [],
+            "Goodwill": [
+                "goodwill"
+            ],
+            "Intangible Assets (net)": [],
+            "Long-term Investments": [
+                "debt securities held to maturity excluding accrued interest after allowance for credit loss",
+                "held to maturity securities",
+                "equity securities fv ni current and noncurrent"
+            ],
+            "Other Non-Current Assets": [
+                "other assets",
+                "servicing asset",
+                "servicing asset at amortized value",
+                "servicing asset at fair value amount"
+            ],
+            "Property, Plant, and Equipment (net)": [
+                "property plant and equipment net"
+            ],
+            "Total Non-Current Assets": []
+        },
+        "Total Assets": [
+            "assets"
+        ]
+    },
+    "Equity": {
+        "Accumulated Other Comprehensive Income": [
+            "accumulated other comprehensive income loss net of tax"
+        ],
+        "Common Stock and APIC": [
+            "additional paid in capital",
+            "common stock value",
+            "minority interest",
+            "preferred stock value"
+        ],
+        "Retained Earnings": [
+            "retained earnings accumulated deficit"
+        ],
+        "Total Equity": [
+            "stockholders equity"
+        ],
+        "Treasury Stock": [
+            "treasury stock value",
+            "unearned e s o p shares cost"
+        ]
+    },
+    "Liabilities": {
+        "Current": {
+            "Accounts Payable and Accrued Expenses": [
+                "accounts payable and accrued liabilities current and noncurrent"
+            ],
+            "Deferred Revenue": [],
+            "Other Current Liabilities": [
+                "deposits",
+                "derivative liabilities",
+                "interest bearing deposit liabilities",
+                "noninterest bearing deposit liabilities"
+            ],
+            "Short-term Debt": [
+                "short term borrowings"
+            ],
+            "Total Current Liabilities": []
+        },
+        "Non-Current": {
+            "Deferred Tax Liabilities": [],
+            "Lease Liabilities": [],
+            "Long-term Debt": [
+                "long term debt"
+            ],
+            "Other Non-Current Liabilities": [],
+            "Total Non-Current Liabilities": []
+        },
+        "Total Liabilities": [
+            "liabilities"
+        ]
+    },
+    "Totals": {
+        "Total Liabilities and Equity": [
+            "liabilities and stockholders equity"
+        ]
+    },
+    "__unmapped__": [
+        "cash cash equivalents restricted cash and restricted cash equivalents",
+        "federal funds sold securities purchased under resale agreements and other short term investments",
+        "financing receivable and net investment in lease allowance for loan losses excluding accrued interest",
+        "property plant and equipment and finance lease right of use asset after accumulated depreciation and amortization"
+    ]
+}

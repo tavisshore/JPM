@@ -1,0 +1,105 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [
+        "comprehensive income net of tax"
+    ],
+    "Dividends Declared": [],
+    "Dividends Paid": [
+        "dividends cash"
+    ],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "net income including portion attributable to nonredeemable non controlling interest",
+        "net income loss",
+        "net income loss including portion attributable to nonredeemable noncontrolling interest",
+        "profit loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [
+            "other comprehensive income unrealized gain loss on derivatives arising during period net of tax"
+        ],
+        "Foreign Currency Translation": [
+            "other comprehensive income foreign currency transaction and translation adjustment net of tax period increase decrease",
+            "other comprehensive income loss foreign currency transaction and translation adjustment net of tax"
+        ],
+        "Other OCI": [
+            "other comprehensive income defined benefit plans adjustment net of tax period increase decrease",
+            "other comprehensive income loss pension and other postretirement benefit plans adjustment net of tax"
+        ],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax",
+            "other comprehensive income loss net of tax portion attributable to parent"
+        ],
+        "Unrealized Gains/Losses on Securities": [
+            "other comprehensive income loss unrealized holding gain loss on securities arising during period including reclassification adjustments net of tax",
+            "other comprehensive income unrealized holding gain loss on securities arising during period net of tax"
+        ]
+    },
+    "Other Equity Adjustments": [
+        "adjustments to additional paid in capital other",
+        "cumulative effectof adoptionof accounting standards update",
+        "new accounting pronouncement or change in accounting principle effect of adoption quantification",
+        "stockholders equity other"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [
+            "stock issued during period shares stock options exercised",
+            "stock issued during period value stock options exercised"
+        ],
+        "Other Stock Issuance": [
+            "sale of stock consideration received on transaction",
+            "stock issued during period shares employee stock purchase plans",
+            "stock issued during period shares new issues",
+            "stock issued during period shares other",
+            "stock issued during period to partner exchange",
+            "stock issued during period value acquisitions",
+            "stock issued during period value employee stock purchase plan",
+            "stock issued during period value other",
+            "stock issued to related parties during period shares",
+            "stock issued to related parties during period value"
+        ],
+        "Stock-Based Compensation": [
+            "stock granted during period value sharebased compensation gross",
+            "stock issued during period shares issued for services",
+            "stock issued during period shares restricted stock award gross",
+            "stock issued during period shares restricted stock award net of forfeitures",
+            "stock issued during period value issued for services",
+            "stock issued during period value restricted stock award net of forfeitures",
+            "vesting of issued restricted stock"
+        ],
+        "Total Stock Issuance Value": []
+    },
+    "Stock Repurchases": [
+        "stock repurchased and retired during period shares",
+        "stock repurchased during period shares",
+        "stock repurchased during period value"
+    ],
+    "Tax Effects from Stock Compensation": [
+        "adjustments to additional paid in capital tax effect from share based compensation"
+    ],
+    "__unmapped__": [
+        "minority interest decrease from redemptions",
+        "minority interest period increase decrease",
+        "net income loss attributable to noncontrolling interest",
+        "net income loss attributable to redeemable noncontrolling interest",
+        "noncontrolling interest decrease from deconsolidation",
+        "noncontrolling interest increase from business combination",
+        "purchaseof noncontrollinginterestcostbasis",
+        "tax benefit from partnership allocation",
+        "treasury stock acquired average cost per share"
+    ]
+}
