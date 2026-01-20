@@ -1,5 +1,14 @@
 # JPM - MLCOE Internship Exercises
 
+<p align="center">
+  <a href="https://www.linkedin.com/in/tavisshore/">
+    <img src="https://img.shields.io/badge/Tavis_Shore-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="Tavis Shore">
+  </a>
+  <a href="https://www.linkedin.com/in/sanaamironov/">
+    <img src="https://img.shields.io/badge/Sanaa_Mironov-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="Sanaa Mironov">
+  </a>
+</p>
+
 ## Setup
 Create a clean Python 3.10 environment and install the package:
 ```bash
