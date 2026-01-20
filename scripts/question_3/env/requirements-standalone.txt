@@ -1,9 +1,27 @@
-# Standalone environment (TF + TFP, no choice-learn)
-numpy<2
-pandas
-scipy
-tqdm
-matplotlib
+# ============================================================
+# Standalone (pip-only) requirements for Question 3
+# Compatible with legacy tf.keras.optimizers.legacy
+# ============================================================
 
-tensorflow==2.16.2
-tensorflow-probability==0.22.1
+# --- Core numerical stack ---
+numpy>=1.23,<2.0
+scipy>=1.9
+pandas>=1.5
+matplotlib>=3.6
+tqdm
+joblib
+scikit-learn
+statsmodels
+
+# --- TensorFlow stack (LOCKED) ---
+tensorflow==2.15.*
+tensorflow-probability==0.23.*
+
+# --- Keras compatibility (CRITICAL) ---
+keras<3
+tf-keras
+
+# --- Utilities ---
+absl-py
+protobuf<5
+typing-extensions
