@@ -4,6 +4,7 @@
   <a href="https://www.linkedin.com/in/tavisshore/">
     <img src="https://img.shields.io/badge/Tavis_Shore-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="Tavis Shore">
   </a>
+  &nbsp;&nbsp;&nbsp;
   <a href="https://www.linkedin.com/in/sanaamironov/">
     <img src="https://img.shields.io/badge/Sanaa_Mironov-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="Sanaa Mironov">
   </a>
