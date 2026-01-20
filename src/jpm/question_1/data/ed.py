@@ -11,7 +11,7 @@ import requests
 from edgar import Company
 from edgar.xbrl import XBRLS
 
-from jpm.question_1.config import Config
+from jpm.config import Config
 from jpm.question_1.data.credit import calculate_credit_ratios
 from jpm.question_1.data.utils import (
     add_derived_columns,

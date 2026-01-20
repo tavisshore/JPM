@@ -5,17 +5,8 @@
 
 import numpy as np
 
-from jpm.question_1 import (
-    Config,
-    CreditDataset,
-    CreditRatingModel,
-    DataConfig,
-    LLMConfig,
-    LSTMConfig,
-    XGBConfig,
-    get_args,
-    set_seed,
-)
+from jpm.config import Config, DataConfig, LLMConfig, LSTMConfig, XGBConfig
+from jpm.question_1 import CreditDataset, CreditRatingModel, get_args, set_seed
 from jpm.question_1.clients.llm_client import LLMClient
 
 
@@ -92,7 +83,6 @@ def train_xgb(cfg: Config, feature_names: list = None):
     # Add top 3 predictions with probabilities
     for i in range(min(3, probabilities.shape[1])):
         top_idx = probabilities.argsort(axis=1)[:, -(i + 1)]
-        print(top_idx)
         results[f"top_{i + 1}_rating"] = dataset.decode_labels(top_idx)
         results[f"top_{i + 1}_prob"] = probabilities[range(len(probabilities)), top_idx]
 
@@ -148,11 +138,11 @@ if __name__ == "__main__":
 
     # Feature names used across training and inference
     feature_cols = [
-        "Quick_Ratio",
-        "Debt_to_Equity",
-        "Debt_to_Assets",
-        "Total_Debt_to_Total_Capital",
-        "Debt_to_EBITDA",
+        "quick_ratio",
+        "debt_to_equity",
+        "debt_to_assets",
+        "debt_to_capital",
+        "debt_to_ebitda",
     ]
 
     # Train Ratios -> Credit Rating XGBoost model

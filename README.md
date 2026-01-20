@@ -46,12 +46,12 @@ This will take quite a long time but will show progress.
 - **Vélez-Pareja:**
   - **Plugless:** from the paper *Forecasting Financial Statements with No plugs and No Circularity* [1]
     ```bash
-    python scripts/question_1/valez/noplug_vp.py
+    python scripts/question_1/valez/noplug.py
     ```
   - **Consistent:** from the paper *Constructing Consistent Financial Planning Models for Valuation* [2]
     ```bash
-    python scripts/question_1/valez/construct_vp.py    # <- pd.series model
-    python scripts/question_1/valez/construct_vp_tf.py # <- TF model
+    python scripts/question_1/valez/construct.py    # <- pd.series model
+    python scripts/question_1/valez/construct_tf.py # <- TF model
     ```
 
 - **Time-series Forecasting:**
@@ -71,38 +71,44 @@ This will take quite a long time but will show progress.
     This script uses the same LLM client to parse pdf annual reports, extracting key financial information. Available reports are stored within `assets/`
     (the argument for parsing is `ticker` although it's the name - to be compatible throughout the config)
     ```bash
-    python scripts/question_1/ml/parse_reports.py --ticker ['alibaba', 'exxon', 'evergrande' ...]
+    python scripts/question_1/ml/parse_reports.py --ticker ['alibaba', 'exxon', 'evergrande' ...] # Default is Apple
     ```
 #### Part B: Bonus 1
 - **Credit Rating:**
     This script trains an XGBoost model on credit ratings data constructed from our SEC data and `ratingshistory.info` before giving a credit prediction to your ticker argument.
     ```bash
-    python scripts/question_1/ml/pipeline.py --ticker ['alibaba', 'exxon', 'evergrande' ...]
+    python scripts/question_1/ml/pipeline.py --ticker ['alibaba', 'exxon', 'evergrande' ...] # Default is Apple
     ```
 
 ## Question 3 - DeepHalo Reproduction
+### Part 1
 The experiments are implemented as Python modules and can be invoked directly.
 - Table 1
-  ```
-  python src/jpm/question_3/experiments/reproduce_table1.py
-  ```
+```bash
+  python scripts/question_3/part_1/reproduce_table1.py
+```
 - Decoy effect
-  ```
-  python src/jpm/question_3/experiments/decoy_effect.py
-  ```
+```bash
+  python scripts/question_3/part_1/decoy_effect.py
+```
 - Attraction effect
-  ```
-  python src/jpm/question_3/experiments/attraction_effect_tf.py
-  ```
+```bash
+  python scripts/question_3/part_1/attraction_effect_tf.py
+```
 - Compromise effect
-  ```
-  python src/jpm/question_3/experiments/compromise_effect_tf.py
-  ```
+```bash
+  python scripts/question_3/part_1/compromise_effect_tf.py
+```
 - Attraction effect (PyTorch)
-  ```
-  python src/jpm/question_3/experiments/attraction_effect_torch.py
-  ```
+```bash
+  python scripts/question_3/part_1/attraction_effect_torch.py
+```
 ---
+
+### Part 2
+```bash
+  python scripts/question_3/part_2/run_replication_choice_learn.py
+```
 
 ## Citations
 ```

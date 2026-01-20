@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from jpm.question_1.config import Config, DataConfig
+from jpm.config.question_1 import Config, DataConfig
 
 unit = pytest.mark.unit
 integration = pytest.mark.integration

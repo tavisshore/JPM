@@ -71,6 +71,7 @@ Thumbs.db
 # -------------------------
 cache/
 temp/
+results/
 temp.*
 *.xlsx
 ckpts/*

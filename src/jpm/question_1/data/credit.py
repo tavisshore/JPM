@@ -767,12 +767,11 @@ def calculate_credit_ratios(df):
 
     # Store derived values in ratios_df
     if total_debt is not None:
-        ratios_df["Total_Debt"] = total_debt
+        ratios_df["total_debt"] = total_debt
     if ebitda is not None:
-        ratios_df["EBITDA"] = ebitda
+        ratios_df["ebitda"] = ebitda
     if free_cash_flow is not None:
-        ratios_df["Free_Cash_Flow"] = free_cash_flow
-
+        ratios_df["free_cash_flow"] = free_cash_flow
     # Ratios in bonus question
     _calculate_jpm_ratios(df, ratios_df, total_debt, ebitda)
 
@@ -789,13 +788,12 @@ def calculate_credit_ratios(df):
     # _calculate_quality_metrics(df, ratios_df)
     # _calculate_size_metrics(df, ratios_df)
 
-    if "Total_Debt" in ratios_df.columns:
-        ratios_df = ratios_df.drop(columns=["Total_Debt"])
-    if "EBITDA" in ratios_df.columns:
-        ratios_df = ratios_df.drop(columns=["EBITDA"])
-    if "Free_Cash_Flow" in ratios_df.columns:
-        ratios_df = ratios_df.drop(columns=["Free_Cash_Flow"])
-
+    if "total_debt" in ratios_df.columns:
+        ratios_df = ratios_df.drop(columns=["total_debt"])
+    if "ebitda" in ratios_df.columns:
+        ratios_df = ratios_df.drop(columns=["ebitda"])
+    if "free_cash_flow" in ratios_df.columns:
+        ratios_df = ratios_df.drop(columns=["free_cash_flow"])
     ratios_df = ratios_df.replace([np.inf, -np.inf], np.nan)
 
     return ratios_df

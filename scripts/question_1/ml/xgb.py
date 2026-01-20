@@ -1,14 +1,5 @@
-from jpm.question_1 import (
-    Config,
-    CreditDataset,
-    CreditRatingModel,
-    DataConfig,
-    LLMConfig,
-    LSTMConfig,
-    XGBConfig,
-    get_args,
-    set_seed,
-)
+from jpm.config import Config, DataConfig, LLMConfig, LSTMConfig, XGBConfig
+from jpm.question_1 import CreditDataset, CreditRatingModel, get_args, set_seed
 
 
 def train(cfg: Config):

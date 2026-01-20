@@ -1,9 +1,7 @@
 import tensorflow as tf
 
-from jpm.question_3.choice_learn_ext.models.deep_context.deep_halo_core import (
-    DeepContextChoiceModel,
-)
-from jpm.question_3.choice_learn_ext.models.deep_context.trainer import Trainer
+from jpm.question_3.choice_learn_extension.deep_halo_core import DeepContextChoiceModel
+from jpm.question_3.choice_learn_extension.trainer import Trainer
 
 
 def test_overfit_tiny_dataset():

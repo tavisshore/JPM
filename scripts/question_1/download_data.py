@@ -5,7 +5,8 @@ from threading import Semaphore
 
 from tqdm import tqdm
 
-from jpm.question_1 import Config, EdgarData, get_args
+from jpm.config import Config
+from jpm.question_1 import EdgarData, get_args
 
 # S&P 500 companies
 sp500 = """

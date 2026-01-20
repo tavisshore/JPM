@@ -4,13 +4,6 @@ This module provides commonly used utilities for financial forecasting tasks.
 """
 
 from jpm.question_1.clients import LLMClient
-from jpm.question_1.config import (
-    Config,
-    DataConfig,
-    LLMConfig,
-    LSTMConfig,
-    XGBConfig,
-)
 from jpm.question_1.data import CreditDataset, EdgarData, StatementsDataset
 from jpm.question_1.misc import as_series, get_args, set_seed
 from jpm.question_1.models.lstm import LSTMForecaster
@@ -19,12 +12,6 @@ from jpm.question_1.models.validation.income_statement import IncomeStatement
 from jpm.question_1.models.xgb import CreditRatingModel
 
 __all__ = [
-    # Config classes
-    "Config",
-    "DataConfig",
-    "LLMConfig",
-    "LSTMConfig",
-    "XGBConfig",
     # Data loaders
     "EdgarData",
     # Datasets

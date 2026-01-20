@@ -17,6 +17,7 @@ from pandas import DataFrame
 from pypdf import PdfReader
 from tqdm import tqdm
 
+from jpm.config.question_1 import Config, LLMConfig
 from jpm.question_1.clients.prompts import (
     get_company_name_prompt,
     get_predict_prompt,
@@ -29,7 +30,6 @@ from jpm.question_1.clients.utils import (
     get_fx_rate,
     parse_llm_json_response,
 )
-from jpm.question_1.config import Config, LLMConfig
 from jpm.question_1.misc import format_money
 
 
@@ -401,15 +401,13 @@ class LLMClient:
                 # In bonus question
                 "net_income": round(NI * fx_rate, 2),
                 # Ratios (names match training data feature columns)
-                "Cost_to_Income": round(OE / REV, 4) if REV != 0 else None,
-                "Quick_Ratio": round((CA - INV) / CL, 4) if CL != 0 else None,
-                "Debt_to_Equity": round(TD / EQ, 4) if EQ != 0 else None,
-                "Debt_to_Assets": round(TD / TA, 4) if TA != 0 else None,
-                "Total_Debt_to_Total_Capital": round(TD / (TD + EQ), 4)
-                if (TD + EQ) != 0
-                else None,
-                "Debt_to_EBITDA": round(TD / EBITDA, 4) if EBITDA != 0 else None,
-                "Interest_Coverage": round(EBIT / IE, 4) if IE != 0 else None,
+                "cost_to_income": round(OE / REV, 4) if REV != 0 else None,
+                "quick_ratio": round((CA - INV) / CL, 4) if CL != 0 else None,
+                "debt_to_equity": round(TD / EQ, 4) if EQ != 0 else None,
+                "debt_to_assets": round(TD / TA, 4) if TA != 0 else None,
+                "debt_to_capital": round(TD / (TD + EQ), 4) if (TD + EQ) != 0 else None,
+                "debt_to_ebitda": round(TD / EBITDA, 4) if EBITDA != 0 else None,
+                "interest_coverage": round(EBIT / IE, 4) if IE != 0 else None,
                 "original_currency": currency,
                 "exchange_rate": fx_rate,
                 "report_date": fiscal_year_end,
@@ -458,9 +456,9 @@ class LLMClient:
         lines.append("-" * 70)
 
         financial_ratios = [
-            ("Cost-to-Income Ratio:", "Cost_to_Income", True),
-            ("Quick Ratio:", "Quick_Ratio", False),
-            ("Interest Coverage Ratio:", "Interest_Coverage", False),
+            ("Cost-to-Income Ratio:", "cost_to_income", True),
+            ("Quick Ratio:", "quick_ratio", False),
+            ("Interest Coverage Ratio:", "interest_coverage", False),
         ]
 
         for label, key, show_pct in financial_ratios:
@@ -472,10 +470,10 @@ class LLMClient:
         lines.append("-" * 70)
 
         leverage_ratios = [
-            ("Debt-to-Equity Ratio:", "Debt_to_Equity", True),
-            ("Debt-to-Assets Ratio:", "Debt_to_Assets", True),
-            ("Debt-to-Capital Ratio:", "Total_Debt_to_Total_Capital", True),
-            ("Debt-to-EBITDA Ratio:", "Debt_to_EBITDA", False),
+            ("Debt-to-Equity Ratio:", "debt_to_equity", True),
+            ("Debt-to-Assets Ratio:", "debt_to_assets", True),
+            ("Debt-to-Capital Ratio:", "debt_to_capital", True),
+            ("Debt-to-EBITDA Ratio:", "debt_to_ebitda", False),
         ]
 
         for label, key, show_pct in leverage_ratios:

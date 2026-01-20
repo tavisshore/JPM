@@ -1,6 +1,6 @@
 import pandas as pd
 
-from jpm.question_3.choice_learn_ext.models.deep_context.deep_halo_estimator import (
+from jpm.question_3.choice_learn_extension.deep_halo_estimator import (
     DeepHaloChoiceModel,
 )
 

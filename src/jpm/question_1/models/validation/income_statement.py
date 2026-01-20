@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict
 
-from jpm.question_1.config import Config
+from jpm.config.question_1 import Config
 from jpm.question_1.data.datasets.statements import StatementsDataset
 from jpm.question_1.misc import format_money
 from jpm.question_1.models.metrics import Metric, TickerResults

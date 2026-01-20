@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from jpm.question_1.config import Config
+from jpm.config.question_1 import Config
 from jpm.question_1.models.metrics import Metric, TickerResults
 from jpm.question_1.models.validation.income_statement import (
     IncomeStatement,

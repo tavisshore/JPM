@@ -8,7 +8,7 @@ def test_seasonal_weight_applied(monkeypatch):
     """
     from unittest.mock import MagicMock
 
-    from jpm.question_1.config import Config, DataConfig
+    from jpm.config.question_1 import Config, DataConfig
     from jpm.question_1.data.datasets.statements import StatementsDataset
 
     # Create mock EdgarData with controlled data
