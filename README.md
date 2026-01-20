@@ -92,15 +92,15 @@ The experiments are implemented as Python modules and can be invoked directly.
   ```
 - Attraction effect
   ```
-  python src/jpm/question_3/experiments/attraction_effect_tf
+  python src/jpm/question_3/experiments/attraction_effect_tf.py
   ```
 - Compromise effect
   ```
-  python src/jpm/question_3/experiments/compromise_effect_tf
+  python src/jpm/question_3/experiments/compromise_effect_tf.py
   ```
 - Attraction effect (PyTorch)
   ```
-  python src/jpm/question_3/experiments/attraction_effect_torch
+  python src/jpm/question_3/experiments/attraction_effect_torch.py
   ```
 ---
 
