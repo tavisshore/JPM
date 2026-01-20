@@ -103,25 +103,25 @@ class HaloBlock(tf.keras.layers.Layer):
         self,
         z_prev: tf.Tensor,  # (B, J, d)
         z_base: tf.Tensor,  # (B, J, d)
-        avail: tf.Tensor,   # (B, J)
+        avail: tf.Tensor,  # (B, J)
         training: bool = False,
-     ) -> tf.Tensor:
+    ) -> tf.Tensor:
         B = tf.shape(z_prev)[0]
         J = tf.shape(z_prev)[1]
         d = self.cfg.d_embed
 
         # Which representation feeds into φ
         if self.cfg.residual_variant == "fixed_base":
-            z_phi_in = z_base          # (B, J, d)
+            z_phi_in = z_base  # (B, J, d)
         else:
-            z_phi_in = z_prev          # (B, J, d)
+            z_phi_in = z_prev  # (B, J, d)
 
         # Global context c: (B, d)
         c = masked_mean(z_prev, mask=avail, axis=1)  # (B, d)
 
         # Broadcast context to all items: (B, 1, d) -> (B, J, d)
-        c_exp = tf.expand_dims(c, axis=1)            # (B, 1, d)
-        c_exp = tf.tile(c_exp, [1, J, 1])            # (B, J, d)
+        c_exp = tf.expand_dims(c, axis=1)  # (B, 1, d)
+        c_exp = tf.tile(c_exp, [1, J, 1])  # (B, J, d)
 
         # φ inputs: concat [z_phi_in_j, c] -> (B, J, 2d)
         phi_inputs = tf.concat([z_phi_in, c_exp], axis=-1)
@@ -139,7 +139,8 @@ class HaloBlock(tf.keras.layers.Layer):
         z_next = z_prev + upd
         z_next = self.layer_norm(z_next, training=training)
         return z_next
+
     """       In standard mode: no difference.
-            In fixed_base mode: you’re using current layer representation to build context 
+            In fixed_base mode: you’re using current layer representation to build context
             and base representation in φ inputs.
     """

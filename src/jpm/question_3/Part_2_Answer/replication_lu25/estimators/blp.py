@@ -20,15 +20,17 @@ def _simulate_shares_given_delta(delta, p, sigma, nu_draws):
     """
     # mu_rj = sigma * nu_r * p_j
     mu = tf.expand_dims(nu_draws, 1) * tf.expand_dims(p, 0) * sigma  # [R, J]
-    util = tf.expand_dims(delta, 0) + mu                              # [R, J]
+    util = tf.expand_dims(delta, 0) + mu  # [R, J]
 
     expu = tf.exp(util)
-    denom = 1.0 + tf.reduce_sum(expu, axis=1, keepdims=True)          # outside option included
-    s_r = expu / denom                                                # [R, J]
-    return tf.reduce_mean(s_r, axis=0)                                # [J]
+    denom = 1.0 + tf.reduce_sum(expu, axis=1, keepdims=True)  # outside option included
+    s_r = expu / denom  # [R, J]
+    return tf.reduce_mean(s_r, axis=0)  # [J]
 
 
-def invert_delta_contraction(s_obs, p, sigma, R=200, max_iter=2000, tol=1e-10, seed=123):
+def invert_delta_contraction(
+    s_obs, p, sigma, R=200, max_iter=2000, tol=1e-10, seed=123
+):
     """
     Berry contraction mapping to find delta s.t. model shares match observed shares.
     s_obs: [J] observed inside shares
@@ -48,7 +50,10 @@ def invert_delta_contraction(s_obs, p, sigma, R=200, max_iter=2000, tol=1e-10, s
 
     for _ in range(max_iter):
         s_hat = _simulate_shares_given_delta(delta, p, sigma, nu_draws)
-        delta_new = delta + (tf.math.log(tf.maximum(s_obs, 1e-12)) - tf.math.log(tf.maximum(s_hat, 1e-12)))
+        delta_new = delta + (
+            tf.math.log(tf.maximum(s_obs, 1e-12))
+            - tf.math.log(tf.maximum(s_hat, 1e-12))
+        )
 
         if tf.reduce_max(tf.abs(delta_new - delta)) < tol:
             delta = delta_new
@@ -63,7 +68,7 @@ def build_matrices(markets, iv_type="cost"):
     markets: list of dicts, each has keys: s, p, w, maybe u
     Returns stacked arrays across all markets/products: y=delta, X, Z, along with market indexing.
     """
-    deltas, Xs, Zs = [], [], []
+    Xs, Zs = [], []
 
     for m in markets:
         # delta is computed later (depends on sigma), so we only prep X,Z pieces here
@@ -71,7 +76,7 @@ def build_matrices(markets, iv_type="cost"):
         w = m["w"]
         u = m.get("u", None)
 
-        # X = [1, p, w]  (intercept is the "Int" reported in tables) 
+        # X = [1, p, w]  (intercept is the "Int" reported in tables)
         X = np.column_stack([np.ones_like(p), p, w])
 
         if iv_type == "cost":
@@ -79,7 +84,7 @@ def build_matrices(markets, iv_type="cost"):
                 raise ValueError("iv_type='cost' requires market['u'] (cost shock).")
             Z = np.column_stack([np.ones_like(p), w, w**2, u, u**2])
         elif iv_type == "nocost":
-            Z = np.column_stack([np.ones_like(p), w, w**2, w**3, w**4])  
+            Z = np.column_stack([np.ones_like(p), w, w**2, w**3, w**4])
         else:
             raise ValueError("iv_type must be 'cost' or 'nocost'.")
 
@@ -96,15 +101,22 @@ def iv_2sls_beta(delta_vec, X, Z):
     2SLS: beta = (X' Pz X)^(-1) X' Pz delta
     """
     delta_vec = tf.convert_to_tensor(delta_vec, dtype=tf.float64)  # [N]
-    X = tf.convert_to_tensor(X, dtype=tf.float64)                  # [N,k]
-    Z = tf.convert_to_tensor(Z, dtype=tf.float64)                  # [N,l]
+    X = tf.convert_to_tensor(X, dtype=tf.float64)  # [N,k]
+    Z = tf.convert_to_tensor(Z, dtype=tf.float64)  # [N,l]
 
     # Pz = Z (Z'Z)^(-1) Z'
     ZTZ_inv = tf.linalg.inv(tf.matmul(Z, Z, transpose_a=True))
-    PzX = tf.matmul(Z, tf.matmul(ZTZ_inv, tf.matmul(Z, X, transpose_a=True)))  # [N,k] via Z(Z'Z)^-1 Z'X
-    XTPzX = tf.matmul(X, PzX, transpose_a=True)                                  # [k,k]
-    XTPzY = tf.matmul(X, tf.matmul(Z, tf.matmul(ZTZ_inv, tf.matmul(Z, delta_vec[:,None], transpose_a=True))),
-                      transpose_a=True)                                          # [k,1]
+    PzX = tf.matmul(
+        Z, tf.matmul(ZTZ_inv, tf.matmul(Z, X, transpose_a=True))
+    )  # [N,k] via Z(Z'Z)^-1 Z'X
+    XTPzX = tf.matmul(X, PzX, transpose_a=True)  # [k,k]
+    XTPzY = tf.matmul(
+        X,
+        tf.matmul(
+            Z, tf.matmul(ZTZ_inv, tf.matmul(Z, delta_vec[:, None], transpose_a=True))
+        ),
+        transpose_a=True,
+    )  # [k,1]
 
     beta = tf.linalg.solve(XTPzX, XTPzY)[:, 0]  # [k]
     return beta
@@ -117,7 +129,7 @@ def gmm_objective_for_sigma(sigma, markets, iv_type="cost", R=200):
     # 1) invert all markets to get delta stacked
     delta_list = []
     for t, m in enumerate(markets):
-        delta_t = invert_delta_contraction(m["s"], m["p"], sigma, R=R, seed=123+t)
+        delta_t = invert_delta_contraction(m["s"], m["p"], sigma, R=R, seed=123 + t)
         delta_list.append(delta_t.numpy())
     delta_vec = np.concatenate(delta_list, axis=0)  # [N=T*J]
 
@@ -149,6 +161,7 @@ def estimate_blp_sigma(markets, iv_type="cost", sigma_init=1.0, R=200):
     :param sigma_init: Initial value for sigma
     :param R: Number of replications
     """
+
     def _tf_value_and_grad(sigma_tf):
         sigma_val = float(sigma_tf.numpy()[0])
         obj, _ = gmm_objective_for_sigma(sigma_val, markets, iv_type=iv_type, R=R)

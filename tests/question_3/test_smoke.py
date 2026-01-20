@@ -1,8 +1,11 @@
 # src/jpm/question_3/tests/test_smoke.py
 
 import tensorflow as tf
-from choice_learn_ext.models.deep_context.deep_halo_core import DeepContextChoiceModel
-from choice_learn_ext.models.deep_context.trainer import Trainer
+
+from jpm.question_3.choice_learn_ext.models.deep_context.deep_halo_core import (
+    DeepContextChoiceModel,
+)
+from jpm.question_3.choice_learn_ext.models.deep_context.trainer import Trainer
 
 
 def test_smoke_run():

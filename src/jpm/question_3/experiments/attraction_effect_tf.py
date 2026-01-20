@@ -4,8 +4,11 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
-from choice_learn_ext.models.deep_context.deep_halo_core import DeepContextChoiceModel
-from choice_learn_ext.models.deep_context.trainer import Trainer
+
+from jpm.question_3.choice_learn_ext.models.deep_context.deep_halo_core import (
+    DeepContextChoiceModel,
+)
+from jpm.question_3.choice_learn_ext.models.deep_context.trainer import Trainer
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 QUESTION3_DIR = os.path.abspath(os.path.join(CURRENT_DIR, ".."))

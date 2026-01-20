@@ -2,7 +2,9 @@ import numpy as np
 import tensorflow as tf
 
 # from choice_learn_ext.models.deep_context.model import DeepContextChoiceModel
-from choice_learn_ext.models.deep_context.deep_halo_core import DeepContextChoiceModel
+from jpm.question_3.choice_learn_ext.models.deep_context.deep_halo_core import (
+    DeepContextChoiceModel,
+)
 
 
 def test_masking_behavior():

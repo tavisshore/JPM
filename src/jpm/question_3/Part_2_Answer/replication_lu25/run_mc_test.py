@@ -38,20 +38,21 @@ import numpy as np
 
 # Handle both flat and organized project structures
 try:
-    from simulation.config import SimConfig
-    from simulation.simulate import simulate_dataset
     from estimators.blp import estimate_blp_sigma
     from estimators.shrinkage import estimate_shrinkage_sigma
+    from simulation.config import SimConfig
+    from simulation.simulate import simulate_dataset
 except ImportError:  # pragma: no cover
-    from config import SimConfig
-    from simulate import simulate_dataset
     from blp import estimate_blp_sigma
+    from config import SimConfig
     from shrinkage import estimate_shrinkage_sigma
+    from simulate import simulate_dataset
 
 
 # -----------------------------
 # Logging utilities
 # -----------------------------
+
 
 class OutputLogger:
     """Write to both console and a log file."""
@@ -81,7 +82,9 @@ def ensure_results_dir() -> Path:
     return results_dir
 
 
-def print_progress_bar(iteration: int, total: int, prefix: str = "", suffix: str = "", length: int = 40) -> None:
+def print_progress_bar(
+    iteration: int, total: int, prefix: str = "", suffix: str = "", length: int = 40
+) -> None:
     """Simple progress bar."""
     percent = 100 * (iteration / float(total))
     filled_length = int(length * iteration // total)
@@ -97,41 +100,107 @@ def print_progress_bar(iteration: int, total: int, prefix: str = "", suffix: str
 
 # Values are (bias, sd) for each parameter and method.
 # Methods keys: "blp_iv" (BLP+cost IV), "blp_noiv" (BLP−cost IV), "shrink" (Shrinkage)
-PAPER_TABLE1: Dict[str, Dict[Tuple[int, int], Dict[str, Dict[str, Tuple[float, float]]]]] = {
+PAPER_TABLE1: Dict[
+    str, Dict[Tuple[int, int], Dict[str, Dict[str, Tuple[float, float]]]]
+] = {
     "DGP1": {
         (5, 25): {
-            "sigma": {"blp_iv": (0.134, 0.127), "blp_noiv": (0.132, 0.130), "shrink": (0.169, 0.134)},
-            "beta_p": {"blp_iv": (0.006, 0.146), "blp_noiv": (0.014, 0.143), "shrink": (0.020, 0.151)},
+            "sigma": {
+                "blp_iv": (0.134, 0.127),
+                "blp_noiv": (0.132, 0.130),
+                "shrink": (0.169, 0.134),
+            },
+            "beta_p": {
+                "blp_iv": (0.006, 0.146),
+                "blp_noiv": (0.014, 0.143),
+                "shrink": (0.020, 0.151),
+            },
         },
         (5, 100): {
-            "sigma": {"blp_iv": (0.072, 0.120), "blp_noiv": (0.075, 0.122), "shrink": (0.095, 0.126)},
-            "beta_p": {"blp_iv": (0.018, 0.103), "blp_noiv": (0.018, 0.103), "shrink": (0.034, 0.106)},
+            "sigma": {
+                "blp_iv": (0.072, 0.120),
+                "blp_noiv": (0.075, 0.122),
+                "shrink": (0.095, 0.126),
+            },
+            "beta_p": {
+                "blp_iv": (0.018, 0.103),
+                "blp_noiv": (0.018, 0.103),
+                "shrink": (0.034, 0.106),
+            },
         },
         (15, 25): {
-            "sigma": {"blp_iv": (0.067, 0.070), "blp_noiv": (0.067, 0.070), "shrink": (0.084, 0.073)},
-            "beta_p": {"blp_iv": (0.009, 0.085), "blp_noiv": (0.012, 0.084), "shrink": (0.016, 0.088)},
+            "sigma": {
+                "blp_iv": (0.067, 0.070),
+                "blp_noiv": (0.067, 0.070),
+                "shrink": (0.084, 0.073),
+            },
+            "beta_p": {
+                "blp_iv": (0.009, 0.085),
+                "blp_noiv": (0.012, 0.084),
+                "shrink": (0.016, 0.088),
+            },
         },
         (15, 100): {
-            "sigma": {"blp_iv": (0.060, 0.066), "blp_noiv": (0.060, 0.066), "shrink": (0.076, 0.068)},
-            "beta_p": {"blp_iv": (0.012, 0.070), "blp_noiv": (0.012, 0.070), "shrink": (0.020, 0.071)},
+            "sigma": {
+                "blp_iv": (0.060, 0.066),
+                "blp_noiv": (0.060, 0.066),
+                "shrink": (0.076, 0.068),
+            },
+            "beta_p": {
+                "blp_iv": (0.012, 0.070),
+                "blp_noiv": (0.012, 0.070),
+                "shrink": (0.020, 0.071),
+            },
         },
     },
     "DGP2": {
         (5, 25): {
-            "sigma": {"blp_iv": (0.217, 0.173), "blp_noiv": (1.008, 0.094), "shrink": (0.262, 0.185)},
-            "beta_p": {"blp_iv": (-0.007, 0.144), "blp_noiv": (0.525, 0.113), "shrink": (-0.010, 0.153)},
+            "sigma": {
+                "blp_iv": (0.217, 0.173),
+                "blp_noiv": (1.008, 0.094),
+                "shrink": (0.262, 0.185),
+            },
+            "beta_p": {
+                "blp_iv": (-0.007, 0.144),
+                "blp_noiv": (0.525, 0.113),
+                "shrink": (-0.010, 0.153),
+            },
         },
         (5, 100): {
-            "sigma": {"blp_iv": (0.117, 0.136), "blp_noiv": (0.433, 0.072), "shrink": (0.158, 0.146)},
-            "beta_p": {"blp_iv": (0.007, 0.104), "blp_noiv": (0.185, 0.066), "shrink": (0.008, 0.111)},
+            "sigma": {
+                "blp_iv": (0.117, 0.136),
+                "blp_noiv": (0.433, 0.072),
+                "shrink": (0.158, 0.146),
+            },
+            "beta_p": {
+                "blp_iv": (0.007, 0.104),
+                "blp_noiv": (0.185, 0.066),
+                "shrink": (0.008, 0.111),
+            },
         },
         (15, 25): {
-            "sigma": {"blp_iv": (0.099, 0.080), "blp_noiv": (0.650, 0.071), "shrink": (0.141, 0.084)},
-            "beta_p": {"blp_iv": (-0.003, 0.085), "blp_noiv": (0.244, 0.067), "shrink": (-0.001, 0.089)},
+            "sigma": {
+                "blp_iv": (0.099, 0.080),
+                "blp_noiv": (0.650, 0.071),
+                "shrink": (0.141, 0.084),
+            },
+            "beta_p": {
+                "blp_iv": (-0.003, 0.085),
+                "blp_noiv": (0.244, 0.067),
+                "shrink": (-0.001, 0.089),
+            },
         },
         (15, 100): {
-            "sigma": {"blp_iv": (0.082, 0.071), "blp_noiv": (0.287, 0.042), "shrink": (0.118, 0.074)},
-            "beta_p": {"blp_iv": (0.002, 0.070), "blp_noiv": (0.096, 0.042), "shrink": (0.001, 0.073)},
+            "sigma": {
+                "blp_iv": (0.082, 0.071),
+                "blp_noiv": (0.287, 0.042),
+                "shrink": (0.118, 0.074),
+            },
+            "beta_p": {
+                "blp_iv": (0.002, 0.070),
+                "blp_noiv": (0.096, 0.042),
+                "shrink": (0.001, 0.073),
+            },
         },
     },
 }
@@ -141,12 +210,13 @@ PAPER_TABLE1: Dict[str, Dict[Tuple[int, int], Dict[str, Dict[str, Tuple[float, f
 # Monte Carlo core
 # -----------------------------
 
+
 @dataclass
 class ShrinkageSettings:
     n_iter: int = 200
     burn: int = 100
-    v0: float = 1e-4   # aligns with tau0^2 used in this repo's single-replication script
-    v1: float = 1.0    # aligns with tau1^2
+    v0: float = 1e-4  # aligns with tau0^2 used in this repo's single-replication script
+    v1: float = 1.0  # aligns with tau1^2
 
 
 @dataclass
@@ -181,7 +251,12 @@ def run_mc_cell(
         beta_p[r] = float(beta_hat[1])
         beta_w[r] = float(beta_hat[2])
 
-        print_progress_bar(r + 1, R_mc, prefix=f"  BLP({iv_type:6}) T={T:<2} J={J:<3}", suffix=f"({r+1}/{R_mc})")
+        print_progress_bar(
+            r + 1,
+            R_mc,
+            prefix=f"  BLP({iv_type:6}) T={T:<2} J={J:<3}",
+            suffix=f"({r+1}/{R_mc})",
+        )
 
     return MCCellResult(sigma=sigma, beta_p=beta_p, beta_w=beta_w)
 
@@ -217,7 +292,12 @@ def run_mc_cell_shrinkage(
         beta_p[r] = float(beta_hat[1])
         beta_w[r] = float(beta_hat[2])
 
-        print_progress_bar(r + 1, R_mc, prefix=f"  Shrinkage  T={T:<2} J={J:<3}", suffix=f"({r+1}/{R_mc})")
+        print_progress_bar(
+            r + 1,
+            R_mc,
+            prefix=f"  Shrinkage  T={T:<2} J={J:<3}",
+            suffix=f"({r+1}/{R_mc})",
+        )
 
     return MCCellResult(sigma=sigma, beta_p=beta_p, beta_w=beta_w)
 
@@ -237,11 +317,15 @@ def print_table_cell_header(DGP: str, T: int, J: int, cfg: SimConfig) -> None:
     print("=" * 90)
 
 
-def print_summary_block(title: str, stats: Dict[str, Dict[str, float]], cfg: SimConfig) -> None:
+def print_summary_block(
+    title: str, stats: Dict[str, Dict[str, float]], cfg: SimConfig
+) -> None:
     print("\n" + "-" * 90)
     print(f"{title}")
     print("-" * 90)
-    print(f"{'Param':<10} {'True':>10} {'Mean':>12} {'Bias':>12} {'SD':>12} {'RMSE':>12}")
+    print(
+        f"{'Param':<10} {'True':>10} {'Mean':>12} {'Bias':>12} {'SD':>12} {'RMSE':>12}"
+    )
     print("-" * 90)
 
     mapping = {
@@ -251,7 +335,9 @@ def print_summary_block(title: str, stats: Dict[str, Dict[str, float]], cfg: Sim
     }
     for key, (sym, true_v) in mapping.items():
         s = stats[key]
-        print(f"{sym:<10} {true_v:>10.4f} {s['mean']:>12.4f} {s['bias']:>12.4f} {s['sd']:>12.4f} {s['rmse']:>12.4f}")
+        print(
+            f"{sym:<10} {true_v:>10.4f} {s['mean']:>12.4f} {s['bias']:>12.4f} {s['sd']:>12.4f} {s['rmse']:>12.4f}"
+        )
 
 
 def save_summary_csv(rows: List[Dict[str, object]], out_csv: Path) -> None:
@@ -291,11 +377,15 @@ def write_table1_latex(paper: dict, ours: dict, out_tex: Path) -> None:
     lines.append(r"\begin{table}[t]")
     lines.append(r"\centering")
     lines.append(r"\small")
-    lines.append(r"\caption{Replication of Table 1: Paper vs. Our Monte Carlo results (bias, standard deviation).}")
+    lines.append(
+        r"\caption{Replication of Table 1: Paper vs. Our Monte Carlo results (bias, standard deviation).}"
+    )
     lines.append(r"\label{tab:table1_replication}")
     lines.append(r"\begin{tabular}{ll l cc cc}")
     lines.append(r"\toprule")
-    lines.append(r"DGP & (T,J) & Method & \multicolumn{2}{c}{Paper} & \multicolumn{2}{c}{Ours}\\")
+    lines.append(
+        r"DGP & (T,J) & Method & \multicolumn{2}{c}{Paper} & \multicolumn{2}{c}{Ours}\\"
+    )
     lines.append(r"\cmidrule(lr){4-5} \cmidrule(lr){6-7}")
     lines.append(r" & & & Bias & SD & Bias & SD\\")
     lines.append(r"\midrule")
@@ -308,18 +398,28 @@ def write_table1_latex(paper: dict, ours: dict, out_tex: Path) -> None:
     param_order = [("sigma", r"$\sigma$"), ("beta_p", r"$\beta_p$")]
 
     for dgp in ["DGP1", "DGP2"]:
-        for (T, J) in [(5, 25), (5, 100), (15, 25), (15, 100)]:
+        for T, J in [(5, 25), (5, 100), (15, 25), (15, 100)]:
             for param_key, _param_tex in param_order:
                 first_row = True
                 for mkey, mname in method_order:
                     pbias, psd = paper[dgp][(T, J)][param_key][mkey]
-                    obias, osd = ours.get(dgp, {}).get((T, J), {}).get(param_key, {}).get(mkey, (float("nan"), float("nan")))
+                    obias, osd = (
+                        ours.get(dgp, {})
+                        .get((T, J), {})
+                        .get(param_key, {})
+                        .get(mkey, (float("nan"), float("nan")))
+                    )
 
-                    dgp_cell = dgp if first_row and param_key == "sigma" and mkey == "blp_iv" else ""
+                    dgp_cell = (
+                        dgp
+                        if first_row and param_key == "sigma" and mkey == "blp_iv"
+                        else ""
+                    )
                     tj_cell = f"({T},{J})" if first_row and mkey == "blp_iv" else ""
 
                     lines.append(
-                        f"{dgp_cell} & {tj_cell} & {mname} & {pbias:+.3f} & {psd:.3f} & {obias:+.3f} & {osd:.3f} \\")
+                        f"{dgp_cell} & {tj_cell} & {mname} & {pbias:+.3f} & {psd:.3f} & {obias:+.3f} & {osd:.3f} \\"
+                    )
                     first_row = False
 
                 lines.append(r"\addlinespace[2pt]")
@@ -337,17 +437,33 @@ def write_table1_latex(paper: dict, ours: dict, out_tex: Path) -> None:
 # Main driver
 # -----------------------------
 
+
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Monte Carlo replication aligned to Lu & Shimizu (2025) Table 1")
-    parser.add_argument("--R_mc", type=int, default=50, help="number of Monte Carlo replications per cell")
+    parser = argparse.ArgumentParser(
+        description="Monte Carlo replication aligned to Lu & Shimizu (2025) Table 1"
+    )
+    parser.add_argument(
+        "--R_mc",
+        type=int,
+        default=50,
+        help="number of Monte Carlo replications per cell",
+    )
     parser.add_argument("--seed", type=int, default=123, help="base RNG seed")
-    parser.add_argument("--full_grid", action="store_true", help="run DGP1–DGP4 over Table-1 (T,J) grid")
-    parser.add_argument("--write_latex", action="store_true", help="write side-by-side LaTeX table for DGP1–DGP2")
+    parser.add_argument(
+        "--full_grid", action="store_true", help="run DGP1–DGP4 over Table-1 (T,J) grid"
+    )
+    parser.add_argument(
+        "--write_latex",
+        action="store_true",
+        help="write side-by-side LaTeX table for DGP1–DGP2",
+    )
 
     # shrinkage hyperparameters
     parser.add_argument("--shrink_n_iter", type=int, default=200)
     parser.add_argument("--shrink_burn", type=int, default=100)
-    parser.add_argument("--v0", type=float, default=1e-4, help="spike variance (tau0^2)")
+    parser.add_argument(
+        "--v0", type=float, default=1e-4, help="spike variance (tau0^2)"
+    )
     parser.add_argument("--v1", type=float, default=1.0, help="slab variance (tau1^2)")
 
     args = parser.parse_args()
@@ -361,7 +477,10 @@ def main() -> None:
     dgps = ["DGP1", "DGP2", "DGP3", "DGP4"] if args.full_grid else ["DGP1"]
 
     # Setup output logging
-    out_log = results_dir / f"mc_table1_{'full' if args.full_grid else 'single'}_R{args.R_mc}_{timestamp}.txt"
+    out_log = (
+        results_dir
+        / f"mc_table1_{'full' if args.full_grid else 'single'}_R{args.R_mc}_{timestamp}.txt"
+    )
     logger = OutputLogger(out_log)
     sys.stdout = logger
 
@@ -373,17 +492,23 @@ def main() -> None:
     print(f"Base seed: {args.seed}")
     print(f"Default market size N_t: {cfg.default_market_size}")
     print(f"Consumer draws R0: {cfg.R0}")
-    print(f"Shrinkage: n_iter={args.shrink_n_iter}, burn={args.shrink_burn}, v0={args.v0:g}, v1={args.v1:g}")
+    print(
+        f"Shrinkage: n_iter={args.shrink_n_iter}, burn={args.shrink_burn}, v0={args.v0:g}, v1={args.v1:g}"
+    )
 
-    shrink_settings = ShrinkageSettings(n_iter=args.shrink_n_iter, burn=args.shrink_burn, v0=args.v0, v1=args.v1)
+    shrink_settings = ShrinkageSettings(
+        n_iter=args.shrink_n_iter, burn=args.shrink_burn, v0=args.v0, v1=args.v1
+    )
 
     csv_rows: List[Dict[str, object]] = []
 
     # For LaTeX comparison (DGP1–DGP2 only)
-    ours_for_latex: Dict[str, Dict[Tuple[int, int], Dict[str, Dict[str, Tuple[float, float]]]]] = {}
+    ours_for_latex: Dict[
+        str, Dict[Tuple[int, int], Dict[str, Dict[str, Tuple[float, float]]]]
+    ] = {}
 
     for dgp in dgps:
-        for (T, J) in grid_TJ:
+        for T, J in grid_TJ:
             print_table_cell_header(dgp, T, J, cfg)
 
             # --- BLP + cost IV
@@ -396,7 +521,9 @@ def main() -> None:
             print_summary_block("BLP + cost IV", stats_iv, cfg)
 
             # --- BLP − cost IV
-            res_noiv = run_mc_cell(dgp, T, J, args.R_mc, cfg, args.seed, iv_type="nocost")
+            res_noiv = run_mc_cell(
+                dgp, T, J, args.R_mc, cfg, args.seed, iv_type="nocost"
+            )
             stats_noiv = {
                 "sigma": summarize(res_noiv.sigma, cfg.sigma_star),
                 "beta_p": summarize(res_noiv.beta_p, cfg.beta_p_star),
@@ -405,7 +532,9 @@ def main() -> None:
             print_summary_block("BLP − cost IV", stats_noiv, cfg)
 
             # --- Shrinkage
-            res_sh = run_mc_cell_shrinkage(dgp, T, J, args.R_mc, cfg, args.seed, shrink_settings)
+            res_sh = run_mc_cell_shrinkage(
+                dgp, T, J, args.R_mc, cfg, args.seed, shrink_settings
+            )
             stats_sh = {
                 "sigma": summarize(res_sh.sigma, cfg.sigma_star),
                 "beta_p": summarize(res_sh.beta_p, cfg.beta_p_star),
@@ -450,16 +579,37 @@ def main() -> None:
                 ours_for_latex[dgp][(T, J)].setdefault("sigma", {})
                 ours_for_latex[dgp][(T, J)].setdefault("beta_p", {})
 
-                ours_for_latex[dgp][(T, J)]["sigma"]["blp_iv"] = (stats_iv["sigma"]["bias"], stats_iv["sigma"]["sd"])
-                ours_for_latex[dgp][(T, J)]["sigma"]["blp_noiv"] = (stats_noiv["sigma"]["bias"], stats_noiv["sigma"]["sd"])
-                ours_for_latex[dgp][(T, J)]["sigma"]["shrink"] = (stats_sh["sigma"]["bias"], stats_sh["sigma"]["sd"])
+                ours_for_latex[dgp][(T, J)]["sigma"]["blp_iv"] = (
+                    stats_iv["sigma"]["bias"],
+                    stats_iv["sigma"]["sd"],
+                )
+                ours_for_latex[dgp][(T, J)]["sigma"]["blp_noiv"] = (
+                    stats_noiv["sigma"]["bias"],
+                    stats_noiv["sigma"]["sd"],
+                )
+                ours_for_latex[dgp][(T, J)]["sigma"]["shrink"] = (
+                    stats_sh["sigma"]["bias"],
+                    stats_sh["sigma"]["sd"],
+                )
 
-                ours_for_latex[dgp][(T, J)]["beta_p"]["blp_iv"] = (stats_iv["beta_p"]["bias"], stats_iv["beta_p"]["sd"])
-                ours_for_latex[dgp][(T, J)]["beta_p"]["blp_noiv"] = (stats_noiv["beta_p"]["bias"], stats_noiv["beta_p"]["sd"])
-                ours_for_latex[dgp][(T, J)]["beta_p"]["shrink"] = (stats_sh["beta_p"]["bias"], stats_sh["beta_p"]["sd"])
+                ours_for_latex[dgp][(T, J)]["beta_p"]["blp_iv"] = (
+                    stats_iv["beta_p"]["bias"],
+                    stats_iv["beta_p"]["sd"],
+                )
+                ours_for_latex[dgp][(T, J)]["beta_p"]["blp_noiv"] = (
+                    stats_noiv["beta_p"]["bias"],
+                    stats_noiv["beta_p"]["sd"],
+                )
+                ours_for_latex[dgp][(T, J)]["beta_p"]["shrink"] = (
+                    stats_sh["beta_p"]["bias"],
+                    stats_sh["beta_p"]["sd"],
+                )
 
     # Save CSV
-    out_csv = results_dir / f"mc_table1_{'full' if args.full_grid else 'single'}_R{args.R_mc}_{timestamp}.csv"
+    out_csv = (
+        results_dir
+        / f"mc_table1_{'full' if args.full_grid else 'single'}_R{args.R_mc}_{timestamp}.csv"
+    )
     save_summary_csv(csv_rows, out_csv)
 
     # Optional LaTeX comparison

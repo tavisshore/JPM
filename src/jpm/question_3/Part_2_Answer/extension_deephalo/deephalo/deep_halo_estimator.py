@@ -1,5 +1,6 @@
 # src/jpm/question_3/choice_learn_ext/models/deep_context/main_model.py
 import json
+
 import numpy as np
 import pandas as pd
 import tensorflow as tf
@@ -105,10 +106,12 @@ class DeepHaloChoiceModel:
 
     def log_likelihood(self, df: pd.DataFrame):
         available, item_ids, choices = self._df_to_tensors(df)
-        return float(self.model.nll(
-            {"available": available, "item_ids": item_ids, "choice": choices},
-            training=False,
-        ).numpy())
+        return float(
+            self.model.nll(
+                {"available": available, "item_ids": item_ids, "choice": choices},
+                training=False,
+            ).numpy()
+        )
 
     # ------------------------------------------------------------------
     # Save / Load

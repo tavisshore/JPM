@@ -1,4 +1,4 @@
-# Question 3 – Part 2  
+# Question 3 – Part 2
 ## Sparse Discrete Choice Estimation with DeepHalo
 
 ## Purpose of Part 2
@@ -28,13 +28,13 @@ Part 2 investigates whether a **MAP-based approximation** using ℓ₁ regulariz
 
 Part 2 implements and evaluates three nested models:
 
-1. **DeepHalo-only**  
+1. **DeepHalo-only**
    A context-dependent neural utility model without market-level or product-specific shocks.
 
-2. **DeepHalo + market fixed effects (μ)**  
+2. **DeepHalo + market fixed effects (μ)**
    Adds market-level demand shifts shared across inside goods.
 
-3. **DeepHalo + μ + sparse market–product shocks (d)**  
+3. **DeepHalo + μ + sparse market–product shocks (d)**
    Introduces Lu-style sparse deviations estimated via a MAP objective with ℓ₁ regularization.
 
 All models are estimated on synthetic datasets generated to match the Monte Carlo designs of Lu & Shimizu (2025).
@@ -92,7 +92,7 @@ part2/
 ├── replication_lu25/ # Lu (2025) Section 4 simulation replication
 ├── choice_learn_extension/ # choice-learn + TensorFlow implementation
 ├── extension_deephalo/ # DeepHalo under sparse market–product shocks
-├── experiments/ # Additional / robustness experiments 
+├── experiments/ # Additional / robustness experiments
 ├── results/ # Saved tables, figures, and diagnostics
 └── report/ # Written analysis for Part 2
 
@@ -124,7 +124,7 @@ Each subdirectory contains its own README with more detailed explanations.
 If you want to see **how the paper’s simulation results are reproduced**, start here:
 
 part2/
-├── replication_lu25/ 
+├── replication_lu25/
 
 - Contains the full Monte Carlo setup
 - Includes BLP+IV, BLP–IV, and shrinkage estimators

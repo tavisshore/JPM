@@ -4,8 +4,10 @@ import tensorflow as tf
 # ---------------------------------------------------------------------
 # Make sure choice_learn_ext is importable when running this as a script
 # ---------------------------------------------------------------------
-from choice_learn_ext.models.deep_context.model import DeepContextChoiceModel
-from choice_learn_ext.models.deep_context.trainer import Trainer
+from jpm.question_3.choice_learn_ext.models.deep_context.model import (
+    DeepContextChoiceModel,
+)
+from jpm.question_3.choice_learn_ext.models.deep_context.trainer import Trainer
 
 
 def simulate_decoy_data(N_per_type=500):

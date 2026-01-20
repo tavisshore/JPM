@@ -12,10 +12,13 @@ price and the demand shock via the shared component alpha_star(eta_star).
 from __future__ import annotations
 
 import numpy as np
+
 from .config import SimConfig
 
 
-def generate_eta_alpha(dgp: str, J: int, cfg: SimConfig, rng: np.random.Generator) -> tuple[np.ndarray, np.ndarray]:
+def generate_eta_alpha(
+    dgp: str, J: int, cfg: SimConfig, rng: np.random.Generator
+) -> tuple[np.ndarray, np.ndarray]:
     """Generate (eta_star, alpha_star) for a single market.
 
     DGP definitions (aligned with the repo's config fields):

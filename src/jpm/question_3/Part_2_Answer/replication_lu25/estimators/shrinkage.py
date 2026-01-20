@@ -1,22 +1,24 @@
 # shrinkage.py
 import numpy as np
-from estimators.blp import invert_delta_contraction, build_matrices
+from estimators.blp import build_matrices, invert_delta_contraction
+
 
 def _log_norm_pdf(x, var):
     # log N(x;0,var)
-    return -0.5*(np.log(2*np.pi*var) + (x*x)/var)
+    return -0.5 * (np.log(2 * np.pi * var) + (x * x) / var)
+
 
 def shrinkage_fit_beta_given_sigma(
     delta_vec,
     X,
     n_iter=200,
     burn=100,
-    v0=0.05,      # spike variance (tuned to typical inversion noise scale)
-    v1=1.0,       # slab variance (large)
+    v0=0.05,  # spike variance (tuned to typical inversion noise scale)
+    v1=1.0,  # slab variance (large)
     a_pi=1.0,
-    b_pi=9.0,     # prior mean pi ~ 0.1 (sparse)
-    beta_var=1e6, # weak prior on beta
-    seed=123
+    b_pi=9.0,  # prior mean pi ~ 0.1 (sparse)
+    beta_var=1e6,  # weak prior on beta
+    seed=123,
 ):
     """
     Bayesian sparse-errors regression:
@@ -42,7 +44,7 @@ def shrinkage_fit_beta_given_sigma(
     score_sum = 0.0
     kept = 0
 
-    I = np.eye(k)
+    identity_k = np.eye(k)
 
     for it in range(n_iter):
         # residuals
@@ -61,10 +63,10 @@ def shrinkage_fit_beta_given_sigma(
         pi = rng.beta(a_pi + s, b_pi + (N - s))
 
         # sample beta | gamma (weighted Gaussian regression)
-        v = np.where(gamma == 1, v1, v0)          # variance per obs
-        w = 1.0 / v                               # precision weights
+        v = np.where(gamma == 1, v1, v0)  # variance per obs
+        w = 1.0 / v  # precision weights
         Xw = X * w[:, None]
-        Prec = (X.T @ Xw) + (1.0 / beta_var) * I  # kxk
+        Prec = (X.T @ Xw) + (1.0 / beta_var) * identity_k  # kxk
         mean = np.linalg.solve(Prec, X.T @ (w * delta_vec))
         cov = np.linalg.inv(Prec)
 
@@ -76,7 +78,9 @@ def shrinkage_fit_beta_given_sigma(
         # optional scoring (rough): log p(r|gamma,pi) + log p(gamma|pi)
         # (skip constants from beta prior/cov, just diagnostic)
         loglik = _log_norm_pdf(r, v).sum()
-        logprior_g = (gamma*np.log(pi+1e-12) + (1-gamma)*np.log(1-pi+1e-12)).sum()
+        logprior_g = (
+            gamma * np.log(pi + 1e-12) + (1 - gamma) * np.log(1 - pi + 1e-12)
+        ).sum()
         score = loglik + logprior_g
 
         if it >= burn:
@@ -90,11 +94,12 @@ def shrinkage_fit_beta_given_sigma(
     score_mean = score_sum / max(1, kept)
     return beta_mean, gamma_prob, float(score_mean)
 
+
 def shrinkage_objective_for_sigma(sigma, markets, R=200, **kwargs):
     # 1) invert all markets to get delta_vec(sigma)
     delta_list = []
     for t, m in enumerate(markets):
-        delta_t = invert_delta_contraction(m["s"], m["p"], sigma, R=R, seed=123+t)
+        delta_t = invert_delta_contraction(m["s"], m["p"], sigma, R=R, seed=123 + t)
         delta_list.append(delta_t.numpy())
     delta_vec = np.concatenate(delta_list, axis=0)
 
@@ -105,13 +110,16 @@ def shrinkage_objective_for_sigma(sigma, markets, R=200, **kwargs):
     # We *maximize* score, so return it
     return score, beta_hat, gamma_prob
 
+
 def estimate_shrinkage_sigma(markets, R=200, sigma_grid=None, **kwargs):
     if sigma_grid is None:
         sigma_grid = np.linspace(0.05, 4.0, 40)
 
     best = None
     for s in sigma_grid:
-        score, beta_hat, gamma_prob = shrinkage_objective_for_sigma(s, markets, R=R, **kwargs)
+        score, beta_hat, gamma_prob = shrinkage_objective_for_sigma(
+            s, markets, R=R, **kwargs
+        )
         if (best is None) or (score > best[0]):
             best = (score, s, beta_hat, gamma_prob)
 
@@ -119,7 +127,9 @@ def estimate_shrinkage_sigma(markets, R=200, sigma_grid=None, **kwargs):
     s0 = best[1]
     refine = np.linspace(max(0.01, s0 - 0.25), s0 + 0.25, 25)
     for s in refine:
-        score, beta_hat, gamma_prob = shrinkage_objective_for_sigma(s, markets, R=R, **kwargs)
+        score, beta_hat, gamma_prob = shrinkage_objective_for_sigma(
+            s, markets, R=R, **kwargs
+        )
         if score > best[0]:
             best = (score, s, beta_hat, gamma_prob)
 

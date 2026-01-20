@@ -5,7 +5,9 @@ from __future__ import annotations
 from typing import Dict, Optional
 
 import tensorflow as tf
-from choice_learn_ext.models.deep_context.deep_halo_core import DeepHalo
+
+from jpm.question_3.choice_learn_ext.models.deep_context.deep_halo_core import DeepHalo
+from jpm.question_3.choice_learn_ext.models.deep_context.utils import apple_silicon
 
 
 class Trainer:
@@ -16,7 +18,10 @@ class Trainer:
     def __init__(self, model: DeepHalo, lr: float = 1e-3):
         self.model = model
         # On Apple Silicon, legacy optimizer is usually faster/more stable
-        self.optimizer = tf.keras.optimizers.legacy.Adam(lr)
+        if apple_silicon():
+            self.optimizer = tf.keras.optimizers.legacy.Adam(lr)
+        else:
+            self.optimizer = tf.keras.optimizers.Adam(lr)
 
     @tf.function
     def train_step(self, batch: Dict[str, tf.Tensor]) -> tf.Tensor:
