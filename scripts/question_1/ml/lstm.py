@@ -4,6 +4,7 @@ import os
 import sys
 import time
 from dataclasses import replace
+from pathlib import Path
 
 import numpy as np
 
@@ -192,7 +193,11 @@ for config_name, results in all_config_results.items():
             {np.mean(bs_pct_vals):.2%} (+/- {np.std(bs_pct_vals):.2%})"
     )
 
-with open("temp/lstm_evaluation_results_all_configs.json", "w") as f:
+# Save all results to JSON
+results_dir = Path("results/question_1/")
+results_dir.parent.mkdir(parents=True, exist_ok=True)
+
+with open(results_dir / "lstm_evaluation.json", "w") as f:
     json.dump(all_config_results, f, indent=2)
 
 

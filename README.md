@@ -46,12 +46,12 @@ This will take quite a long time but will show progress.
 - **Vélez-Pareja:**
   - **Plugless:** from the paper *Forecasting Financial Statements with No plugs and No Circularity* [1]
     ```bash
-    python scripts/question_1/valez/noplug_vp.py
+    python scripts/question_1/valez/noplug.py
     ```
   - **Consistent:** from the paper *Constructing Consistent Financial Planning Models for Valuation* [2]
     ```bash
-    python scripts/question_1/valez/construct_vp.py    # <- pd.series model
-    python scripts/question_1/valez/construct_vp_tf.py # <- TF model
+    python scripts/question_1/valez/construct.py    # <- pd.series model
+    python scripts/question_1/valez/construct_tf.py # <- TF model
     ```
 
 - **Time-series Forecasting:**

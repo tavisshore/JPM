@@ -1,6 +1,6 @@
 # Lu (2025) – Section 4 Replication
 
-src/jpm/question_3/choice_learn_extension contains a **standalone Monte Carlo replication** of the simulation results in **Lu (2025), Section 4**, focusing on:
+This folder contains a **standalone Monte Carlo replication** of the simulation results in **Lu (2025), Section 4**, focusing on:
 
 - Standard BLP with valid cost instruments (BLP+IV)
 - BLP without cost instruments (BLP–IV)

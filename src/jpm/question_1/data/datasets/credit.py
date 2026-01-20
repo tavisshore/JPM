@@ -15,7 +15,7 @@ from sklearn.model_selection import train_test_split
 class CreditDataset:
     def __init__(
         self,
-        data_dir: Path = Path("/scratch/datasets/jpm/ratings"),
+        data_dir: Path = Path("/scratch/datasets/jpm"),
         pattern: str = "*_ratings.parquet",
         val_size: float = 0.1,
         test_size: float = 0.1,
@@ -71,16 +71,19 @@ class CreditDataset:
         # Remove last row (no target) - safe now because len(df) >= 2
         df_trainable = df[:-1].copy()
         df_predict = df.iloc[[-1]].copy()
-
         return df_trainable, df_predict
 
-    def _process_features(self, df: pd.DataFrame) -> pd.DataFrame:
+    def _process_features(self, df: pd.DataFrame) -> pd.DataFrame | None:
         """Process features and handle missing values."""
         feature_cols = [
             col
             for col in df.columns
             if col not in ["quarter", "rating", "target_rating", "ticker", "index"]
         ]
+        print(feature_cols)
+        # If no feature columns - data error, skip
+        if len(feature_cols) == 0:
+            return None
 
         # Replace inf/-inf with NaN
         df[feature_cols] = df[feature_cols].replace([np.inf, -np.inf], np.nan)
@@ -115,6 +118,24 @@ class CreditDataset:
         for file in files:
             try:
                 df_train, df_pred = self._load_and_prepare(file)
+                # if df_train or df_pred contains no feature columns, skip
+                train_zeroed = (
+                    df_train[feature_names].replace(0, np.nan).isna().all(axis=0).any()
+                )
+                pred_zeroed = (
+                    df_pred[feature_names].replace(0, np.nan).isna().all(axis=0).any()
+                )
+                if train_zeroed or pred_zeroed:
+                    skipped.append(
+                        (file.name, "No valid feature columns after processing")
+                    )
+                    continue
+
+                # If nane, skip
+                # if df_train.isna().sum().sum() > 0 or df_pred.isna().sum().sum() > 0:
+                #     skipped.append((file.name, "NaN values found after processing"))
+                #     continue
+
                 trainable_dfs.append(df_train)
                 predict_dfs.append(df_pred)
             except Exception as e:
@@ -127,7 +148,7 @@ class CreditDataset:
         df_predict_all = pd.concat(predict_dfs, ignore_index=True)
 
         # Select subset of features if specified
-        if feature_names is not None:
+        if feature_names:
             meta_cols = ["quarter", "rating", "target_rating", "ticker", "index"]
             keep_cols = [c for c in meta_cols if c in df_all.columns] + feature_names
             df_all = df_all[[c for c in keep_cols if c in df_all.columns]]
@@ -161,7 +182,8 @@ class CreditDataset:
             "Baa3": 3,
             "Baa2": 3,
             "Baa1": 3,  # Lower
-            "Ba2": 3,  # Non-Investment Grade Speculative (1 sample)
+            "Ba2": 3,
+            "Ba1": 3,  # Non-Investment Grade Speculative (1 sample)
             # Add more once I download more data
         }
 
