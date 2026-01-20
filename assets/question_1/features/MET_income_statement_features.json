@@ -1,0 +1,87 @@
+{
+    "Comprehensive Income": [
+        "comprehensive income net of tax"
+    ],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "policyholder benefits and claims incurred net",
+            "policyholder dividends"
+        ]
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before provision for income tax"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "net income loss",
+        "net income loss available to common stockholders basic",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [],
+        "Interest Income": [
+            "net investment income"
+        ],
+        "Other Income (Expense)": [
+            "gain loss on derivative instruments net pretax",
+            "gain loss on investments",
+            "gain loss on sale of other investments",
+            "liability for future policy benefit remeasurement gain loss",
+            "market risk benefit change in fair value gain loss",
+            "other income",
+            "other than temporary impairment losses investments portion recognized in earnings net availableforsale securities"
+        ],
+        "Total Non-Operating Items": []
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [],
+        "General and Administrative": [],
+        "Other Operating Expenses": [
+            "goodwill impairment loss",
+            "interest credited to policyholders account balances"
+        ],
+        "Research and Development": [],
+        "Sales and Marketing": [],
+        "Total Operating Expenses": [
+            "operating expenses"
+        ]
+    },
+    "Operating Income": [],
+    "Other Comprehensive Income": [
+        "other than temporary impairment losses investments portion in other comprehensive income loss before tax including portion attributable to noncontrolling interest availableforsale securities"
+    ],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic",
+            "income loss from continuing operations per basic share"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted",
+            "income loss from continuing operations per diluted share"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [],
+        "Weighted Average Shares Outstanding (Diluted)": []
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "insurance commissions and fees",
+            "premiums earned net",
+            "revenues"
+        ]
+    },
+    "__unmapped__": [
+        "benefits losses and expenses",
+        "common stock dividends per share cash paid",
+        "comprehensive income net of tax attributable to noncontrolling interest",
+        "comprehensive income net of tax including portion attributable to noncontrolling interest",
+        "dividends preferred stock",
+        "income loss from continuing operations including portion attributable to noncontrolling interest",
+        "income loss from discontinued operations net of tax",
+        "net income loss attributable to noncontrolling interest",
+        "preferred stock redemption premium",
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ]
+}

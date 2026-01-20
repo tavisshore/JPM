@@ -560,17 +560,27 @@ class LSTMForecaster:
                     history=history_df, cfg=llm_config, verbose=True
                 )
 
-            y_pred_unscaled = y_pred_unscaled_df.apply(pd.to_numeric, errors="coerce")
+            y_pred_unscaled_df = y_pred_unscaled_df.apply(
+                pd.to_numeric, errors="coerce"
+            )
             llm_estimation = llm_estimation.apply(pd.to_numeric, errors="coerce")
 
             # Ensure both indices are in pandas datetime format
-            y_pred_unscaled.index = pd.to_datetime(y_pred_unscaled.index)
+            y_pred_unscaled_df.index = pd.to_datetime(y_pred_unscaled_df.index)
             llm_estimation.index = pd.to_datetime(llm_estimation.index)
 
+            # LLM returns single row, broadcast to match validation set size
             if llm_config.adjust:
-                y_pred_unscaled = llm_estimation.values
+                # Replace all predictions with LLM estimation (broadcast single row)
+                y_pred_unscaled = np.tile(
+                    llm_estimation.values, (y_pred_unscaled.shape[0], 1)
+                )
             else:
-                y_pred_unscaled = (y_pred_unscaled.add(llm_estimation)).div(2).values
+                # Average LSTM and LLM (broadcast single row)
+                llm_broadcast = np.tile(
+                    llm_estimation.values, (y_pred_unscaled.shape[0], 1)
+                )
+                y_pred_unscaled = (y_pred_unscaled + llm_broadcast) / 2.0
 
         feature_metrics, per_feature_std = self._compute_feature_metrics(
             y_pred_unscaled, y_gt_unscaled, pred_std_unscaled

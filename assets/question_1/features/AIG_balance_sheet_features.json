@@ -1,0 +1,153 @@
+{
+    "Assets": {
+        "Current": {
+            "Cash and Equivalents": [
+                "cash"
+            ],
+            "Inventory": [],
+            "Marketable Securities (Short-term)": [
+                "equity securities fv ni",
+                "equity securities fv ni current and noncurrent",
+                "other short term investments",
+                "securities purchased under agreements to resell",
+                "short term investments",
+                "trading securities debt",
+                "trading securities equity"
+            ],
+            "Prepaid and Other Current Assets": [
+                "derivative assets"
+            ],
+            "Receivables": [
+                "accrued investment income receivable",
+                "financing receivable excluding accrued interest after allowance for credit loss",
+                "loans and leases receivable net reported amount",
+                "loans and leases receivable net reported amount consumer",
+                "mortgage and other loans receivable net",
+                "notes receivable net",
+                "premiums and other receivables net"
+            ],
+            "Total Current Assets": []
+        },
+        "Non-Current": {
+            "Deferred Tax Assets": [
+                "deferred income tax assets net"
+            ],
+            "Goodwill": [
+                "goodwill"
+            ],
+            "Intangible Assets (net)": [],
+            "Long-term Investments": [
+                "available for sale securities bonds",
+                "available for sale securities debt securities",
+                "available for sale securities equity securities",
+                "debt securities available for sale excluding accrued interest",
+                "held to maturity securities",
+                "investments",
+                "other investments"
+            ],
+            "Other Non-Current Assets": [
+                "deposit contracts assets",
+                "funds held under reinsurance agreements asset",
+                "market risk benefit asset amount",
+                "other assets",
+                "reinsurance assets net of allowance",
+                "separate account assets"
+            ],
+            "Property, Plant, and Equipment (net)": [
+                "flight equipment net",
+                "property plant and equipment net"
+            ],
+            "Total Non-Current Assets": []
+        },
+        "Total Assets": [
+            "assets"
+        ]
+    },
+    "Equity": {
+        "Accumulated Other Comprehensive Income": [
+            "accumulated other comprehensive income loss net of tax"
+        ],
+        "Common Stock and APIC": [
+            "additional paid in capital common stock",
+            "common stock value",
+            "preferred stock including additional paid in capital"
+        ],
+        "Retained Earnings": [
+            "retained earnings accumulated deficit"
+        ],
+        "Total Equity": [
+            "stockholders equity"
+        ],
+        "Treasury Stock": [
+            "treasury stock common value"
+        ]
+    },
+    "Liabilities": {
+        "Current": {
+            "Accounts Payable and Accrued Expenses": [
+                "accrued premiums and other accrued expenses"
+            ],
+            "Deferred Revenue": [
+                "unearned premiums"
+            ],
+            "Other Current Liabilities": [
+                "deposits",
+                "derivative liabilities",
+                "financial instruments sold not yet purchased at fair value",
+                "insurance balances payable",
+                "liability for claims and claims adjustment expense",
+                "policyholder contract deposits"
+            ],
+            "Short-term Debt": [
+                "frbny credit facility",
+                "securities sold under agreements to repurchase"
+            ],
+            "Total Current Liabilities": []
+        },
+        "Non-Current": {
+            "Deferred Tax Liabilities": [],
+            "Lease Liabilities": [],
+            "Long-term Debt": [
+                "long term debt",
+                "other long term debt"
+            ],
+            "Other Non-Current Liabilities": [
+                "deposit contracts liabilities",
+                "funds held under reinsurance agreements liability",
+                "liability for future policy benefits",
+                "market risk benefit liability amount",
+                "other liabilities",
+                "other policyholder funds"
+            ],
+            "Total Non-Current Liabilities": []
+        },
+        "Total Liabilities": [
+            "liabilities"
+        ]
+    },
+    "Totals": {
+        "Total Liabilities and Equity": [
+            "liabilities and stockholders equity"
+        ]
+    },
+    "__unmapped__": [
+        "accounts payable current and noncurrent",
+        "accrued commissions and accrued premium taxes",
+        "assets of disposal group including discontinued operation",
+        "common stock value outstanding",
+        "current and deferred income tax liabilities",
+        "current and deferred income taxes",
+        "debt longterm and shortterm combined amount",
+        "deferred policy acquisition costs and value of business acquired",
+        "income taxes payable current and deferred income tax liabilities net",
+        "liabilities of disposal group including discontinued operation",
+        "minority interest",
+        "noncontrolling nonvoting callable junior and senior preferred interests held by federal reserve bank of new york",
+        "other minority interests",
+        "redeemable noncontrolling interest equity carrying amount",
+        "redeemable noncontrolling interest equity preferred carrying amount",
+        "redeemable noncontrolling interest held by department of treasury",
+        "redeemable noncontrolling nonvoting callable junior preferred interests held by department of treasury",
+        "temporary equity redemption value"
+    ]
+}
