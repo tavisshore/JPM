@@ -31,7 +31,8 @@ The LLM clients requires API keys (currently only OpenAI):
 ```bash
 export OPENAI_API_KEY="your_api_key"
 ```
-We use `https://www.exchangerate-api.com/` to retrieve exchange rates for particular dates - this must be set to sucessfully parse non-USD reports. Otherwise it falls back to static values.
+We use `https://www.exchangerate-api.com/` to retrieve exchange rates for particular dates - this must be set to sucessfully parse non-USD reports. 
+Otherwise it falls back to static annual values.
 ```bash
 export FX_API_KEY='your_fx_api_key'
 ```
