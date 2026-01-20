@@ -77,7 +77,7 @@ class DataConfig:
     """
 
     ticker: str = "AAPL"
-    cache_dir: Path = Path("data/question_1/")
+    cache_dir: Path = Path("assets/question_1/")
     save_dir: Path = Path("results/question_1/")
     plots_dir: Path = Path("results/question_1/plots")
     periods: int = 60  # quarters -> 15 years, post-2008
