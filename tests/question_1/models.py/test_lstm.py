@@ -41,14 +41,14 @@ def _build_config(tmp_path: Path, scheduler: str = "constant"):
 
 
 @unit
-def test_build_optimizer_constant_scheduler_returns_scalar_lr(tmp_path):
-    """_build_optimizer should return a scalar LR when scheduler=constant."""
+def test_build_optimiser_constant_scheduler_returns_scalar_lr(tmp_path):
+    """_build_optimiser should return a scalar LR when scheduler=constant."""
     config = _build_config(tmp_path, scheduler="constant")
     data = DummyDataLoader()
     dataset = DummyStatementsDataset()
     forecaster = LSTMForecaster(config=config, data=data, dataset=dataset)
 
-    optimizer = forecaster._build_optimizer()
+    optimizer = forecaster._build_optimiser()
     lr = optimizer.learning_rate
     lr_value = float(lr.numpy()) if hasattr(lr, "numpy") else float(lr)
     assert lr_value == pytest.approx(config.lstm.lr)
@@ -97,7 +97,7 @@ def test_compile_uses_bs_loss_and_optimizer(tmp_path):
             return_value="LOSS",
         ) as loss_mock,
         patch.object(tf.keras.Model, "compile") as compile_mock,
-        patch.object(LSTMForecaster, "_build_optimizer", return_value="OPT"),
+        patch.object(LSTMForecaster, "_build_optimiser", return_value="OPT"),
     ):
         LSTMForecaster(config=config, data=data, dataset=dataset)
 
@@ -285,3 +285,110 @@ def test_view_results_prints_tables(monkeypatch, tmp_path):
         dataset.bs_structure["Equity"], forecaster.val_results.features
     )
     assert print_table_mock.call_count == 4
+
+
+# Probabilistic and Variational LSTM Tests
+
+
+@unit
+def test_probabilistic_lstm_builds_with_multivariate_normal_output(tmp_path):
+    """Probabilistic LSTM should use MultivariateNormalTriLLayer output."""
+    config = _build_config(tmp_path)
+    config.lstm.probabilistic = True
+    data = DummyDataLoader()
+    dataset = DummyStatementsDataset()
+
+    with patch("jpm.question_1.models.lstm.MultivariateNormalTriLLayer") as mvn_mock:
+        mvn_mock.return_value = lambda x: x
+        forecaster = LSTMForecaster(config=config, data=data, dataset=dataset)
+        assert forecaster.config.lstm.probabilistic is True
+
+    mvn_mock.assert_called_once()
+    call_kwargs = mvn_mock.call_args.kwargs
+    assert call_kwargs["event_size"] == len(dataset.targets)
+
+
+@unit
+def test_probabilistic_lstm_rejects_enforce_balance(tmp_path):
+    """Probabilistic LSTM should raise error when enforce_balance=True."""
+    config = _build_config(tmp_path)
+    config.lstm.probabilistic = True
+    config.lstm.enforce_balance = True
+    data = DummyDataLoader()
+    dataset = DummyStatementsDataset()
+
+    with pytest.raises(ValueError, match="enforce_balance.*probabilistic"):
+        LSTMForecaster(config=config, data=data, dataset=dataset)
+
+
+@unit
+def test_variational_lstm_builds_with_variational_layer(tmp_path):
+    """Variational LSTM should use DenseVariationalLayer for output."""
+    config = _build_config(tmp_path)
+    config.lstm.variational = True
+    data = DummyDataLoader()
+    dataset = DummyStatementsDataset()
+
+    with patch("jpm.question_1.models.lstm.DenseVariationalLayer") as var_mock:
+        var_mock.return_value = lambda x: x
+        forecaster = LSTMForecaster(config=config, data=data, dataset=dataset)
+        assert forecaster.config.lstm.variational is True
+
+    var_mock.assert_called_once()
+    call_kwargs = var_mock.call_args.kwargs
+    assert call_kwargs["units"] == len(dataset.tgt_indices)
+
+
+@unit
+def test_probabilistic_and_variational_are_mutually_exclusive(tmp_path):
+    """Config should reject both probabilistic=True and variational=True."""
+    with pytest.raises(ValueError, match="mutually exclusive"):
+        LSTMConfig(probabilistic=True, variational=True, epochs=1)
+
+
+@integration
+def test_probabilistic_predict_returns_mean_and_std(tmp_path):
+    """Probabilistic LSTM predictions should include uncertainty estimates."""
+    config = _build_config(tmp_path)
+    config.lstm.probabilistic = True
+    data = DummyDataLoader()
+    dataset = DummyStatementsDataset()
+    forecaster = LSTMForecaster(config=config, data=data, dataset=dataset)
+
+    x = np.zeros((1, 1, 5), dtype=np.float32)
+    mean, std = forecaster._predict_probabilistic(x)
+
+    assert mean.shape == (1, len(dataset.targets))
+    assert std.shape == (1, len(dataset.targets))
+    assert np.all(std >= 0)
+
+
+@integration
+def test_variational_predict_with_mc_samples(tmp_path):
+    """Variational LSTM should use Monte Carlo sampling for uncertainty."""
+    config = _build_config(tmp_path)
+    config.lstm.variational = True
+    config.lstm.mc_samples = 5
+    data = DummyDataLoader()
+    dataset = DummyStatementsDataset()
+    forecaster = LSTMForecaster(config=config, data=data, dataset=dataset)
+
+    x = np.zeros((1, 1, 5), dtype=np.float32)
+    mean, std = forecaster._predict_variational(x)
+
+    assert mean.shape == (1, len(dataset.targets))
+    assert std.shape == (1, len(dataset.targets))
+    assert np.all(std >= 0)
+
+
+@integration
+def test_sample_predictions_requires_probabilistic_or_variational(tmp_path):
+    """sample_predictions should error on deterministic models."""
+    config = _build_config(tmp_path)
+    data = DummyDataLoader()
+    dataset = DummyStatementsDataset()
+    forecaster = LSTMForecaster(config=config, data=data, dataset=dataset)
+
+    x = np.zeros((1, 1, 5), dtype=np.float32)
+    with pytest.raises(ValueError, match="probabilistic or variational"):
+        forecaster.sample_predictions(x, n_samples=10)

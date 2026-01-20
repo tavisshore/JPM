@@ -57,7 +57,8 @@ This will take quite a long time but will show progress.
     ```
 
 - **Time-series Forecasting:**
-  - Train **LSTM** forecaster:
+  - **LSTM** forecaster :
+    Trains, evaluates, and compares various forms of LSTM - update CONFIG_VARIATIONS at the top of the file with your desired variety.
     ```bash
     python scripts/question_1/ml/lstm.py
     ```
@@ -67,19 +68,23 @@ This will take quite a long time but will show progress.
     The LLM can be used to either adjust the LSTM estimation, or independently predict the future financial statement features before combining the output with the LSTM.
     ```bash
     python scripts/question_1/ml/ensemble.py
+    # Options: --enforce_balance True --learn_subtotals True
     ```
 
 - **Annual Report Parsing:**
     This script uses the same LLM client to parse pdf annual reports, extracting key financial information. Available reports are stored within `assets/`
     (the argument for parsing is `ticker` although it's the name - to be compatible throughout the config)
     ```bash
-    python scripts/question_1/ml/parse_reports.py --ticker ['alibaba', 'exxon', 'evergrande' ...] # Default is Apple
+    python scripts/question_1/ml/parse_reports.py --ticker msft
+    # Options: --ticker [alibaba, exxon, evergrande, ...]
     ```
 #### Part B: Bonus 1
 - **Credit Rating:**
     This script trains an XGBoost model on credit ratings data constructed from our SEC data and `ratingshistory.info` before giving a credit prediction to your ticker argument.
     ```bash
-    python scripts/question_1/ml/pipeline.py --ticker ['alibaba', 'exxon', 'evergrande' ...] # Default is Apple
+    python scripts/question_1/ml/pipeline.py --ticker msft
+    # Options: --ticker [alibaba, exxon, evergrande, ...]
+    # Shared LSTM options also available (epochs, lookback, etc.)
     ```
 
 

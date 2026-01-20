@@ -29,7 +29,7 @@ from jpm.question_1.vis import (
 
 RATINGS_MAPPINGS = RATINGS_MAPPINGS
 
-# Keep keras tied to tf.keras so unit tests can patch tf.keras.* as expected
+# keras has to stick to tf.keras so pytests can patch tf.keras.* as expected
 keras = tf.keras
 
 tfpl = tfp.layers
@@ -170,7 +170,7 @@ class LSTMForecaster:
         self, config: Config, data: EdgarData, dataset: StatementsDataset
     ) -> None:
         """
-        Initialize the LSTM forecaster.
+        Initialise the LSTM forecaster.
 
         Parameters
         ----------
@@ -256,7 +256,7 @@ class LSTMForecaster:
 
     def _compile_model(self):
         """
-        Compile the model with loss function and optimizer.
+        Compile the model with loss function and optimiser.
 
         Configures the model with either negative log likelihood (for
         probabilistic models) or custom balance sheet loss function
@@ -292,19 +292,19 @@ class LSTMForecaster:
 
             keras.Model.compile(
                 self.model,
-                optimizer=self._build_optimizer(),
+                optimizer=self._build_optimiser(),
                 loss=loss_fn,
                 metrics=["mae"],
             )
 
-    def _build_optimizer(self):
+    def _build_optimiser(self):
         """
-        Create optimizer with optional learning rate schedule.
+        Create optimiser with optional learning rate schedule.
 
         Returns
         -------
         keras.optimizers.Optimizer
-            Adam optimizer with constant or cosine decay learning rate.
+            Adam optimiser with constant or cosine decay learning rate.
         """
         lr = self.config.lstm.lr
         if self.config.lstm.scheduler == "cosine":
@@ -725,19 +725,19 @@ class LSTMForecaster:
         self, y_pred: np.ndarray, y_gt: np.ndarray, history: np.ndarray
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
-        Unscale normalized predictions back to original scale.
+        Unscale normalised predictions back to original scale.
 
-        Reverses standardization by multiplying by standard deviation
+        Reverses standardisation by multiplying by standard deviation
         and adding the mean.
 
         Parameters
         ----------
         y_pred : np.ndarray
-            Normalized predictions of shape (n_samples, n_targets).
+            Normalised predictions of shape (n_samples, n_targets).
         y_gt : np.ndarray
-            Normalized ground truth of shape (n_samples, n_targets).
+            Normalised ground truth of shape (n_samples, n_targets).
         history : np.ndarray
-            Normalized history of shape (n_samples, lookback, features).
+            Normalised history of shape (n_samples, lookback, features).
 
         Returns
         -------
@@ -1308,7 +1308,7 @@ class LSTMForecaster:
         """
         Plot prediction intervals for a specific feature.
 
-        Creates a visualization showing the ground truth, predictions, and
+        Creates a visualisation showing the ground truth, predictions, and
         uncertainty bands at different confidence levels.
 
         Parameters
@@ -1396,7 +1396,7 @@ class LSTMForecaster:
         """
         Plot a heatmap of prediction uncertainties across all features.
 
-        Visualizes which features have the highest prediction uncertainty.
+        Visualises which features have the highest prediction uncertainty.
 
         Parameters
         ----------
