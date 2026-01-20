@@ -14,6 +14,7 @@ dependencies = [
   "tensorflow>=2.14",
   "tensorflow-probability[tf]>=0.25",
   "scikit-learn>=1.3",
+  "scipy>=1.11",
   "edgartools>=4.30",
   "pypdf>=6.5.0",
   "openai>=1.0",

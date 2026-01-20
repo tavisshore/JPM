@@ -8,7 +8,7 @@ import tensorflow_probability as tfp
 from jpm.config.question_1 import Config, LLMConfig
 from jpm.question_1.clients.llm_client import LLMClient
 from jpm.question_1.data import EdgarData, StatementsDataset
-from jpm.question_1.misc import RATINGS_MAPPINGS, set_seed
+from jpm.question_1.misc import RATINGS_MAPPINGS, format_money, set_seed
 from jpm.question_1.models.losses import EnforceBalance, bs_loss
 from jpm.question_1.models.metrics import (
     Metric,
@@ -20,6 +20,9 @@ from jpm.question_1.vis import (
     build_baseline_rows,
     build_equity_rows,
     build_section_rows,
+    colour,
+    colour_mae,
+    fmt,
     make_row,
     print_table,
 )
@@ -31,6 +34,133 @@ keras = tf.keras
 
 tfpl = tfp.layers
 tfd = tfp.distributions
+
+
+class MultivariateNormalTriLLayer(keras.layers.Layer):
+    """Custom layer for multivariate normal distribution output compatible with Keras 3.
+
+    This layer outputs distribution parameters as a tensor, which can be converted
+    to a distribution object during inference.
+    """
+
+    def __init__(self, event_size, name=None, **kwargs):
+        super().__init__(name=name, **kwargs)
+        self.event_size = event_size
+        self.params_size = tfpl.MultivariateNormalTriL.params_size(event_size)
+
+        # Create dense layer for distribution parameters
+        self.dense = keras.layers.Dense(
+            self.params_size, name=f"{name}_params" if name else "params"
+        )
+
+    def call(self, inputs, training=None):
+        """Forward pass that outputs distribution parameters."""
+        return self.dense(inputs)
+
+    def get_config(self):
+        config = super().get_config()
+        config.update(
+            {
+                "event_size": self.event_size,
+            }
+        )
+        return config
+
+
+class DenseVariationalLayer(keras.layers.Layer):
+    """Custom variational dense layer compatible with Keras 3.
+
+    This layer uses variational inference with trainable weight distributions
+    instead of point estimates. Compatible with Keras 3 functional API.
+    """
+
+    def __init__(self, units, kl_weight=1.0, name=None, **kwargs):
+        super().__init__(name=name, **kwargs)
+        self.units = units
+        self.kl_weight = kl_weight
+
+    def build(self, input_shape):
+        input_dim = input_shape[-1]
+
+        self.prior_mean_weights = 0.0
+        self.prior_std_weights = 1.0
+        self.prior_mean_bias = 0.0
+        self.prior_std_bias = 1.0
+
+        # Weight distribution parameters
+        self.w_mean = self.add_weight(
+            name="w_mean",
+            shape=(input_dim, self.units),
+            initializer="glorot_uniform",
+            trainable=True,
+        )
+        self.w_log_std = self.add_weight(
+            name="w_log_std",
+            shape=(input_dim, self.units),
+            initializer=keras.initializers.Constant(-5.0),
+            trainable=True,
+        )
+
+        # Bias distribution parameters
+        self.b_mean = self.add_weight(
+            name="b_mean",
+            shape=(self.units,),
+            initializer="zeros",
+            trainable=True,
+        )
+        self.b_log_std = self.add_weight(
+            name="b_log_std",
+            shape=(self.units,),
+            initializer=keras.initializers.Constant(-5.0),
+            trainable=True,
+        )
+
+        super().build(input_shape)
+
+    def call(self, inputs, training=None):
+        """Forward pass with reparameterization trick."""
+        w_std = tf.exp(self.w_log_std)
+        b_std = tf.exp(self.b_log_std)
+
+        if training:
+            w_noise = tf.random.normal(shape=tf.shape(self.w_mean))
+            b_noise = tf.random.normal(shape=tf.shape(self.b_mean))
+
+            w = self.w_mean + w_std * w_noise
+            b = self.b_mean + b_std * b_noise
+
+            kl_loss = self._compute_kl_divergence(
+                self.w_mean, w_std, self.b_mean, b_std
+            )
+            self.add_loss(self.kl_weight * kl_loss)
+        else:
+            w = self.w_mean
+            b = self.b_mean
+
+        output = tf.matmul(inputs, w) + b
+        return output
+
+    def _compute_kl_divergence(self, w_mean, w_std, b_mean, b_std):
+        """Compute KL divergence between posterior and prior."""
+        kl_w = 0.5 * tf.reduce_sum(
+            tf.square(w_std) + tf.square(w_mean) - 1.0 - 2.0 * tf.math.log(w_std + 1e-8)
+        )
+
+        kl_b = 0.5 * tf.reduce_sum(
+            tf.square(b_std) + tf.square(b_mean) - 1.0 - 2.0 * tf.math.log(b_std + 1e-8)
+        )
+
+        return kl_w + kl_b
+
+    def get_config(self):
+        config = super().get_config()
+        config.update(
+            {
+                "units": self.units,
+                "kl_weight": self.kl_weight,
+            }
+        )
+        return config
 
 
 class LSTMForecaster:
@@ -100,22 +230,14 @@ class LSTMForecaster:
 
         if self.config.lstm.probabilistic:
             n = len(self.dataset.targets)
-            params_size = tfpl.MultivariateNormalTriL.params_size(n)
 
-            params = keras.layers.Dense(
-                params_size,
-                name="params",
-            )(x)
-
-            outputs = tfpl.MultivariateNormalTriL(
+            outputs = MultivariateNormalTriLLayer(
                 event_size=n,
                 name="next_quarter",
-            )(params)
+            )(x)
         else:
             outputs = self._build_output_layer()(x)
 
-        # EnforceBalance is a post-processing constraint layer
-        # Not for probabilistic outputs
         if self.config.lstm.enforce_balance:
             if self.config.lstm.probabilistic:
                 raise ValueError(
@@ -141,15 +263,24 @@ class LSTMForecaster:
         (for deterministic models).
         """
         if self.config.lstm.probabilistic:
+            n = len(self.dataset.targets)
 
-            def nll(y_true, y_pred_dist):
-                return -tf.reduce_mean(y_pred_dist.log_prob(y_true))
+            def nll(y_true, y_pred_params):
+                """Negative log likelihood loss for probabilistic model."""
+                loc = y_pred_params[..., :n]
+                scale_params = y_pred_params[..., n:]
+
+                scale_tril = tfp.bijectors.FillScaleTriL(
+                    diag_bijector=tfp.bijectors.Softplus(low=1e-3)
+                )(scale_params)
+
+                dist = tfd.MultivariateNormalTriL(loc=loc, scale_tril=scale_tril)
+                return -tf.reduce_mean(dist.log_prob(y_true))
 
             keras.Model.compile(
                 self.model,
                 optimizer="adam",
                 loss=nll,
-                metrics=["mae"],
             )
         else:
             loss_fn = bs_loss(
@@ -165,7 +296,6 @@ class LSTMForecaster:
                 loss=loss_fn,
                 metrics=["mae"],
             )
-        # self.model.summary()  # Disabled for batch processing
 
     def _build_optimizer(self):
         """
@@ -201,8 +331,8 @@ class LSTMForecaster:
         Returns
         -------
         keras.layers.Layer
-            Either a standard Dense layer or DenseVariational layer with
-            Bayesian inference capabilities.
+            Either a standard Dense layer or custom DenseVariational layer with
+            Bayesian inference capabilities (Keras 3 compatible).
         """
         if not self.config.lstm.variational:
             return keras.layers.Dense(
@@ -210,13 +340,8 @@ class LSTMForecaster:
             )
 
         kl_weight = self._kl_weight()
-        make_prior_fn = tfp.layers.default_multivariate_normal_fn
-        make_posterior_fn = tfp.layers.default_mean_field_normal_fn()
-
-        return tfp.layers.DenseVariational(
-            len(self.dataset.tgt_indices),
-            make_prior_fn=make_prior_fn,
-            make_posterior_fn=make_posterior_fn,
+        return DenseVariationalLayer(
+            units=len(self.dataset.tgt_indices),
             kl_weight=kl_weight,
             name="next_quarter",
         )
@@ -284,12 +409,11 @@ class LSTMForecaster:
         # Unscale predictions
         y_pred_unscaled = y_pred * self.dataset.target_std + self.dataset.target_mean
 
-        # Compute per-feature std if available
         per_feature_std = np.zeros(y_pred_unscaled.shape[-1])
         if pred_std is not None:
-            per_feature_std = np.mean(pred_std, axis=0)
+            pred_std_unscaled = pred_std * self.dataset.target_std
+            per_feature_std = np.mean(pred_std_unscaled, axis=0)
 
-        # Build feature metrics (no ground truth, so mae=0, gt=0)
         feature_metrics = {
             name: Metric(
                 value=float(y_pred_unscaled[:, idx].mean()),
@@ -300,7 +424,6 @@ class LSTMForecaster:
             for name, idx in self.dataset.feat_to_idx.items()
         }
 
-        # Compute aggregate predictions for assets/liabilities/equity
         asset_idx = self.dataset.feature_mappings["assets"]
         liability_idx = self.dataset.feature_mappings["liabilities"]
         equity_idx = self.dataset.feature_mappings["equity"]
@@ -311,7 +434,6 @@ class LSTMForecaster:
         )
         equity_pred = float(np.sum(y_pred_unscaled[:, equity_idx], axis=-1).mean())
 
-        # Net income prediction
         ni_idx = self.dataset.feat_to_idx.get("Net Income")
         net_income_pred = (
             float(y_pred_unscaled[:, ni_idx].mean()) if ni_idx is not None else 0.0
@@ -403,6 +525,10 @@ class LSTMForecaster:
             y_pred, y_gt, history
         )
 
+        pred_std_unscaled = None
+        if pred_std is not None:
+            pred_std_unscaled = pred_std * self.dataset.target_std
+
         if llm_config:
             history_df = pd.DataFrame(
                 history_unscaled[0],
@@ -441,14 +567,13 @@ class LSTMForecaster:
             y_pred_unscaled.index = pd.to_datetime(y_pred_unscaled.index)
             llm_estimation.index = pd.to_datetime(llm_estimation.index)
 
-            # # If not adjusting - avg the predictions
             if llm_config.adjust:
                 y_pred_unscaled = llm_estimation.values
             else:
                 y_pred_unscaled = (y_pred_unscaled.add(llm_estimation)).div(2).values
 
         feature_metrics, per_feature_std = self._compute_feature_metrics(
-            y_pred_unscaled, y_gt_unscaled, pred_std
+            y_pred_unscaled, y_gt_unscaled, pred_std_unscaled
         )
 
         ticker_results = self._build_results(
@@ -545,26 +670,39 @@ class LSTMForecaster:
             Tuple of (mean_predictions, std_predictions) both with shape
             (n_samples, n_targets).
         """
+        n = len(self.dataset.targets)
+
+        def params_to_dist(params):
+            """Convert parameter tensor to distribution."""
+            loc = params[..., :n]
+            scale_params = params[..., n:]
+            scale_tril = tfp.bijectors.FillScaleTriL(
+                diag_bijector=tfp.bijectors.Softplus(low=1e-3)
+            )(scale_params)
+            return tfd.MultivariateNormalTriL(loc=loc, scale_tril=scale_tril)
+
         if self.config.lstm.mc_samples > 1:
-            dists = [
+            param_outputs = [
                 self.model(history, training=False)
                 for _ in range(self.config.lstm.mc_samples)
             ]
+            dists = [params_to_dist(p) for p in param_outputs]
             means = np.stack([d.mean().numpy() for d in dists], axis=0)
             stds = np.stack([d.stddev().numpy() for d in dists], axis=0)
             return np.mean(means, axis=0), np.mean(stds, axis=0)
 
-        dist = self.model(history, training=False)
+        params = self.model(history, training=False)
+        dist = params_to_dist(params)
         return dist.mean().numpy(), dist.stddev().numpy()
 
     def _predict_variational(
         self, history: np.ndarray
     ) -> tuple[np.ndarray, np.ndarray]:
         """
-        Make variational predictions using Monte Carlo dropout.
+        Make variational predictions using Monte Carlo sampling.
 
-        Performs multiple forward passes with dropout enabled to estimate
-        prediction uncertainty via Monte Carlo sampling.
+        Performs multiple forward passes with weight sampling enabled to estimate
+        prediction uncertainty via Monte Carlo sampling from the variational posterior.
 
         Parameters
         ----------
@@ -578,7 +716,7 @@ class LSTMForecaster:
             (n_samples, n_targets).
         """
         samples = [
-            self.model.predict(history, verbose=0)
+            self.model(history, training=True).numpy()
             for _ in range(self.config.lstm.mc_samples)
         ]
         return np.mean(samples, axis=0), np.std(samples, axis=0)
@@ -932,6 +1070,618 @@ class LSTMForecaster:
             self.dataset.bs_structure["Equity"], results.features
         )
         print_table("Equity", equity_rows)
+
+        if results.baseline_mae:
+            baseline_rows = build_baseline_rows(
+                results.baseline_mae, results.skill, results.model_mae
+            )
+            print_table(
+                "Baseline Comparison (Balance Sheet)",
+                baseline_rows,
+                headers=("Method", "MAE", "Error diff"),
+            )
+
+        print()
+
+    def sample_predictions(
+        self, history: np.ndarray, n_samples: int = 100
+    ) -> np.ndarray:
+        """
+        Generate multiple samples from the predictive distribution.
+
+        For probabilistic models, samples from the output distribution.
+        For variational models, uses Monte Carlo dropout sampling.
+
+        Parameters
+        ----------
+        history : np.ndarray
+            Input sequences of shape (n_samples, lookback, features).
+        n_samples : int, default=100
+            Number of samples to generate from the predictive distribution.
+
+        Returns
+        -------
+        np.ndarray
+            Samples with shape (n_samples, batch_size, n_targets).
+
+        Raises
+        ------
+        ValueError
+            If model is not probabilistic or variational.
+        """
+        if not (self.config.lstm.probabilistic or self.config.lstm.variational):
+            raise ValueError(
+                "sample_predictions requires a probabilistic or variational model"
+            )
+
+        if self.config.lstm.probabilistic:
+            n = len(self.dataset.targets)
+            params = self.model(history, training=False)
+
+            loc = params[..., :n]
+            scale_params = params[..., n:]
+            scale_tril = tfp.bijectors.FillScaleTriL(
+                diag_bijector=tfp.bijectors.Softplus(low=1e-3)
+            )(scale_params)
+            dist = tfd.MultivariateNormalTriL(loc=loc, scale_tril=scale_tril)
+
+            samples = dist.sample(n_samples).numpy()
+        else:
+            samples = np.stack(
+                [self.model(history, training=True).numpy() for _ in range(n_samples)],
+                axis=0,
+            )
+        return samples
+
+    def predict_quantiles(
+        self, history: np.ndarray, quantiles: list[float] | None = None
+    ) -> dict[float, np.ndarray]:
+        """
+        Compute quantile predictions from the predictive distribution.
+
+        Parameters
+        ----------
+        history : np.ndarray
+            Input sequences of shape (n_samples, lookback, features).
+        quantiles : list[float], optional
+            List of quantiles to compute (e.g., [0.05, 0.25, 0.5, 0.75, 0.95]).
+            Default: [0.05, 0.25, 0.5, 0.75, 0.95].
+
+        Returns
+        -------
+        dict[float, np.ndarray]
+            Dictionary mapping quantile values to predictions of shape
+            (n_samples, n_targets).
+
+        Raises
+        ------
+        ValueError
+            If model is not probabilistic or variational.
+        """
+        if quantiles is None:
+            quantiles = [0.05, 0.25, 0.5, 0.75, 0.95]
+
+        if not (self.config.lstm.probabilistic or self.config.lstm.variational):
+            raise ValueError(
+                "predict_quantiles requires a probabilistic or variational model"
+            )
+
+        samples = self.sample_predictions(history, n_samples=1000)
+
+        quantile_preds = {}
+        for q in quantiles:
+            quantile_preds[q] = np.percentile(samples, q * 100, axis=0)
+
+        return quantile_preds
+
+    def get_prediction_intervals(
+        self,
+        history: np.ndarray,
+        confidence_levels: list[float] | None = None,
+    ) -> dict[float, tuple[np.ndarray, np.ndarray]]:
+        """
+        Compute prediction intervals at various confidence levels.
+
+        Parameters
+        ----------
+        history : np.ndarray
+            Input sequences of shape (n_samples, lookback, features).
+        confidence_levels : list[float], optional
+            List of confidence levels (e.g., [0.68, 0.95, 0.99]).
+            Default: [0.68, 0.95, 0.99].
+
+        Returns
+        -------
+        dict[float, tuple[np.ndarray, np.ndarray]]
+            Dictionary mapping confidence levels to (lower, upper) tuples,
+            each with shape (n_samples, n_targets).
+
+        Raises
+        ------
+        ValueError
+            If model is not probabilistic or variational.
+        """
+        if confidence_levels is None:
+            confidence_levels = [0.68, 0.95, 0.99]
+
+        if not (self.config.lstm.probabilistic or self.config.lstm.variational):
+            raise ValueError(
+                "get_prediction_intervals requires a probabilistic or variational model"
+            )
+
+        intervals = {}
+        for level in confidence_levels:
+            alpha = (1 - level) / 2
+            lower_q = alpha
+            upper_q = 1 - alpha
+
+            quantiles = self.predict_quantiles(history, [lower_q, upper_q])
+            intervals[level] = (quantiles[lower_q], quantiles[upper_q])
+
+        return intervals
+
+    def compute_calibration_metrics(
+        self, stage: str = "val"
+    ) -> dict[str, float | dict]:
+        """
+        Compute calibration metrics for probabilistic predictions.
+
+        Evaluates whether the predicted uncertainties are well-calibrated by
+        checking if the empirical coverage matches the nominal coverage.
+
+        Parameters
+        ----------
+        stage : str, default="val"
+            Dataset stage to evaluate on ("val" or "train").
+
+        Returns
+        -------
+        dict[str, float | dict]
+            Dictionary containing:
+            - coverage: dict mapping confidence levels to empirical coverage
+            - calibration_error: mean absolute difference between nominal and empirical coverage
+            - sharpness: average prediction interval width
+            - crps: continuous ranked probability score (if available)
+
+        Raises
+        ------
+        ValueError
+            If model is not probabilistic or stage is invalid.
+        """
+        if not self.config.lstm.probabilistic:
+            raise ValueError(
+                "compute_calibration_metrics requires a probabilistic model"
+            )
+
+        if stage not in {"val", "train"}:
+            raise ValueError("stage must be 'val' or 'train'")
+
+        ds = self.dataset.val_dataset if stage == "val" else self.dataset.train_dataset
+        if ds is None:
+            raise ValueError(f"{stage} dataset is not available")
+
+        history, y_gt = self._collect_batches(ds, stage)
+
+        confidence_levels = [0.50, 0.68, 0.80, 0.90, 0.95, 0.99]
+        intervals = self.get_prediction_intervals(history, confidence_levels)
+
+        coverage = {}
+        interval_widths = []
+
+        for level, (lower, upper) in intervals.items():
+            in_interval = (y_gt >= lower) & (y_gt <= upper)
+            empirical_coverage = np.mean(in_interval)
+            coverage[level] = float(empirical_coverage)
+
+            interval_widths.append(np.mean(upper - lower))
+
+        calibration_error = np.mean(
+            [abs(coverage[level] - level) for level in confidence_levels]
+        )
+
+        sharpness = float(np.mean(intervals[0.95][1] - intervals[0.95][0]))
+
+        crps = None
+        try:
+            samples = self.sample_predictions(history, n_samples=200)
+            mean_abs_error = np.mean(np.abs(samples - y_gt[np.newaxis, :, :]), axis=0)
+            mean_spread = np.mean(np.abs(samples[:100] - samples[100:]), axis=0) / 2
+            crps_per_feature = np.mean(mean_abs_error - mean_spread, axis=0)
+            crps = float(np.mean(crps_per_feature))
+        except Exception:
+            pass
+
+        return {
+            "coverage": coverage,
+            "calibration_error": float(calibration_error),
+            "sharpness": sharpness,
+            "crps": crps,
+        }
+
+    def plot_prediction_intervals(
+        self,
+        feature_name: str,
+        stage: str = "val",
+        confidence_levels: list[float] | None = None,
+        max_periods: int = 20,
+    ) -> None:
+        """
+        Plot prediction intervals for a specific feature.
+
+        Creates a visualization showing the ground truth, predictions, and
+        uncertainty bands at different confidence levels.
+
+        Parameters
+        ----------
+        feature_name : str
+            Name of the feature to plot (must be in dataset.targets).
+        stage : str, default="val"
+            Dataset stage to plot ("val" or "train").
+        confidence_levels : list[float], optional
+            Confidence levels to plot. Default: [0.68, 0.95].
+        max_periods : int, default=20
+            Maximum number of time periods to display.
+
+        Raises
+        ------
+        ValueError
+            If model is not probabilistic, feature not found, or stage is invalid.
+        """
+        if not self.config.lstm.probabilistic:
+            raise ValueError("plot_prediction_intervals requires a probabilistic model")
+
+        if feature_name not in self.dataset.targets:
+            raise ValueError(f"Feature '{feature_name}' not found in targets")
+
+        if stage not in {"val", "train"}:
+            raise ValueError("stage must be 'val' or 'train'")
+
+        if confidence_levels is None:
+            confidence_levels = [0.68, 0.95]
+
+        import matplotlib.pyplot as plt
+
+        ds = self.dataset.val_dataset if stage == "val" else self.dataset.train_dataset
+        history, y_gt = self._collect_batches(ds, stage)
+
+        n_periods = min(max_periods, y_gt.shape[0])
+        history = history[:n_periods]
+        y_gt = y_gt[:n_periods]
+
+        y_pred, pred_std = self._predict_with_uncertainty(history)
+        intervals = self.get_prediction_intervals(history, confidence_levels)
+
+        y_pred_unscaled = y_pred * self.dataset.target_std + self.dataset.target_mean
+        y_gt_unscaled = y_gt * self.dataset.target_std + self.dataset.target_mean
+
+        feat_idx = self.dataset.feat_to_idx[feature_name]
+
+        pred = y_pred_unscaled[:, feat_idx]
+        gt = y_gt_unscaled[:, feat_idx]
+
+        fig, ax = plt.subplots(figsize=(12, 6))
+        x = np.arange(n_periods)
+
+        ax.plot(x, gt, "o-", label="Ground Truth", color="black", linewidth=2)
+        ax.plot(x, pred, "s-", label="Prediction", color="blue", linewidth=2)
+
+        colors = ["lightblue", "lightcoral", "lightyellow"]
+        for i, level in enumerate(sorted(confidence_levels, reverse=True)):
+            lower, upper = intervals[level]
+            lower_unscaled = lower * self.dataset.target_std + self.dataset.target_mean
+            upper_unscaled = upper * self.dataset.target_std + self.dataset.target_mean
+
+            ax.fill_between(
+                x,
+                lower_unscaled[:, feat_idx],
+                upper_unscaled[:, feat_idx],
+                alpha=0.3,
+                color=colors[i % len(colors)],
+                label=f"{level * 100:.0f}% CI",
+            )
+
+        ax.set_xlabel("Time Period")
+        ax.set_ylabel(f"{feature_name} (Unscaled)")
+        ax.set_title(
+            f"Probabilistic Forecast: {feature_name} ({stage} set)\n"
+            f"{self.config.data.ticker}"
+        )
+        ax.legend(loc="best")
+        ax.grid(True, alpha=0.3)
+
+        plt.tight_layout()
+        plt.show()
+
+    def plot_uncertainty_heatmap(self, stage: str = "val") -> None:
+        """
+        Plot a heatmap of prediction uncertainties across all features.
+
+        Visualizes which features have the highest prediction uncertainty.
+
+        Parameters
+        ----------
+        stage : str, default="val"
+            Dataset stage to plot ("val" or "train").
+
+        Raises
+        ------
+        ValueError
+            If model is not probabilistic or stage is invalid.
+        """
+        if not self.config.lstm.probabilistic:
+            raise ValueError("plot_uncertainty_heatmap requires a probabilistic model")
+
+        if stage not in {"val", "train"}:
+            raise ValueError("stage must be 'val' or 'train'")
+
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+
+        results = self.val_results if stage == "val" else self.train_results
+
+        feature_names = []
+        uncertainties = []
+
+        for name in self.dataset.targets:
+            if name in results.pred_std:
+                feature_names.append(name)
+                uncertainties.append(results.pred_std[name])
+
+        data = np.array(uncertainties).reshape(-1, 1)
+
+        fig, ax = plt.subplots(figsize=(10, max(8, len(feature_names) * 0.3)))
+        sns.heatmap(
+            data,
+            yticklabels=feature_names,
+            xticklabels=["Std Dev"],
+            annot=True,
+            fmt=".2e",
+            cmap="YlOrRd",
+            cbar_kws={"label": "Prediction Std Dev"},
+            ax=ax,
+        )
+
+        ax.set_title(
+            f"Prediction Uncertainty by Feature ({stage} set)\n{self.config.data.ticker}"
+        )
+        plt.tight_layout()
+        plt.show()
+
+    def view_calibration_results(self, stage: str = "val") -> None:
+        """
+        Display calibration diagnostics in a formatted table.
+
+        Shows empirical coverage vs nominal coverage, calibration error,
+        sharpness, and CRPS metrics.
+
+        Parameters
+        ----------
+        stage : str, default="val"
+            Dataset stage to evaluate ("val" or "train").
+
+        Raises
+        ------
+        ValueError
+            If model is not probabilistic or stage is invalid.
+        """
+        if not self.config.lstm.probabilistic:
+            print("Model is not probabilistic. Use view_results() instead.")
+            return
+
+        print(
+            f"\033[1mCalibration Diagnostics for {stage} dataset ({self.config.data.ticker}):\033[0m\n"
+        )
+
+        metrics = self.compute_calibration_metrics(stage)
+
+        coverage_rows = []
+        for level in sorted(metrics["coverage"].keys()):
+            nominal = level
+            empirical = metrics["coverage"][level]
+            diff = empirical - nominal
+
+            if abs(diff) < 0.05:
+                diff_str = colour(f"{diff:+.3f}", "green")
+            elif abs(diff) < 0.10:
+                diff_str = colour(f"{diff:+.3f}", "yellow")
+            else:
+                diff_str = colour(f"{diff:+.3f}", "red")
+
+            coverage_rows.append(
+                [
+                    f"{nominal * 100:.0f}%",
+                    f"{empirical * 100:.1f}%",
+                    diff_str,
+                ]
+            )
+
+        print_table(
+            "Prediction Interval Coverage",
+            coverage_rows,
+            headers=("Nominal Coverage", "Empirical Coverage", "Difference"),
+        )
+
+        print("\nOverall Calibration Metrics:")
+        print(f"  Calibration Error (MAE): {colour_mae(metrics['calibration_error'])}")
+        print(f"  Sharpness (95% PI width): {colour_mae(metrics['sharpness'])}")
+        if metrics["crps"] is not None:
+            print(f"  CRPS: {colour_mae(metrics['crps'])}")
+
+        print("\nInterpretation:")
+        print(
+            "  - Well-calibrated: Empirical coverage ≈ Nominal coverage (difference < 5%)"
+        )
+        print("  - Sharpness: Lower is better (narrower prediction intervals)")
+        print("  - CRPS: Lower is better (better probabilistic forecasts)")
+        print()
+
+    def view_probabilistic_results(
+        self, stage: str = "val", confidence_level: float = 0.95
+    ) -> None:
+        """
+        Display probabilistic forecast results with uncertainty intervals.
+
+        Shows predictions with confidence intervals for probabilistic models,
+        including per-feature uncertainty estimates and distribution statistics.
+
+        Parameters
+        ----------
+        stage : str, default="val"
+            Dataset stage to display results for ("val" or "train").
+        confidence_level : float, default=0.95
+            Confidence level for prediction intervals (e.g., 0.95 for 95% CI).
+        """
+        if not self.config.lstm.probabilistic:
+            print("Model is not probabilistic. Use view_results() instead.")
+            return
+
+        results = self.val_results if stage == "val" else self.train_results
+
+        print(
+            f"\033[1mProbabilistic Results for {stage} dataset ({self.config.data.ticker}):\033[0m"
+        )
+        print(f"Confidence Level: {confidence_level * 100:.0f}%\n")
+
+        from scipy import stats
+
+        z = stats.norm.ppf((1 + confidence_level) / 2)
+
+        def make_prob_row(category: str, metric: Metric, std: float) -> list[str]:
+            """Build row with prediction, CI, and ground truth."""
+            ci_lower = metric.value - z * std
+            ci_upper = metric.value + z * std
+            return [
+                category,
+                format_money(metric.gt),
+                format_money(metric.value),
+                f"{format_money(ci_lower)} to {format_money(ci_upper)}",
+                colour_mae(metric.mae),
+            ]
+
+        asset_idx = self.dataset.feature_mappings["assets"]
+        liability_idx = self.dataset.feature_mappings["liabilities"]
+        equity_idx = self.dataset.feature_mappings["equity"]
+
+        assets_std = np.sqrt(
+            sum(
+                results.pred_std[name] ** 2
+                for name in self.dataset.targets
+                if self.dataset.feat_to_idx.get(name) in asset_idx
+            )
+        )
+        liabilities_std = np.sqrt(
+            sum(
+                results.pred_std[name] ** 2
+                for name in self.dataset.targets
+                if self.dataset.feat_to_idx.get(name) in liability_idx
+            )
+        )
+        equity_std = np.sqrt(
+            sum(
+                results.pred_std[name] ** 2
+                for name in self.dataset.targets
+                if self.dataset.feat_to_idx.get(name) in equity_idx
+            )
+        )
+
+        overall_rows = [
+            make_prob_row("Assets", results.assets, assets_std),
+            make_prob_row("Liabilities", results.liabilities, liabilities_std),
+            make_prob_row("Equity", results.equity, equity_std),
+        ]
+        print_table(
+            "Overall with Confidence Intervals",
+            overall_rows,
+            headers=(
+                "Category",
+                "Ground Truth",
+                "Predicted",
+                f"{confidence_level * 100:.0f}% CI",
+                "Error",
+            ),
+        )
+
+        def build_prob_section_rows(
+            sections: dict[str, list[str]],
+            feature_stats: dict[str, Metric],
+        ) -> list[list[str]]:
+            """Create rows with uncertainty for features."""
+            rows = []
+            for feat in sections:
+                m = feature_stats.get(feat)
+                if m is None:
+                    continue
+                std = results.pred_std.get(feat, 0.0)
+                ci_lower = m.value - z * std
+                ci_upper = m.value + z * std
+                rows.append(
+                    [
+                        fmt(feat),
+                        format_money(m.gt),
+                        format_money(m.value),
+                        f"{format_money(ci_lower)} to {format_money(ci_upper)}",
+                        colour_mae(m.mae),
+                    ]
+                )
+            return rows
+
+        assets_rows = build_prob_section_rows(
+            self.dataset.bs_structure["Assets"], results.features
+        )
+        print_table(
+            "Assets with Confidence Intervals",
+            assets_rows,
+            headers=(
+                "Category",
+                "Ground Truth",
+                "Predicted",
+                f"{confidence_level * 100:.0f}% CI",
+                "Error",
+            ),
+        )
+
+        liabilities_rows = build_prob_section_rows(
+            self.dataset.bs_structure["Liabilities"], results.features
+        )
+        print_table(
+            "Liabilities with Confidence Intervals",
+            liabilities_rows,
+            headers=(
+                "Category",
+                "Ground Truth",
+                "Predicted",
+                f"{confidence_level * 100:.0f}% CI",
+                "Error",
+            ),
+        )
+
+        equity_rows = build_prob_section_rows(
+            self.dataset.bs_structure["Equity"], results.features
+        )
+        print_table(
+            "Equity with Confidence Intervals",
+            equity_rows,
+            headers=(
+                "Category",
+                "Ground Truth",
+                "Predicted",
+                f"{confidence_level * 100:.0f}% CI",
+                "Error",
+            ),
+        )
+
+        print("\nUncertainty Statistics:")
+        avg_std = np.mean(list(results.pred_std.values()))
+        max_std_feature = max(results.pred_std.items(), key=lambda x: x[1])
+        min_std_feature = min(results.pred_std.items(), key=lambda x: x[1])
+
+        print(f"  Average Prediction Std Dev: {colour_mae(avg_std)}")
+        print(
+            f"  Highest Uncertainty: {fmt(max_std_feature[0])} ({colour_mae(max_std_feature[1])})"
+        )
+        print(
+            f"  Lowest Uncertainty: {fmt(min_std_feature[0])} ({colour_mae(min_std_feature[1])})"
+        )
 
         if results.baseline_mae:
             baseline_rows = build_baseline_rows(

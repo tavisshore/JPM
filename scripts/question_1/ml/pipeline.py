@@ -1,7 +1,23 @@
-# 2. Trains XGBoost
-# 3. Train LSTM
-# 4. Parse Report -> Credit Rating
-# 5. LSTM output -> ratios -> Credit rating
+"""
+End-to-End Pipeline for Credit Rating Prediction.
+
+This comprehensive pipeline integrates multiple components for credit rating analysis:
+
+Workflow:
+1. Train XGBoost model on financial ratios to predict credit ratings
+2. Extract financial ratios from annual reports using LLM parsing
+3. Predict credit ratings from extracted ratios
+4. Optionally integrate with LSTM balance sheet forecasts
+
+Components:
+- XGBoost classifier trained on historical ratio-to-rating mappings
+- LLM-based annual report parser for ratio extraction
+- Feature engineering and model evaluation
+- Prediction confidence scoring and analysis
+
+The pipeline supports both historical model training and real-time report analysis
+for credit risk assessment.
+"""
 
 import numpy as np
 

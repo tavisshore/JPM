@@ -1,3 +1,26 @@
+"""
+XGBoost Credit Rating Model Training Script.
+
+Trains a gradient boosting classifier to predict credit ratings from financial ratios.
+The script performs:
+
+Training Process:
+- Load historical credit rating data with financial ratios
+- Split data into train/validation/test sets
+- Train XGBoost classifier with hyperparameter tuning
+- Evaluate model performance on test set
+
+Outputs:
+- Trained model with performance metrics (accuracy, F1 score)
+- Feature importance analysis
+- Confusion matrices (normalized and unnormalized)
+- Training history plots
+- Predictions on future quarters with confidence scores
+
+The model maps financial health indicators to credit rating categories
+(Prime, High, Medium, Low) for risk assessment. # Expanding later
+"""
+
 from jpm.config import Config, DataConfig, LLMConfig, LSTMConfig, XGBConfig
 from jpm.question_1 import CreditDataset, CreditRatingModel, get_args, set_seed
 

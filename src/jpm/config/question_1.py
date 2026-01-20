@@ -228,7 +228,9 @@ class LSTMConfig:
     dropout : float, optional
         Dropout rate for regularization (default: 0.1).
     variational : bool, optional
-        Whether to use variational dropout (default: False).
+        Whether to use variational inference with Bayesian weights (default: False).
+        When enabled, the output layer learns weight distributions instead of point
+        estimates, providing uncertainty quantification via Monte Carlo sampling.
     probabilistic : bool, optional
         Whether to use probabilistic predictions (default: False).
     mc_samples : int, optional
@@ -298,6 +300,11 @@ class LSTMConfig:
             raise ValueError("dropout must be in [0, 1)")
         if self.mc_samples <= 0:
             raise ValueError("mc_samples must be positive")
+        if self.variational and self.probabilistic:
+            raise ValueError(
+                "variational and probabilistic cannot both be True - "
+                "they are mutually exclusive uncertainty quantification approaches"
+            )
         # Training validation
         if self.lr <= 0:
             raise ValueError("lr must be positive")

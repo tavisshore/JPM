@@ -1,3 +1,18 @@
+"""
+Annual Report Parser Script.
+
+Uses LLM to extract financial information from annual reports (PDF format).
+The script:
+
+- Loads annual report PDFs
+- Extracts relevant pages containing financial data
+- Uses LLM to parse and structure financial ratios and metrics
+- Outputs structured data for downstream credit rating prediction
+
+This standalone script focuses solely on document parsing and information
+extraction, supporting the broader credit analysis pipeline.
+"""
+
 from jpm.config import Config, DataConfig, LLMConfig
 from jpm.question_1 import LLMClient, get_args, set_seed
 

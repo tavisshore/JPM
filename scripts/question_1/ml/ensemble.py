@@ -1,3 +1,18 @@
+"""
+Ensemble Model
+
+Combines LSTM forecasting with LLM-based adjustments to create an ensemble
+approach for predicting financial statements. The script:
+
+- Trains an LSTM model on historical financial data
+- Uses an LLM to refine or average predictions
+- Evaluates the ensemble on validation data
+- Computes balance sheet identity error and income statement metrics
+
+The ensemble approach leverages both neural network pattern recognition
+and LLM reasoning capabilities for improved forecast accuracy.
+"""
+
 from jpm.config import Config, DataConfig, LLMConfig, LSTMConfig
 from jpm.question_1 import (
     BalanceSheet,
