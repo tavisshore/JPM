@@ -82,35 +82,19 @@ This will take quite a long time but will show progress.
     python scripts/question_1/ml/pipeline.py --ticker ['alibaba', 'exxon', 'evergrande' ...] # Default is Apple
     ```
 
-## Question 3 - DeepHalo Reproduction
-### Part 1
-The experiments are implemented as Python modules and can be invoked directly.
-- Table 1
-```bash
-  python scripts/question_3/part_1/reproduce_table1.py
-```
-- Decoy effect
-```bash
-  python scripts/question_3/part_1/decoy_effect.py
-```
-- Attraction effect
-```bash
-  python scripts/question_3/part_1/attraction_effect_tf.py
-```
-- Compromise effect
-```bash
-  python scripts/question_3/part_1/compromise_effect_tf.py
-```
-- Attraction effect (PyTorch)
-```bash
-  python scripts/question_3/part_1/attraction_effect_torch.py
-```
----
 
-### Part 2
-```bash
-  python scripts/question_3/part_2/run_replication_choice_learn.py
+## Question 3 (Discrete Choice Models)
+The solution to **Question 3** is located under:
+ ```bash
+src/jpm/question_3/
 ```
+All runnable scripts are executed from the **repository root** using paths under:
+```bash
+scripts/question_3/
+```
+
+Please see `src/jpm/question_3/readme.md` for full instructions.
+
 
 ## Citations
 ```
