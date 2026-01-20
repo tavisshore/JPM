@@ -55,17 +55,29 @@ import numpy as np
 # -----------------------------------------------------------------------------
 # Repo import handling (FIXED)
 # -----------------------------------------------------------------------------
+from pathlib import Path
+import sys
+
 HERE = Path(__file__).resolve()
 
-# If file is Part_2_Closer/replication_lu25/run_replication_study.py:
-# REPL_ROOT = Part_2_Closer/replication_lu25
-# PROJECT_ROOT = Part_2_Closer
-REPL_ROOT = HERE.parent
-PROJECT_ROOT = REPL_ROOT.parent
+def find_project_root(start: Path) -> Path:
+    for p in [start] + list(start.parents):
+        if (p / "replication_lu25").is_dir():
+            return p
+    raise RuntimeError(
+        f"Could not find project root containing 'replication_lu25' when starting from {start}"
+    )
 
-# Ensure we can import "simulation.*" and "estimators.*" from replication_lu25/
+PROJECT_ROOT = find_project_root(HERE.parent)
+REPL_ROOT = PROJECT_ROOT / "replication_lu25"
+
 if str(REPL_ROOT) not in sys.path:
     sys.path.insert(0, str(REPL_ROOT))
+
+# Defaults for optional modules (prevents NameError later)
+HAS_LU25_MAP = False
+estimate_lu25_map = None
+Lu25MapConfig = None
 
 try:
     from estimators.blp import estimate_blp_sigma
@@ -73,14 +85,11 @@ try:
     from simulation.config import SimConfig
     from simulation.simulate import simulate_dataset
 
-    # lu25 MAP is optional (older repo layouts may not have it)
     try:
         from estimators.lu25_map import Lu25MapConfig, estimate_lu25_map
 
         HAS_LU25_MAP = True
     except Exception:
-        estimate_lu25_map = None
-        Lu25MapConfig = None
         HAS_LU25_MAP = False
 
 except Exception as e:

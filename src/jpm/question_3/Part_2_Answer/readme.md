@@ -203,5 +203,7 @@ Part 2 is intended to be run in a **TensorFlow-enabled conda environment**.
 From the repository root:
 
 ```bash
-conda activate tf-mac
- 1be4ccf1e4620038679e53b55406005cb3f02d42
+conda env create -f environment.yml
+conda activate choice-learn-lu25
+
+python replication_lu25/run_replication_study.py
