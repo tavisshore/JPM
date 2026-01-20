@@ -9,7 +9,7 @@ from jpm.config import Config
 from jpm.question_1 import EdgarData, get_args
 
 # S&P 500 companies
-sp500 = """
+data_tickers = """
 AAPL MSFT GOOGL AMZN NVDA META TSLA BRK.B UNH XOM JNJ JPM V PG MA HD CVX ABBV MRK AVGO
 COST PEP ADBE LLY WMT TMO CSCO MCD ACN CRM ABT NFLX DHR TXN NKE DIS ORCL VZ INTC
 CMCSA PFE PM NEE WFC UPS COP RTX IBM BA QCOM AMD INTU NOW CAT GS MS SPGI LOW AXP
@@ -42,12 +42,14 @@ def process_ticker(ticker):
 max_workers = 4
 
 with ThreadPoolExecutor(max_workers=max_workers) as executor:
-    futures = {executor.submit(process_ticker, ticker): ticker for ticker in sp500}
+    futures = {
+        executor.submit(process_ticker, ticker): ticker for ticker in data_tickers
+    }
 
     results = {}
     errors = {}
 
-    with tqdm(total=len(sp500), desc="Downloading", unit="ticker") as pbar:
+    with tqdm(total=len(data_tickers), desc="Downloading", unit="ticker") as pbar:
         for future in as_completed(futures):
             ticker = futures[future]
             ticker_result, data, error = future.result()
@@ -62,6 +64,6 @@ with ThreadPoolExecutor(max_workers=max_workers) as executor:
             pbar.set_postfix_str(f"✅ {len(results)} | ❌ {len(errors)}")
 
 print(f"\n{'=' * 60}")
-print(f"Successfully processed: {len(results)}/{len(sp500)}")
+print(f"Successfully processed: {len(results)}/{len(data_tickers)}")
 if errors:
     print(f"Failed tickers: {', '.join(errors.keys())}")

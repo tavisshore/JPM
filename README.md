@@ -24,28 +24,34 @@ pytest -v
 
 ## Question 1 - Financial Statement Forecasting
 #### Environment Variables
-EDGAR requires an email for downloads:
+EDGAR requires an email for SEC downloads:
 ```bash
 export EDGAR_EMAIL="your_email@address.com"
 ```
-The LLM clients requires API keys (currently only OpenAI):
+
+The LLM clients require API keys (currently only OpenAI is compatible):
 ```bash
 export OPENAI_API_KEY="your_api_key"
 ```
-We use `https://www.exchangerate-api.com/` to retrieve exchange rates for particular dates - this must be set to sucessfully parse non-USD reports.
-Otherwise it falls back to static annual values.
+
+When parsing non-USD annual reports, we use `https://www.exchangerate-api.com/` to retrieve FX rates for the report date - this must be set to accurately parse non-USD reports - otherwise it falls back to innacurate static annual values.
 ```bash
 export FX_API_KEY='your_fx_api_key'
 ```
+
+#### Configuration
+All configuration defaults can be edited in `src/jpm/config/question_1.py`, and most are available as terminal arguments.
+
 #### Downloading Data
-There is a script that will attempt to download all suitable data - requiring above environments:
+This script downloads data from all `data_tickers` - if available from EDGAR, can be edited.
 ```bash
 python scripts/question_1/download_data.py --cache_dir 'YOUR_DESIRED_LOCATION'
 ```
-This will take quite a long time but will show progress.
+This will take quite a long time but shows progress and a time estimate.
 
 ### Part 1
 - **Vélez-Pareja:**
+  The models below are constructed following the cited academic papers - outputs match those in the papers.
   - **Plugless:** from the paper *Forecasting Financial Statements with No plugs and No Circularity* [1]
     ```bash
     python scripts/question_1/valez/noplug.py
@@ -57,8 +63,8 @@ This will take quite a long time but will show progress.
     ```
 
 - **Time-series Forecasting:**
-  - **LSTM** forecaster :
-    Trains, evaluates, and compares various forms of LSTM - update CONFIG_VARIATIONS at the top of the file with your desired variety.
+  - **Deterministic / Variational / Probabilistic LSTM** - predict future financial statement values
+  Script is an evaluation - CONFIG_VARIATIONS can be edited to desired variety.
     ```bash
     python scripts/question_1/ml/lstm.py
     ```
@@ -68,7 +74,6 @@ This will take quite a long time but will show progress.
     The LLM can be used to either adjust the LSTM estimation, or independently predict the future financial statement features before combining the output with the LSTM.
     ```bash
     python scripts/question_1/ml/ensemble.py
-    # Options: --enforce_balance True --learn_subtotals True
     ```
 
 - **Annual Report Parsing:**
@@ -84,7 +89,6 @@ This will take quite a long time but will show progress.
     ```bash
     python scripts/question_1/ml/pipeline.py --ticker msft
     # Options: --ticker [alibaba, exxon, evergrande, ...]
-    # Shared LSTM options also available (epochs, lookback, etc.)
     ```
 
 
