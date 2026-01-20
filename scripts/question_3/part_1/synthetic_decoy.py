@@ -45,7 +45,7 @@ def simulate_decoy_data(N_per_type=500):
 
 def main():
     tf.random.set_seed(0)
-    np.random.set_seed(0)
+    np.random.seed(0)
 
     available, item_ids, choices, mask_A, mask_B = simulate_decoy_data()
 
