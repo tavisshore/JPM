@@ -356,6 +356,14 @@ class EdgarData:
                 print(f"No Moody's ratings found for {self.config.data.ticker}.")
                 self.ratings_data = pd.DataFrame()
                 return
+        else:
+            # Data processing may have failed halfway
+            try:
+                _ratings_df = pd.read_parquet(self.ratings_partial_data_path)
+            except (OSError, ValueError):
+                print(
+                    f"Failed to load cached ratings at {self.ratings_partial_data_path}."
+                )
 
         if not self.ratings_data_path.exists() or self.overwrite or ratings_updated:
             # Select only the relevant company's data
