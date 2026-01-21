@@ -72,7 +72,6 @@ cache/
 temp/
 examples/
 docs/
-results/
 temp.*
 *.xlsx
 ckpts/*

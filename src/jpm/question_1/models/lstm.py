@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -1387,11 +1388,11 @@ class LSTMForecaster:
 
     def plot_series_with_uncertainty(
         self,
-        feature_name: str,
+        feature_name: str = "Net Income",
         history: np.ndarray | None = None,
         save_path: Path | None = None,
-        n_periods: int = 50,
-        n_samples: int = 100,
+        n_samples: int = 1000,
+        previous_quarters: int = 4,
     ) -> None:
         """
         Plot time series with uncertainty bands for a specific feature.
@@ -1402,9 +1403,7 @@ class LSTMForecaster:
             Name of the feature to plot (must be in dataset.targets).
         history : np.ndarray
             Input sequences of shape (n_samples, lookback, features).
-        n_periods : int, default=50
-            Number of time periods to display.
-        n_samples : int, default=100
+        n_samples : int, default=1000
             Number of samples to draw from the predictive distribution.
         Raises
         ------
@@ -1424,47 +1423,67 @@ class LSTMForecaster:
             ds = self.dataset.val_dataset
             if ds is None:
                 raise ValueError("Validation dataset is not available")
-            history, _ = self._collect_batches(ds, stage="val")
+            history, y_gt_all = self._collect_batches(ds, stage="val")
+        # (withheld, lookback, features), (withheld, features)
+        # y_gt_val = y_gt_all[:, self.dataset.feat_to_idx[feature_name]]
+
+        y_gt_val = (
+            y_gt_all[:, self.dataset.feat_to_idx[feature_name]]
+            * self.dataset.target_std[self.dataset.feat_to_idx[feature_name]]
+            + self.dataset.target_mean[self.dataset.feat_to_idx[feature_name]]
+        )
 
         samples = self.sample_predictions(history, n_samples=n_samples)
 
-        feat_idx = self.dataset.feat_to_idx[feature_name]
-        samples_unscaled = (
-            samples[:, :, feat_idx] * self.dataset.target_std[feat_idx]
-            + self.dataset.target_mean[feat_idx]
+        # Collect historical ground truth
+        ds = self.dataset.train_dataset
+        history, _ = self._collect_batches(ds, stage="train")
+        history_unscaled = (
+            history[-previous_quarters:, -1, self.dataset.feat_to_idx[feature_name]]
+            * self.dataset.target_std[self.dataset.feat_to_idx[feature_name]]
+            + self.dataset.target_mean[self.dataset.feat_to_idx[feature_name]]
         )
 
-        mean_pred = np.mean(samples_unscaled, axis=0)
-        lower_bound = np.percentile(samples_unscaled, 2.5, axis=0)
-        upper_bound = np.percentile(samples_unscaled, 97.5, axis=0)
+        # (n_samples, withheld, features)
+        fig, ax = plt.subplots(figsize=(8, 4))
+        cmap = cm.Blues
 
-        periods = min(n_periods, mean_pred.shape[0])
-        x = np.arange(periods)
-        print(x)
-        print(lower_bound)
-        print(upper_bound)
-        fig, ax = plt.subplots(figsize=(12, 6))
-        ax.plot(x, mean_pred[:periods], label="Mean Prediction", color="blue")
-        ax.fill_between(
-            x,
-            lower_bound[:periods],
-            upper_bound[:periods],
-            color="lightblue",
-            alpha=0.5,
-            label="95% Prediction Interval",
-        )
+        intervals = [95, 80, 50]
+        for idx, interval in enumerate(intervals):
+            mean_pred, lower_bound, upper_bound, val_gt = (
+                self.compute_predictions_with_history(
+                    samples,
+                    feature_name,
+                    interval=interval,
+                    val_gt=y_gt_val,
+                    history_unscaled=history_unscaled,
+                )
+            )
+            color = cmap(0.2 + 0.5 * idx / (len(intervals) - 1))
+            x = np.arange(mean_pred.shape[0])
+            ax.plot(x, mean_pred, label="Mean Prediction", color="blue")
+            ax.plot(x, val_gt, label="Ground Truth", color="green")
+            ax.fill_between(
+                x,
+                lower_bound,
+                upper_bound,
+                color=color,
+                alpha=1 - (0.5 * interval) / 100,
+                label=f"{interval}% PI",
+            )
 
         ax.set_xlabel("Time Period")
-        ax.set_ylabel(f"{feature_name} (Unscaled)")
-        ax.set_title(
-            f"Time Series with Uncertainty: {feature_name}\n{self.config.data.ticker}"
-        )
-        ax.legend(loc="best")
+        ax.set_ylabel(f"{feature_name} USD$")
+        ax.set_title(f"Probabilistic LSTM\n{self.config.data.ticker}: {feature_name}")
+        handles, labels = plt.gca().get_legend_handles_labels()
+        by_label = dict(zip(labels, handles, strict=True))
+        ax.legend(by_label.values(), by_label.keys(), loc="best")
+
         ax.grid(True, alpha=0.3)
 
         plt.tight_layout()
         if save_path:
-            plt.savefig(save_path)
+            plt.savefig(save_path, dpi=300)
         else:
             plt.show()
 
@@ -1715,6 +1734,52 @@ class LSTMForecaster:
             )
 
         print()
+
+    def compute_predictions_with_history(
+        self,
+        samples: np.ndarray,
+        feature_name: str,
+        history_unscaled: np.ndarray,
+        interval: float = 95,
+        val_gt: np.ndarray | None = None,
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """
+        Compute mean prediction and confidence bounds for a feature,
+        including previous ground-truth history.
+
+        Args:
+            samples: Array of shape (n_samples, horizon, n_features), scaled.
+            feature_name: Name of the target feature.
+            history_unscaled: Array of shape (previous_quarters,), unscaled.
+            interval: Confidence interval percentage (e.g., 95 for 95% CI).
+            val_gt: Array of shape (horizon,), unscaled ground truth values.
+        Returns:
+            mean_pred: (previous_quarters + horizon,) array
+            lower_bound: (previous_quarters + horizon,) array
+            upper_bound: (previous_quarters + horizon,) array
+        """
+        feat_idx = self.dataset.feat_to_idx[feature_name]
+
+        # Unscale samples
+        samples_unscaled = (
+            samples[:, :, feat_idx] * self.dataset.target_std[feat_idx]
+            + self.dataset.target_mean[feat_idx]
+        )
+
+        lower = (100 - interval) / 2
+        upper = 100 - lower
+
+        # Prediction statistics
+        mean_pred = np.mean(samples_unscaled, axis=0)
+        lower_bound = np.percentile(samples_unscaled, lower, axis=0)
+        upper_bound = np.percentile(samples_unscaled, upper, axis=0)
+
+        # Concatenate history with predictions
+        mean_pred = np.concatenate([history_unscaled, mean_pred], axis=0)
+        lower_bound = np.concatenate([history_unscaled, lower_bound], axis=0)
+        upper_bound = np.concatenate([history_unscaled, upper_bound], axis=0)
+        val_gt = np.concatenate([history_unscaled, val_gt], axis=0)
+        return mean_pred, lower_bound, upper_bound, val_gt
 
 
 if __name__ == "__main__":

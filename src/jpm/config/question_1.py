@@ -69,7 +69,7 @@ class DataConfig:
     target_type : str, optional
         Type of target variable: 'full', 'bs', or 'net_income' (default: "full").
     withhold_periods : int, optional
-        Number of quarters to withhold for testing (default: 1).
+        Number of quarters to withhold for testing (default: 3).
     seasonal_weight : float, optional
         Weight applied to seasonal lag timestep, >1.0 increases importance (default: 1.1).
         Used as initial value when learnable_seasonal_weight is True.
@@ -95,7 +95,7 @@ class DataConfig:
     horizon: int = 1
     batch_size: int = 32
     target_type: str = "full"
-    withhold_periods: int = 1  # test set size in quarters
+    withhold_periods: int = 3  # test set size in quarters
     # >1.0 weighs for the seasonal lag timestep
     seasonal_weight: float = 1.1
     seasonal_lag: int = 4

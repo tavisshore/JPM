@@ -97,6 +97,11 @@ CONFIG_VARIATIONS = [
     # },
 ]
 
+features_to_plot = [
+    "Cash and Equivalents",
+    "Net Income",
+    "Receivables",
+]
 # If argument ticker used, only run that ticker
 if args.ticker:
     tickers = [args.ticker]
@@ -194,13 +199,15 @@ for var_idx, variation in enumerate(CONFIG_VARIATIONS, 1):
                 )
                 heatmap_path.parent.mkdir(parents=True, exist_ok=True)
                 # model.plot_uncertainty_heatmap(stage="val", save_path=heatmap_path)
-                # model.plot_series_with_uncertainty(
-                #     feature_name="Net Income",
-                #     save_path=Path(
-                #         f"results/question_1/ml/{ticker}_net_income_uncertainty.png"
-                #     ),
-                #     n_periods=20,
-                # )
+                # Cash and Equivalents, Net Income, Receivables
+                for plot_feature in features_to_plot:
+                    model.plot_series_with_uncertainty(
+                        feature_name=plot_feature,
+                        save_path=Path(
+                            f"results/question_1/ml/{ticker}_{plot_feature.replace(' ', '_').lower()}_uncertainty.png"
+                        ),
+                        previous_quarters=4,
+                    )
 
             results[ticker] = {
                 "net_income": {
