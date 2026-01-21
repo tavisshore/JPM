@@ -66,20 +66,20 @@ CONFIG_VARIATIONS = [
     # Deterministic models
     # {"learn_identity": False, "enforce_balance": False, "probabilistic": False, "variational": False},
     # {"learn_identity": True, "enforce_balance": False, "probabilistic": False, "variational": False},
-    {
-        "learn_identity": True,
-        "enforce_balance": True,
-        "probabilistic": False,
-        "variational": False,
-        "learnable_seasonal_weight": False,
-    },
+    # {
+    #     "learn_identity": True,
+    #     "enforce_balance": True,
+    #     "probabilistic": False,
+    #     "variational": False,
+    #     "learnable_seasonal_weight": False,
+    # },
     # + learned seasonal weight
     {
-        "learn_identity": True,
-        "enforce_balance": True,
-        "probabilistic": False,
+        "learn_identity": False,
+        "enforce_balance": False,
+        "probabilistic": True,
         "variational": False,
-        "learnable_seasonal_weight": True,
+        "learnable_seasonal_weight": False,
     },
     # Probabilistic models (cannot use enforce_balance with probabilistic=True)
     # {
@@ -97,7 +97,11 @@ CONFIG_VARIATIONS = [
     # },
 ]
 
-tickers = get_tickers(args.industry, length=args.total_tickers)
+# If argument ticker used, only run that ticker
+if args.ticker:
+    tickers = [args.ticker]
+else:
+    tickers = get_tickers(args.industry, length=args.total_tickers)
 
 all_config_results = {}
 failed = []
@@ -190,6 +194,13 @@ for var_idx, variation in enumerate(CONFIG_VARIATIONS, 1):
                 )
                 heatmap_path.parent.mkdir(parents=True, exist_ok=True)
                 model.plot_uncertainty_heatmap(stage="val", save_path=heatmap_path)
+                # model.plot_series_with_uncertainty(
+                #     feature_name="Net Income",
+                #     save_path=Path(
+                #         f"results/question_1/ml/{ticker}_net_income_uncertainty.png"
+                #     ),
+                #     n_periods=20,
+                # )
 
             results[ticker] = {
                 "net_income": {

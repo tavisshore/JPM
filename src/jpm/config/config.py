@@ -333,6 +333,10 @@ def get_args():
 
     args = p.parse_args()
 
+    # Capitalise ticker
+    if args.ticker is not None:
+        args.ticker = str(args.ticker).upper()
+
     # Resolve cache_dir: CLI arg > env var > hardcoded default
     # if args.cache_dir is None:
     #     args.cache_dir = os.getenv("JPM_CACHE_DIR", "/assets/jpm")
