@@ -1,0 +1,118 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [
+        "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents including disposal group and discontinued operations"
+    ],
+    "Financing Activities": {
+        "Dividends Paid": [],
+        "Net Cash from Financing Activities": [
+            "net cash provided by used in financing activities"
+        ],
+        "Other Financing Activities": [
+            "build to suit lease obligations incurred",
+            "capital lease obligations incurred",
+            "finance lease principal payments"
+        ],
+        "Proceeds from Debt": [
+            "proceeds from issuance of long term debt",
+            "proceeds from short term debt",
+            "proceeds from repayments of long term debt and capital securities"
+        ],
+        "Proceeds from Stock Issuance": [],
+        "Repayment of Debt": [
+            "repayments of long term capital lease obligations",
+            "repayments of long term debt",
+            "repayments of long term debt and capital securities",
+            "repayments of long term finance lease obligations",
+            "repayments of long term financing obligations",
+            "repayments of short term debt"
+        ],
+        "Stock Repurchases": [
+            "payments for repurchase of common stock"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "payments to acquire businesses net of cash acquired",
+            "payments to acquire businesses net of cash acquired and other"
+        ],
+        "Capital Expenditures": [
+            "fixed assets acquired under build to suit leases",
+            "payments for proceeds from productive assets",
+            "payments to acquire productive assets",
+            "payments to acquire property plant and equipment"
+        ],
+        "Net Cash from Investing Activities": [
+            "net cash provided by used in investing activities"
+        ],
+        "Other Investing Activities": [
+            "noncash or part noncash acquisition fixed assets acquired1",
+            "proceeds from property plant and equipment sales and incentives",
+            "propertyand equipment obtainedin exchangefor financing obligations",
+            "right of use asset obtained in exchange for finance lease liability",
+            "right of use asset obtained in exchange for operating lease liability",
+            "supplemental assets acquired under capital leases"
+        ],
+        "Purchases of Investments": [
+            "payments to acquire investments",
+            "payments to acquire marketable securities"
+        ],
+        "Sales and Maturities of Investments": [
+            "proceeds from sale and maturity of marketable securities"
+        ]
+    },
+    "Net Change in Cash": [
+        "cash and cash equivalents period increase decrease",
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "additions to unearned revenue",
+            "increase decrease in accounts payable",
+            "increase decrease in accounts receivable and other operating assets",
+            "increase decrease in accrued liabilities and other operating liabilities",
+            "increase decrease in contract with customer liability",
+            "increase decrease in inventories",
+            "increase decrease in other noncurrent assets",
+            "recognition of deferred revenue"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income tax expense benefit"
+        ],
+        "Depreciation and Amortization": [
+            "depreciation and amortization",
+            "depreciation depletion and amortization"
+        ],
+        "Interest Paid": [
+            "finance lease interest payment on liability",
+            "interest paid",
+            "interest paid financing obligations",
+            "interest paid on capital and finance lease obligations",
+            "interest paid on long term debt"
+        ],
+        "Net Cash from Operating Activities": [
+            "net cash provided by used in operating activities"
+        ],
+        "Net Income": [
+            "net income loss"
+        ],
+        "Other Non-Cash Items": [
+            "gain loss on sale of investments",
+            "income taxes paid",
+            "income taxes paid net",
+            "other noncash income expense",
+            "other operating activities cash flow statement",
+            "other operating income expense net"
+        ],
+        "Stock-Based Compensation": [
+            "excess tax benefit from share based compensation operating activities",
+            "share based compensation"
+        ]
+    },
+    "__unmapped__": [
+        "operating lease payments",
+        "other cost and expense operating",
+        "payments to acquire businesses net of cash acquired and payments to acquire nonmarketable securities and other"
+    ]
+}

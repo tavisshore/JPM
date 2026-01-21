@@ -16,7 +16,7 @@ class CreditDataset:
     def __init__(
         self,
         data_dir: Path = Path("/scratch/datasets/jpm"),
-        pattern: str = "*_ratings.parquet",
+        pattern: str = "[!_]*_ratings.parquet",
         val_size: float = 0.1,
         test_size: float = 0.1,
         random_state: int = 42,
@@ -110,26 +110,37 @@ class CreditDataset:
                           If provided, only these columns will be used as features.
                           If None, all available feature columns will be used.
         """
-        files = sorted(self.data_dir.glob(self.pattern))
+        # files = sorted(self.data_dir.glob(self.pattern))
+        files = sorted(
+            [
+                f
+                for f in Path(self.data_dir).glob("*_ratings.parquet")
+                if not f.stem.endswith("partial_ratings")
+            ]
+        )
+
         trainable_dfs = []
         predict_dfs = []
         skipped = []
-
         for file in files:
             try:
                 df_train, df_pred = self._load_and_prepare(file)
+
                 # if df_train or df_pred contains no feature columns, skip
-                train_zeroed = (
-                    df_train[feature_names].replace(0, np.nan).isna().all(axis=0).any()
-                )
-                pred_zeroed = (
-                    df_pred[feature_names].replace(0, np.nan).isna().all(axis=0).any()
-                )
-                if train_zeroed or pred_zeroed:
-                    skipped.append(
-                        (file.name, "No valid feature columns after processing")
-                    )
-                    continue
+                # train_zeroed = (
+                #     df_train[feature_names].replace(0, np.nan).isna().all(axis=0).any()
+                # )
+                # pred_zeroed = (
+                #     df_pred[feature_names].replace(0, np.nan).isna().all(axis=0).any()
+                # )
+                # print(train_zeroed, pred_zeroed)
+                # if train_zeroed or pred_zeroed:
+                #     skipped.append(
+                #         (file.name, "No valid feature columns after processing")
+                #     )
+                #     continue
+                # print(df_train.head())
+                # print(df_pred.head())
 
                 # If nane, skip
                 # if df_train.isna().sum().sum() > 0 or df_pred.isna().sum().sum() > 0:

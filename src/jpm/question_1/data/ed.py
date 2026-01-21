@@ -119,7 +119,11 @@ class RatingsHistoryDownloader:
         return sorted(moodys_financial, reverse=True)[0]
 
     def download_moodys_financial(  # noqa: C901
-        self, llm_client, ticker=None, ratings_data_path=None, overwrite: bool = False
+        self,
+        llm_client,
+        ticker=None,
+        ratings_data_path: Path = None,
+        overwrite: bool = False,
     ) -> tuple[pd.DataFrame | None, bool]:
         """Download the latest Moody's Financial ratings CSV.
         1. Download latest csv from https://ratingshistory.info/
@@ -130,6 +134,7 @@ class RatingsHistoryDownloader:
         filename = self._find_latest_moodys_financial(files)
 
         raw_data = Path(self.config.data.cache_dir) / filename
+        moody_ratings = Path(self.config.data.cache_dir) / "moody_ratings.parquet"
 
         # Downloads the latest moodys corporate data
         updated = False
@@ -168,8 +173,12 @@ class RatingsHistoryDownloader:
                 df_clean["rating_action_date"]
             )
             df_clean = df_clean.dropna(subset=["rating"])
+            df_clean.to_parquet(moody_ratings)
+            # Ratings downloaded and processed
 
+        if not ratings_data_path.exists() or overwrite or updated:
             name_variations = ticker_to_name(ticker, llm_client)
+            df_clean = pd.read_parquet(moody_ratings)
             df_clean = df_clean[df_clean["obligor_name"].isin(name_variations)]
             df_clean["rating"] = df_clean["rating"].apply(standardise_rating)
             # Try organisational ratings, otherwise fallback to instrument
@@ -202,8 +211,8 @@ class RatingsHistoryDownloader:
 
                 df = pd.DataFrame(results)
 
-            if "quarter" not in df.columns or df.empty:
-                return None
+            # if "quarter" not in df.columns or df.empty:
+            # return None
 
             df["quarter"] = pd.to_datetime(df["quarter"]).dt.to_period("Q")
             df = df[["rating", "quarter"]]

@@ -90,7 +90,7 @@ def get_args():
 
     # DataConfig fields
     p.add_argument(
-        "--ticker", type=str, default="MSFT", help="Stock ticker symbol (default: AAPL)"
+        "--ticker", type=str, default="MSFT", help="Stock ticker symbol (default: MSFT)"
     )
     p.add_argument(
         "--cache_dir",
