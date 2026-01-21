@@ -54,7 +54,7 @@ python scripts/question_1/ml/parse_reports.py --help llm   # Show only LLMConfig
 ```
 
 #### Downloading Data
-This script download data for tickers in jpm.utils - selectable by industry or __all__.
+This script download data for tickers in jpm.utils - by ticker, industry, or __all__.
 ```bash
 python scripts/question_1/download_data.py --cache-dir 'DATA_LOCATION'
 # Example optional args: --industry tech --total-ticker -1
@@ -75,7 +75,7 @@ This will take quite a long time but shows progress and a time estimate.
     ```
 
 - **Deterministic / Variational / Probabilistic LSTMs**
-  - Update `CONFIG_VARIATIONS` for desired evaluations, again tickers may be selected by industry or __all__.
+  - Update `CONFIG_VARIATIONS` for desired evaluations - by ticker, industry, or __all__.
   - Accounting identity can be encouraged through the identity loss:   `learn_identity = True`
   - It can also be enforced (only compatible with deterministic LSTM): `enforce_balance = True`
   - **Seasonality Weighting**
@@ -85,7 +85,7 @@ This will take quite a long time but shows progress and a time estimate.
   N.B. Ground truth currently shows as $0 when predicting future quarter but it is of course unknown.
 
   ```bash
-  python scripts/question_1/ml/lstm.py --industry tech
+  python scripts/question_1/ml/lstm.py --ticker msft
   ```
 
     Two examples of the probabilistic LSTM results, estimating the unseen test set's quarters - single feature plots.
