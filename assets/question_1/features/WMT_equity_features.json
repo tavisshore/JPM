@@ -1,0 +1,67 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [],
+    "Dividends Declared": [],
+    "Dividends Paid": [
+        "dividends cash"
+    ],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [],
+        "Foreign Currency Translation": [],
+        "Other OCI": [],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax",
+            "other comprehensive income loss net of tax excluding portion attributableto noncontrolling interest",
+            "other comprehensive income loss net of tax period increase decrease"
+        ],
+        "Unrealized Gains/Losses on Securities": []
+    },
+    "Other Equity Adjustments": [
+        "new accounting pronouncement or change in accounting principle effect of adoption quantification",
+        "stockholders equity other"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [],
+        "Other Stock Issuance": [],
+        "Stock-Based Compensation": [],
+        "Total Stock Issuance Value": []
+    },
+    "Stock Repurchases": [
+        "stock repurchased and retired during period value"
+    ],
+    "Tax Effects from Stock Compensation": [],
+    "__unmapped__": [
+        "common stock dividends per share declared",
+        "consolidated income net of tax excluding portion attributable to redeemable noncontrolling interest",
+        "consolidated net income netof tax attributableto redeemable noncontrolling interest",
+        "minority interest change in redemption value",
+        "minority interest decrease from distributions to noncontrolling interest holders",
+        "minority interest decrease from redemptions",
+        "net income loss attributable to noncontrolling interest excluding redeemable",
+        "net income loss including portion attributable to nonredeemable noncontrolling interest",
+        "noncontrolling interest increase from business combination",
+        "noncontrolling interest increase from subsidiary equity issuance",
+        "other changein redeemable noncontrolling interest",
+        "other comprehensive income loss net of tax portion attributable to noncontrolling interest",
+        "other comprehensive income net of tax portion attributable to redeemable noncontrolling interest",
+        "other comprehensive income netof tax portion attributable to redeemable noncontrolling interest",
+        "stock repurchased and retired during period shares",
+        "stockholders equity other shares"
+    ]
+}

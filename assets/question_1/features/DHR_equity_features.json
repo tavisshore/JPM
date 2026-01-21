@@ -1,0 +1,84 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [],
+    "Dividends Declared": [],
+    "Dividends Paid": [
+        "dividends cash",
+        "dividends common stock cash",
+        "dividends preferred stock cash"
+    ],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": [
+            "treasury stock value acquired cost method"
+        ]
+    },
+    "Net Income": [
+        "net income loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [],
+        "Foreign Currency Translation": [
+            "other comprehensive income foreign currency transaction and translation adjustment net of tax period increase decrease"
+        ],
+        "Other OCI": [
+            "other comprehensive income defined benefit plans net unamortized gain loss arising during period net of tax"
+        ],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax",
+            "other comprehensive income loss net of tax portion attributable to parent"
+        ],
+        "Unrealized Gains/Losses on Securities": [
+            "other comprehensive income unrealized holding gain loss on securities arising during period net of tax"
+        ]
+    },
+    "Other Equity Adjustments": [
+        "acquisition of controlling interests",
+        "adjustments to additional paid in capital other",
+        "stock redeemed through distribution of a business during period value",
+        "stockholders equity note spinoff transaction"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [],
+        "Other Stock Issuance": [],
+        "Stock-Based Compensation": [
+            "stock issued during period value share based compensation"
+        ],
+        "Total Stock Issuance Value": [
+            "stock issued during period value acquisitions",
+            "stock issued during period value conversion of convertible securities",
+            "stock issued during period value new issues"
+        ]
+    },
+    "Stock Repurchases": [
+        "stock tendered during period value exchange offer"
+    ],
+    "Tax Effects from Stock Compensation": [
+        "tax benefit of stock issued during period value conversion of convertible securities"
+    ],
+    "__unmapped__": [
+        "debt conversion converted instrument tax benefit expense",
+        "minority interest decrease from redemptions",
+        "minority interest increase from stock issuance",
+        "minority interest period increase decrease",
+        "noncontrolling interest decreasefrom envista deconsolidationand increasefrom saleof envista common stock net",
+        "noncontrolling interest increase from business combination",
+        "noncontrolling interest increase from subsidiary equity issuance",
+        "stock issued during period shares acquisitions",
+        "stock issued during period shares conversion of convertible securities",
+        "stock issued during period shares new issues",
+        "stock issued during period shares share based compensation",
+        "stock redeemed through distribution of a business during period shares"
+    ]
+}

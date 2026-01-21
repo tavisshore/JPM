@@ -1,0 +1,113 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [
+        "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents"
+    ],
+    "Financing Activities": {
+        "Dividends Paid": [],
+        "Net Cash from Financing Activities": [
+            "net cash provided by used in financing activities"
+        ],
+        "Other Financing Activities": [
+            "capital lease obligations incurred",
+            "payments of debt issuance costs",
+            "proceeds from payments for other financing activities"
+        ],
+        "Proceeds from Debt": [
+            "proceeds from issuance of long term debt",
+            "proceeds from repayments of long term debt and capital securities"
+        ],
+        "Proceeds from Stock Issuance": [
+            "proceeds from cost of issuance of treasury stock",
+            "proceeds from sale of treasury stock"
+        ],
+        "Repayment of Debt": [
+            "repayments of acquired debt",
+            "repayments of long term debt"
+        ],
+        "Stock Repurchases": [
+            "payments for repurchase of common stock"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "payments to acquire businesses net of cash acquired",
+            "equity awards assumed for acquisition"
+        ],
+        "Capital Expenditures": [
+            "payments to acquire property plant and equipment"
+        ],
+        "Net Cash from Investing Activities": [
+            "net cash provided by used in investing activities"
+        ],
+        "Other Investing Activities": [
+            "investmentin lease receivable appliedto building purchase",
+            "payments for proceeds from other investing activities",
+            "proceeds from sale of property plant and equipment"
+        ],
+        "Purchases of Investments": [
+            "payments to acquire longterm investments",
+            "payments to acquire short term investments",
+            "purchases long term investments other assets"
+        ],
+        "Sales and Maturities of Investments": [
+            "proceeds from maturities prepayments and calls of shortterm investments",
+            "proceeds from sale of longterm investments",
+            "proceeds from sale of short term investments"
+        ]
+    },
+    "Net Change in Cash": [
+        "cash and cash equivalents period increase decrease",
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "increase decrease in accounts payable",
+            "increase decrease in accrued income taxes payable",
+            "increase decrease in accrued liabilities",
+            "increase decrease in deferred revenue",
+            "increase decrease in operating lease right of use assets",
+            "increase decrease in prepaid deferred expense and other assets",
+            "increase decrease in receivables",
+            "increase decrease in restructuring reserve"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income taxes and tax credits"
+        ],
+        "Depreciation and Amortization": [
+            "depreciation depletion and amortization"
+        ],
+        "Interest Paid": [
+            "interest paid net"
+        ],
+        "Net Cash from Operating Activities": [
+            "net cash provided by used in operating activities"
+        ],
+        "Net Income": [
+            "net income loss"
+        ],
+        "Other Non-Cash Items": [
+            "asset impairment charges",
+            "gain loss on sale of properties",
+            "gain loss on sale of property plant equipment",
+            "operating lease impairment loss",
+            "other noncash income expense",
+            "income taxes paid net",
+            "unrealized gain loss on investments"
+        ],
+        "Stock-Based Compensation": [
+            "employee service share based compensation tax benefit from compensation expense",
+            "employee service share based compensation tax benefit realized from exercise of stock options",
+            "excess tax benefit from share based compensation operating activities",
+            "payments related to tax withholding for share based compensation",
+            "share based compensation",
+            "tax benefit from stock options exercised1",
+            "taxbenefitfromstockbasedcompensation"
+        ]
+    },
+    "__unmapped__": [
+        "gain loss on sales of assets and asset impairment charges",
+        "proceeds from long term debt and long term capital lease obligations"
+    ]
+}

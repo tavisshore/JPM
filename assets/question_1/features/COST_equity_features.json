@@ -1,0 +1,81 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [
+        "comprehensive income net of tax"
+    ],
+    "Dividends Declared": [],
+    "Dividends Paid": [
+        "dividends cash"
+    ],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "net income loss",
+        "profit loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [],
+        "Foreign Currency Translation": [
+            "other comprehensive income foreign currency transaction and translation adjustment net of tax period increase decrease",
+            "other comprehensive income loss foreign currency transaction and translation adjustment net of tax"
+        ],
+        "Other OCI": [],
+        "Total Other Comprehensive Income": [],
+        "Unrealized Gains/Losses on Securities": [
+            "other comprehensive income unrealized holding gain loss on securities arising during period net of tax",
+            "other comprehensive income unrealized holding gain loss on securities arising during period tax"
+        ]
+    },
+    "Other Equity Adjustments": [
+        "stockholders equity other"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [
+            "stock issued during period value stock options exercised"
+        ],
+        "Other Stock Issuance": [
+            "stock issued during period value conversion of convertible securities",
+            "stock issued during period value restricted stock award gross"
+        ],
+        "Stock-Based Compensation": [
+            "adjustments to additional paid in capital sharebased compensation requisite service period recognition value",
+            "share based compensation"
+        ],
+        "Total Stock Issuance Value": []
+    },
+    "Stock Repurchases": [
+        "stock repurchased during period value"
+    ],
+    "Tax Effects from Stock Compensation": [],
+    "__unmapped__": [
+        "common stock dividends per share declared",
+        "comprehensive income net of tax attributable to noncontrolling interest",
+        "comprehensive income net of tax including portion attributable to noncontrolling interest",
+        "minority interest decrease from distributions to noncontrolling interest holders",
+        "minority interest decrease from redemptions",
+        "minority interest period increase decrease",
+        "net income loss attributable to noncontrolling interest",
+        "noncontrolling interest increase from subsidiary equity issuance",
+        "stock issued during period shares conversion of convertible securities",
+        "stock issued during period shares restricted stock award gross",
+        "stock issued during period shares stock options exercised",
+        "stock options exercised and vesting of restricted stock shares",
+        "stock options exercised and vesting of restricted stock value",
+        "stock repurchased and retired during period shares",
+        "stock repurchased and retired during period value",
+        "stock repurchased during period shares"
+    ]
+}
