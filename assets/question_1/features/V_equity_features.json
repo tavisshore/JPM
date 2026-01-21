@@ -1,0 +1,96 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [
+        "comprehensive income net of tax including portion attributable to noncontrolling interest"
+    ],
+    "Dividends Declared": [],
+    "Dividends Paid": [
+        "dividends cash"
+    ],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "profit loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [],
+        "Foreign Currency Translation": [],
+        "Other OCI": [],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax",
+            "other comprehensive income loss net of tax period increase decrease"
+        ],
+        "Unrealized Gains/Losses on Securities": []
+    },
+    "Other Equity Adjustments": [
+        "new accounting pronouncement or change in accounting principle effect of adoption quantification",
+        "treasury stock appreciation net of tax"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [
+            "stock issued during period value stock options exercised"
+        ],
+        "Other Stock Issuance": [
+            "conversion of class c common stock upon sale into public market shares",
+            "stock issued during period value acquisitions",
+            "stock issued during period value new issues",
+            "stock issued during period value treasury stock reissued"
+        ],
+        "Stock-Based Compensation": [
+            "adjustments to additional paid in capital sharebased compensation requisite service period recognition value",
+            "restricted stock instruments settled in cash for taxes",
+            "stock issued during period value anniversary release",
+            "vesting of issued restricted stock"
+        ],
+        "Total Stock Issuance Value": []
+    },
+    "Stock Repurchases": [
+        "stock repurchased during period value"
+    ],
+    "Tax Effects from Stock Compensation": [
+        "adjustments related to tax withholding for share based compensation",
+        "adjustments to additional paid in capital tax effect from share based compensation"
+    ],
+    "__unmapped__": [
+        "common stock dividends per share declared",
+        "conversion of stock amount converted1",
+        "conversion of stock shares converted1",
+        "minority interest period increase decrease",
+        "net income loss attributable to noncontrolling interest",
+        "recovery through conversion rate adjustment",
+        "recovery through conversion rate adjustments",
+        "restricted stock instrument settled in cash for taxes shares",
+        "restricted stock instruments settled in cash for taxes shares",
+        "shares paid for tax withholding for share based compensation",
+        "stock issued during period shares acquisitions",
+        "stock issued during period shares anniversary release",
+        "stock issued during period shares employee stock ownership planand option exercisesin period",
+        "stock issued during period shares employee stock purchase plansand stock options exercised",
+        "stock issued during period shares new issues",
+        "stock issued during period shares restricted stock award forfeited",
+        "stock issued during period shares restricted stock award gross",
+        "stock issued during period shares stock exchange offer",
+        "stock issued during period shares stock options exercised",
+        "stock issued during period shares treasury stock reissued",
+        "stock issued during period value employee stock purchase plansand stock options exercised",
+        "stock issuedand vested during period shares restricted stockand perfomancebased stock awards",
+        "stock repurchased and retired during period shares",
+        "stock repurchased and retired during period value",
+        "stock repurchased during period shares",
+        "v e territory covered losses incurred",
+        "v_ recovery through conversion rate adjustment"
+    ]
+}
