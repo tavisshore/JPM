@@ -88,6 +88,15 @@ This will take quite a long time but shows progress and a time estimate.
   python scripts/question_1/ml/lstm.py --industry tech
   ```
 
+    Two examples of the probabilistic LSTM results, estimating the unseen test set's quarters - single feature plots.
+
+  <p align="center">
+    <img src="results/question_1/ml/MSFT_receivables_uncertainty.png" width="47%" />
+    <img src="results/question_1/ml/AAPL_cash_and_equivalents_uncertainty.png" width="47%" />
+  </p>
+
+  More result plots and data files are available in `results/`.
+
 ### Part 2
 - **Ensemble model:**
     The LLM can be used to either adjust the LSTM estimation, or independently predict the future financial statement features before combining the output with the LSTM.
