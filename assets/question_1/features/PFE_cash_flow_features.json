@@ -1,0 +1,153 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [
+        "effect of exchange rate on cash and cash equivalents",
+        "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents"
+    ],
+    "Financing Activities": {
+        "Dividends Paid": [
+            "payments of ordinary dividends"
+        ],
+        "Net Cash from Financing Activities": [
+            "cash provided by used in financing activities discontinued operations",
+            "net cash provided by used in financing activities",
+            "net cash provided by used in financing activities continuing operations"
+        ],
+        "Other Financing Activities": [
+            "debt conversion converted instrument amount1",
+            "exchangeof zoetis common stockfor pfizer common stock",
+            "exhange of long term debt for retirement of short term debt",
+            "issuance of subsidiary common stockin exchangefor receiptof common stock",
+            "noncashexchangeofsubsidiaryseniornotesfortheretirementofcompanycommercialpaper",
+            "noncashtransactionexchangeofsubsidiarycommonstockfortheretirementofcompanycommercialpaper",
+            "proceeds from payments for other financing activities",
+            "receipt of common stock for retirement of short term debt",
+            "right of use asset obtained in exchange for operating lease liability"
+        ],
+        "Proceeds from Debt": [
+            "netproceedsfromissuanceofseniornotesbysubsidiary",
+            "proceeds from issuance of long term debt",
+            "proceeds from issuances of short term debt net of proceeds from repayments of short term debt maturing in three months or less",
+            "proceeds from short term debt",
+            "proceeds from short term loans",
+            "proceeds from repayments of debt maturing in more than three months",
+            "proceeds from repayments of short term debt maturing in three months or less"
+        ],
+        "Proceeds from Stock Issuance": [
+            "proceeds from stock options exercised"
+        ],
+        "Repayment of Debt": [
+            "repayments of long term debt",
+            "repayments of short term debt",
+            "repayments of short term debt maturing in more than three months net of repayments of short term debt maturing in three months or less"
+        ],
+        "Stock Repurchases": [
+            "payments for repurchase of common stock"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "noncash or part noncash acquisition debt assumed1",
+            "payments to acquire businesses net of cash acquired"
+        ],
+        "Capital Expenditures": [
+            "payments to acquire property plant and equipment"
+        ],
+        "Net Cash from Investing Activities": [
+            "cash provided by used in investing activities discontinued operations",
+            "net cash provided by used in investing activities",
+            "net cash provided by used in investing activities continuing operations"
+        ],
+        "Other Investing Activities": [
+            "contributionofaninvestmentinconnectionwiththeresolutionofalegalmatter",
+            "issuances of long term loans",
+            "issuances of short term loans",
+            "noncashor part noncash divestiture amountof consideration received common stock",
+            "noncashor part noncash divestiture amountof consideration received note receivable",
+            "noncashor part noncash divestiture contribution agreement equity investment",
+            "payments for proceeds from other investing activities",
+            "payments to acquire intangible assets",
+            "proceeds from divestiture of businesses",
+            "proceeds from equity method investment dividends or distributions return of capital",
+            "proceeds from redemption of long term loans",
+            "proceeds from sale of equity method investments",
+            "transfer of certain product rights to equity method investment",
+            "transferfrom investments legal settlements"
+        ],
+        "Purchases of Investments": [
+            "payments for proceeds from short term investments with original maturities of three months or less",
+            "payments to acquire marketable securities",
+            "payments to acquire short term investments"
+        ],
+        "Sales and Maturities of Investments": [
+            "proceeds from sale and maturity of long term marketable securities",
+            "proceeds from sale and maturity of short term marketable securities more than ninety days",
+            "proceeds from sale maturity and collection of longterm investments",
+            "proceeds from sale maturity and collection of shortterm investments"
+        ]
+    },
+    "Net Change in Cash": [
+        "cash and cash equivalents period increase decrease",
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "increase decrease in accounts payable",
+            "increase decrease in accounts payable and accrued liabilities",
+            "increase decrease in accounts payable trade",
+            "increase decrease in accounts receivable",
+            "increase decrease in accrued taxes payable",
+            "increase decrease in inventories",
+            "increase decrease in operating capital",
+            "increase decrease in other operating assets",
+            "increase decrease in other operating liabilities"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income tax expense benefit",
+            "deferred income tax expense benefit discontinued operations",
+            "tax cuts and jobs act of2017 income tax expense benefit"
+        ],
+        "Depreciation and Amortization": [
+            "depreciation depletion and amortization"
+        ],
+        "Interest Paid": [
+            "interest paid",
+            "interest paid net",
+            "interest paid received interest rate hedges"
+        ],
+        "Net Cash from Operating Activities": [
+            "cash provided by used in operating activities discontinued operations",
+            "net cash provided by used in operating activities",
+            "net cash provided by used in operating activities continuing operations"
+        ],
+        "Net Income": [],
+        "Other Non-Cash Items": [
+            "adjustments noncash items to reconcile net income loss to cash provided by used in operating activities other",
+            "asset impairment charges",
+            "asset write offs and asset impairment charges",
+            "deconsolidation gain loss amount net of cash conveyed",
+            "disposal group not discontinued operation gain loss on disposal",
+            "foreign currency transaction gain loss unrealized",
+            "gain loss associated with the transfer of certain product rights to an equity method investment",
+            "gains on disposals",
+            "impairmenton remeasurementof assetstobe disposed of",
+            "income taxes paid net",
+            "inventory write down",
+            "other noncash income expense",
+            "pension and other postretirement benefit contributions less pension and other postretirement benefit expense",
+            "pension and other postretirement benefit contributions net of pension and other postretirement benefit expense"
+        ],
+        "Stock-Based Compensation": [
+            "share based compensation"
+        ]
+    },
+    "__unmapped__": [
+        "discontinued operation gain loss from disposal of discontinued operation before income tax",
+        "discontinued operation provision for loss gain on disposal before income tax",
+        "income loss from continuing operations including portion attributable to noncontrolling interest",
+        "income loss from discontinued operations net of tax",
+        "profit loss",
+        "research and development in process"
+    ]
+}

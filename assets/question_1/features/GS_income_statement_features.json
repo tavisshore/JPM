@@ -1,0 +1,87 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": []
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "net income loss",
+        "net income loss available to common stockholders basic"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [
+            "interest expense operating"
+        ],
+        "Interest Income": [
+            "interest and dividend income operating"
+        ],
+        "Other Income (Expense)": [
+            "interest income expense net",
+            "market making net",
+            "noninterest income",
+            "other principal transactions"
+        ],
+        "Total Non-Operating Items": []
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "depreciation and amortization"
+        ],
+        "General and Administrative": [
+            "communications and information technology",
+            "labor and related expense",
+            "occupancy net",
+            "professional fees",
+            "u k bank payroll tax"
+        ],
+        "Other Operating Expenses": [
+            "insurance reserve",
+            "non compensation expenses",
+            "noninterest expense",
+            "other noninterest expense",
+            "provision for loan lease and other losses"
+        ],
+        "Research and Development": [],
+        "Sales and Marketing": [
+            "business development"
+        ],
+        "Total Operating Expenses": []
+    },
+    "Operating Income": [],
+    "Other Comprehensive Income": [],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [
+            "weighted average number of shares outstanding basic"
+        ],
+        "Weighted Average Shares Outstanding (Diluted)": [
+            "weighted average number of diluted shares outstanding"
+        ]
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "brokerage clearing exchange and distribution fees",
+            "brokerage commissions revenue",
+            "investment banking revenue",
+            "investment management",
+            "net revenues including net interest income",
+            "revenues net of interest expense",
+            "transaction based"
+        ]
+    },
+    "__unmapped__": [
+        "common stock dividends per share declared",
+        "preferred stock dividends income statement impact"
+    ]
+}

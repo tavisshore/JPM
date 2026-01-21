@@ -1,0 +1,97 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [
+        "comprehensive income net of tax"
+    ],
+    "Dividends Declared": [
+        "dividends common stock"
+    ],
+    "Dividends Paid": [
+        "dividends preferred stock cash",
+        "preferred stock dividends and accretion"
+    ],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [
+            "adjustments to additional paid in capital sharebased compensation requisite service period recognition value",
+            "adjustments to additional paid in capital tax effect from share based compensation",
+            "adjustmentsto additional paidin capital warrant issued repurchased"
+        ],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": [
+            "treasury stock value acquired cost method"
+        ]
+    },
+    "Net Income": [
+        "net income loss",
+        "profit loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [
+            "other comprehensive income derivatives qualifying as hedges net of tax period increase decrease"
+        ],
+        "Foreign Currency Translation": [
+            "other comprehensive income foreign currency transaction and translation adjustment net of tax period increase decrease"
+        ],
+        "Other OCI": [
+            "other comprehensive income defined benefit plans adjustment net of tax period increase decrease"
+        ],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax",
+            "other comprehensive income loss net of tax period increase decrease",
+            "other comprehensive income loss net of tax portion attributable to parent",
+            "other comprehensive income available for sale securities adjustment net of tax period increase decrease"
+        ],
+        "Unrealized Gains/Losses on Securities": []
+    },
+    "Other Equity Adjustments": [
+        "cumulative effect from change in accounting for embedded credit derivatives",
+        "cumulative effect from change in accounting for variable interest entities",
+        "cumulative effect of new accounting principle in period of adoption",
+        "net increase decrease in deferred compensation and related plans",
+        "payments to acquire additional interest in subsidiaries",
+        "stockholders equity other",
+        "tax cuts and jobs act of2017 reclassification from aoci to retained earnings tax effect"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [],
+        "Other Stock Issuance": [
+            "preferred stock issued during period value new issues",
+            "stock issued during period shares conversion of convertible securities",
+            "stock issued during period value",
+            "stock issued during period value new issues"
+        ],
+        "Stock-Based Compensation": [
+            "amortization of e s o p award common stock",
+            "amortization of e s o p award preferred stock",
+            "share based compensation"
+        ],
+        "Total Stock Issuance Value": []
+    },
+    "Stock Repurchases": [
+        "stock redeemed or called during period value",
+        "stock repurchased during period shares"
+    ],
+    "Tax Effects from Stock Compensation": [
+        "employee service share based compensation tax benefit realized from exercise of stock options"
+    ],
+    "__unmapped__": [
+        "adjustments to additional paid in capital redemption value of noncontrolling interests",
+        "increase decrease in noncontrolling interests",
+        "minority interest decrease from distributions to noncontrolling interest holders",
+        "net income loss attributable to noncontrolling interest",
+        "other comprehensive income loss net of tax portion attributable to noncontrolling interest",
+        "preferredstockamount",
+        "stockholders equity including portion attributable to noncontrolling interest adjusted balance",
+        "stockholders equity period increase decrease"
+    ]
+}

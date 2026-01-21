@@ -1,0 +1,103 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [
+        "effect of exchange rate on cash and cash equivalents"
+    ],
+    "Financing Activities": {
+        "Dividends Paid": [
+            "payments of dividends common stock"
+        ],
+        "Net Cash from Financing Activities": [
+            "cash provided by used in financing activities discontinued operations",
+            "net cash provided by used in financing activities",
+            "net cash provided by used in financing activities continuing operations"
+        ],
+        "Other Financing Activities": [],
+        "Proceeds from Debt": [
+            "proceeds from issuance of debt"
+        ],
+        "Proceeds from Stock Issuance": [
+            "proceeds from issuance of common stock"
+        ],
+        "Repayment of Debt": [
+            "repayments of debt"
+        ],
+        "Stock Repurchases": [
+            "payments for repurchase of common stock"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "cash acquired from acquisition",
+            "payments to acquire businesses net of cash acquired"
+        ],
+        "Capital Expenditures": [
+            "payment to acquire productive assets and investments"
+        ],
+        "Net Cash from Investing Activities": [
+            "cash provided by used in investing activities discontinued operations",
+            "net cash provided by used in investing activities",
+            "net cash provided by used in investing activities continuing operations"
+        ],
+        "Other Investing Activities": [
+            "exploration abandonment and impairment cash payments",
+            "increase decrease in capital accrual associated with investing activities",
+            "payments to fund longterm loans to related parties",
+            "proceeds from collection of advance to affiliate",
+            "proceeds from collection of longterm loans to related parties",
+            "proceeds from sale of productive assets",
+            "proceeds from special cash distribution"
+        ],
+        "Purchases of Investments": [
+            "net purchases sales of short term investments",
+            "payments for proceeds from investments",
+            "payments for proceeds from short term investments"
+        ],
+        "Sales and Maturities of Investments": []
+    },
+    "Net Change in Cash": [
+        "cash and cash equivalents period increase decrease",
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "increase decrease in accounts payable",
+            "increase decrease in capital accrual",
+            "increase decrease in inventories",
+            "increase decrease in other operating capital net",
+            "increase decrease in prepaid deferred expense and other assets",
+            "increase decrease in receivables"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income tax expense benefit"
+        ],
+        "Depreciation and Amortization": [
+            "depreciation depletion and amortization"
+        ],
+        "Interest Paid": [],
+        "Net Cash from Operating Activities": [
+            "cash provided by used in operating activities discontinued operations",
+            "net cash provided by used in operating activities",
+            "net cash provided by used in operating activities continuing operations"
+        ],
+        "Net Income": [],
+        "Other Non-Cash Items": [
+            "accretion expense including asset retirement obligations",
+            "asset impairment charges",
+            "equity securities fv ni gain loss",
+            "equity securities fv ni unrealized gain loss",
+            "gain loss on dispositions",
+            "gain loss on sale of property plant equipment",
+            "income loss from equity method investments net of dividends or distributions",
+            "other operating activities cash flow statement"
+        ],
+        "Stock-Based Compensation": []
+    },
+    "__unmapped__": [
+        "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents",
+        "income loss from discontinued operations net of tax",
+        "increase decrease in restricted cash",
+        "profit loss"
+    ]
+}
