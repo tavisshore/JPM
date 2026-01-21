@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import tensorflow as tf
@@ -1223,6 +1224,7 @@ class LSTMForecaster:
     def plot_prediction_intervals(
         self,
         feature_name: str,
+        save_path: Path | None = None,
         stage: str = "val",
         confidence_levels: list[float] | None = None,
         max_periods: int = 20,
@@ -1260,8 +1262,6 @@ class LSTMForecaster:
 
         if confidence_levels is None:
             confidence_levels = [0.68, 0.95]
-
-        import matplotlib.pyplot as plt
 
         ds = self.dataset.val_dataset if stage == "val" else self.dataset.train_dataset
         history, y_gt = self._collect_batches(ds, stage)
@@ -1312,7 +1312,10 @@ class LSTMForecaster:
         ax.grid(True, alpha=0.3)
 
         plt.tight_layout()
-        plt.show()
+        if save_path:
+            plt.savefig(save_path)
+        else:
+            plt.show()
 
     def plot_uncertainty_heatmap(
         self, stage: str = "val", save_path: Path | None = None
@@ -1368,6 +1371,87 @@ class LSTMForecaster:
         ax.set_title(
             f"Prediction Uncertainty by Feature ({stage} set)\n{self.config.data.ticker}"
         )
+        plt.tight_layout()
+        if save_path:
+            plt.savefig(save_path)
+        else:
+            plt.show()
+
+    def plot_series_with_uncertainty(
+        self,
+        feature_name: str,
+        history: np.ndarray | None = None,
+        save_path: Path | None = None,
+        n_periods: int = 50,
+        n_samples: int = 100,
+    ) -> None:
+        """
+        Plot time series with uncertainty bands for a specific feature.
+
+        Parameters
+        ----------
+        feature_name : str
+            Name of the feature to plot (must be in dataset.targets).
+        history : np.ndarray
+            Input sequences of shape (n_samples, lookback, features).
+        n_periods : int, default=50
+            Number of time periods to display.
+        n_samples : int, default=100
+            Number of samples to draw from the predictive distribution.
+        Raises
+        ------
+        ValueError
+            If model is not probabilistic or feature not found.
+        """
+        if not self.config.lstm.probabilistic:
+            raise ValueError(
+                "plot_series_with_uncertainty requires a probabilistic model"
+            )
+
+        if feature_name not in self.dataset.targets:
+            raise ValueError(f"Feature '{feature_name}' not found in targets")
+
+        # Get history from self.data if not provided
+        if history is None:
+            ds = self.dataset.val_dataset
+            if ds is None:
+                raise ValueError("Validation dataset is not available")
+            history, _ = self._collect_batches(ds, stage="val")
+
+        samples = self.sample_predictions(history, n_samples=n_samples)
+
+        feat_idx = self.dataset.feat_to_idx[feature_name]
+        samples_unscaled = (
+            samples[:, :, feat_idx] * self.dataset.target_std[feat_idx]
+            + self.dataset.target_mean[feat_idx]
+        )
+
+        mean_pred = np.mean(samples_unscaled, axis=0)
+        lower_bound = np.percentile(samples_unscaled, 2.5, axis=0)
+        upper_bound = np.percentile(samples_unscaled, 97.5, axis=0)
+
+        periods = min(n_periods, mean_pred.shape[0])
+        x = np.arange(periods)
+
+        fig, ax = plt.subplots(figsize=(12, 6))
+        ax.plot(x, mean_pred[:periods], label="Mean Prediction", color="blue")
+        ax.fill_between(
+            x,
+            lower_bound[:periods],
+            upper_bound[:periods],
+            color="lightblue",
+            alpha=0.5,
+            label="95% Prediction Interval",
+        )
+
+        ax.set_xlabel("Time Period")
+        ax.set_ylabel(f"{feature_name} (Unscaled)")
+        ax.set_title(
+            f"Time Series with Uncertainty: {feature_name}\n{self.config.data.ticker}"
+        )
+        ax.legend(loc="best")
+        ax.grid(True, alpha=0.3)
+
         plt.tight_layout()
         if save_path:
             plt.savefig(save_path)

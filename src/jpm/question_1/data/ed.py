@@ -260,37 +260,18 @@ class EdgarData:
         self.overwrite = overwrite
         self.verbose = verbose
         self.cache_statement = Path(
-            f"{self.config.data.cache_dir}/statements/{self.config.data.ticker}.parquet"
+            f"{self.config.data.cache_dir}/statements/{str(self.config.data.ticker).upper()}.parquet"
         )
         self.ratings_data_path = Path(
-            f"{self.config.data.cache_dir}/ratings/{self.config.data.ticker}_ratings.parquet"
+            f"{self.config.data.cache_dir}/ratings/{str(self.config.data.ticker).upper()}_ratings.parquet"
         )
         self.ratings_partial_data_path = Path(
-            f"{self.config.data.cache_dir}/ratings/{self.config.data.ticker}_partial_ratings.parquet"
+            f"{self.config.data.cache_dir}/ratings/{str(self.config.data.ticker).upper()}_partial_ratings.parquet"
         )
         self.cache_statement.parent.mkdir(parents=True, exist_ok=True)
         self.ratings_data_path.parent.mkdir(parents=True, exist_ok=True)
 
-        self._load_data()
-
-    def _load_data(self) -> None:
-        """Load data from cache or fetch from SEC"""
-        self._validate_target_type()
-        self.data = self._load_or_fetch_data()
-
-    def _validate_target_type(self) -> None:
-        """Validate that the target_type configuration parameter is supported.
-
-        Raises
-        ------
-        ValueError
-            If target_type is not one of 'full', 'bs', or 'net_income'
-        """
-        if self.config.data.target_type not in {"full", "bs", "net_income"}:
-            raise ValueError(
-                f"Unsupported target_type '{self.config.data.target_type}'. "
-                "Use 'full', 'bs', or 'net_income'."
-            )
+        self._load_or_fetch_data()
 
     def _load_or_fetch_data(self) -> pd.DataFrame:
         """Load financial data from cache or fetch fresh data from SEC.
@@ -311,6 +292,7 @@ class EdgarData:
         ValueError
             If no data is available after filtering
         """
+
         if self.cache_statement.exists() and not self.overwrite:
             try:
                 self.data = pd.read_parquet(self.cache_statement)
@@ -355,6 +337,7 @@ class EdgarData:
         ratings_updated = downloader.download_moodys_financial(moody_ratings)
 
         if ratings_updated:
+            print("New credit ratings data downloaded for Moody's Financial.")
             if not hasattr(self, "llm_client"):
                 # Lazy import to avoid circular dependency
                 from jpm.question_1.clients.llm_client import LLMClient
