@@ -74,7 +74,7 @@ This will take quite a long time but shows progress and a time estimate.
     ```
 
 - **Deterministic / Variational / Probabilistic LSTMs**
-  - Update `CONFIG_VARIATIONS` with the desired evaluations, again tickers may be selected by industry or __all__.
+  - Update `CONFIG_VARIATIONS` for desired evaluations, again tickers may be selected by industry or __all__.
   - Accounting identity can be encouraged through the identity loss:   `learn_identity = True`
   - It can also be enforced (only compatible with deterministic LSTM): `enforce_balance = True`
   - **Seasonality Weighting**
