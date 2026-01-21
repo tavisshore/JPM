@@ -19,6 +19,7 @@ from jpm.question_1.data.utils import (
     bs_identity_checker,
     drop_constants,
     drop_non_numeric_columns,
+    load_cached_features,
     remap_financial_dataframe,
     remove_duplicate_columns,
     standardise_rating,
@@ -120,11 +121,8 @@ class RatingsHistoryDownloader:
 
     def download_moodys_financial(  # noqa: C901
         self,
-        llm_client,
-        ticker=None,
-        ratings_data_path: Path = None,
-        overwrite: bool = False,
-    ) -> tuple[pd.DataFrame | None, bool]:
+        moodys_path: Path,
+    ) -> bool | None:
         """Download the latest Moody's Financial ratings CSV.
         1. Download latest csv from https://ratingshistory.info/
         2. For each record, add the company's corresponding ticker
@@ -134,11 +132,10 @@ class RatingsHistoryDownloader:
         filename = self._find_latest_moodys_financial(files)
 
         raw_data = Path(self.config.data.cache_dir) / filename
-        moody_ratings = Path(self.config.data.cache_dir) / "moody_ratings.parquet"
 
         # Downloads the latest moodys corporate data
         updated = False
-        if not raw_data.exists() or overwrite:
+        if not raw_data.exists():
             if filename is None:
                 print("No Moody's Financial CSV file found on ratingshistory.info.")
                 return None, False
@@ -173,10 +170,19 @@ class RatingsHistoryDownloader:
                 df_clean["rating_action_date"]
             )
             df_clean = df_clean.dropna(subset=["rating"])
-            df_clean.to_parquet(moody_ratings)
+            df_clean.to_parquet(moodys_path)
             # Ratings downloaded and processed
+            return updated
 
-        if not ratings_data_path.exists() or overwrite or updated:
+    def process_moodys_financial(  # noqa: C901
+        self,
+        moody_ratings: Path,
+        llm_client,
+        ticker: str,
+        ratings_data_path: Path,
+        overwrite: bool = False,
+    ) -> pd.DataFrame | None:
+        if not ratings_data_path.exists() or overwrite:
             name_variations = ticker_to_name(ticker, llm_client)
             df_clean = pd.read_parquet(moody_ratings)
             df_clean = df_clean[df_clean["obligor_name"].isin(name_variations)]
@@ -212,10 +218,10 @@ class RatingsHistoryDownloader:
             df = pd.DataFrame(results)
 
             if len(df_clean) == 0:
-                return None, updated
+                return None
 
             if "quarter" not in df.columns or df.empty:
-                return None, updated
+                return None
 
             df["quarter"] = pd.to_datetime(df["quarter"]).dt.to_period("Q")
             df = df[["rating", "quarter"]]
@@ -224,11 +230,10 @@ class RatingsHistoryDownloader:
             df.index = pd.PeriodIndex(df.index, freq="Q")
 
             df.to_parquet(ratings_data_path)
-        else:
-            updated = False
+
         df = pd.read_parquet(ratings_data_path)
 
-        return df, updated
+        return df
 
 
 class EdgarData:
@@ -266,10 +271,6 @@ class EdgarData:
         self.cache_statement.parent.mkdir(parents=True, exist_ok=True)
         self.ratings_data_path.parent.mkdir(parents=True, exist_ok=True)
 
-        # Lazy import to avoid circular dependency
-        from jpm.question_1.clients.llm_client import LLMClient
-
-        self.llm_client = LLMClient()
         self._load_data()
 
     def _load_data(self) -> None:
@@ -347,16 +348,31 @@ class EdgarData:
 
     def get_ratings(self):
         """Training Data for Credit Rating Prediction."""
+        moody_ratings = Path(self.config.data.cache_dir) / "moody_ratings.parquet"
+
         # Download and process credit ratings
         downloader = RatingsHistoryDownloader(config=self.config)
-        _ratings_df, ratings_updated = downloader.download_moodys_financial(
-            self.llm_client, self.config.data.ticker, self.ratings_partial_data_path
-        )  # noqa: F841
+        ratings_updated = downloader.download_moodys_financial(moody_ratings)
 
-        if _ratings_df is None or _ratings_df.empty:
-            print(f"No Moody's ratings found for {self.config.data.ticker}.")
-            self.ratings_data = pd.DataFrame()
-            return
+        if ratings_updated:
+            if not hasattr(self, "llm_client"):
+                # Lazy import to avoid circular dependency
+                from jpm.question_1.clients.llm_client import LLMClient
+
+                self.llm_client = LLMClient()
+
+            _ratings_df = downloader.process_moodys_financial(
+                moody_ratings=moody_ratings,
+                llm_client=self.llm_client,
+                ticker=self.config.data.ticker,
+                ratings_data_path=self.ratings_partial_data_path,
+                overwrite=self.overwrite,
+            )
+
+            if _ratings_df is None or _ratings_df.empty:
+                print(f"No Moody's ratings found for {self.config.data.ticker}.")
+                self.ratings_data = pd.DataFrame()
+                return
 
         if not self.ratings_data_path.exists() or self.overwrite or ratings_updated:
             # Select only the relevant company's data
@@ -503,10 +519,14 @@ class EdgarData:
         features_cache_path.parent.mkdir(parents=True, exist_ok=True)
 
         if features_cache_path.exists() and not self.overwrite:
-            organised_features = self.llm_client.load_cached_features(
-                features_cache_path
-            )
+            organised_features = load_cached_features(features_cache_path)
         else:
+            if not hasattr(self, "llm_client"):
+                # Lazy import to avoid circular dependency
+                from jpm.question_1.clients.llm_client import LLMClient
+
+                self.llm_client = LLMClient()
+
             organised_features = self.llm_client.parse_financial_features(
                 features=input_columns,
                 statement_type=kind,

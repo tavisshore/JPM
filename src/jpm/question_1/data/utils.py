@@ -1,6 +1,7 @@
 import json
 import re
-from typing import List, Optional, Tuple, TypedDict
+from pathlib import Path
+from typing import Any, List, Optional, Tuple, TypedDict
 
 import numpy as np
 import pandas as pd
@@ -1483,3 +1484,12 @@ def _is_mutually_exclusive(df, cols):
     # If <5% of rows have multiple non-zero values, treat as mutually exclusive
     threshold = len(df) * 0.05
     return simultaneous_nonzero < threshold
+
+
+def load_cached_features(cache_path: Path) -> dict[str, Any]:
+    """Load cached parsed features from JSON file."""
+    if not cache_path.exists():
+        raise FileNotFoundError(f"Cache file not found: {cache_path}")
+
+    with open(cache_path, "r", encoding="utf-8") as f:
+        return json.load(f)

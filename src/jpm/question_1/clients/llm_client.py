@@ -66,6 +66,7 @@ class LLMClient:
             raise RuntimeError(
                 "OpenAI API key is missing. "
                 "Set OPENAI_API_KEY or pass openai_api_key explicitly."
+                "Otherwise - using offline data only."
             )
 
         self._openai: OpenAI = OpenAI(api_key=openai_api_key)
@@ -298,14 +299,6 @@ class LLMClient:
             raise ValueError(
                 f"Failed to parse LLM response as JSON: {e}\nRaw response: {raw}"
             )
-
-    def load_cached_features(self, cache_path: Path) -> Dict[str, Any]:
-        """Load cached parsed features from JSON file."""
-        if not cache_path.exists():
-            raise FileNotFoundError(f"Cache file not found: {cache_path}")
-
-        with open(cache_path, "r", encoding="utf-8") as f:
-            return json.load(f)
 
     def save_features_to_cache(
         self, features: Dict[str, Any], cache_path: Path
