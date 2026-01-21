@@ -23,7 +23,10 @@ pytest -v
 
 
 ## Question 1 - Financial Statement Forecasting
-#### Environment Variables
+***Environment Variables***
+
+If you want to download further data or use the LLM services, you will need to add your own keys for the following API services - otherwise the remaining scripts work fully with the offline data stored in assets/.
+
 EDGAR requires an email for SEC downloads:
 ```bash
 export EDGAR_EMAIL="your_email@address.com"
@@ -57,7 +60,8 @@ The category-specific help commands display organised, focused documentation for
 #### Downloading Data
 This script download data for tickers in jpm.utils - selectable by industry or __all__.
 ```bash
-python scripts/question_1/download_data.py --cache-dir 'YOUR_DESIRED_LOCATION'
+python scripts/question_1/download_data.py --cache-dir 'DATA_LOCATION'
+# Example optional args: --industry tech --total-ticker -1
 ```
 This will take quite a long time but shows progress and a time estimate.
 
