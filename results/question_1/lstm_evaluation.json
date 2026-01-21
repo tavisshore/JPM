@@ -1,34 +1,175 @@
 {
-  "learn_identity=False,         enforce_balance=False,         probabilistic=True,         variational=False,         learnable_seasonal_weight=False": {
+  "learn_identity=False,         enforce_balance=False,         probabilistic=False,         variational=False,         learnable_seasonal_weight=False": {
     "MSFT": {
       "net_income": {
-        "lstm": 42966964806.86831,
+        "lstm": 43865892584.48388,
         "global_mean": 43699569583.333336,
         "last_value": 49688333333.333336,
         "seasonal_naive": 20605211666.666668
       },
       "balance_sheet": {
-        "lstm": 25096473837.54451,
+        "lstm": 13857978771.68298,
         "global_mean": 12006772741.402117,
         "last_value": 11407047619.047619,
         "seasonal_naive": 12214941071.428572
       },
-      "bs_pct_error": 5.882420494046126,
+      "bs_pct_error": 8.3811253112997,
+      "probabilistic": false,
+      "variational": false
+    }
+  },
+  "learn_identity=True,         enforce_balance=False,         probabilistic=False,         variational=False,         learnable_seasonal_weight=False": {
+    "MSFT": {
+      "net_income": {
+        "lstm": 41559816216.212715,
+        "global_mean": 43699569583.333336,
+        "last_value": 49688333333.333336,
+        "seasonal_naive": 20605211666.666668
+      },
+      "balance_sheet": {
+        "lstm": 13478806697.71898,
+        "global_mean": 12006772741.402117,
+        "last_value": 11407047619.047619,
+        "seasonal_naive": 12214941071.428572
+      },
+      "bs_pct_error": 1.4052718780797038,
+      "probabilistic": false,
+      "variational": false
+    }
+  },
+  "learn_identity=True,         enforce_balance=True,         probabilistic=False,         variational=False,         learnable_seasonal_weight=False": {
+    "MSFT": {
+      "net_income": {
+        "lstm": 42788853174.95835,
+        "global_mean": 43699569583.333336,
+        "last_value": 49688333333.333336,
+        "seasonal_naive": 20605211666.666668
+      },
+      "balance_sheet": {
+        "lstm": 14093736922.798986,
+        "global_mean": 12006772741.402117,
+        "last_value": 11407047619.047619,
+        "seasonal_naive": 12214941071.428572
+      },
+      "bs_pct_error": -1.3619792140435514e-08,
+      "probabilistic": false,
+      "variational": false
+    }
+  },
+  "learn_identity=False,         enforce_balance=False,         probabilistic=True,         variational=False,         learnable_seasonal_weight=False": {
+    "MSFT": {
+      "net_income": {
+        "lstm": 43114012921.19621,
+        "global_mean": 43699569583.333336,
+        "last_value": 49688333333.333336,
+        "seasonal_naive": 20605211666.666668
+      },
+      "balance_sheet": {
+        "lstm": 25637357638.255646,
+        "global_mean": 12006772741.402117,
+        "last_value": 11407047619.047619,
+        "seasonal_naive": 12214941071.428572
+      },
+      "bs_pct_error": 7.19735654716696,
       "probabilistic": true,
       "variational": false,
       "calibration": {
-        "calibration_error": 0.22,
-        "sharpness": 4.330379029138693,
-        "crps": 1.035948125567867,
+        "calibration_error": 0.2067724867724868,
+        "sharpness": 4.434388580232384,
+        "crps": 1.0357576596757456,
         "coverage": {
-          "0.5": 0.2777777777777778,
-          "0.68": 0.38095238095238093,
+          "0.5": 0.24603174603174602,
+          "0.68": 0.4523809523809524,
           "0.8": 0.5317460317460317,
-          "0.9": 0.626984126984127,
-          "0.95": 0.7936507936507936,
-          "0.99": 0.8888888888888888
+          "0.9": 0.6666666666666666,
+          "0.95": 0.7698412698412699,
+          "0.99": 0.9126984126984127
         }
       }
+    }
+  },
+  "learn_identity=False,         enforce_balance=False,         probabilistic=True,         variational=False,         learnable_seasonal_weight=True": {
+    "MSFT": {
+      "net_income": {
+        "lstm": 42569787294.63288,
+        "global_mean": 43723750000.0,
+        "last_value": 49688333333.333336,
+        "seasonal_naive": 22556000000.0
+      },
+      "balance_sheet": {
+        "lstm": 25431184606.559372,
+        "global_mean": 12091569444.444445,
+        "last_value": 11407047619.047619,
+        "seasonal_naive": 12888976190.47619
+      },
+      "bs_pct_error": -0.15722383057281414,
+      "probabilistic": true,
+      "variational": false,
+      "calibration": {
+        "calibration_error": 0.23984126984126988,
+        "sharpness": 4.1042373764373,
+        "crps": 1.0539142024067538,
+        "coverage": {
+          "0.5": 0.23809523809523808,
+          "0.68": 0.3888888888888889,
+          "0.8": 0.49206349206349204,
+          "0.9": 0.6349206349206349,
+          "0.95": 0.7301587301587301,
+          "0.99": 0.8968253968253969
+        }
+      },
+      "final_seasonal_weight": 1.0026819705963135
+    }
+  },
+  "learn_identity=True,         enforce_balance=False,         probabilistic=True,         variational=False,         learnable_seasonal_weight=False": {
+    "MSFT": {
+      "net_income": {
+        "lstm": 42038859529.81241,
+        "global_mean": 43699569583.333336,
+        "last_value": 49688333333.333336,
+        "seasonal_naive": 20605211666.666668
+      },
+      "balance_sheet": {
+        "lstm": 25219329656.92626,
+        "global_mean": 12006772741.402117,
+        "last_value": 11407047619.047619,
+        "seasonal_naive": 12214941071.428572
+      },
+      "bs_pct_error": 3.828128658723642,
+      "probabilistic": true,
+      "variational": false,
+      "calibration": {
+        "calibration_error": 0.18560846560846564,
+        "sharpness": 4.47740158677574,
+        "crps": 1.058508284867767,
+        "coverage": {
+          "0.5": 0.2619047619047619,
+          "0.68": 0.3968253968253968,
+          "0.8": 0.5476190476190477,
+          "0.9": 0.753968253968254,
+          "0.95": 0.8253968253968254,
+          "0.99": 0.9206349206349206
+        }
+      }
+    }
+  },
+  "learn_identity=True,         enforce_balance=False,         probabilistic=False,         variational=True,         learnable_seasonal_weight=False": {
+    "MSFT": {
+      "net_income": {
+        "lstm": 43760941819.259834,
+        "global_mean": 43699569583.333336,
+        "last_value": 49688333333.333336,
+        "seasonal_naive": 20605211666.666668
+      },
+      "balance_sheet": {
+        "lstm": 12809686074.624987,
+        "global_mean": 12006772741.402117,
+        "last_value": 11407047619.047619,
+        "seasonal_naive": 12214941071.428572
+      },
+      "bs_pct_error": 3.48274060092756,
+      "probabilistic": false,
+      "variational": true
     }
   }
 }
