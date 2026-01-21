@@ -22,7 +22,7 @@ This file is intentionally "repo-consistent":
 
 Run
 ---
-python choice_learn_extension/zhang_sparse_choice_learn.py
+python zhang_sparse_choice_learn.py
 """
 
 from __future__ import annotations
@@ -39,7 +39,7 @@ from typing import Dict, Optional, Tuple
 import numpy as np
 import tensorflow as tf
 
-from jpm.question_3.choice_learn_extension.data import ChoiceDataset
+from choice_learn.data import ChoiceDataset
 
 # -----------------------------------------------------------------------------
 # Import DeepHalo
