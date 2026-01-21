@@ -52,11 +52,6 @@ python scripts/question_1/ml/parse_reports.py --help lstm  # Show only LSTMConfi
 python scripts/question_1/ml/parse_reports.py --help llm   # Show only LLMConfig arguments
 ```
 
-The category-specific help commands display organised, focused documentation for each configuration section:
-- **DataConfig** (11 args): Data loading, preprocessing, and dataset configuration
-- **LSTMConfig** (15 args): Model architecture, uncertainty quantification, training hyperparameters, and BS constraints
-- **LLMConfig** (6 args): Large language model integration for report parsing and ensemble predictions
-
 #### Downloading Data
 This script download data for tickers in jpm.utils - selectable by industry or __all__.
 ```bash
@@ -78,12 +73,18 @@ This will take quite a long time but shows progress and a time estimate.
     python scripts/question_1/valez/construct_tf.py # <- TF model
     ```
 
-- **Time-series Forecasting:**
-  - **Deterministic / Variational / Probabilistic LSTM** - predict future financial statement values.
-  Update `CONFIG_VARIATIONS` with the desired evaluations, again tickers may be selected by industry or __all__.
-    ```bash
-    python scripts/question_1/ml/lstm.py --industry tech
-    ```
+- **Deterministic / Variational / Probabilistic LSTMs**
+  - Update `CONFIG_VARIATIONS` with the desired evaluations, again tickers may be selected by industry or __all__.
+  - Accounting identity can be encouraged through the identity loss:   `learn_identity = True`
+  - It can also be enforced (only compatible with deterministic LSTM): `enforce_balance = True`
+  - **Seasonality Weighting**
+    - The system adds a seasonality weighting to data: `seasonal_weight = 1.1`
+    - Or a **Temporal Attention** layer learns the optimal weight: `learnable_seasonal_weight = True`
+
+
+  ```bash
+  python scripts/question_1/ml/lstm.py --industry tech
+  ```
 
 ### Part 2
 - **Ensemble model:**
