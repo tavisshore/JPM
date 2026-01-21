@@ -27,17 +27,18 @@ pytest -v
 
 If you want to download further data or use the LLM services, you will need to add your own keys for the following APIs - otherwise the remaining scripts work fully with the offline data stored in assets/.
 
+**Required** - this is currently essential to run the scripts, but the other APIs are optional.
 EDGAR requires an email for SEC downloads:
 ```bash
 export EDGAR_EMAIL="your_email@address.com"
 ```
 
-The LLM clients require API keys (currently only OpenAI is compatible):
+(Optional) The LLM clients require API keys (currently only OpenAI is compatible):
 ```bash
 export OPENAI_API_KEY="your_api_key"
 ```
 
-When parsing non-USD annual reports, we use `https://www.exchangerate-api.com/` to retrieve FX rates for the report date - this must be set to accurately parse non-USD reports - otherwise it falls back to innacurate static annual values.
+(Optional) When parsing non-USD annual reports, we use `https://www.exchangerate-api.com/` to retrieve FX rates for the report date - this must be set to accurately parse non-USD reports - otherwise it falls back to innacurate static annual values.
 ```bash
 export FX_API_KEY='your_fx_api_key'
 ```
