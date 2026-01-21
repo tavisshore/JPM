@@ -25,7 +25,7 @@ DataConfig Arguments (Data Loading and Preprocessing):
   --batch-size BATCH_SIZE       Batch size for training (default: 32)
   --target-type {full,bs,net_income}
                                 Type of target variable (default: full)
-  --withhold-periods WITHHOLD   Number of quarters to withhold for testing (default: 1)
+  --withhold-periods WITHHOLD   Number of quarters to withhold for testing (default: 4)
   --seasonal-weight WEIGHT      Weight applied to seasonal lag (default: 1.1)
 """,
         "lstm": """
@@ -165,7 +165,7 @@ def get_args():
         "--withhold-periods",
         type=int,
         default=None,
-        help="Number of quarters to withhold for testing (default: 1)",
+        help="Number of quarters to withhold for testing (default: 3)",
     )
     p.add_argument(
         "--seasonal-weight",
