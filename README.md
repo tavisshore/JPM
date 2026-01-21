@@ -103,6 +103,12 @@ This will take quite a long time but shows progress and a time estimate.
     # Options: --ticker [alibaba, exxon, evergrande, ...]
     ```
 
+    Or for just XGBoost training and evaluation - not requiring any API access.
+    ```bash
+    python scripts/question_1/ml/xgb.py
+    # Options: --ticker [alibaba, exxon, evergrande, ...]
+    ```
+
 
 ## Question 3 (Discrete Choice Models)
 The solution to **Question 3** is located under:
