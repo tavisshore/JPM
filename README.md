@@ -82,6 +82,7 @@ This will take quite a long time but shows progress and a time estimate.
     - The system adds a seasonality weighting to data: `seasonal_weight = 1.1`
     - Or a **Temporal Attention** layer learns the optimal weight: `learnable_seasonal_weight = True`
 
+  N.B. Ground truth currently shows as $0 when predicting future quarter but it is of course unknown.
 
   ```bash
   python scripts/question_1/ml/lstm.py --industry tech
