@@ -303,6 +303,7 @@ class LSTMForecaster:
             Prediction results with forecasted values. MAE and ground truth
             fields are set to 0 since no actuals are available.
         """
+
         if x is None:
             x = self.dataset.X_predict
 
@@ -593,17 +594,24 @@ class LSTMForecaster:
             )(scale_params)
             return tfd.MultivariateNormalTriL(loc=loc, scale_tril=scale_tril)
 
+        def run_once():
+            params_batches = []
+            for x_batch in history:
+                if x_batch.ndim == 2:
+                    x_batch = tf.expand_dims(x_batch, axis=0)
+                params_batches.append(self.model(x_batch, training=False))
+            return tf.concat(params_batches, axis=0)
+
         if self.config.lstm.mc_samples > 1:
-            param_outputs = [
-                self.model(history, training=False)
-                for _ in range(self.config.lstm.mc_samples)
-            ]
+            param_outputs = [run_once() for _ in range(self.config.lstm.mc_samples)]
             dists = [params_to_dist(p) for p in param_outputs]
+
             means = np.stack([d.mean().numpy() for d in dists], axis=0)
             stds = np.stack([d.stddev().numpy() for d in dists], axis=0)
-            return np.mean(means, axis=0), np.mean(stds, axis=0)
 
-        params = self.model(history, training=False)
+            return means.mean(axis=0), stds.mean(axis=0)
+
+        params = run_once()
         dist = params_to_dist(params)
         return dist.mean().numpy(), dist.stddev().numpy()
 
@@ -1432,7 +1440,9 @@ class LSTMForecaster:
 
         periods = min(n_periods, mean_pred.shape[0])
         x = np.arange(periods)
-
+        print(x)
+        print(lower_bound)
+        print(upper_bound)
         fig, ax = plt.subplots(figsize=(12, 6))
         ax.plot(x, mean_pred[:periods], label="Mean Prediction", color="blue")
         ax.fill_between(
