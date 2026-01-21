@@ -95,7 +95,7 @@ This will take quite a long time but shows progress and a time estimate.
     <img src="results/question_1/ml/AAPL_cash_and_equivalents_uncertainty.png" width="47%" />
   </p>
 
-  More result plots and data files are available in `results/`.
+ ** More result plots and data files are available in `results/`.**
 
 ### Part 2
 - **Ensemble model:**
