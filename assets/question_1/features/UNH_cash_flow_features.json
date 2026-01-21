@@ -1,0 +1,110 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [
+        "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents"
+    ],
+    "Financing Activities": {
+        "Dividends Paid": [
+            "payments of dividends",
+            "payments of dividends common stock"
+        ],
+        "Net Cash from Financing Activities": [
+            "net cash provided by used in financing activities"
+        ],
+        "Other Financing Activities": [
+            "payments for proceeds from hedge financing activities",
+            "payments for repurchase of redeemable noncontrolling interest",
+            "proceeds from hedge financing activities"
+        ],
+        "Proceeds from Debt": [
+            "proceeds from issuance of debt",
+            "proceeds from issuance of long term debt",
+            "proceeds from sale of available for sale securities debt"
+        ],
+        "Proceeds from Stock Issuance": [
+            "proceeds from issuance of common stock"
+        ],
+        "Repayment of Debt": [
+            "proceeds from repayments of commercial paper",
+            "proceeds from repaymentsof commercial paper",
+            "repayments of long term debt"
+        ],
+        "Stock Repurchases": [
+            "payments for repurchase of common stock"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "payments to acquire businesses net of cash acquired",
+            "payments to acquire interest in subsidiaries and affiliates"
+        ],
+        "Capital Expenditures": [
+            "payments to acquire property plant and equipment"
+        ],
+        "Net Cash from Investing Activities": [
+            "net cash provided by used in investing activities"
+        ],
+        "Other Investing Activities": [
+            "loans to care providers cyberattack",
+            "proceeds from divestiture of businesses",
+            "proceeds from divestiture of businesses net of cash divested",
+            "proceeds from sale of property plant and equipment",
+            "repayments of care provider loans cyberattack"
+        ],
+        "Purchases of Investments": [
+            "payments to acquire investments"
+        ],
+        "Sales and Maturities of Investments": [
+            "proceeds from maturities prepayments and calls of available for sale securities"
+        ]
+    },
+    "Net Change in Cash": [
+        "cash and cash equivalents period increase decrease",
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect",
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect disposal group including discontinued operations"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "increase decrease in accounts payable and accrued liabilities",
+            "increase decrease in accounts receivable",
+            "increase decrease in book overdrafts",
+            "increase decrease in deferred revenue",
+            "increase decrease in deposits",
+            "increase decrease in health care insurance liabilities",
+            "increase decrease in other operating assets",
+            "increase decrease in other policyholder funds"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income tax expense benefit"
+        ],
+        "Depreciation and Amortization": [
+            "depreciation and amortization"
+        ],
+        "Interest Paid": [
+            "interest paid net"
+        ],
+        "Net Cash from Operating Activities": [
+            "net cash provided by used in operating activities"
+        ],
+        "Net Income": [
+            "profit loss"
+        ],
+        "Other Non-Cash Items": [
+            "adjustments noncash items to reconcile net income loss to cash provided by used in operating activities other",
+            "gain loss on sale of business",
+            "income taxes paid net",
+            "loss on sale of subsidiary and subsidiaries held for sale",
+            "other noncash income expense",
+            "other significant noncash transaction value of consideration given1"
+        ],
+        "Stock-Based Compensation": [
+            "excess tax benefit from share based compensation financing activities",
+            "share based compensation"
+        ]
+    },
+    "__unmapped__": [
+        "cash within businesses held for sale",
+        "increase in cash within businesses held for sale"
+    ]
+}

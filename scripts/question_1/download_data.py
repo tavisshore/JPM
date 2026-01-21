@@ -39,7 +39,7 @@ def process_ticker(ticker):
             return ticker, None, str(e)
 
 
-max_workers = 1
+max_workers = 4
 
 with ThreadPoolExecutor(max_workers=max_workers) as executor:
     futures = {

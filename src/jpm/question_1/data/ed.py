@@ -209,10 +209,13 @@ class RatingsHistoryDownloader:
                         }
                     )
 
-                df = pd.DataFrame(results)
+            df = pd.DataFrame(results)
 
-            # if "quarter" not in df.columns or df.empty:
-            # return None
+            if len(df_clean) == 0:
+                return None, updated
+
+            if "quarter" not in df.columns or df.empty:
+                return None, updated
 
             df["quarter"] = pd.to_datetime(df["quarter"]).dt.to_period("Q")
             df = df[["rating", "quarter"]]
@@ -222,8 +225,8 @@ class RatingsHistoryDownloader:
 
             df.to_parquet(ratings_data_path)
         else:
-            df = pd.read_parquet(ratings_data_path)
             updated = False
+        df = pd.read_parquet(ratings_data_path)
 
         return df, updated
 
