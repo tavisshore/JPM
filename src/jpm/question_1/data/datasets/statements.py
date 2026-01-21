@@ -203,7 +203,7 @@ class StatementsDataset:
         # Build predict set: final lookback window with no ground truth
         self.X_predict = self._build_predict_window(X_scaled)
         self.predict_dataset = tf.data.Dataset.from_tensor_slices(
-            self.X_predict.astype("float64")
+            self.X_predict.astype("float32")
         ).batch(1)
 
     def _get_structure(self) -> None:

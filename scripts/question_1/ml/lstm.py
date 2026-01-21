@@ -171,14 +171,14 @@ for var_idx, variation in enumerate(CONFIG_VARIATIONS, 1):
             bs = BalanceSheet(
                 config=config, data=data, dataset=dataset, results=validation_results
             )
-            # bs.view()
+            bs.view()
             bs_pct_error = bs.check_identity(verbose=False)
 
             i_s = IncomeStatement(
                 config=config, dataset=dataset, results=validation_results
             )
-            # i_s.view()
-            # is_results = i_s.get_results()
+            i_s.view()
+            is_results = i_s.get_results()
 
             # Compute calibration metrics for probabilistic models
             calibration_metrics = None
@@ -193,7 +193,7 @@ for var_idx, variation in enumerate(CONFIG_VARIATIONS, 1):
                     f"results/question_1/ml/{ticker}_uncertainty_heatmap.png"
                 )
                 heatmap_path.parent.mkdir(parents=True, exist_ok=True)
-                model.plot_uncertainty_heatmap(stage="val", save_path=heatmap_path)
+                # model.plot_uncertainty_heatmap(stage="val", save_path=heatmap_path)
                 # model.plot_series_with_uncertainty(
                 #     feature_name="Net Income",
                 #     save_path=Path(
@@ -230,7 +230,6 @@ for var_idx, variation in enumerate(CONFIG_VARIATIONS, 1):
 
             # Now predict the future on the final lookback window dataset.predict_dataset
             predictions = model.predict(dataset.predict_dataset)
-            print(f"\n  {ticker}: Future Balance Sheet Prediction:", flush=True)
 
             bs = BalanceSheet(
                 config=config, data=data, dataset=dataset, results=predictions
@@ -254,7 +253,6 @@ for var_idx, variation in enumerate(CONFIG_VARIATIONS, 1):
 
             gc.collect()
             tf.keras.backend.clear_session()
-
         except Exception as E:
             print(f"\n{E}", flush=True)
             failed.append(ticker)
