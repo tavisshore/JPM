@@ -1,0 +1,98 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [
+        "comprehensive income net of tax"
+    ],
+    "Dividends Declared": [],
+    "Dividends Paid": [],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [
+            "adjustments to additional paid in capital convertible debt hedge",
+            "adjustments to additional paid in capital equity component of convertible debt",
+            "adjustments to additional paid in capital exercise of conversion feature of convertible senior notes",
+            "adjustments to additional paid in capital shareholder settlement",
+            "adjustments to additional paid in capital warrant issued",
+            "amount of adjustments to additional paid in capital convertible debt discount"
+        ],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "net income loss including portion attributable to nonredeemable noncontrolling interest",
+        "profit loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [],
+        "Foreign Currency Translation": [
+            "other comprehensive income loss foreign currency transaction and translation adjustment net of tax"
+        ],
+        "Other OCI": [],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax",
+            "other comprehensive income loss net of tax portion attributable to parent"
+        ],
+        "Unrealized Gains/Losses on Securities": [
+            "other comprehensive income available for sale securities adjustment net of tax period increase decrease",
+            "other comprehensive income loss available for sale securities adjustment net of tax"
+        ]
+    },
+    "Other Equity Adjustments": [
+        "assumption of capped call",
+        "new accounting pronouncement or change in accounting principle effect of adoption quantification",
+        "reclassifications of permanent equity to temporary equity",
+        "reclassifications of temporary equity to equity component of debt instrument",
+        "stockholders equity other"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [
+            "stock issued during period value stock options exercised"
+        ],
+        "Other Stock Issuance": [
+            "warrants settlement"
+        ],
+        "Stock-Based Compensation": [
+            "adjustments to additional paid in capital sharebased compensation requisite service period recognition value",
+            "allocated share based compensation expense"
+        ],
+        "Total Stock Issuance Value": [
+            "stock issued during period concurrent private placements value new issues",
+            "stock issued during period value acquisitions",
+            "stock issued during period value conversion of convertible securities",
+            "stock issued during period value employee stock purchase plan",
+            "stock issued during period value equity incentive awards",
+            "stock issued during period value new issues",
+            "stock issued during period value restricted stock",
+            "stock issued during period value withheld for employee taxes"
+        ]
+    },
+    "Stock Repurchases": [],
+    "Tax Effects from Stock Compensation": [],
+    "__unmapped__": [
+        "acquisition of noncontrolling interest in subsidiaries",
+        "minority interest decrease from distributions to noncontrolling interest holders through acquisition",
+        "noncontrolling interest increase from business combination",
+        "stock issued during period concurrent private placements shares new issues",
+        "stock issued during period share based compensation net of shares withheld for taxes",
+        "stock issued during period shares acquisitions",
+        "stock issued during period shares conversion of convertible securities",
+        "stock issued during period shares employee stock purchase plans",
+        "stock issued during period shares equity incentive awards",
+        "stock issued during period shares new issues",
+        "stock issued during period shares stock options exercised",
+        "stock issued during period shares withheld for employee taxes",
+        "temporary equity buy out of noncontrolling interests",
+        "temporary equity contributions to noncontrolling interests",
+        "temporary equity distributions to noncontrolling interests",
+        "temporary equity net income"
+    ]
+}

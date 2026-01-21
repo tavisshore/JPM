@@ -1,0 +1,166 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [
+        "effect of exchange rate on cash and cash equivalents",
+        "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents including disposal group and discontinued operations"
+    ],
+    "Financing Activities": {
+        "Dividends Paid": [],
+        "Net Cash from Financing Activities": [
+            "net cash provided by used in financing activities"
+        ],
+        "Other Financing Activities": [
+            "finance lease principal payments",
+            "issuance costs for common stock and convertible notes",
+            "payments for buy outs of noncontrolling interests in subsidiaries",
+            "payments for hedge financing activities",
+            "payments for repurchase of warrants",
+            "payments of debt issuance costs",
+            "payments of financing costs",
+            "payments of stock issuance costs",
+            "payments to minority shareholders",
+            "proceeds from hedge financing activities",
+            "proceeds from minority shareholders",
+            "proceeds from repayments of long term debt and capital securities",
+            "proceeds from repayments of secured debt",
+            "proceeds received from directors in shareholder settlement"
+        ],
+        "Proceeds from Debt": [
+            "proceeds from convertible and other debt",
+            "proceeds from convertible debt",
+            "proceeds from issuance of debt",
+            "proceeds from issuance of long term debt",
+            "proceeds from secured notes payable"
+        ],
+        "Proceeds from Stock Issuance": [
+            "proceeds from issuance initial public offering",
+            "proceeds from issuance of common stock",
+            "proceeds from issuance of private placement",
+            "proceeds from issuance of shares under incentive and share based compensation plans including stock options",
+            "proceeds from issuance of warrants"
+        ],
+        "Repayment of Debt": [
+            "operating cash flow related to repayment of discounted convertible notes",
+            "operating cash flow related to repayment of discounted convertible senior notes",
+            "repayments of convertible and other debt",
+            "repayments of convertible debt",
+            "repayments of debt and capital lease obligations",
+            "repayments of long term debt",
+            "repayments of other debt",
+            "repayments of related party debt"
+        ],
+        "Stock Repurchases": []
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "business combination consideration transferred equity interests issued and issuable",
+            "payments to acquire businesses net of cash acquired",
+            "noncash or part noncash acquisition value of assets acquired1",
+            "shares issued in connection of business combination and assumed vested awards"
+        ],
+        "Capital Expenditures": [
+            "payments for solar energy systems",
+            "payments for solar energy systems leased and to be leased",
+            "payments for solar energy systems net of sales",
+            "payments to acquire property plant and equipment"
+        ],
+        "Net Cash from Investing Activities": [
+            "net cash provided by used in investing activities"
+        ],
+        "Other Investing Activities": [
+            "government grant receipt",
+            "payments to acquire other indefinite lived intangible assets"
+        ],
+        "Purchases of Investments": [
+            "payments to acquire investments",
+            "payments to acquire marketable securities",
+            "purchase of digital assets"
+        ],
+        "Sales and Maturities of Investments": [
+            "proceeds from maturities prepayments and calls of available for sale securities",
+            "proceeds from sale and maturity of marketable securities",
+            "proceeds from sale maturity and collections of investments",
+            "proceeds from sale of short term investments",
+            "proceeds from sales of digital assets"
+        ]
+    },
+    "Net Change in Cash": [
+        "cash and cash equivalents period increase decrease",
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect",
+        "increase decrease in restricted cash and cash equivalents"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "increase decrease in accounts payable",
+            "increase decrease in accounts payable and accrued liabilities",
+            "increase decrease in accounts receivable",
+            "increase decrease in accrued liabilities",
+            "increase decrease in contract with customer liability",
+            "increase decrease in contract with customer liability customer deposits",
+            "increase decrease in customer advances",
+            "increase decrease in inventories",
+            "increase decrease in notes receivables",
+            "increase decrease in operating lease vehicles",
+            "increase decrease in other noncurrent assets",
+            "increase decrease in other noncurrent liabilities",
+            "increase decrease in other operating assets",
+            "increase decrease in prepaid deferred expense and other assets",
+            "increase decrease in resale value guarantee"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income tax expense benefit"
+        ],
+        "Depreciation and Amortization": [
+            "depreciation amortization and impairment",
+            "depreciation and amortization"
+        ],
+        "Interest Paid": [
+            "interest paid",
+            "interest paid net"
+        ],
+        "Net Cash from Operating Activities": [
+            "net cash provided by used in operating activities",
+            "net cash provided by used in operating activities continuing operations"
+        ],
+        "Net Income": [
+            "net income loss",
+            "profit loss"
+        ],
+        "Other Non-Cash Items": [
+            "accretion amortization of discounts and premiums investments",
+            "amortization of debt discount less capitalized interest",
+            "amortization of debt discount premium",
+            "amortization of financing costs and discounts",
+            "foreign currency transaction gain loss before tax",
+            "foreign currency transaction gain loss realized",
+            "foreign currency transaction gain loss unrealized",
+            "gain loss on digital assets",
+            "gain loss on disposition of assets1",
+            "gain loss on disposition of property",
+            "gain loss on sale of property plant equipment",
+            "gain on digital assets",
+            "gains loss on acquisition",
+            "income taxes paid",
+            "inventory write down",
+            "non cash additionally estimated fair market value of manufacturing facility",
+            "non cash estimated fair market value of manufacturing facility",
+            "noncash interest income expense and other operating activities",
+            "other noncash income expense",
+            "right of use asset obtained in exchange for finance lease liability",
+            "right of use asset obtained in exchange for operating lease liability",
+            "unrealized gain loss on derivatives",
+            "write off of loan origination costs"
+        ],
+        "Stock-Based Compensation": [
+            "share based compensation"
+        ]
+    },
+    "__unmapped__": [
+        "decrease in restricted cash",
+        "increase decrease in inventories and property subject to or available for operating lease",
+        "increase decrease in other operating assets and notes receivables",
+        "increase decrease in restricted cash",
+        "payment for legal fees"
+    ]
+}
