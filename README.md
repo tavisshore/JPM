@@ -25,7 +25,7 @@ pytest -v
 ## Question 1 - Financial Statement Forecasting
 ***Environment Variables***
 
-If you want to download further data or use the LLM services, you will need to add your own keys for the following API services - otherwise the remaining scripts work fully with the offline data stored in assets/.
+If you want to download further data or use the LLM services, you will need to add your own keys for the following APIs - otherwise the remaining scripts work fully with the offline data stored in assets/.
 
 EDGAR requires an email for SEC downloads:
 ```bash
