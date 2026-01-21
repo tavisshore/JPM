@@ -64,15 +64,25 @@ llm_cfg = LLMConfig.from_args(args)
 
 CONFIG_VARIATIONS = [
     # Deterministic models
-    # {"learn_identity": False, "enforce_balance": False, "probabilistic": False, "variational": False},
-    # {"learn_identity": True, "enforce_balance": False, "probabilistic": False, "variational": False},
-    # {
-    #     "learn_identity": True,
-    #     "enforce_balance": True,
-    #     "probabilistic": False,
-    #     "variational": False,
-    #     "learnable_seasonal_weight": False,
-    # },
+    {
+        "learn_identity": False,
+        "enforce_balance": False,
+        "probabilistic": False,
+        "variational": False,
+    },
+    {
+        "learn_identity": True,
+        "enforce_balance": False,
+        "probabilistic": False,
+        "variational": False,
+    },
+    {
+        "learn_identity": True,
+        "enforce_balance": True,
+        "probabilistic": False,
+        "variational": False,
+        "learnable_seasonal_weight": False,
+    },
     # + learned seasonal weight
     {
         "learn_identity": False,
@@ -81,20 +91,27 @@ CONFIG_VARIATIONS = [
         "variational": False,
         "learnable_seasonal_weight": False,
     },
+    {
+        "learn_identity": False,
+        "enforce_balance": False,
+        "probabilistic": True,
+        "variational": False,
+        "learnable_seasonal_weight": True,
+    },
     # Probabilistic models (cannot use enforce_balance with probabilistic=True)
-    # {
-    #     "learn_identity": True,
-    #     "enforce_balance": False,
-    #     "probabilistic": True,
-    #     "variational": False,
-    # },
+    {
+        "learn_identity": True,
+        "enforce_balance": False,
+        "probabilistic": True,
+        "variational": False,
+    },
     # Variational models (Bayesian uncertainty via weight distributions)
-    # {
-    #     "learn_identity": True,
-    #     "enforce_balance": False,
-    #     "probabilistic": False,
-    #     "variational": True,
-    # },
+    {
+        "learn_identity": True,
+        "enforce_balance": False,
+        "probabilistic": False,
+        "variational": True,
+    },
 ]
 
 features_to_plot = [
