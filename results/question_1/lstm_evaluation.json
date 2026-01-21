@@ -1,32 +1,32 @@
 {
   "learn_identity=False,         enforce_balance=False,         probabilistic=True,         variational=False,         learnable_seasonal_weight=False": {
-    "AAPL": {
+    "MSFT": {
       "net_income": {
-        "lstm": 41617286502.3553,
-        "global_mean": 26660647012.578613,
-        "last_value": 25226666666.666668,
-        "seasonal_naive": 18833921383.647797
+        "lstm": 42966964561.88317,
+        "global_mean": 43699569583.333336,
+        "last_value": 49688333333.333336,
+        "seasonal_naive": 20605211666.666668
       },
       "balance_sheet": {
-        "lstm": 20587213554.58008,
-        "global_mean": 9956327606.752731,
-        "last_value": 9353798245.614035,
-        "seasonal_naive": 8103577126.779211
+        "lstm": 25096473721.270264,
+        "global_mean": 12006772741.402117,
+        "last_value": 11407047619.047619,
+        "seasonal_naive": 12214941071.428572
       },
-      "bs_pct_error": -5.62753346426176,
+      "bs_pct_error": 5.882421838228733,
       "probabilistic": true,
       "variational": false,
       "calibration": {
-        "calibration_error": 0.0372514619883041,
-        "sharpness": 4.425974369049072,
-        "crps": 0.7281487509543522,
+        "calibration_error": 0.22,
+        "sharpness": 4.330379962921143,
+        "crps": 1.0359480896271496,
         "coverage": {
-          "0.5": 0.47368421052631576,
-          "0.68": 0.6052631578947368,
-          "0.8": 0.7543859649122807,
-          "0.9": 0.868421052631579,
-          "0.95": 0.9210526315789473,
-          "0.99": 0.9736842105263158
+          "0.5": 0.2777777777777778,
+          "0.68": 0.38095238095238093,
+          "0.8": 0.5317460317460317,
+          "0.9": 0.626984126984127,
+          "0.95": 0.7936507936507936,
+          "0.99": 0.8888888888888888
         }
       }
     }
