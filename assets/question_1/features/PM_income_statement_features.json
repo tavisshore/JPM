@@ -1,0 +1,75 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "cost of goods and services sold"
+        ]
+    },
+    "Gross Profit": [
+        "gross profit"
+    ],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes minority interest and income loss from equity method investments"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "net income loss",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [],
+        "Interest Income": [],
+        "Other Income (Expense)": [
+            "equity securities without readily determinable fair value impairment loss annual amount",
+            "income loss from equity method investments",
+            "interest income expense nonoperating net"
+        ],
+        "Total Non-Operating Items": []
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "amortization of intangible assets"
+        ],
+        "General and Administrative": [],
+        "Other Operating Expenses": [
+            "goodwill impairment loss",
+            "net periodic defined benefits expense reversal of expense excluding service cost component",
+            "net periodic defined benefits expense reversalof expense excluding service cost component"
+        ],
+        "Research and Development": [],
+        "Sales and Marketing": [],
+        "Total Operating Expenses": []
+    },
+    "Operating Income": [
+        "operating income loss"
+    ],
+    "Other Comprehensive Income": [],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [],
+        "Weighted Average Shares Outstanding (Diluted)": []
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "revenue from contract with customer excluding assessed tax",
+            "revenue from contract with customer including assessed tax",
+            "sales revenue net"
+        ]
+    },
+    "__unmapped__": [
+        "common stock dividends per share declared",
+        "equity securities without readily determinable fair value impairment loss annual amount",
+        "excise and sales taxes",
+        "income loss from equity method investments and equity securities f v n i",
+        "marketing administration and research costs",
+        "net income loss attributable to noncontrolling interest",
+        "restructuring settlement and impairment provisions"
+    ]
+}

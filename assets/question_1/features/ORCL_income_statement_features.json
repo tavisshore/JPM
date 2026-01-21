@@ -1,0 +1,94 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": []
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "net income loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [
+            "interest expense"
+        ],
+        "Interest Income": [],
+        "Other Income (Expense)": [],
+        "Total Non-Operating Items": [
+            "nonoperating income expense including elimination of net income loss attributable to noncontrolling interests"
+        ]
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "amortization of intangible assets"
+        ],
+        "General and Administrative": [
+            "general and administrative expense"
+        ],
+        "Other Operating Expenses": [
+            "business combination acquisition related costs",
+            "cloud and software expenses",
+            "restructuring charges"
+        ],
+        "Research and Development": [
+            "research and development expense",
+            "research and development expense software excluding acquired in process cost"
+        ],
+        "Sales and Marketing": [
+            "selling and marketing expense"
+        ],
+        "Total Operating Expenses": []
+    },
+    "Operating Income": [
+        "operating income loss"
+    ],
+    "Other Comprehensive Income": [],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [],
+        "Weighted Average Shares Outstanding (Diluted)": []
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "cloud infrastructure as a service",
+            "cloud license and on premise license revenue",
+            "cloud on premise software revenues",
+            "cloud platform as service and infrastructure as a service",
+            "cloud revenues",
+            "cloud services and license support revenue",
+            "cloud software as service",
+            "cloud software subscriptions",
+            "hardware products revenues",
+            "hardware revenues",
+            "hardware support revenues",
+            "hardware systems products revenues",
+            "hardware systems revenues",
+            "hardware systems support revenues",
+            "license and maintenance revenue",
+            "licenses revenue",
+            "maintenance revenue",
+            "new software licenses and cloud software subscriptions",
+            "revenue from contract with customer excluding assessed tax",
+            "sales revenue services net1",
+            "software revenues",
+            "total cloud revenues"
+        ]
+    },
+    "__unmapped__": [
+        "common stock dividends per share cash paid",
+        "common stock dividends per share declared",
+        "costs and expenses",
+        "software and cloud revenues",
+        "income loss from continuing operations including noncontrolling interest before income taxes extraordinary items"
+    ]
+}

@@ -1,0 +1,116 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [
+        "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents"
+    ],
+    "Financing Activities": {
+        "Dividends Paid": [
+            "payments of dividends"
+        ],
+        "Net Cash from Financing Activities": [
+            "net cash provided by used in financing activities"
+        ],
+        "Other Financing Activities": [
+            "distributions to n b c universal noncontrolling interest holders",
+            "distributions to noncontrolling interests and dividends for redeemable subsidiary preferred stock",
+            "distributions to other noncontrolling interests",
+            "distributionstononcontrollinginterestholders",
+            "minority interest decrease from distributions to noncontrolling interest holders",
+            "payments of capital distribution",
+            "payments to minority shareholders",
+            "proceeds from note receivable issued to and borrowings from ultimate parent",
+            "redemption transaction distribution",
+            "settlement of station venture liability"
+        ],
+        "Proceeds from Debt": [
+            "proceeds from collateralized obligation",
+            "proceeds from issuance of long term debt",
+            "proceeds from other debt",
+            "proceeds from repayments of short term debt"
+        ],
+        "Proceeds from Stock Issuance": [
+            "proceeds from issuance of common stock"
+        ],
+        "Repayment of Debt": [
+            "repayment of collateralized obligation",
+            "repayments of borrowings from comcast",
+            "repayments of long term debt"
+        ],
+        "Stock Repurchases": [
+            "payments for repurchase of common stock"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "payments to acquire businesses net of cash acquired"
+        ],
+        "Capital Expenditures": [
+            "payments for construction of theme park",
+            "payments to acquire buildings"
+        ],
+        "Net Cash from Investing Activities": [
+            "net cash provided by used in investing activities"
+        ],
+        "Other Investing Activities": [
+            "equity method investment dividends or distributions",
+            "note receivable issued from ultimate parent",
+            "payments to acquire intangible assets",
+            "payments to acquire intangible assets spectrum rights",
+            "proceeds from equity method investment dividends or distributions return of capital",
+            "proceeds from sales of businesses and investments"
+        ],
+        "Purchases of Investments": [
+            "payments to acquire investments"
+        ],
+        "Sales and Maturities of Investments": [
+            "proceeds from advance on sale of investment"
+        ]
+    },
+    "Net Change in Cash": [
+        "cash and cash equivalents period increase decrease",
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "change in film and television costs",
+            "increase decrease in accounts payable and accrued liabilities",
+            "increase decrease in accounts receivable",
+            "increase decrease in current and noncurrent receivables net",
+            "increase decrease in film and television costs net",
+            "increase decrease in other operating capital net"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income tax expense benefit"
+        ],
+        "Depreciation and Amortization": [
+            "adjustment for amortization",
+            "amortization of film and television costs",
+            "depreciation",
+            "depreciation and amortization",
+            "depreciation and amortization and gain loss on disposition of assets",
+            "depreciation depletion and amortization"
+        ],
+        "Interest Paid": [],
+        "Net Cash from Operating Activities": [
+            "net cash provided by used in operating activities"
+        ],
+        "Net Income": [
+            "profit loss"
+        ],
+        "Other Non-Cash Items": [
+            "gain loss on investments and other noncash income loss net",
+            "goodwill and intangible asset impairment",
+            "income loss from equity method investments",
+            "noncash interest expense income net"
+        ],
+        "Stock-Based Compensation": [
+            "share based compensation"
+        ]
+    },
+    "__unmapped__": [
+        "deposit",
+        "payments for acquisitions and construction of real estate properties",
+        "payments for proceeds from other investing activities"
+    ]
+}

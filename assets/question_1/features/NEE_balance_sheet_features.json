@@ -1,0 +1,138 @@
+{
+    "Assets": {
+        "Current": {
+            "Cash and Equivalents": [
+                "cash and cash equivalents at carrying value"
+            ],
+            "Inventory": [
+                "inventory net",
+                "materials supplies and fossil fuel inventory",
+                "nuclear fuel"
+            ],
+            "Marketable Securities (Short-term)": [
+                "commercial paper"
+            ],
+            "Prepaid and Other Current Assets": [
+                "assets held for sale not part of disposal group current",
+                "contract with customer asset net current",
+                "current regulatory assets deferred clause and franchise expenses",
+                "derivative assets current",
+                "other assets current",
+                "regulatory assets current"
+            ],
+            "Receivables": [
+                "accounts receivable net current",
+                "other receivables net current"
+            ],
+            "Total Current Assets": [
+                "assets current"
+            ]
+        },
+        "Non-Current": {
+            "Deferred Tax Assets": [
+                "deferred income tax liabilities net"
+            ],
+            "Goodwill": [
+                "goodwill"
+            ],
+            "Intangible Assets (net)": [],
+            "Long-term Investments": [
+                "decommissioning fund investments",
+                "equity method investments",
+                "other investments mareketable securities"
+            ],
+            "Other Non-Current Assets": [
+                "defined benefit plan assets for plan benefits noncurrent",
+                "non current regulatory assets securitized storm recovery costs",
+                "noncurrent regulatory asset other",
+                "regulatory assets purchased power agreement gross noncurrent",
+                "other assets"
+            ],
+            "Property, Plant, and Equipment (net)": [
+                "accumulated depreciation and amortization",
+                "construction in progress gross",
+                "electric utility plant in service and other property",
+                "property plant and equipment net",
+                "public utilities property plant and equipment net",
+                "public utilities property plant and equipment plant in service gross"
+            ],
+            "Total Non-Current Assets": []
+        },
+        "Total Assets": [
+            "assets"
+        ]
+    },
+    "Equity": {
+        "Accumulated Other Comprehensive Income": [
+            "accumulated other comprehensive income loss net of tax"
+        ],
+        "Common Stock and APIC": [
+            "additional paid in capital common stock",
+            "common stock value"
+        ],
+        "Retained Earnings": [
+            "retained earnings accumulated deficit"
+        ],
+        "Total Equity": [
+            "stockholders equity",
+            "stockholders equity including portion attributable to noncontrolling interest"
+        ],
+        "Treasury Stock": []
+    },
+    "Liabilities": {
+        "Current": {
+            "Accounts Payable and Accrued Expenses": [
+                "accounts payable current and noncurrent",
+                "accrued interest and taxes",
+                "construction payable current"
+            ],
+            "Deferred Revenue": [
+                "contract with customer liability current",
+                "current regulatory liabilities deferred clause and franchise revenues"
+            ],
+            "Other Current Liabilities": [
+                "liabilities associatedwith assets heldfor sale",
+                "regulatory liability current"
+            ],
+            "Short-term Debt": [
+                "long term debt current",
+                "other short term borrowings"
+            ],
+            "Total Current Liabilities": [
+                "liabilities current"
+            ]
+        },
+        "Non-Current": {
+            "Deferred Tax Liabilities": [],
+            "Lease Liabilities": [],
+            "Long-term Debt": [
+                "long term debt noncurrent"
+            ],
+            "Other Non-Current Liabilities": [
+                "asset retirement obligations noncurrent",
+                "deferred proceeds from sale of differential membership interests",
+                "deferred storm and property reserve deficiency noncurrent",
+                "noncurrent regulatory liability accrued asset removal costs",
+                "noncurrent regulatory liability asset retirement obligation regulatory expense difference"
+            ],
+            "Total Non-Current Liabilities": [
+                "liabilities noncurrent"
+            ]
+        },
+        "Total Liabilities": [
+            "liabilities"
+        ]
+    },
+    "Totals": {
+        "Total Liabilities and Equity": [
+            "liabilities and stockholders equity"
+        ]
+    },
+    "__unmapped__": [
+        "capitalization longterm debt and equity",
+        "investments and other noncurrent assets",
+        "minority interest",
+        "redeemable noncontrolling interest equity carrying amount",
+        "total capitalization"
+    ]
+}

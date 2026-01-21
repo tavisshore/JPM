@@ -1,0 +1,139 @@
+{
+    "Assets": {
+        "Current": {
+            "Cash and Equivalents": [
+                "cash and cash equivalents at carrying value"
+            ],
+            "Inventory": [
+                "inventory net"
+            ],
+            "Marketable Securities (Short-term)": [
+                "other short term investments",
+                "restricted investments current"
+            ],
+            "Prepaid and Other Current Assets": [
+                "other assets current",
+                "other tax assets current"
+            ],
+            "Receivables": [
+                "accounts receivable net current",
+                "allowance for doubtful accounts receivable current",
+                "notes and loans receivable gross current"
+            ],
+            "Total Current Assets": [
+                "assets current"
+            ]
+        },
+        "Non-Current": {
+            "Deferred Tax Assets": [],
+            "Goodwill": [
+                "goodwill"
+            ],
+            "Intangible Assets (net)": [
+                "intangible assets net excluding goodwill"
+            ],
+            "Long-term Investments": [
+                "equity method investments",
+                "other long term investments"
+            ],
+            "Other Non-Current Assets": [
+                "other assets noncurrent"
+            ],
+            "Property, Plant, and Equipment (net)": [
+                "property plant and equipment net"
+            ],
+            "Total Non-Current Assets": []
+        },
+        "Total Assets": [
+            "assets"
+        ]
+    },
+    "Equity": {
+        "Accumulated Other Comprehensive Income": [
+            "accumulated other comprehensive income loss net of tax"
+        ],
+        "Common Stock and APIC": [
+            "additional paid in capital",
+            "common stock value",
+            "preferred stock value"
+        ],
+        "Retained Earnings": [
+            "retained earnings accumulated deficit"
+        ],
+        "Total Equity": [
+            "stockholders equity",
+            "minority interest"
+        ],
+        "Treasury Stock": [
+            "treasury stock common value",
+            "treasury stock shares"
+        ]
+    },
+    "Liabilities": {
+        "Current": {
+            "Accounts Payable and Accrued Expenses": [
+                "accounts payable current"
+            ],
+            "Deferred Revenue": [
+                "contract with customer liability current"
+            ],
+            "Other Current Liabilities": [
+                "dividends payable current",
+                "employee related liabilities current",
+                "other liabilities current",
+                "taxes payable current"
+            ],
+            "Short-term Debt": [
+                "debt current",
+                "long term debt current"
+            ],
+            "Total Current Liabilities": [
+                "liabilities current"
+            ]
+        },
+        "Non-Current": {
+            "Deferred Tax Liabilities": [
+                "deferred income tax liabilities net"
+            ],
+            "Lease Liabilities": [],
+            "Long-term Debt": [
+                "long term debt noncurrent"
+            ],
+            "Other Non-Current Liabilities": [
+                "defined benefit pension plan liabilities noncurrent",
+                "liability for uncertain tax positions noncurrent",
+                "other liabilities noncurrent",
+                "other postretirement defined benefit plan liabilities noncurrent",
+                "pension and other postretirement defined benefit plans liabilities noncurrent"
+            ],
+            "Total Non-Current Liabilities": []
+        },
+        "Total Liabilities": [
+            "liabilities"
+        ]
+    },
+    "Totals": {
+        "Total Liabilities and Equity": [
+            "liabilities and stockholders equity"
+        ]
+    },
+    "__unmapped__": [
+        "assets of disposal group including discontinued operation",
+        "assets of disposal group including discontinued operation current",
+        "common stock par or stated value per share",
+        "common stock shares authorized",
+        "common stock shares issued",
+        "compensation and benefits trust",
+        "deferred income taxes and other assets current",
+        "deferred income taxes and other assets noncurrent",
+        "deferred tax assets net and other tax assets current",
+        "deferred tax assets net and other tax assets noncurrent",
+        "disposal group including discontinued operation assets noncurrent",
+        "dividends payable current and noncurrent",
+        "liabilities of disposal group including discontinued operation",
+        "long term investments and receivables net",
+        "preferred stock shares authorized",
+        "preferred stock shares issued",
+        "stockholders equity including portion attributable to noncontrolling interest"
+    ]
+}

@@ -1,0 +1,86 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [
+        "comprehensive income net of tax including portion attributable to noncontrolling interest"
+    ],
+    "Dividends Declared": [
+        "dividends common stock"
+    ],
+    "Dividends Paid": [],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "disposal group not discontinued operation gain loss on disposal",
+        "income loss from equity method investments",
+        "net income loss",
+        "profit loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [],
+        "Foreign Currency Translation": [],
+        "Other OCI": [],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax"
+        ],
+        "Unrealized Gains/Losses on Securities": []
+    },
+    "Other Equity Adjustments": [
+        "adjustments to additional paid in capital reclassification to temporary equity from convertible debt",
+        "reclassifications of temporary to permanent equity",
+        "temporary equity issue period increase or decrease"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [
+            "proceeds from sales of shares through employee equity incentive plans net excess tax benefit tax deficiency and other",
+            "proceeds from sales of shares through employee equity incentive plans net excess tax benefit tax deficiency and other shares"
+        ],
+        "Other Stock Issuance": [
+            "fair value of equity awards assumed in connection with acquisitions",
+            "stock and warrants issued during period shares new issues",
+            "stock issued during period shares employee stock purchase plans"
+        ],
+        "Stock-Based Compensation": [
+            "adjustments to additional paid in capital share based compensation employee stock purchase program requisite service period recognition",
+            "adjustments to additional paid in capital sharebased compensation requisite service period recognition value",
+            "adjustmentsto additional paidin capital sharebased compensation other longterm incentive plans requisite service period recognition shares"
+        ],
+        "Total Stock Issuance Value": [
+            "stock and warrants issued during period value new issues"
+        ]
+    },
+    "Stock Repurchases": [
+        "accelerated share repurchases forward agreements",
+        "repurchase of common stock shares",
+        "repurchase of common stock value",
+        "shares paid for tax withholding for share based compensation",
+        "stock repurchased during period shares",
+        "stock repurchased during period value"
+    ],
+    "Tax Effects from Stock Compensation": [
+        "adjustments related to tax withholding for share based compensation"
+    ],
+    "__unmapped__": [
+        "common stock dividends per share declared",
+        "investments in non marketable equity investments",
+        "noncontrolling interest increase from sale of parent equity interest and contributions from noncontrolling interest holders",
+        "noncontrolling interest increase from sale of parent equity interest and subsidiary equity issuance",
+        "noncontrolling interest increase from subsidiary equity issuance",
+        "proceeds from equity method investment dividends or distributions return of capital",
+        "proceeds from sale of certain assets of joint ventures to counterparty",
+        "related party transaction amounts of transaction",
+        "related party transaction purchases from related party"
+    ]
+}
