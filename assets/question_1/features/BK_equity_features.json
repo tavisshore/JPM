@@ -1,0 +1,91 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [
+        "comprehensive income net of tax including portion attributable to noncontrolling interest"
+    ],
+    "Dividends Declared": [],
+    "Dividends Paid": [],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [
+            "common stock member"
+        ],
+        "Retained Earnings": [],
+        "Total Equity": [
+            "stockholders equity including portion attributable to noncontrolling interest adjusted balance1"
+        ],
+        "Treasury Stock": [
+            "treasury stock value acquired cost method"
+        ]
+    },
+    "Net Income": [
+        "profit loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [
+            "other comprehensive income unrealized gain loss on derivatives arising during period net of tax"
+        ],
+        "Foreign Currency Translation": [
+            "other comprehensive income foreign currency transaction and translation adjustment net of tax period increase decrease"
+        ],
+        "Other OCI": [
+            "other comprehensive income defined benefit pension plans adjustment net of tax period increase decrease",
+            "other comprehensive income defined benefit plans adjustment net of tax period increase decrease",
+            "other comprehensive income reclassification adjustments and other"
+        ],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax",
+            "other comprehensive income loss net of tax including portion attributable to noncontrolling interest",
+            "other comprehensive income loss net of tax period increase decrease",
+            "other comprehensive income loss net of tax portion attributable to parent"
+        ],
+        "Unrealized Gains/Losses on Securities": [
+            "other comprehensive income unrealized holding gain loss on securities arising during period net of tax"
+        ]
+    },
+    "Other Equity Adjustments": [
+        "cumulative effect of initial adoption of new accounting principle",
+        "preferred stock amortization of deferred fees",
+        "preferred stock member",
+        "stockholders equity other"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [],
+        "Other Stock Issuance": [
+            "stock issued during period value dividend reinvestment and employee stock purchase plan",
+            "stock issued during period value employee benefit plan",
+            "stock issued during period value new issues",
+            "stock issued during period value stock forward contract"
+        ],
+        "Stock-Based Compensation": [
+            "adjustments to additional paid in capital sharebased compensation requisite service period recognition value"
+        ],
+        "Total Stock Issuance Value": []
+    },
+    "Stock Repurchases": [
+        "excise tax on share repurchase",
+        "share repurchase program excise tax",
+        "stock redeemed or called during period value"
+    ],
+    "Tax Effects from Stock Compensation": [],
+    "__unmapped__": [
+        "equity profit loss",
+        "minority interest decrease from distributions to noncontrolling interest holders",
+        "minority interest decrease from redemptions",
+        "minority interest period increase decrease",
+        "net income loss attributable to redeemable noncontrolling interest",
+        "noncontrolling interest attributable to consolidation of asset management funds",
+        "noncontrolling interest attributable to consolidation of investment management funds",
+        "noncontrolling interest decrease from deconsolidation",
+        "noncontrolling interest increase from subsidiary equity issuance",
+        "temporary equity other comprehensive income loss"
+    ]
+}

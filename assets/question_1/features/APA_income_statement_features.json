@@ -1,0 +1,82 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "cost of goods and services sold"
+        ]
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ],
+    "Income Tax Expense": [
+        "current income tax expense benefit",
+        "deferred income tax expense benefit"
+    ],
+    "Net Income": [
+        "net income loss",
+        "net income loss available to common stockholders basic",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [],
+        "Interest Income": [],
+        "Other Income (Expense)": [
+            "financing costs net",
+            "gain loss on derivative instruments net pretax",
+            "gain loss on sale of business",
+            "loss on previously sold properties"
+        ],
+        "Total Non-Operating Items": []
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "depreciation depletion and amortization"
+        ],
+        "General and Administrative": [
+            "general and administrative expense",
+            "operating lease expense"
+        ],
+        "Other Operating Expenses": [
+            "asset impairment charges",
+            "asset retirement obligation accretion expense",
+            "exploration expense",
+            "restructuring charges"
+        ],
+        "Research and Development": [],
+        "Sales and Marketing": [],
+        "Total Operating Expenses": []
+    },
+    "Operating Income": [],
+    "Other Comprehensive Income": [],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [
+            "weighted average number of shares outstanding basic"
+        ],
+        "Weighted Average Shares Outstanding (Diluted)": [
+            "weighted average number of diluted shares outstanding"
+        ]
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "other sales revenue losses net",
+            "revenue from contract with customer including assessed tax",
+            "revenues",
+            "revenues from customers and non customers"
+        ]
+    },
+    "__unmapped__": [
+        "costs and expenses",
+        "net income loss attributable to noncontrolling interest",
+        "net income loss attributable to nonredeemable noncontrolling interest",
+        "net income loss attributable to redeemable noncontrolling interest",
+        "revenues and other",
+        "taxes other"
+    ]
+}

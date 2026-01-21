@@ -1,0 +1,113 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [
+        "effect of exchange rate on cash and cash equivalents"
+    ],
+    "Financing Activities": {
+        "Dividends Paid": [
+            "payments of dividends common stock"
+        ],
+        "Net Cash from Financing Activities": [
+            "net cash provided by used in financing activities"
+        ],
+        "Other Financing Activities": [
+            "payments to minority shareholders",
+            "proceeds from contributions from parent",
+            "proceeds from payments for other financing activities",
+            "transferfrom parent net"
+        ],
+        "Proceeds from Debt": [
+            "proceeds from issuance of commercial paper",
+            "proceeds from issuance of long term debt",
+            "proceeds from repayments of debt",
+            "proceeds from repayments of other debt",
+            "proceeds from repayments of short term debt"
+        ],
+        "Proceeds from Stock Issuance": [],
+        "Repayment of Debt": [
+            "proceeds from repayments of commercial paper",
+            "repayments of long term debt",
+            "repayments of short term debt"
+        ],
+        "Stock Repurchases": [
+            "payments for repurchase of common stock",
+            "payments for repurchaseof parent common units by subsidiary"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "payments to acquire additional interest in subsidiaries",
+            "payments to acquire businesses net of cash acquired"
+        ],
+        "Capital Expenditures": [
+            "payments to acquire productive assets"
+        ],
+        "Net Cash from Investing Activities": [
+            "net cash provided by used in investing activities"
+        ],
+        "Other Investing Activities": [
+            "payments for proceeds from other investing activities",
+            "proceeds from divestiture of businesses",
+            "proceeds from sale of productive assets"
+        ],
+        "Purchases of Investments": [],
+        "Sales and Maturities of Investments": [
+            "proceeds from sale of equity securities fv ni"
+        ]
+    },
+    "Net Change in Cash": [
+        "cash and cash equivalents period increase decrease",
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "increase decrease in accounts payable trade",
+            "increase decrease in accounts receivable",
+            "increase decrease in contract with customer liability",
+            "increase decrease in deferred charges",
+            "increase decrease in inventories",
+            "increase decrease in other operating capital net"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income tax expense benefit"
+        ],
+        "Depreciation and Amortization": [
+            "depreciation depletion and amortization"
+        ],
+        "Interest Paid": [
+            "interest paid net"
+        ],
+        "Net Cash from Operating Activities": [
+            "net cash provided by used in operating activities"
+        ],
+        "Net Income": [
+            "net income loss attributable to noncontrolling interest",
+            "net income loss attributableto parentand former parent",
+            "profit loss"
+        ],
+        "Other Non-Cash Items": [
+            "disposal group not discontinued operation valuation allowance",
+            "equity securities fv ni unrealized gain loss",
+            "equity securities fv ni unrealized loss",
+            "gain loss on sale of business",
+            "goodwill impairment loss",
+            "impairment of intangible assets finitelived",
+            "impairment of long lived assets held for use",
+            "impairment of long lived assets to be disposed of",
+            "income loss from equity method investments",
+            "income taxes paid net",
+            "inventory write down"
+        ],
+        "Stock-Based Compensation": [
+            "share based compensation"
+        ]
+    },
+    "__unmapped__": [
+        "debt and equity securities gain loss",
+        "deferred income taxes and tax credits",
+        "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents",
+        "equity securities f v n i unrealized and realized loss",
+        "proceeds from repayments of other debt and other borrowings"
+    ]
+}

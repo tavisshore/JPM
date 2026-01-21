@@ -1,0 +1,81 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [],
+    "Dividends Declared": [],
+    "Dividends Paid": [
+        "dividends common stock cash",
+        "dividends preferred stock cash"
+    ],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "net income loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [
+            "other comprehensive income loss cash flow hedge gain loss after reclassification and tax parent"
+        ],
+        "Foreign Currency Translation": [
+            "other comprehensive income foreign currency transaction and translation adjustment net of tax portion attributable to parent"
+        ],
+        "Other OCI": [
+            "other comprehensive income cumulative effect of change in accounting principle net of taxes",
+            "other comprehensive income defined benefit plans adjustment net of tax portion attributable to parent",
+            "other comprehensive income loss financial liability fair value option after tax and reclassification adjustment attributable to parent"
+        ],
+        "Total Other Comprehensive Income": [],
+        "Unrealized Gains/Losses on Securities": [
+            "other comprehensive income available for sale securities adjustment net of tax period increase decrease",
+            "other comprehensive income loss available for sale securities adjustment net of tax"
+        ]
+    },
+    "Other Equity Adjustments": [
+        "cumulative adjustment for accounting change consolidation of variable interest entities",
+        "cumulative effect of initial adoption of credit related notes",
+        "stockholders equity other",
+        "tax cuts and jobs act of2017 reclassification from aoci to retained earnings tax effect"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [
+            "stock options exercised including income tax benefits vesting of restricted stock units and other shares"
+        ],
+        "Other Stock Issuance": [
+            "stock issued during period value employee benefit plan",
+            "stock issued during period value exchangeof stock",
+            "stock issued during period value new issues",
+            "stock issued during period value preferred new issues and warrants",
+            "stock issued during period value warrants exercised and exchange of preferred stock"
+        ],
+        "Stock-Based Compensation": [
+            "shares issued value share based payment arrangement after forfeiture and other"
+        ],
+        "Total Stock Issuance Value": []
+    },
+    "Stock Repurchases": [
+        "stock redeemed or called during period value",
+        "stock repurchased and retired during period value"
+    ],
+    "Tax Effects from Stock Compensation": [],
+    "__unmapped__": [
+        "stock converted from one class to another class changes shares",
+        "stock issued during period shares employee benefit plan",
+        "stock issued during period shares new issues",
+        "stock issued during period shares share based compensation",
+        "stock issued during period shares warrants exercised and exchange of preferred stock",
+        "stock repurchased and retired during period shares",
+        "stock repurchased during period shares"
+    ]
+}

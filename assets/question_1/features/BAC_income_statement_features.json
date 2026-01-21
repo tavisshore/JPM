@@ -1,0 +1,111 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "product delivery and transaction related expenses"
+        ]
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "net income loss",
+        "net income loss available to common stockholders basic"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [
+            "interest expense deposits",
+            "interest expense long term debt",
+            "interest expense operating",
+            "interest expense short term borrowings",
+            "interest expense trading liabilities"
+        ],
+        "Interest Income": [
+            "interest and dividend income operating",
+            "interest and dividend income operating abstract",
+            "interest and dividend income securities",
+            "interest and fee income loans and leases",
+            "interest income debt securities trading operating",
+            "interest income federal funds sold and securities purchased under agreements to resell",
+            "other interest and dividend income"
+        ],
+        "Other Income (Expense)": [
+            "available for sale debt securities realized gain loss other than temporary impairments amount",
+            "marketable securities realized gain loss excluding other than temporary impairments",
+            "net impairment losses on available for sale debt securities",
+            "principal investment gains losses",
+            "trading gains losses"
+        ],
+        "Total Non-Operating Items": []
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "amortization of intangible assets"
+        ],
+        "General and Administrative": [
+            "communication",
+            "information technology and data processing",
+            "labor and related expense",
+            "occupancy net",
+            "professional fees"
+        ],
+        "Other Operating Expenses": [
+            "equipment expense",
+            "goodwill impairment loss",
+            "merger and restructuring charges",
+            "other cost and expense operating"
+        ],
+        "Research and Development": [],
+        "Sales and Marketing": [
+            "marketing and advertising expense"
+        ],
+        "Total Operating Expenses": [
+            "noninterest expense"
+        ]
+    },
+    "Operating Income": [],
+    "Other Comprehensive Income": [
+        "non credit portion of other than temporary impairments of debt reclassification recognized in other comprehensive income"
+    ],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [
+            "weighted average number of shares outstanding basic"
+        ],
+        "Weighted Average Shares Outstanding (Diluted)": [
+            "weighted average number of diluted shares outstanding"
+        ]
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "brokerage commissions revenue",
+            "fees and commissions mortgage banking",
+            "fees and commissions1",
+            "feesand commissions creditand debit cards1",
+            "feesand commissions depositor accounts1",
+            "insurance commissions and fees",
+            "investment banking revenue",
+            "noninterest income",
+            "noninterest income other operating income",
+            "revenues"
+        ]
+    },
+    "__unmapped__": [
+        "common stock dividends per share cash paid",
+        "communications and information technology",
+        "financing receivable excluding accrued interest and off balance sheet liability credit loss provision reversal",
+        "preferred stock dividends",
+        "preferred stock dividends and other adjustments",
+        "preferred stock dividends income statement impact",
+        "income loss from continuing operations before income taxes minority interest and income loss from equity method investments"
+    ]
+}

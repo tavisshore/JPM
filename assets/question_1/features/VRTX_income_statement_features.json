@@ -1,0 +1,88 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "cost of goods and services sold",
+            "direct operating cost royalty expense"
+        ]
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "net income loss",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [
+            "interest expense nonoperating"
+        ],
+        "Interest Income": [
+            "investment income interest and dividend"
+        ],
+        "Other Income (Expense)": [
+            "business combination contingent consideration arrangements change in amount of contingent consideration liability1",
+            "gain loss on derivative instruments net pretax",
+            "interest income expense nonoperating net"
+        ],
+        "Total Non-Operating Items": [
+            "other nonoperating income expense"
+        ]
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [],
+        "General and Administrative": [
+            "selling general and administrative expense"
+        ],
+        "Other Operating Expenses": [
+            "impairment of intangible assets indefinitelived excluding goodwill",
+            "restructuring charges"
+        ],
+        "Research and Development": [
+            "research and development asset acquired other than through business combination written off",
+            "research and development expense excluding acquired in process cost"
+        ],
+        "Sales and Marketing": [],
+        "Total Operating Expenses": []
+    },
+    "Operating Income": [
+        "operating income loss"
+    ],
+    "Other Comprehensive Income": [],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic",
+            "income loss from continuing operations per basic share"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [
+            "weighted average number of shares outstanding basic"
+        ],
+        "Weighted Average Shares Outstanding (Diluted)": [
+            "weighted average number of diluted shares outstanding"
+        ]
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "collaborative revenues",
+            "revenue from contract with customer excluding assessed tax",
+            "royalty revenue"
+        ]
+    },
+    "__unmapped__": [
+        "comprehensive income net of tax attributable to noncontrolling interest",
+        "costs and expenses",
+        "income loss from continuing operations attributable to noncontrolling entity",
+        "income loss from continuing operations including portion attributable to noncontrolling interest",
+        "income loss from discontinued operations net of tax",
+        "net income loss attributable to noncontrolling interest",
+        "product member",
+        "income loss from continuing operations before income taxes minority interest and income loss from equity method investments"
+    ]
+}

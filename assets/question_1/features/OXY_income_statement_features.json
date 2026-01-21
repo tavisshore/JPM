@@ -1,0 +1,105 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "cost of goods and services sold",
+            "cost of goods sold excluding depreciation depletion and amortization",
+            "cost of revenue",
+            "cost of sales excluding depreciation depletion and amortization",
+            "purchased commodities",
+            "results of operations expense from oil and gas producing activities",
+            "results of operations transportation costs",
+            "transportation and gathering expense"
+        ]
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "pretax asset impairment and related items"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "income loss from continuing operations",
+        "income loss from continuing operations including portion attributable to noncontrolling interest",
+        "net income loss attributable to common stockholders",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [
+            "interest and debt expense"
+        ],
+        "Interest Income": [
+            "interest dividends and other income"
+        ],
+        "Other Income (Expense)": [
+            "equity method investment realized gain loss on disposal",
+            "gain loss on disposition of assets including oil and gas properties",
+            "gain loss on disposition of assets1",
+            "gain loss on sale of oil and gas property",
+            "gain on sale of assets and equity investments",
+            "gain on sale of equity investments and other assets",
+            "gains on sale of equity investments and other assets",
+            "gainson saleof equity investmentsand other assets",
+            "income loss from equity method investments"
+        ],
+        "Total Non-Operating Items": []
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "depreciation depletion and amortization"
+        ],
+        "General and Administrative": [
+            "results of operations general and administrative related to oil and gas producing activities",
+            "selling general and administrative expense"
+        ],
+        "Other Operating Expenses": [
+            "asset impairment charges",
+            "business combination acquisition related costs",
+            "environmental remediation expense",
+            "exploration expense",
+            "other cost and expense operating",
+            "taxes excluding income and excise taxes"
+        ],
+        "Research and Development": [],
+        "Sales and Marketing": [],
+        "Total Operating Expenses": [
+            "operating expenses"
+        ]
+    },
+    "Operating Income": [],
+    "Other Comprehensive Income": [],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic",
+            "income loss from continuing operations per basic share"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted",
+            "income loss from continuing operations per diluted share"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [],
+        "Weighted Average Shares Outstanding (Diluted)": []
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "revenues"
+        ]
+    },
+    "__unmapped__": [
+        "common stock dividends per share declared",
+        "discontinued operation income loss from discontinued operation net of tax per basic share",
+        "discontinued operation income loss from discontinued operation net of tax per diluted share",
+        "general and administrative expense and other operating expenses",
+        "income loss from discontinued operations net of tax",
+        "income loss from discontinued operations net of tax attributable to reporting entity",
+        "income loss from discontinued operations net of tax per basic share",
+        "net income loss attributable to noncontrolling interest",
+        "other expense operatingand nonoperating",
+        "preferred stock dividends and other adjustments",
+        "revenues operating and nonoperating",
+        "gain loss on derivative instruments net pretax",
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest",
+        "income loss from continuing operations before nonoperating income expense equity method investments income taxes noncontrolling interest"
+    ]
+}

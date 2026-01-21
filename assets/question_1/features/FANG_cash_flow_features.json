@@ -1,0 +1,173 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [],
+    "Financing Activities": {
+        "Dividends Paid": [
+            "payments of dividends common stock",
+            "payments of dividends minority interest"
+        ],
+        "Net Cash from Financing Activities": [
+            "net cash provided by used in financing activities",
+            "net cash provided by used in financing activities continuing operations"
+        ],
+        "Other Financing Activities": [
+            "excess tax benefit from share based compensation financing activities",
+            "payments for proceeds from derivative instrument financing activities",
+            "payments of debt extinguishment costs",
+            "payments of debt issuance costs",
+            "payments of distributions to affiliates",
+            "payments of stock issuance costs",
+            "payments related to tax withholding for share based compensation",
+            "payments to minority shareholders",
+            "proceeds from partnership contribution",
+            "proceeds from repurchase of equity"
+        ],
+        "Proceeds from Debt": [
+            "notes issued1",
+            "proceeds from issuance of debt",
+            "proceeds from issuance of senior long term debt",
+            "proceeds from lines of credit",
+            "proceeds from related party debt",
+            "proceeds from short term debt"
+        ],
+        "Proceeds from Stock Issuance": [
+            "proceeds from issuance initial public offering",
+            "proceeds from issuance of common stock",
+            "proceeds from stock options exercised",
+            "proceeds from unit options exercised",
+            "stock issued1"
+        ],
+        "Repayment of Debt": [
+            "repayments of debt",
+            "repayments of lines of credit",
+            "repayments of related party debt",
+            "repayments of senior debt",
+            "repayments of short term debt"
+        ],
+        "Stock Repurchases": [
+            "payments for repurchase of common stock",
+            "payments for repurchase of common stock units",
+            "repurchasedsharesfortaxwithholding"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "noncash or part noncash acquisition noncash financial or equity instrument consideration shares issued value",
+            "noncash or part noncash acquisition noncash financial or equity instrument consideration shares issued1",
+            "noncash or part noncash acquisition other liabilities assumed1",
+            "noncash or part noncash acquisition payables assumed1",
+            "restrictedstockunitsassumedinbusinesscombinations",
+            "stock issued during period shares acquisitions",
+            "stockoptionsassumedinbusinesscombination"
+        ],
+        "Capital Expenditures": [
+            "capital expenditures incurred but not yet paid",
+            "payments to acquire mineral rights",
+            "payments to acquire oil and gas equipment",
+            "payments to acquire oil and gas property",
+            "payments to acquire other productive assets",
+            "payments to acquire real estate and real estate joint ventures",
+            "payments to explore and develop oil and gas properties",
+            "paymentsto acquire midstream assets",
+            "paymentsto acquire oiland gas property related party",
+            "paymentsto exploreand develop oiland gas properties related party",
+            "paymentstoaddoilandnaturalgaspropertiesinfrastructure"
+        ],
+        "Net Cash from Investing Activities": [
+            "net cash provided by used in investing activities",
+            "net cash provided by used in investing activities continuing operations"
+        ],
+        "Other Investing Activities": [
+            "contribution of property",
+            "distribution of equity method investments",
+            "equity method investment dividends or distributions",
+            "derivative cash received on hedge",
+            "derivative cash received paid on settlement of hedge",
+            "payments for derivative instrument investing activities",
+            "proceeds from derivative instrument investing activities",
+            "proceeds from partial sale of investment in subsidiary",
+            "proceeds from sales of business affiliate and productive assets",
+            "proceeds from repayments to joint ventures"
+        ],
+        "Purchases of Investments": [
+            "payments to acquire equity method investments",
+            "payments to acquire investments",
+            "payments to acquire other investments"
+        ],
+        "Sales and Maturities of Investments": [
+            "proceeds from sale of equity method investments",
+            "proceeds from partial sale of investment in subsidiary"
+        ]
+    },
+    "Net Change in Cash": [
+        "cash and cash equivalents period increase decrease",
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "increase decrease in accounts payable and accrued liabilities",
+            "increase decrease in accounts payable related parties",
+            "increase decrease in accounts receivable",
+            "increase decrease in accounts receivable related parties",
+            "increase decrease in accrued income taxes payable",
+            "increase decrease in deferred revenue",
+            "increase decrease in deposit other assets",
+            "increase decrease in income taxes receivable",
+            "increase decrease in interest payable net",
+            "increase decrease in inventories",
+            "increase decrease in prepaid deferred expense and other assets",
+            "increase decrease in restricted cash for operating activities",
+            "increase decrease in royalties payable related party"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income tax expense benefit"
+        ],
+        "Depreciation and Amortization": [
+            "amortization of financing costs",
+            "depreciation depletion and amortization",
+            "depreciation depletion and amortization net of depreciation reported in oil and natural gas services",
+            "depreciation depletionand amortization excluding amortizationof financing costs"
+        ],
+        "Interest Paid": [
+            "interest paid net"
+        ],
+        "Net Cash from Operating Activities": [
+            "net cash provided by used in operating activities",
+            "net cash provided by used in operating activities continuing operations"
+        ],
+        "Net Income": [
+            "net income loss"
+        ],
+        "Other Non-Cash Items": [
+            "asset retirement obligation accretion expense",
+            "asset retirement obligation additional liability incurred",
+            "asset retirement obligation liabilities acquired",
+            "asset retirement obligation liabilities incurred",
+            "asset retirement obligation revision of estimate",
+            "derivative gain loss on derivative net",
+            "derivative instruments gain loss recognized in income net",
+            "gain loss on sale of inventory",
+            "gain loss on sale of investments",
+            "gain loss on sale of property plant equipment",
+            "gain losson revaluationof investments",
+            "gains losses on extinguishment of debt",
+            "impairment of midstream assets",
+            "impairment of oil and gas properties",
+            "income loss from equity method investments",
+            "income loss from equity method investments operating activities",
+            "income taxes paid",
+            "increase decrease in fair value of unhedged derivative instruments",
+            "excess tax benefit from share based compensation operating activities",
+            "other operating activities cash flow statement"
+        ],
+        "Stock-Based Compensation": [
+            "employee service share based compensation allocation of recognized period costs capitalized amount",
+            "share based compensation"
+        ]
+    },
+    "__unmapped__": [
+        "other comprehensive income other net of tax",
+        "profit loss"
+    ]
+}

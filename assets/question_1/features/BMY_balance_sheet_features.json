@@ -1,0 +1,130 @@
+{
+    "Assets": {
+        "Current": {
+            "Cash and Equivalents": [
+                "cash and cash equivalents at carrying value"
+            ],
+            "Inventory": [
+                "inventory net"
+            ],
+            "Marketable Securities (Short-term)": [
+                "available for sale securities debt securities current"
+            ],
+            "Prepaid and Other Current Assets": [
+                "assets held for sale current",
+                "assets held for sale not part of disposal group current",
+                "other assets current",
+                "prepaid expense current"
+            ],
+            "Receivables": [
+                "receivables net current"
+            ],
+            "Total Current Assets": [
+                "assets current"
+            ]
+        },
+        "Non-Current": {
+            "Deferred Tax Assets": [
+                "deferred income tax assets net",
+                "deferred tax assets net current",
+                "deferred tax assets net noncurrent"
+            ],
+            "Goodwill": [
+                "goodwill"
+            ],
+            "Intangible Assets (net)": [
+                "intangible assets net excluding goodwill"
+            ],
+            "Long-term Investments": [],
+            "Other Non-Current Assets": [
+                "other assets noncurrent"
+            ],
+            "Property, Plant, and Equipment (net)": [
+                "property plant and equipment net"
+            ],
+            "Total Non-Current Assets": []
+        },
+        "Total Assets": [
+            "assets"
+        ]
+    },
+    "Equity": {
+        "Accumulated Other Comprehensive Income": [
+            "accumulated other comprehensive income loss net of tax"
+        ],
+        "Common Stock and APIC": [
+            "additional paid in capital",
+            "common stock value outstanding"
+        ],
+        "Retained Earnings": [
+            "retained earnings accumulated deficit"
+        ],
+        "Total Equity": [
+            "stockholders equity",
+            "stockholders equity including portion attributable to noncontrolling interest"
+        ],
+        "Treasury Stock": [
+            "treasury stock common value"
+        ]
+    },
+    "Liabilities": {
+        "Current": {
+            "Accounts Payable and Accrued Expenses": [
+                "accounts payable current",
+                "accrued income taxes current",
+                "accrued liabilities current"
+            ],
+            "Deferred Revenue": [
+                "deferred revenue and credits current"
+            ],
+            "Other Current Liabilities": [
+                "accrued rebates and returns",
+                "dividends payable current",
+                "liabilities of disposal group including discontinued operation current",
+                "other liabilities current"
+            ],
+            "Short-term Debt": [
+                "debt current",
+                "short term borrowings"
+            ],
+            "Total Current Liabilities": [
+                "liabilities current"
+            ]
+        },
+        "Non-Current": {
+            "Deferred Tax Liabilities": [],
+            "Lease Liabilities": [],
+            "Long-term Debt": [
+                "long term debt noncurrent"
+            ],
+            "Other Non-Current Liabilities": [
+                "accrued income taxes noncurrent",
+                "deferred revenue and credits noncurrent",
+                "other liabilities noncurrent",
+                "pension and other postretirement defined benefit plans liabilities noncurrent"
+            ],
+            "Total Non-Current Liabilities": []
+        },
+        "Total Liabilities": [
+            "liabilities"
+        ]
+    },
+    "Totals": {
+        "Total Liabilities and Equity": [
+            "liabilities and stockholders equity"
+        ]
+    },
+    "__unmapped__": [
+        "common stock par or stated value per share",
+        "common stock shares authorized",
+        "common stock shares issued",
+        "minority interest",
+        "preferred stock liquidation preference",
+        "preferred stock par or stated value per share",
+        "preferred stock shares authorized",
+        "preferred stock shares issued",
+        "preferred stock value",
+        "short term borrowings and current portion of long term debt",
+        "treasury stock shares"
+    ]
+}

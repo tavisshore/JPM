@@ -1,0 +1,117 @@
+{
+    "Comprehensive Income": [
+        "comprehensive income net of tax"
+    ],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "cost of goods and services sold",
+            "cost of services oil and gas",
+            "gas gathering transportation marketing and processing costs related party",
+            "gathering and transportation expsense",
+            "gathering processing and transportation",
+            "oil and gas property lease operating expense related party",
+            "production tax expense",
+            "production tax expense related party",
+            "purchased oil expense"
+        ]
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ],
+    "Income Tax Expense": [
+        "current income tax expense benefit",
+        "deferred income tax expense benefit",
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "net income loss",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [],
+        "Interest Income": [
+            "investment income interest"
+        ],
+        "Other Income (Expense)": [
+            "derivative instruments gain loss recognized in income net",
+            "derivative instruments not designated as hedging instruments gain loss net",
+            "equity method investment realized gain loss on disposal",
+            "gain loss on investments",
+            "gains losses on extinguishment of debt",
+            "income loss from equity method investments",
+            "interest income expense net",
+            "interest income expense nonoperating net",
+            "other nonoperating expense",
+            "other nonoperating income expense",
+            "other nonoperating income related party",
+            "other operating income"
+        ],
+        "Total Non-Operating Items": [
+            "nonoperating income expense"
+        ]
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "depreciation depletion and amortization"
+        ],
+        "General and Administrative": [
+            "related party transaction selling general and administrative expenses from transactions with related party",
+            "selling general and administrative expense"
+        ],
+        "Other Operating Expenses": [
+            "asset retirement obligation accretion expense",
+            "impairment of midstream assets",
+            "impairment of oil and gas properties",
+            "merger and integration expense",
+            "merger and transaction expense",
+            "mergerandintegrationexpense",
+            "operating lease expense",
+            "other cost and expense operating"
+        ],
+        "Research and Development": [],
+        "Sales and Marketing": [],
+        "Total Operating Expenses": []
+    },
+    "Operating Income": [
+        "operating income loss"
+    ],
+    "Other Comprehensive Income": [
+        "other comprehensive income defined benefit plans adjustment net of tax portion attributable to parent"
+    ],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [
+            "weighted average number of shares outstanding basic"
+        ],
+        "Weighted Average Shares Outstanding (Diluted)": [
+            "weighted average number of diluted shares outstanding"
+        ]
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "liquid natural gas sales revenue",
+            "oil sales revenue",
+            "revenue from contract with customer excluding assessed tax",
+            "revenue from related parties liquid natural gas sales revenue",
+            "revenue from related parties natural gas sales",
+            "revenues"
+        ]
+    },
+    "__unmapped__": [
+        "basic earnings per share pro forma",
+        "common stock dividends per share declared",
+        "costs and expenses",
+        "income tax expense benefit pro forma",
+        "leasebonus",
+        "natural gas midstream member",
+        "natural gas production member",
+        "net income loss attributable to noncontrolling interest",
+        "net income loss pro forma"
+    ]
+}

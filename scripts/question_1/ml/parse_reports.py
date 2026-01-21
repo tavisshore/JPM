@@ -14,7 +14,8 @@ extraction, supporting the broader credit analysis pipeline.
 """
 
 from jpm.config import Config, DataConfig, LLMConfig, get_args
-from jpm.question_1 import LLMClient, set_seed
+from jpm.question_1 import LLMClient
+from jpm.utils import set_seed
 
 if __name__ == "__main__":
     set_seed(42)

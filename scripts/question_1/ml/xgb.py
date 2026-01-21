@@ -22,7 +22,8 @@ The model maps financial health indicators to credit rating categories
 """
 
 from jpm.config import Config, DataConfig, LLMConfig, LSTMConfig, XGBConfig, get_args
-from jpm.question_1 import CreditDataset, CreditRatingModel, set_seed
+from jpm.question_1 import CreditDataset, CreditRatingModel
+from jpm.utils import set_seed
 
 
 def train(cfg: Config):

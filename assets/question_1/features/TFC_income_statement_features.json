@@ -1,0 +1,121 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": []
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "income loss from continuing operations",
+        "net income loss available to common stockholders basic",
+        "net income loss available to the bank holding company",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [
+            "interest expense deposits",
+            "interest expense long term debt",
+            "interest expense operating",
+            "interest expense short term borrowings"
+        ],
+        "Interest Income": [
+            "interest and dividend income operating",
+            "interest and dividend income securities",
+            "interest and fee income loans and leases",
+            "other interest and dividend income"
+        ],
+        "Other Income (Expense)": [
+            "available for sale securities gross realized gains",
+            "available for sale securities gross realized losses",
+            "bank owned life insurance income",
+            "f d i c indemnification asset accretion of discount",
+            "gain loss on investments",
+            "gain loss on sale of securities net",
+            "gains losses on extinguishment of debt",
+            "interest income expense after provision for loan loss",
+            "interest income expense net",
+            "noncredit portion of other than temporary impairments"
+        ],
+        "Total Non-Operating Items": []
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "amortization of intangible assets",
+            "capitalized computer software amortization1",
+            "operating leases income statement depreciation expense on property subject to or held for lease"
+        ],
+        "General and Administrative": [
+            "information technology and data processing",
+            "labor and related expense",
+            "occupancy net",
+            "professional fees"
+        ],
+        "Other Operating Expenses": [
+            "equipment expense",
+            "federal deposit insurance corporation premium expense",
+            "foreclosed real estate expense",
+            "goodwill impairment loss",
+            "impairment of investments",
+            "other expenses",
+            "provision for loan lease and other losses",
+            "regulatory assessments",
+            "restructuring charges"
+        ],
+        "Research and Development": [],
+        "Sales and Marketing": [
+            "marketing and advertising expense"
+        ],
+        "Total Operating Expenses": [
+            "noninterest expense"
+        ]
+    },
+    "Operating Income": [],
+    "Other Comprehensive Income": [
+        "other than temporary impairment losses investments portion in other comprehensive income loss before tax including portion attributable to noncontrolling interest"
+    ],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic",
+            "income loss from continuing operations per basic share"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted",
+            "income loss from continuing operations per diluted share"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [
+            "weighted average number of shares outstanding basic"
+        ],
+        "Weighted Average Shares Outstanding (Diluted)": [
+            "weighted average number of diluted shares outstanding"
+        ]
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "fees and commissions credit cards",
+            "fees and commissions fiduciary and trust activities",
+            "fees and commissions other",
+            "insurance commissions and fees",
+            "investment banking advisory brokerage and underwriting fees and commissions",
+            "loan processing fee",
+            "noninterest income abstract"
+        ]
+    },
+    "__unmapped__": [
+        "common stock dividends per share declared",
+        "debit card member",
+        "deposit account member",
+        "dividends preferred stock",
+        "financial service other member",
+        "income loss from discontinued operations net of tax attributable to reporting entity",
+        "mortgage banking member",
+        "net income loss attributable to noncontrolling interest",
+        "preferred stock dividends and other adjustments",
+        "service other member",
+        "income loss from continuing operations before income taxes minority interest and income loss from equity method investments"
+    ]
+}

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import tensorflow as tf
@@ -8,7 +10,13 @@ import tensorflow_probability as tfp
 from jpm.config.question_1 import Config, LLMConfig
 from jpm.question_1.clients.llm_client import LLMClient
 from jpm.question_1.data import EdgarData, StatementsDataset
-from jpm.question_1.misc import format_money, set_seed
+from jpm.question_1.misc import format_money
+from jpm.question_1.models.layers import (
+    DenseVariationalLayer,
+    MultivariateNormalTriLLayer,
+    SeasonalWeightLogger,
+    TemporalAttention,
+)
 from jpm.question_1.models.losses import EnforceBalance, bs_loss
 from jpm.question_1.models.metrics import (
     Metric,
@@ -26,139 +34,12 @@ from jpm.question_1.vis import (
     make_row,
     print_table,
 )
+from jpm.utils import set_seed
 
 # keras has to stick to tf.keras so pytests can patch tf.keras.* as expected
 keras = tf.keras
-
 tfpl = tfp.layers
 tfd = tfp.distributions
-
-
-class MultivariateNormalTriLLayer(keras.layers.Layer):
-    """Custom layer for multivariate normal distribution output compatible with Keras 3.
-
-    This layer outputs distribution parameters as a tensor, which can be converted
-    to a distribution object during inference.
-    """
-
-    def __init__(self, event_size, name=None, **kwargs):
-        super().__init__(name=name, **kwargs)
-        self.event_size = event_size
-        self.params_size = tfpl.MultivariateNormalTriL.params_size(event_size)
-
-        # Create dense layer for distribution parameters
-        self.dense = keras.layers.Dense(
-            self.params_size, name=f"{name}_params" if name else "params"
-        )
-
-    def call(self, inputs, training=None):
-        """Forward pass that outputs distribution parameters."""
-        return self.dense(inputs)
-
-    def get_config(self):
-        config = super().get_config()
-        config.update(
-            {
-                "event_size": self.event_size,
-            }
-        )
-        return config
-
-
-class DenseVariationalLayer(keras.layers.Layer):
-    """Custom variational dense layer compatible with Keras 3.
-
-    This layer uses variational inference with trainable weight distributions
-    instead of point estimates. Compatible with Keras 3 functional API.
-    """
-
-    def __init__(self, units, kl_weight=1.0, name=None, **kwargs):
-        super().__init__(name=name, **kwargs)
-        self.units = units
-        self.kl_weight = kl_weight
-
-    def build(self, input_shape):
-        input_dim = input_shape[-1]
-
-        self.prior_mean_weights = 0.0
-        self.prior_std_weights = 1.0
-        self.prior_mean_bias = 0.0
-        self.prior_std_bias = 1.0
-
-        # Weight distribution parameters
-        self.w_mean = self.add_weight(
-            name="w_mean",
-            shape=(input_dim, self.units),
-            initializer="glorot_uniform",
-            trainable=True,
-        )
-        self.w_log_std = self.add_weight(
-            name="w_log_std",
-            shape=(input_dim, self.units),
-            initializer=keras.initializers.Constant(-5.0),
-            trainable=True,
-        )
-
-        # Bias distribution parameters
-        self.b_mean = self.add_weight(
-            name="b_mean",
-            shape=(self.units,),
-            initializer="zeros",
-            trainable=True,
-        )
-        self.b_log_std = self.add_weight(
-            name="b_log_std",
-            shape=(self.units,),
-            initializer=keras.initializers.Constant(-5.0),
-            trainable=True,
-        )
-
-        super().build(input_shape)
-
-    def call(self, inputs, training=None):
-        """Forward pass with reparameterization trick."""
-        w_std = tf.exp(self.w_log_std)
-        b_std = tf.exp(self.b_log_std)
-
-        if training:
-            w_noise = tf.random.normal(shape=tf.shape(self.w_mean))
-            b_noise = tf.random.normal(shape=tf.shape(self.b_mean))
-
-            w = self.w_mean + w_std * w_noise
-            b = self.b_mean + b_std * b_noise
-
-            kl_loss = self._compute_kl_divergence(
-                self.w_mean, w_std, self.b_mean, b_std
-            )
-            self.add_loss(self.kl_weight * kl_loss)
-        else:
-            w = self.w_mean
-            b = self.b_mean
-
-        output = tf.matmul(inputs, w) + b
-        return output
-
-    def _compute_kl_divergence(self, w_mean, w_std, b_mean, b_std):
-        """Compute KL divergence between posterior and prior."""
-        kl_w = 0.5 * tf.reduce_sum(
-            tf.square(w_std) + tf.square(w_mean) - 1.0 - 2.0 * tf.math.log(w_std + 1e-8)
-        )
-
-        kl_b = 0.5 * tf.reduce_sum(
-            tf.square(b_std) + tf.square(b_mean) - 1.0 - 2.0 * tf.math.log(b_std + 1e-8)
-        )
-
-        return kl_w + kl_b
-
-    def get_config(self):
-        config = super().get_config()
-        config.update(
-            {
-                "units": self.units,
-                "kl_weight": self.kl_weight,
-            }
-        )
-        return config
 
 
 class LSTMForecaster:
@@ -208,6 +89,22 @@ class LSTMForecaster:
         )
 
         x = inputs
+
+        # Apply learnable seasonal weighting if configured
+        if (
+            self.config.data.seasonal_lag > 0
+            and hasattr(self.config.data, "learnable_seasonal_weight")
+            and self.config.data.learnable_seasonal_weight
+        ):
+            x = TemporalAttention(
+                seasonal_lag=self.config.data.seasonal_lag,
+                initial_weight=getattr(self.config.data, "seasonal_weight", 2.0),
+                per_feature=getattr(
+                    self.config.data, "seasonal_weight_per_feature", False
+                ),
+                name="temporal_attention",
+            )(x)
+
         for i in range(self.config.lstm.lstm_layers):
             return_sequences = i < self.config.lstm.lstm_layers - 1
             x = keras.layers.LSTM(
@@ -371,11 +268,17 @@ class LSTMForecaster:
         if not hasattr(checkpoint_cb, "_implements_train_batch_hooks"):
             checkpoint_cb._implements_train_batch_hooks = lambda: False
 
+        # Add seasonal weight logger if using learnable weighting
+        callbacks = [checkpoint_cb]
+        if getattr(self.config.data, "learnable_seasonal_weight", False):
+            self.seasonal_logger = SeasonalWeightLogger(layer_name="temporal_attention")
+            callbacks.append(self.seasonal_logger)
+
         history = self.model.fit(
             self.dataset.train_dataset,
             validation_data=self.dataset.val_dataset,
             epochs=self.config.lstm.epochs,
-            callbacks=[checkpoint_cb],
+            callbacks=callbacks,
             **kwargs,
         )
         weights_path = self.config.lstm.checkpoint_path / "best_model_ckpt.weights.h5"
@@ -1306,6 +1209,17 @@ class LSTMForecaster:
             "crps": crps,
         }
 
+    def get_seasonal_weight(self, epoch=-1) -> float:
+        """
+        Retrieve the final seasonal weights.
+        Returns
+        -------
+        np.ndarray
+            Array of seasonal weights with shape (lookback,).
+        """
+        self.seasonal_weights = self.seasonal_logger.get_weight()
+        return float(self.seasonal_weights[epoch][0])
+
     def plot_prediction_intervals(
         self,
         feature_name: str,
@@ -1400,7 +1314,9 @@ class LSTMForecaster:
         plt.tight_layout()
         plt.show()
 
-    def plot_uncertainty_heatmap(self, stage: str = "val") -> None:
+    def plot_uncertainty_heatmap(
+        self, stage: str = "val", save_path: Path | None = None
+    ) -> None:
         """
         Plot a heatmap of prediction uncertainties across all features.
 
@@ -1453,7 +1369,10 @@ class LSTMForecaster:
             f"Prediction Uncertainty by Feature ({stage} set)\n{self.config.data.ticker}"
         )
         plt.tight_layout()
-        plt.show()
+        if save_path:
+            plt.savefig(save_path)
+        else:
+            plt.show()
 
     def view_calibration_results(self, stage: str = "val") -> None:
         """

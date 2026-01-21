@@ -20,8 +20,8 @@ from jpm.question_1 import (
     IncomeStatement,
     LSTMForecaster,
     StatementsDataset,
-    set_seed,
 )
+from jpm.utils import set_seed
 
 set_seed(42)
 args = get_args()

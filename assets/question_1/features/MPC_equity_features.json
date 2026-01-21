@@ -1,0 +1,77 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [],
+    "Dividends Declared": [],
+    "Dividends Paid": [
+        "dividends common stock cash"
+    ],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [
+            "adjustments to additional paid in capital other",
+            "reclassification of net investment to additional paid in capital"
+        ],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "net income loss",
+        "net income loss including portion attributable to nonredeemable noncontrolling interest"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [],
+        "Foreign Currency Translation": [],
+        "Other OCI": [],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax"
+        ],
+        "Unrealized Gains/Losses on Securities": []
+    },
+    "Other Equity Adjustments": [
+        "impactof subsidiary equity transactions",
+        "partners capital account sale of units",
+        "partners capital account saleof units tax",
+        "stockholders equity note spinoff transaction",
+        "stockholders equity other",
+        "tax effect of m p l x reorganization"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [],
+        "Other Stock Issuance": [
+            "stock issued during period value acquisitions",
+            "stock issued during period value new issues"
+        ],
+        "Stock-Based Compensation": [
+            "adjustments to additional paid in capital sharebased compensation requisite service period recognition value",
+            "stock issued during period value share based compensation forfeited",
+            "stock issued during period value share based compensation gross"
+        ],
+        "Total Stock Issuance Value": [
+            "total adjustments to equity from share based compensation"
+        ]
+    },
+    "Stock Repurchases": [
+        "treasury stock value acquired cost method"
+    ],
+    "Tax Effects from Stock Compensation": [
+        "tax effect of stock issued during period acquisitions",
+        "tax effect of stock received during period contribution of assets"
+    ],
+    "__unmapped__": [
+        "consolidation less than wholly owned subsidiary parent ownership interest changes net",
+        "minority interest decrease from distributions to noncontrolling interest holders",
+        "noncontrolling interest increase from business combination",
+        "noncontrolling interest increase from subsidiary equity issuance",
+        "stock issued during period shares share based compensation",
+        "treasury stock shares acquired"
+    ]
+}

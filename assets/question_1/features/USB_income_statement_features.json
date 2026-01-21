@@ -1,0 +1,111 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": []
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "net income loss",
+        "net income loss available to common stockholders basic",
+        "net income loss available to common stockholders diluted",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [
+            "interest expense deposits",
+            "interest expense long term debt",
+            "interest expense operating",
+            "interest expense short term borrowings"
+        ],
+        "Interest Income": [
+            "interest and dividend income operating",
+            "interest and dividend income securities",
+            "interest and fee income loans and leases held for sale",
+            "interest and fee income loans and leases held in portfolio",
+            "other interest and dividend income"
+        ],
+        "Other Income (Expense)": [
+            "automated teller machine servicing fees net",
+            "availableforsale securities gross realized gain loss excluding other than temporary impairments",
+            "debt securities available for sale realized gain loss",
+            "fee and commission credit and debit cards",
+            "fee and commission depositor accounts",
+            "fee and commission fiduciary and trust activities",
+            "fees and commissions credit and debit cards",
+            "fees and commissions mortgage banking and servicing",
+            "gain loss on sale of securities net",
+            "interest income expense after provision for loan loss",
+            "interest income expense net",
+            "investment advisory management and administrative fee",
+            "marketable securities realized gain loss",
+            "merchant discount fee",
+            "noninterest income",
+            "noninterest income other operating income",
+            "service charges",
+            "treasury management fees"
+        ],
+        "Total Non-Operating Items": []
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "amortization of intangible assets"
+        ],
+        "General and Administrative": [
+            "communications and information technology",
+            "employee benefits and share based compensation",
+            "occupancy net",
+            "other labor related expenses",
+            "professional fees",
+            "salaries wages and officers compensation",
+            "supplies and postage expense"
+        ],
+        "Other Operating Expenses": [
+            "impairment of investments",
+            "merger and integration charges",
+            "provision for loan lease and other losses"
+        ],
+        "Research and Development": [],
+        "Sales and Marketing": [
+            "marketing and advertising expense"
+        ],
+        "Total Operating Expenses": [
+            "noninterest expense"
+        ]
+    },
+    "Operating Income": [],
+    "Other Comprehensive Income": [
+        "change in fair value of impaired securities recognized in other comprehensive income",
+        "less change in fair value of impaired securities recognized in other comprehensive income"
+    ],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [
+            "weighted average number of shares outstanding basic"
+        ],
+        "Weighted Average Shares Outstanding (Diluted)": [
+            "weighted average number of diluted shares outstanding"
+        ]
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "capital markets revenue",
+            "commercial products revenue",
+            "corporate payment products revenue"
+        ]
+    },
+    "__unmapped__": [
+        "common stock dividends per share declared",
+        "net income loss attributable to noncontrolling interest"
+    ]
+}

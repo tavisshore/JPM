@@ -1,0 +1,74 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [
+        "comprehensive income net of tax"
+    ],
+    "Dividends Declared": [],
+    "Dividends Paid": [
+        "dividends common stock cash"
+    ],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "net income loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [],
+        "Foreign Currency Translation": [
+            "other comprehensive income foreign currency transaction and translation adjustment net of tax portion attributable to parent"
+        ],
+        "Other OCI": [
+            "oci before reclassifications before tax attributable to parent",
+            "reclassification from aoci current period before tax attributable to parent"
+        ],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax period increase decrease",
+            "other comprehensive income loss net of tax portion attributable to parent",
+            "other comprehensive income loss tax portion attributable to parent1"
+        ],
+        "Unrealized Gains/Losses on Securities": [
+            "other comprehensive income loss unrealized gain lossbefore reclassificationand tax"
+        ]
+    },
+    "Other Equity Adjustments": [
+        "adjustments to additional paid in capital equity component of convertible debt",
+        "stockholders equity other"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [],
+        "Other Stock Issuance": [
+            "adjustmentsto additional paidin capital settlementof warrants",
+            "stock issued during period value acquisitions"
+        ],
+        "Stock-Based Compensation": [
+            "adjustments to additional paid in capital sharebased compensation requisite service period recognition value",
+            "stock issued during period value share based compensation"
+        ],
+        "Total Stock Issuance Value": []
+    },
+    "Stock Repurchases": [
+        "stock repurchased and retired during period value"
+    ],
+    "Tax Effects from Stock Compensation": [
+        "adjustments related to tax withholding for share based compensation",
+        "adjustments to additional paid in capital tax effect from share based compensation"
+    ],
+    "__unmapped__": [
+        "common stock dividends per share declared",
+        "stock issued during period shares share based compensation",
+        "stock repurchased and retired during period shares"
+    ]
+}

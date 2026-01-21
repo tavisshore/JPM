@@ -1,0 +1,139 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [
+        "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents",
+        "effect of exchange rate on cash continuing operations"
+    ],
+    "Financing Activities": {
+        "Dividends Paid": [
+            "payments of ordinary dividends"
+        ],
+        "Net Cash from Financing Activities": [
+            "cash provided by used in financing activities discontinued operations",
+            "net cash provided by used in financing activities",
+            "net cash provided by used in financing activities continuing operations"
+        ],
+        "Other Financing Activities": [
+            "excess tax benefit from share based compensation financing activities",
+            "gains losses on extinguishment of debt",
+            "payments of debt extinguishment costs",
+            "payments to minority shareholders",
+            "tax withholding for share based compensation"
+        ],
+        "Proceeds from Debt": [
+            "proceeds from issuance of commercial paper",
+            "proceeds from issuance of long term debt",
+            "proceeds from issuance of senior long term debt",
+            "proceeds from lines of credit"
+        ],
+        "Proceeds from Stock Issuance": [
+            "proceeds from issuance of common stock",
+            "proceeds from minority shareholders",
+            "proceeds from stock options exercised"
+        ],
+        "Repayment of Debt": [
+            "repayments of debt",
+            "repayments of lines of credit",
+            "repayments of long term debt",
+            "repayments of other debt"
+        ],
+        "Stock Repurchases": [
+            "payments for repurchase of common stock",
+            "payments for repurchase of redeemable noncontrolling interest"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "cash acquired from acquisition",
+            "payments to acquire businesses net of cash acquired"
+        ],
+        "Capital Expenditures": [
+            "payments to acquire productive assets",
+            "payments to property and equipment acquisition"
+        ],
+        "Net Cash from Investing Activities": [
+            "cash provided by used in investing activities discontinued operations",
+            "net cash provided by used in investing activities",
+            "net cash provided by used in investing activities continuing operations"
+        ],
+        "Other Investing Activities": [
+            "proceeds from divestiture of businesses and interests in affiliates",
+            "proceeds from sale of interest in corporate unit",
+            "proceeds from sale of interest in partnership unit",
+            "proceeds from sale of oil and gas property and equipment",
+            "proceeds from sale of productive assets",
+            "proceeds from sale of property plant and equipment"
+        ],
+        "Purchases of Investments": [
+            "payments to acquire equity method investments",
+            "payments to acquire investments",
+            "payments to acquire short term investments"
+        ],
+        "Sales and Maturities of Investments": [
+            "proceeds from repayments of commercial paper",
+            "proceeds from sale and maturity of held to maturity securities",
+            "proceeds from sale maturity and collection of shortterm investments",
+            "proceeds from sale of equity method investments"
+        ]
+    },
+    "Net Change in Cash": [
+        "cash and cash equivalents period increase decrease",
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect",
+        "net cash provided by used in continuing operations",
+        "net cash provided by used in continuing operations including exchange rate effect",
+        "net cash provided by used in discontinued operations including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "increase decrease in operating capital",
+            "increase decrease in other noncurrent assets",
+            "increase decrease in other noncurrent liabilities",
+            "settlements of intercompany foreign denominated assets liabilities in operating activities"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income tax expense benefit"
+        ],
+        "Depreciation and Amortization": [
+            "depreciation depletion and amortization"
+        ],
+        "Interest Paid": [],
+        "Net Cash from Operating Activities": [
+            "cash provided by used in operating activities discontinued operations",
+            "net cash provided by used in operating activities",
+            "net cash provided by used in operating activities continuing operations"
+        ],
+        "Net Income": [
+            "income loss from continuing operations",
+            "income loss from discontinued operations net of tax",
+            "income loss from discontinued operations net of tax attributable to reporting entity",
+            "net income loss",
+            "profit loss"
+        ],
+        "Other Non-Cash Items": [
+            "accretion expense including asset retirement obligations",
+            "amortization of debt discount premium",
+            "asset retirement obligation accretion expense",
+            "cash settlements on commodity derivatives",
+            "cash settlements on derivatives and financial instruments",
+            "cash settlements on other derivatives and financial instruments",
+            "derivative instruments not designated as hedging instruments gain loss net",
+            "gain loss on disposition of assets1",
+            "gain loss on oil and gas hedging activity",
+            "gain loss on sale of property plant equipment",
+            "impairment of leasehold",
+            "impairment of long lived assets held for use",
+            "other derivative instruments not designated as hedging instruments gain loss net",
+            "other noncash expense",
+            "other noncash income expense",
+            "other operating activities cash flow statement",
+            "unrealized gain loss on derivatives and commodity contracts"
+        ],
+        "Stock-Based Compensation": [
+            "share based compensation"
+        ]
+    },
+    "__unmapped__": [
+        "foreign currency transaction gain loss before tax"
+    ]
+}

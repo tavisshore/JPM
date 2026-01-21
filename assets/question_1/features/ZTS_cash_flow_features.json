@@ -1,0 +1,122 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [
+        "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents"
+    ],
+    "Financing Activities": {
+        "Dividends Paid": [
+            "payments of ordinary dividends"
+        ],
+        "Net Cash from Financing Activities": [
+            "net cash provided by used in financing activities"
+        ],
+        "Other Financing Activities": [
+            "finance lease principal payments",
+            "payment for contingent consideration liability financing activities",
+            "payments of debt issuance costs",
+            "payments to minority shareholders",
+            "proceeds from payments for other financing activities"
+        ],
+        "Proceeds from Debt": [
+            "proceeds from issuance of commercial paper",
+            "proceeds from issuance of debt"
+        ],
+        "Proceeds from Stock Issuance": [
+            "share based compensation related proceeds net of taxes paid on withholding shares"
+        ],
+        "Repayment of Debt": [
+            "repayments of assumed debt",
+            "repayments of long term debt"
+        ],
+        "Stock Repurchases": [
+            "payments for repurchase of common stock"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "payments to acquire business two net of cash acquired",
+            "payments to acquire businesses net of cash acquired"
+        ],
+        "Capital Expenditures": [
+            "payments to acquire property plant and equipment"
+        ],
+        "Net Cash from Investing Activities": [
+            "net cash provided by used in investing activities"
+        ],
+        "Other Investing Activities": [
+            "payments for previous acquisition",
+            "payments to acquire intangible assets",
+            "proceeds from divestiture of businesses net of cash divested",
+            "proceeds from hedge investing activities",
+            "proceeds from sale of property plant and equipment"
+        ],
+        "Purchases of Investments": [
+            "payments to acquire investments"
+        ],
+        "Sales and Maturities of Investments": [
+            "proceeds from sale maturity and collections of investments"
+        ]
+    },
+    "Net Change in Cash": [
+        "cash and cash equivalents period increase decrease",
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "increase decrease in accounts payable",
+            "increase decrease in accounts receivable",
+            "increase decrease in accrued taxes payable",
+            "increase decrease in inventories",
+            "increase decrease in operating capital",
+            "increase decrease in other operating assets",
+            "increase decrease in other operating liabilities"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income tax expense benefit"
+        ],
+        "Depreciation and Amortization": [
+            "depreciation depletion and amortization"
+        ],
+        "Interest Paid": [
+            "interest paid net"
+        ],
+        "Net Cash from Operating Activities": [
+            "net cash provided by used in operating activities"
+        ],
+        "Net Income": [
+            "profit loss"
+        ],
+        "Other Non-Cash Items": [
+            "asset impairment charges",
+            "debt issued to related party for net asset transfers",
+            "foreign currency transaction gain loss realized excluding cash",
+            "gain loss on disposition of assets1",
+            "gain on sale of business excluding transaction costs",
+            "income taxes paid net",
+            "inventory write down",
+            "non cash transfersto related party",
+            "noncash or part noncash acquisition intangible assets acquired1",
+            "other noncash income expense",
+            "other significant noncash transaction value of consideration given1",
+            "restructuring and other related costs net of payments",
+            "right of use asset obtained in exchange for finance lease liability",
+            "right of use asset obtained in exchange for operating lease liability"
+        ],
+        "Stock-Based Compensation": [
+            "share based compensation"
+        ]
+    },
+    "__unmapped__": [
+        "cash received from payments to settle derivative instruments",
+        "excise tax accrued on net share repurchased not paid",
+        "gain loss on sales of assets and asset impairment charges",
+        "operating lease payments",
+        "payment to related party in connection with asset transfer",
+        "payments for proceeds from hedge investing activities",
+        "payments for proceeds from other investing activities",
+        "payments to settle derivative instruments",
+        "proceeds from payments to minority shareholders",
+        "proceeds from repayments of short term debt"
+    ]
+}

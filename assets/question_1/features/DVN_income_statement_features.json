@@ -1,0 +1,112 @@
+{
+    "Comprehensive Income": [
+        "comprehensive income net of tax"
+    ],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "cost of goods and services sold",
+            "gas gathering transportation marketing and processing costs",
+            "results of operations production or lifting costs"
+        ]
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes minority interest and income loss from equity method investments"
+    ],
+    "Income Tax Expense": [
+        "current income tax expense benefit",
+        "deferred income tax expense benefit",
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "income loss from continuing operations",
+        "net income loss",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [
+            "interest expense"
+        ],
+        "Interest Income": [],
+        "Other Income (Expense)": [
+            "financing costs net",
+            "gain loss on disposition of assets1",
+            "gain loss on oil and gas hedging activity",
+            "interest income expense nonoperating net",
+            "other nonoperating income expense"
+        ],
+        "Total Non-Operating Items": []
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "depreciation depletion and amortization",
+            "other depreciation and amortization"
+        ],
+        "General and Administrative": [
+            "general and administrative expense"
+        ],
+        "Other Operating Expenses": [
+            "asset retirement obligation accretion expense",
+            "exploration expense",
+            "impairment of long lived assets held for use",
+            "lease operating expense",
+            "other operating income expense net",
+            "restructuring costs",
+            "restructuring costs continuing operations"
+        ],
+        "Research and Development": [],
+        "Sales and Marketing": [],
+        "Total Operating Expenses": []
+    },
+    "Operating Income": [
+        "operating income loss"
+    ],
+    "Other Comprehensive Income": [
+        "other comprehensive income foreign currency transaction and translation adjustment net of tax portion attributable to parent",
+        "other comprehensive income foreign currency transaction and translation gain loss arising during period net of tax",
+        "other comprehensive income loss foreign currency transaction and translation reclassification adjustment from a o c i realized upon sale or liquidation net of tax",
+        "other comprehensive income loss net of tax",
+        "other comprehensive income loss net of tax portion attributable to parent",
+        "other comprehensive income loss pension and other postretirement benefit plans adjustment net of tax",
+        "other comprehensive income other net of tax"
+    ],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic",
+            "income loss from continuing operations per basic share",
+            "net income loss available to common stockholders basic"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted",
+            "income loss from continuing operations per diluted share"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [],
+        "Weighted Average Shares Outstanding (Diluted)": []
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "gas gathering transportation marketing and processing revenue",
+            "revenue from contract with customer excluding assessed tax",
+            "revenues",
+            "upstream revenues"
+        ]
+    },
+    "__unmapped__": [
+        "comprehensive income net of tax abstract",
+        "comprehensive income net of tax attributable to noncontrolling interest",
+        "costs and expenses",
+        "discontinued operation income loss from discontinued operation before income tax",
+        "discontinued operation tax effect of discontinued operation",
+        "income loss from continuing operations before noncontrolling interest",
+        "income loss from continuing operations including portion attributable to noncontrolling interest",
+        "income loss from discontinued operations net of tax",
+        "income loss from discontinued operations net of tax attributable to reporting entity",
+        "income loss from discontinued operations net of tax per basic share",
+        "income loss from discontinued operations net of tax per diluted share",
+        "interest rate and other financial instruments",
+        "net income loss attributable to noncontrolling interest",
+        "operating and nonoperating other income expense",
+        "taxes excluding income and excise taxes",
+        "total expenses"
+    ]
+}

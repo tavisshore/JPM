@@ -1,0 +1,127 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [
+        "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents"
+    ],
+    "Financing Activities": {
+        "Dividends Paid": [
+            "payments of dividends"
+        ],
+        "Net Cash from Financing Activities": [
+            "net cash provided by used in financing activities"
+        ],
+        "Other Financing Activities": [
+            "paymentto settle warrants relatedto convertible notes",
+            "proceeds from contributions from payments of distributions to affiliates",
+            "proceeds from hedge financing activities",
+            "proceeds from issuance of warrants",
+            "proceeds from payments for other financing activities",
+            "proceeds from payments to minority shareholders",
+            "purchasesofconvertiblenotehedgescashoutflow"
+        ],
+        "Proceeds from Debt": [
+            "proceeds from bank debt",
+            "proceeds from convertible debt",
+            "proceeds from convertible note hedges",
+            "proceeds from debt net of issuance costs",
+            "proceeds from issuance of senior long term debt",
+            "proceeds from lines of credit",
+            "proceeds from sale of available for sale securities debt"
+        ],
+        "Proceeds from Stock Issuance": [
+            "proceeds from issuance of common stock"
+        ],
+        "Repayment of Debt": [
+            "repayments of bank debt",
+            "repayments of convertible debt",
+            "repayments of debt",
+            "repayments of debt and capital lease obligations",
+            "repayments of lines of credit",
+            "repayments of long term debt",
+            "repayments of other debt"
+        ],
+        "Stock Repurchases": [
+            "payments for repurchase of common stock"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "payments to acquire businesses net of cash acquired"
+        ],
+        "Capital Expenditures": [
+            "payments to acquire productive assets",
+            "payments to acquire property plant and equipment"
+        ],
+        "Net Cash from Investing Activities": [
+            "net cash provided by used in investing activities"
+        ],
+        "Other Investing Activities": [
+            "paymentofcontingentconsideration",
+            "payments for proceeds from other investing activities",
+            "upfrontandmilestonepaymentsrelatedtocollaborativeandotherarrangements"
+        ],
+        "Purchases of Investments": [
+            "increase decrease in equity securities fv ni",
+            "payments to acquire available for sale securities debt",
+            "payments to acquire available for sale securities equity",
+            "payments to acquire investments",
+            "payments to acquire other investments"
+        ],
+        "Sales and Maturities of Investments": [
+            "proceeds from maturities prepayments and calls of available for sale securities"
+        ]
+    },
+    "Net Change in Cash": [
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "increase decrease in accounts payable",
+            "increase decrease in accounts receivable",
+            "increase decrease in accrued income taxes payable",
+            "increase decrease in accrued liabilities",
+            "increase decrease in deferred revenue",
+            "increase decrease in income taxes",
+            "increase decrease in inventories",
+            "increase decrease in prepaid deferred expense and other assets"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income tax expense benefit"
+        ],
+        "Depreciation and Amortization": [
+            "adjustment for amortization",
+            "depreciation"
+        ],
+        "Interest Paid": [
+            "interest paid net"
+        ],
+        "Net Cash from Operating Activities": [
+            "net cash provided by used in operating activities"
+        ],
+        "Net Income": [
+            "net income loss",
+            "profit loss"
+        ],
+        "Other Non-Cash Items": [
+            "adjustments noncash items to reconcile net income loss to cash provided by used in operating activities other",
+            "asset impairment charges",
+            "business combination contingent consideration arrangements change in amount of contingent consideration liability1",
+            "impairment of intangible assets indefinitelived excluding goodwill",
+            "income taxes paid",
+            "inventory reserve for excess raw materials",
+            "inventoryreserveforexcessrawmaterials",
+            "other noncash income expense",
+            "research and development asset acquired other than through business combination written off",
+            "upfrontandmilestoneexpenserelatedtocollaborativeandotherarrangements"
+        ],
+        "Stock-Based Compensation": [
+            "excess tax benefit from share based compensation operating activities",
+            "share based compensation",
+            "tax benefit from stock options exercised1",
+            "tax benefitfrom employee stock plans",
+            "taxbenefitsfromexerciseandvestingofstockbasedawards"
+        ]
+    },
+    "__unmapped__": []
+}

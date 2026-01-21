@@ -1,0 +1,71 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [
+        "comprehensive income net of tax",
+        "comprehensive income net of tax including portion attributable to noncontrolling interest"
+    ],
+    "Dividends Declared": [
+        "dividends preferred stock"
+    ],
+    "Dividends Paid": [],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "net income loss",
+        "profit loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [],
+        "Foreign Currency Translation": [
+            "other comprehensive income foreign currency transaction and translation gain loss arising during period net of tax"
+        ],
+        "Other OCI": [],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax",
+            "other comprehensive income loss net of tax period increase decrease",
+            "other comprehensive income loss net of tax portion attributable to parent"
+        ],
+        "Unrealized Gains/Losses on Securities": [
+            "other comprehensive income loss available for sale securities adjustment net of tax"
+        ]
+    },
+    "Other Equity Adjustments": [
+        "cumulative effect on retained earnings tax1",
+        "stockholders equity other",
+        "tax cuts and jobs act of2017 reclassificationfrom a o c i to retained earnings tax effect"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [],
+        "Other Stock Issuance": [
+            "stock issued during period shares t a r pand t d e c repayments"
+        ],
+        "Stock-Based Compensation": [],
+        "Total Stock Issuance Value": []
+    },
+    "Stock Repurchases": [],
+    "Tax Effects from Stock Compensation": [],
+    "__unmapped__": [
+        "comprehensive income net of tax attributable to noncontrolling interest",
+        "increase decrease from transactions between consolidating entity and noncontrolling interest shareholders",
+        "increase decrease from transactions between consolidating entity and the noncontrolling interest shareholders",
+        "increase decrease from transactions between noncontrolling interest shareholders and consolidated subsidiary",
+        "minority interest decrease from distributions to noncontrolling interest holders",
+        "minority interest period increase decrease",
+        "net income loss attributable to noncontrolling interest",
+        "noncontrolling interest increase from sale of parent equity interest",
+        "other comprehensive income loss net of tax portion attributable to noncontrolling interest"
+    ]
+}

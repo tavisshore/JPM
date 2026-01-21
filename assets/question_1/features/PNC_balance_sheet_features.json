@@ -1,0 +1,121 @@
+{
+    "Assets": {
+        "Current": {
+            "Cash and Equivalents": [
+                "cash and due from banks",
+                "federal funds sold and securities purchased under agreements to resell",
+                "interest bearing deposits in banks"
+            ],
+            "Inventory": [],
+            "Marketable Securities (Short-term)": [
+                "available for sale securities",
+                "available for sale securities debt securities",
+                "commercial paper",
+                "debt securities available for sale excluding accrued interest",
+                "investment securities",
+                "trading securities"
+            ],
+            "Prepaid and Other Current Assets": [],
+            "Receivables": [
+                "financing receivable allowance for credit loss excluding accrued interest",
+                "financing receivable excluding accrued interest after allowance for credit loss",
+                "financing receivable excluding accrued interest before allowance for credit loss",
+                "loans and leases receivable net of deferred income",
+                "loans receivable held for sale net",
+                "loans receivable held for sale net not part of disposal group"
+            ],
+            "Total Current Assets": []
+        },
+        "Non-Current": {
+            "Deferred Tax Assets": [],
+            "Goodwill": [
+                "goodwill"
+            ],
+            "Intangible Assets (net)": [
+                "intangible assets net excluding goodwill"
+            ],
+            "Long-term Investments": [
+                "debt securities held to maturity excluding accrued interest after allowance for credit loss",
+                "held to maturity securities",
+                "equity investments"
+            ],
+            "Other Non-Current Assets": [
+                "other assets",
+                "servicing asset at fair value amount"
+            ],
+            "Property, Plant, and Equipment (net)": [],
+            "Total Non-Current Assets": []
+        },
+        "Total Assets": [
+            "assets"
+        ]
+    },
+    "Equity": {
+        "Accumulated Other Comprehensive Income": [
+            "accumulated other comprehensive income loss net of tax"
+        ],
+        "Common Stock and APIC": [
+            "additional paid in capital",
+            "additional paid in capital common stock",
+            "additional paid in capital preferred stock",
+            "common stock value",
+            "preferred stock value"
+        ],
+        "Retained Earnings": [
+            "retained earnings accumulated deficit"
+        ],
+        "Total Equity": [
+            "stockholders equity",
+            "stockholders equity including portion attributable to noncontrolling interest"
+        ],
+        "Treasury Stock": [
+            "treasury stock common value",
+            "treasury stock value"
+        ]
+    },
+    "Liabilities": {
+        "Current": {
+            "Accounts Payable and Accrued Expenses": [
+                "accrued liabilities current and noncurrent"
+            ],
+            "Deferred Revenue": [],
+            "Other Current Liabilities": [
+                "deposits",
+                "interest bearing deposit liabilities",
+                "noninterest bearing deposit liabilities",
+                "other liabilities"
+            ],
+            "Short-term Debt": [
+                "federal funds purchased and securities sold under agreements to repurchase"
+            ],
+            "Total Current Liabilities": []
+        },
+        "Non-Current": {
+            "Deferred Tax Liabilities": [],
+            "Lease Liabilities": [],
+            "Long-term Debt": [
+                "advances from federal home loan banks",
+                "long term debt",
+                "senior notes",
+                "subordinated debt"
+            ],
+            "Other Non-Current Liabilities": [],
+            "Total Non-Current Liabilities": []
+        },
+        "Total Liabilities": [
+            "liabilities"
+        ]
+    },
+    "Totals": {
+        "Total Liabilities and Equity": [
+            "liabilities and stockholders equity"
+        ]
+    },
+    "__unmapped__": [
+        "accrued liabilities and other liabilities",
+        "available for sale securities and held to maturity securities",
+        "common stock shares issued",
+        "minority interest",
+        "off balance sheet credit loss liability"
+    ]
+}

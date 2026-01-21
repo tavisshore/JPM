@@ -1,0 +1,97 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [],
+    "Financing Activities": {
+        "Dividends Paid": [
+            "payment for distribution to limited partner",
+            "payments of dividends",
+            "payments of dividends common stock",
+            "payments to minority shareholders"
+        ],
+        "Net Cash from Financing Activities": [
+            "net cash provided by used in financing activities"
+        ],
+        "Other Financing Activities": [],
+        "Proceeds from Debt": [
+            "proceeds from issuance of debt",
+            "proceeds from issuance of senior long term debt",
+            "proceeds from lines of credit",
+            "proceeds from related party debt",
+            "proceeds from repayments of commercial paper and lines of credit",
+            "proceeds from repayments of lines of credit"
+        ],
+        "Proceeds from Stock Issuance": [],
+        "Repayment of Debt": [
+            "repayments of fixed rate debt",
+            "repayments of lines of credit",
+            "repayments of long term lines of credit"
+        ],
+        "Stock Repurchases": [
+            "treasury stock activity net"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [],
+        "Capital Expenditures": [
+            "additions to gas gathering processing and transmission facilities",
+            "payments to acquire oil and gas properties leasehold and property",
+            "payments to acquire oil and gas properties proved",
+            "payments to explore and develop oil and gas properties"
+        ],
+        "Net Cash from Investing Activities": [
+            "net cash provided by used in investing activities"
+        ],
+        "Other Investing Activities": [
+            "equity method investment contribution",
+            "proceeds from sale of oil and gas property and equipment",
+            "cash divested from deconsolidation",
+            "results of operations dry hole costs"
+        ],
+        "Purchases of Investments": [],
+        "Sales and Maturities of Investments": [
+            "proceeds from sale of equity method investments"
+        ]
+    },
+    "Net Change in Cash": [
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "increase decrease in accounts payable",
+            "increase decrease in accounts receivable",
+            "increase decrease in accrued liabilities",
+            "increase decrease in drilling advances",
+            "increase decrease in inventories",
+            "increase decrease in prepaid deferred expense and other assets",
+            "increase decrease of deferred charges deferred credits and noncurrent liabilities"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income tax expense benefit"
+        ],
+        "Depreciation and Amortization": [
+            "depreciation depletion and amortization"
+        ],
+        "Interest Paid": [
+            "interest paid net"
+        ],
+        "Net Cash from Operating Activities": [
+            "net cash provided by used in operating activities"
+        ],
+        "Net Income": [
+            "profit loss"
+        ],
+        "Other Non-Cash Items": [
+            "asset impairment charges",
+            "asset retirement obligation accretion expense",
+            "gain loss on sale of properties",
+            "gains losses on extinguishment of debt",
+            "income taxes paid net",
+            "other noncash income expense",
+            "loss on previously sold properties",
+            "unrealized gain loss on derivatives"
+        ],
+        "Stock-Based Compensation": []
+    },
+    "__unmapped__": []
+}

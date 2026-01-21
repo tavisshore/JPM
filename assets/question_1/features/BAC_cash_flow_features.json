@@ -1,0 +1,125 @@
+{
+    "Cash at Beginning of Period": [],
+    "Cash at End of Period": [],
+    "Effect of Exchange Rate Changes": [
+        "effect of exchange rate on cash cash equivalents restricted cash and restricted cash equivalents"
+    ],
+    "Financing Activities": {
+        "Dividends Paid": [
+            "payments of ordinary dividends"
+        ],
+        "Net Cash from Financing Activities": [
+            "net cash provided by used in financing activities"
+        ],
+        "Other Financing Activities": [
+            "proceeds from payments for other financing activities"
+        ],
+        "Proceeds from Debt": [
+            "proceeds from issuance of long term debt",
+            "proceeds from other short term debt",
+            "proceeds from maturities prepayments and calls of debt securities fair value",
+            "proceeds from sale of debt securities fair value"
+        ],
+        "Proceeds from Stock Issuance": [
+            "excess tax benefit from share based compensation financing activities",
+            "proceeds from issuance of preferred stock and warrants"
+        ],
+        "Repayment of Debt": [
+            "repayments of long term debt"
+        ],
+        "Stock Repurchases": [
+            "payments for repurchase of common stock",
+            "payments for repurchase of preferred stock and preference stock",
+            "stock redeemedor called during period value cash"
+        ]
+    },
+    "Investing Activities": {
+        "Acquisitions (net of cash acquired)": [
+            "cash acquired from acquisition"
+        ],
+        "Capital Expenditures": [],
+        "Net Cash from Investing Activities": [
+            "net cash provided by used in investing activities"
+        ],
+        "Other Investing Activities": [
+            "cash received due to impact of adoption of new consolidation guidance",
+            "financing receivable excluding accrued interest and off balance sheet liability credit loss provision reversal",
+            "payments for origination and purchases of loans held for sale",
+            "payments for proceeds from other investing activities",
+            "payments for proceeds from other loans and leases",
+            "payments for proceeds from productive assets",
+            "proceeds from sale of foreclosed assets"
+        ],
+        "Purchases of Investments": [
+            "payments to acquire available for sale securities debt",
+            "payments to acquire debt securities carried at fair value"
+        ],
+        "Sales and Maturities of Investments": [
+            "proceeds from payments for federal funds sold and securities borrowed or purchased under agreements to resell net",
+            "proceeds from payments for federal funds sold and securities purchased under agreements to resell net",
+            "proceeds from payments for in interest bearing deposits in banks",
+            "proceeds from sale of loans and leases held for investment",
+            "proceeds from sale of other investments",
+            "proceeds from sales and paydowns of loans originally classified as held for sale and instruments from related securitization activities",
+            "proceeds from sales securitizations and paydowns of loans held for sale",
+            "proceedsfrom maturities prepaymentsand callsof debt securities carriedat fair value",
+            "proceedsfrom saleof debt securities carriedat fair value",
+            "proceedsfrom salesand paydownsof loans originally classifiedas heldfor sale",
+            "proceedsfromsalesandpaydownsofloansoriginallydesignatedasheldforsale"
+        ]
+    },
+    "Net Change in Cash": [
+        "cash and cash equivalents period increase decrease",
+        "cash cash equivalents restricted cash and restricted cash equivalents period increase decrease including exchange rate effect"
+    ],
+    "Operating Activities": {
+        "Changes in Operating Assets and Liabilities": [
+            "increase decrease in accounts payable and accrued liabilities",
+            "increase decrease in accrued liabilities and other operating liabilities",
+            "increase decrease in deposits",
+            "increase decrease in federal funds purchased and securities loaned or sold under agreements to repurchase net",
+            "increase decrease in federal funds purchased and securities sold under agreements to repurchase net",
+            "increase decrease in financial instruments used in operating activities",
+            "increase decrease in loans held for sale",
+            "increase decrease in other operating assets",
+            "increase decrease in other operating capital net",
+            "increase decrease in time deposits and other short term investments"
+        ],
+        "Deferred Income Taxes": [
+            "deferred income tax expense benefit"
+        ],
+        "Depreciation and Amortization": [
+            "amortization of intangible assets",
+            "depreciation and amortization of premise improvements",
+            "depreciation depletion and amortization"
+        ],
+        "Interest Paid": [
+            "interest paid net"
+        ],
+        "Net Cash from Operating Activities": [
+            "net cash provided by used in operating activities",
+            "net cash provided by used in operating activities continuing operations"
+        ],
+        "Net Income": [
+            "net income loss"
+        ],
+        "Other Non-Cash Items": [
+            "accretion amortization of discounts and premiums investments",
+            "debt securities available for sale realized gain loss",
+            "debt securities available for sale realized gain loss excluding other than temporary impairment",
+            "equity method investment other than temporary impairment",
+            "fair value option structured liabilities changesin fair value gain loss",
+            "goodwill impairment loss",
+            "income taxes paid",
+            "income taxes paid net",
+            "increase decrease in fair value adjustments on assets and liabilities carried at fair value under fair value option",
+            "proceeds from income tax refunds"
+        ],
+        "Stock-Based Compensation": [
+            "share based compensation"
+        ]
+    },
+    "__unmapped__": [
+        "increase decrease in financial instruments used in operating activities and derivative assets"
+    ]
+}

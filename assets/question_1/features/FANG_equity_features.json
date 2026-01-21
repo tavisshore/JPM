@@ -1,0 +1,88 @@
+{
+    "Beginning Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Comprehensive Income": [],
+    "Dividends Declared": [
+        "dividends common stock cash"
+    ],
+    "Dividends Paid": [],
+    "Ending Balance": {
+        "Accumulated Other Comprehensive Income": [],
+        "Additional Paid-in Capital": [],
+        "Common Stock": [],
+        "Retained Earnings": [],
+        "Total Equity": [],
+        "Treasury Stock": []
+    },
+    "Net Income": [
+        "net income loss",
+        "net income loss attributable to parent prior to merger",
+        "net income loss attributable to parent subsequent to merger",
+        "profit loss"
+    ],
+    "Other Comprehensive Income": {
+        "Derivatives and Hedging": [],
+        "Foreign Currency Translation": [],
+        "Other OCI": [],
+        "Total Other Comprehensive Income": [
+            "other comprehensive income loss net of tax"
+        ],
+        "Unrealized Gains/Losses on Securities": []
+    },
+    "Other Equity Adjustments": [
+        "adjustment to additional paid in capital repurchased shares for tax withholding"
+    ],
+    "Stock Issuance": {
+        "Exercise of Stock Options": [
+            "stock issued during period value stock options exercisedand restricted stock vested"
+        ],
+        "Other Stock Issuance": [
+            "stock issued during period value acquisitions",
+            "stock issued during period value issued for services",
+            "stock issued during period value new issues",
+            "stock issued during period value other",
+            "stockoptionsassumedinbusinesscombination"
+        ],
+        "Stock-Based Compensation": [
+            "adjustments to additional paid in capital sharebased compensation requisite service period recognition value",
+            "share based compensation arrangement by share based payment award options grants in period gross",
+            "stock issued during period value share based compensation"
+        ],
+        "Total Stock Issuance Value": []
+    },
+    "Stock Repurchases": [
+        "stock repurchased during period value",
+        "stock units repurchased during period value",
+        "units repurchased during period value"
+    ],
+    "Tax Effects from Stock Compensation": [
+        "adjustments to additional paid in capital tax effect from share based compensation"
+    ],
+    "__unmapped__": [
+        "adjustment to additional paid in capital repurchased shares for tax withholding shares",
+        "consolidation less than wholly owned subsidiary parent ownership interest changes net",
+        "limited partners capital account distribution equivalent rights payments",
+        "minority interest decrease from distributions to noncontrolling interest holders",
+        "noncontrolling interest increase from sale of parent equity interest",
+        "noncontrolling interest increase from subsidiary equity issuance",
+        "noncontrolling interest increase from unit based compensation",
+        "noncontrolling interest increasefrom unitbased compensation",
+        "noncontrolling interest units issued duringthe period pursuantto acquisitions",
+        "partners capital account contributions",
+        "partners capital account distributions",
+        "shares paid for tax withholding for share based compensation",
+        "stock issued during period shares acquisitions",
+        "stock issued during period shares issued for services",
+        "stock issued during period shares new issues",
+        "stock issued during period shares other",
+        "stock issued during period shares share based compensation",
+        "stock issued during period shares stock options exercisedand restricted stock vested",
+        "stock repurchased during period shares"
+    ]
+}

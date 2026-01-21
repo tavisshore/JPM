@@ -1,0 +1,90 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "cost direct material",
+            "cost of goods and services sold depreciation and amortization",
+            "cost of goods and services sold overhead",
+            "cost of revenue"
+        ]
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "income loss from continuing operations",
+        "net income loss",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [
+            "interest expense",
+            "interest expense capitalized reduction of expense"
+        ],
+        "Interest Income": [],
+        "Other Income (Expense)": [
+            "gain or loss on sale of previously unissued stock by equity investee"
+        ],
+        "Total Non-Operating Items": [
+            "other nonoperating income expense"
+        ]
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [],
+        "General and Administrative": [
+            "general and administrative expense"
+        ],
+        "Other Operating Expenses": [
+            "asset impairment charges",
+            "ethanol operating costs and expenses",
+            "excise taxes",
+            "impairment of long lived assets held for use",
+            "inventory write down",
+            "other cost and expense operating",
+            "refining operating costs and expenses"
+        ],
+        "Research and Development": [],
+        "Sales and Marketing": [
+            "selling expense"
+        ],
+        "Total Operating Expenses": []
+    },
+    "Operating Income": [
+        "operating income loss"
+    ],
+    "Other Comprehensive Income": [],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [
+            "weighted average number of shares outstanding basic"
+        ],
+        "Weighted Average Shares Outstanding (Diluted)": [
+            "weighted average number of diluted shares outstanding"
+        ]
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "revenue from contract with customer including assessed tax"
+        ]
+    },
+    "__unmapped__": [
+        "common stock dividends per share cash paid",
+        "costs and expenses",
+        "discontinued operation income loss from discontinued operation during phase out period net of tax",
+        "excise and sales taxes",
+        "income loss from continuing operations including portion attributable to noncontrolling interest",
+        "income loss from discontinued operations net of tax",
+        "net income loss attributable to noncontrolling interest",
+        "operating costs and expenses",
+        "income loss from continuing operations before income taxes minority interest and income loss from equity method investments"
+    ]
+}

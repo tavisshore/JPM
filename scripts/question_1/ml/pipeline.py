@@ -22,8 +22,9 @@ for credit risk assessment.
 import numpy as np
 
 from jpm.config import Config, DataConfig, LLMConfig, LSTMConfig, XGBConfig, get_args
-from jpm.question_1 import CreditDataset, CreditRatingModel, set_seed
+from jpm.question_1 import CreditDataset, CreditRatingModel
 from jpm.question_1.clients.llm_client import LLMClient
+from jpm.utils import set_seed
 
 
 def train_xgb(cfg: Config, feature_names: list = None):

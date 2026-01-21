@@ -72,11 +72,21 @@ class DataConfig:
         Number of quarters to withhold for testing (default: 1).
     seasonal_weight : float, optional
         Weight applied to seasonal lag timestep, >1.0 increases importance (default: 1.1).
+        Used as initial value when learnable_seasonal_weight is True.
     seasonal_lag : int, optional
         Number of quarters for seasonal lag (default: 4, one year).
+    # NOTE Maybe move to LSTMConfig?
+    learnable_seasonal_weight : bool, optional
+        Whether to learn seasonal weights during training instead of fixing them (default: False).
+        When True, seasonal_weight is used as the initial value.
+    seasonal_weight_per_feature : bool, optional
+        When learnable_seasonal_weight is True, learn separate weights per feature (default: False).
+        If False, learns a single weight applied to all features.
     """
 
     ticker: str = "AAPL"
+    industry: str = "tech"
+    total_tickers: int = -1
     cache_dir: Path = Path("assets/question_1/")
     save_dir: Path = Path("results/question_1/")
     plots_dir: Path = Path("results/question_1/plots")
@@ -89,6 +99,8 @@ class DataConfig:
     # >1.0 weighs for the seasonal lag timestep
     seasonal_weight: float = 1.1
     seasonal_lag: int = 4
+    learnable_seasonal_weight: bool = False
+    seasonal_weight_per_feature: bool = False
 
     def __post_init__(self) -> None:
         """Validate configuration parameters after initialization.
@@ -114,6 +126,8 @@ class DataConfig:
         """
         if not isinstance(self.ticker, str) or not self.ticker.strip():
             raise ValueError("ticker must be a non-empty string")
+        if not isinstance(self.industry, str) or not self.industry.strip():
+            raise ValueError("industry must be a non-empty string")
 
     def _validate_positive_ints(self) -> None:
         """Validate positive integer parameters.

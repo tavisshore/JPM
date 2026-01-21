@@ -1,0 +1,90 @@
+{
+    "Comprehensive Income": [],
+    "Cost of Revenue": {
+        "Total Cost of Revenue": [
+            "cost of goods and services sold",
+            "cost of goods sold"
+        ]
+    },
+    "Gross Profit": [],
+    "Income Before Taxes": [
+        "income loss from continuing operations before income taxes extraordinary items noncontrolling interest"
+    ],
+    "Income Tax Expense": [
+        "income tax expense benefit"
+    ],
+    "Net Income": [
+        "net income loss",
+        "profit loss"
+    ],
+    "Non-Operating Items": {
+        "Interest Expense": [],
+        "Interest Income": [],
+        "Other Income (Expense)": [
+            "business combination contingent consideration arrangements change in amount of contingent consideration liability1",
+            "fair value adjustment of contingent consideration",
+            "fair value measurement with unobservable inputs reconciliation recurring basis liability gain loss included in earnings",
+            "gain loss on disposition of intangible assets",
+            "gain loss on sale of property plant equipment",
+            "gain on sale of rights",
+            "gains losses on sales of assets",
+            "income loss from equity method investments",
+            "income loss from equity method investments net of tax",
+            "unconsolidated joint business"
+        ],
+        "Total Non-Operating Items": [
+            "other nonoperating income expense"
+        ]
+    },
+    "Operating Expenses": {
+        "Depreciation and Amortization": [
+            "amortization and impairment of acquired intangible assets"
+        ],
+        "General and Administrative": [
+            "selling general and administrative expense"
+        ],
+        "Other Operating Expenses": [
+            "collaboration profit sharing",
+            "collaborationprofitlosssharing",
+            "collaborationprofitsharing",
+            "litigation settlement expense",
+            "other operating income expense net",
+            "restructuring charges"
+        ],
+        "Research and Development": [
+            "acquired in process research and development",
+            "research and development expense excluding acquired in process cost",
+            "research and development expense including acquired in process cost"
+        ],
+        "Sales and Marketing": [],
+        "Total Operating Expenses": []
+    },
+    "Operating Income": [
+        "operating income loss"
+    ],
+    "Other Comprehensive Income": [],
+    "Per-Share Data": {
+        "Basic EPS": [
+            "earnings per share basic"
+        ],
+        "Diluted EPS": [
+            "earnings per share diluted"
+        ],
+        "Weighted Average Shares Outstanding (Basic)": [],
+        "Weighted Average Shares Outstanding (Diluted)": []
+    },
+    "Revenues": {
+        "Total Revenues": [
+            "other sales revenue net",
+            "revenues",
+            "revenuesfromanti c d20therapeuticprograms",
+            "sales revenue goods net"
+        ]
+    },
+    "__unmapped__": [
+        "costs and expenses",
+        "disposal group not discontinued operation loss gain on write down",
+        "net income loss attributable to noncontrolling interest",
+        "income loss from continuing operations before income taxes minority interest and income loss from equity method investments"
+    ]
+}

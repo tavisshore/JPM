@@ -169,7 +169,9 @@ class StatementsDataset:
             index=self.data.index,
         )
 
-        X_train, X_test = self._apply_seasonal_weight(X_train, X_test)
+        # Only apply fixed seasonal weighting if not using learnable weighting
+        if not getattr(self.config.data, "learnable_seasonal_weight", False):
+            X_train, X_test = self._apply_seasonal_weight(X_train, X_test)
         self.X_train, self.y_train = X_train, y_train
         self.X_test, self.y_test = X_test, y_test
 
@@ -357,25 +359,13 @@ class StatementsDataset:
         self.target_std = self.full_std[self.tgt_indices]
 
     def _build_predict_window(self, X_scaled: np.ndarray) -> np.ndarray:
-        """
-        Build the final lookback window for prediction (no ground truth).
-
-        Takes the last `lookback` periods from the scaled data to create
-        a single window for predicting the next unseen period.
-
-        Parameters
-        ----------
-        X_scaled : np.ndarray
-            Scaled feature array of shape (time, features)
-
-        Returns
-        -------
-        np.ndarray
-            Prediction window of shape (1, lookback, features)
-        """
+        """Build the final lookback window for prediction (no ground truth)."""
         lookback = self.config.data.lookback
         X_predict = X_scaled[-lookback:][np.newaxis, ...]  # Shape: (1, lookback, F)
-        return self._apply_seasonal_weight_single(X_predict)
+        # Only apply fixed seasonal weighting if not using learnable weighting
+        if not getattr(self.config.data, "learnable_seasonal_weight", False):
+            return self._apply_seasonal_weight_single(X_predict)
+        return X_predict
 
     def _apply_seasonal_weight_single(self, X: np.ndarray) -> np.ndarray:
         """Apply seasonal weighting to a single window array."""

@@ -55,9 +55,9 @@ The category-specific help commands display organised, focused documentation for
 - **LLMConfig** (6 args): Large language model integration for report parsing and ensemble predictions
 
 #### Downloading Data
-This script downloads data from all `data_tickers` - if available from EDGAR, can be edited.
+This script download data for tickers in jpm.utils - selectable by industry or __all__.
 ```bash
-python scripts/question_1/download_data.py --cache_dir 'YOUR_DESIRED_LOCATION'
+python scripts/question_1/download_data.py --cache-dir 'YOUR_DESIRED_LOCATION'
 ```
 This will take quite a long time but shows progress and a time estimate.
 
@@ -76,9 +76,9 @@ This will take quite a long time but shows progress and a time estimate.
 
 - **Time-series Forecasting:**
   - **Deterministic / Variational / Probabilistic LSTM** - predict future financial statement values.
-  This script is an evaluation - CONFIG_VARIATIONS can be edited to desired variety.
+  Update `CONFIG_VARIATIONS` with the desired evaluations, again tickers may be selected by industry or __all__.
     ```bash
-    python scripts/question_1/ml/lstm.py
+    python scripts/question_1/ml/lstm.py --industry tech
     ```
 
 ### Part 2
