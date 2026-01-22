@@ -1,5 +1,7 @@
 # JPM - MLCOE Internship Exercises
 
+[![CI - Pre-commit Auto-Fix & Lint](https://github.com/tavisshore/JPM/actions/workflows/ci.yml/badge.svg)](https://github.com/tavisshore/JPM/actions/workflows/ci.yml)
+
 <p align="center">
   <a href="https://www.linkedin.com/in/tavisshore/">
     <img src="https://img.shields.io/badge/Tavis_Shore-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="Tavis Shore">
