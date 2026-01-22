@@ -22,7 +22,8 @@ dependencies = [
   "matplotlib>=3.7",
   "seaborn>=0.12",
   "xgboost>=2.0",
-  "choice-learn"
+  "choice-learn",
+  "pyrate-limiter==3.9.0"
 ]
 
 [project.optional-dependencies]
