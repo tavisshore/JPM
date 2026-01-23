@@ -96,7 +96,7 @@ This will take quite a long time but shows progress and a time estimate.
   python scripts/question_1/ml/lstm.py --ticker msft
   ```
 
-    Two examples of the probabilistic LSTM results, estimating the unseen test set's quarters - single feature plots.
+    Two examples of the probabilistic LSTM results, estimating the test set's quarters - single features.
 
   <p align="center">
     <img src="results/question_1/ml/MSFT_receivables_uncertainty.png" width="47%" />
